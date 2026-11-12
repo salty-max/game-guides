@@ -1,0 +1,88 @@
+import type { RawChapter } from "../types";
+
+const chapter: RawChapter = {
+  id: 3,
+  title: "Jabul Waters",
+  region: "Seesyde Village · Jabul Ruins",
+  teaser: "Jabul Waters",
+  intro: "Visit both Zora chiefs, clear the river and cove emergencies, and use the five water switches inside Jabul Ruins. Bring Bombfish to the den and learn Water Block on the dungeon approach.",
+  sources: [
+    ["Jabul quest and stilled approach", "https://www.nintendolife.com/guides/zelda-echoes-of-wisdom-the-jabul-waters-rift-main-quest"],
+    ["Jabul Ruins puzzles and chest rooms", "https://www.nintendolife.com/guides/zelda-echoes-of-wisdom-jabul-ruins-dungeon-walkthrough"],
+    ["Jabul Ruins chest and switch cross-check", "https://www.zeldadungeon.net/wiki/Walkthrough:Jabul_Ruins_(Echoes_of_Wisdom"],
+    ["Vocavor strategy", "https://www.nintendolife.com/guides/zelda-echoes-of-wisdom-how-to-defeat-vocavor"],
+    ["Heart Pieces", "https://www.zeldadungeon.net/wiki/Echoes_of_Wisdom_Heart_Pieces"],
+    ["Stamp Stands", "https://www.zeldadungeon.net/wiki/Echoes_of_Wisdom_Stamp_Locations"],
+    ["Side quest rewards", "https://www.nintendolife.com/guides/zelda-echoes-of-wisdom-all-side-quest-locations-and-rewards"],
+  ],
+  groups: [
+    {
+      title: "Seesyde Village and the two chiefs",
+      rows: [
+      ["waypoint-seesyde", "waypoint", "Activate the Seesyde Village Waypoint", "Travel northeast through the canyon east of Castle Town and turn east toward the coast. Use the Waypoint near the village."],
+      ["stamp-seesyde", "stamp", "Stamp the stand in Seesyde Village", "Look beside the pair discussing Lord Jabu-Jabu on the village's eastward approach."],
+      ["waypoint-jabu-den", "waypoint", "Activate the Waypoint by Lord Jabu-Jabu's Den", "Follow the river north from Seesyde. Check the blocked den and use the Waypoint east of it before heading northwest upriver."],
+      ["waypoint-river-zora", "waypoint", "Activate the River Zora Village Waypoint", "Touch the stone and speak to Dradd at the house on the northwest side of the village. He leaves before you can settle things."],
+      ["accessory-zora-flippers", "accessory", "Buy Zora's Flippers for 350 rupees", "Visit the River Zora Village shop. The flippers speed up underwater travel and the dungeon boss."],
+      ["heart-river-zora-upper-pool", "heart-piece", "Dive for the Heart Piece above River Zora Village", "Climb the northeast side of the village and keep north to the high pool. Dive to the piece below the surface."],
+      ["stamp-river-zora-upper-ledge", "stamp", "Stamp the high ledge northwest of River Zora Village", "Build up the cliff at the far northwest edge of the village."],
+      ["waypoint-sea-zora", "waypoint", "Activate the Waypoint outside Sea Zora Village", "Warp to Seesyde and swim out into the cove. Look for the underwater entrance in the central cove and mark the nearby warp stone."],
+      ["story-zora-chiefs", "story", "Speak to Kushara and follow the chiefs to Crossflows Plaza", "Dive into Sea Zora Village and talk to Kushara at the back. Leave, head north near the Business Scrub, and take the stairs to the plaza. After the scene, go back to River Zora Village."],
+      ],
+    },
+    {
+      title: "Two emergencies and the den",
+      rows: [
+      ["echo-bombfish", "echo", "Learn Bombfish in the Upper Zora River rift", "Go east of River Zora Village to the waterfall island and enter the rift. From the rift entrance, go right past the Keese to the ladder cave. Defeat a Bombfish and learn its remnant."],
+      ["crystal-stilled-upper-zora", "might-crystal", "Free five groups in Stilled Upper Zora River", "Take the group across the broken river left of the entrance and the group beside Dradd above it. In the Bombfish cave, break the submerged rocks to reach the lower-left group, then follow the passage to the Tektite group. Outside, go south past the Octoroks and drop to the pillar for the last group.", 2],
+      ["echo-octorok", "echo", "Learn Octorok on the river route", "The platforms south of the cave have Octoroks. A ranged echo works well while you approach the remnant."],
+      ["echo-tangler-2", "echo", "Learn Tangler Lv. 2 in the cove rescue cave", "Swim to the island east of Sea Zora Village. Dive into the opening below Dradd, take the ladder and touch the luminous plants as you go. Defeat the large fish and learn it."],
+      ["chest-zora-rescue-kelp", "chest", "Open the Bubble Kelp chest in the rescue cave", "Check the chest along the dark underwater passage. Continue to Kushara and the child. Move the rock blocking them with Bind."],
+      ["story-jabu-stage", "story", "Repair both performance stages at the den", "Remove the misplaced blue stone from the left base. Bind the gold piece underwater and swim back up with it. Put the pieces on their matching stages so the chiefs can perform."],
+      ["story-jabu-miniboss", "story", "Stop Lord Jabu-Jabu's rampage", "Keep moving as he spits fish and debris. Put a Bombfish in front when he starts inhaling. Strike with echoes or Swordfighter Form while he recovers from swallowing it."],
+      ["echo-water-block", "echo", "Learn Water Block in Stilled Jabul Waters", "Enter the rift after the fight. Swim north and climb across the pillars and shelves. Use the Tri Rod on the shimmering floating water cube. Stack blocks to fill gaps in the floating pools and swim up them."],
+      ["chest-stilled-jabul-riverhorses", "chest", "Open the chest of ten Riverhorses on the boat platforms", "Beyond the log bridge, link the high pools with Water Blocks. Head left past the ship, then follow the rising water right to the boats."],
+      ["chest-stilled-jabul-rupees", "chest", "Open the 50-rupee chest on the upper ledges", "Backtrack left from the boats. Use the trees and water to climb the wall to the chest. Continue past the stilled Jabu-Jabu to the dungeon door."],
+      ],
+    },
+    {
+      title: "Jabul Ruins lower branches",
+      rows: [
+      ["dungeon-waypoint-jabul-entry", "dungeon-waypoint", "Activate the Jabul Ruins entry Waypoint", "Walk forward and fall into the water. Bind rocks out of the route, top up air from bubbles and swim right through the current. Move boxes and the final boulder aside, then climb out."],
+      ["dungeon-waypoint-jabul-hall", "dungeon-waypoint", "Activate the central Waypoint and first water switch", "Go left and upstairs to the main hall. Touch the stone, go north and press the pink switch. The four remaining switches sit at the ends of the two lower and two upper wings."],
+      ["echo-bio-deku-baba", "echo", "Learn Bio Deku Baba below the left ladder", "Take the lower-left ladder into dark water. Follow the glowing plants, refill air at bubbles and fight a submerged plant with a swimming echo."],
+      ["chest-jabul-ruins-100", "chest dungeon-chest", "Open the 100-rupee chest at the bottom of the dark passage", "Search the lower-left floor before taking the ladder out of the underwater section."],
+      ["story-jabul-blue-switch", "story", "Light the pool-room braziers and press the blue switch", "Bind the sunken brazier, swim it to dry ground and light it along with the others using Ignizol. Pass the unlocked door and step on the switch. Drop down and return to the hall."],
+      ["chest-jabul-ruins-map", "chest dungeon-chest", "Open the Dungeon Map chest in the lower-right branch", "Take the lower-right ladder and cross the ledges near the start of the passage to the chest. Swim past the Bombfish and climb the far ladder."],
+      ["chest-jabul-ruins-50", "chest dungeon-chest", "Open the 50-rupee chest past the flooded grate", "Swim beneath the bars in the shark room. Bind the wooden box wedged in the rear grate and pull it free, then swim through and climb the northwest ledge to the chest."],
+      ["story-jabul-orange-switch", "story", "Clear the crab room and press the orange switch", "Cross the rope in the shark room, defeat the crabs and go through the opened door. Use the switch and the return hole. The geyser is now tall enough to reach the upper doors."],
+      ],
+    },
+    {
+      title: "Upper branches and Vocavor",
+      rows: [
+      ["story-jabul-yellow-switch", "story", "Hit the four targets in the current wing and press the yellow switch", "Take the upper-left door. Work across the fast current with floating planks and Water Blocks. In the target room, use ledges and boxes to reach the nearer targets, bridge to the high one on the left and clear the crate barrier to reach the far upper-left target. Throw a rock or strike with an echo or sword. Clear the Tektites in the room above and press yellow."],
+      ["chest-jabul-ruins-golden-egg", "chest dungeon-chest", "Open the Golden Egg chest in the upper-right flooded passage", "Take the right upper door and dive into the dark water. Use Bind to move the platforms and use Bombfish on the cracked rock leading to the southwest pocket."],
+      ["chest-jabul-ruins-big-key", "chest dungeon-chest", "Open the Big Key chest at the bottom of the passage", "Move the boulders weighing the platforms with Bind, using their weight to sink the lower platform out of the way. Clear the cracked obstruction with Bombfish and swim down to the ornate chest."],
+      ["story-jabul-green-switch", "story", "Weigh down the final water switch", "Return up and swim right through the boxes. Surface and clear the underwater enemies. Use a Boulder or a heavy pot on the final green switch in the adjoining room. Follow the underwater return and shift the plank and rock with Bind to get back to the hub."],
+      ["crystal-jabul-ruins-clear", "might-crystal", "Defeat Vocavor and receive five Might Crystals", "Ride the geyser to the boss door. Swim above or below the whirlpools and keep an eye on air bubbles. Send Bombfish or Chompfin into the blue growths on its back, then use Swordfighter Form on the exposed weak point. When the air pockets appear, switch to flying echoes or attack as it passes through the remaining water.", 5],
+      ["container-vocavor", "heart-container", "Collect Vocavor's Heart Container", "Take the full heart before using the exit. The restored den area has a Heart Piece that was covered before the clear."],
+      ],
+    },
+    {
+      title: "Jabul collection loop",
+      note: "The Wrecked Ship's entrance can be found now, but The Zappy Shipwreck and its bottle are part of the later collection sweep.",
+      rows: [
+      ["heart-jabu-den-pillar", "heart-piece", "Collect the Heart Piece on the pillar by the restored den", "Build up with Water Blocks or use a bed bridge from nearby higher ground."],
+      ["heart-zora-cove-torch-cave", "heart-piece", "Extinguish the torches in the west cove cave for a Heart Piece", "Enter the cave at the landward western end of the cove. Learn Hydrozol and use it to put out every torch in the puzzle room, then take the opened north door."],
+      ["echo-hydrozol", "echo", "Learn Hydrozol in the west cove cave", "Defeat one of the water slimes before the torch puzzle and learn the remnant."],
+      ["heart-zora-cove-seafloor", "heart-piece", "Blast the rock hiding the cove seabed Heart Piece", "Dive south of the Wrecked Ship entrance in the southeast cove. Summon Bombfish at the cracked rock and take the piece below it."],
+      ["stamp-zora-cove-island", "stamp", "Stamp the far southeast island in Zora Cove", "Swim to the small outer island and climb onto dry ground."],
+      ["stamp-zora-river-southwest", "stamp", "Stamp the southwest corner of Zora River", "Find the stand southwest of the big river rift."],
+      ["quest-zora-child-fate", "side-quest accessory", "Finish The Zora Child's Fate for the Zora Scale", "Speak to the mother in River Zora Village after clearing the Upper Zora River rift. Show her a Tangler, a Bombfish and a Biri as she asks for them. The scale extends dive time."],
+      ],
+    },
+  ],
+};
+
+export default chapter;

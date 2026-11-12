@@ -1,0 +1,88 @@
+import type { RawChapter } from "../types";
+
+const chapter: RawChapter = {
+  id: 5,
+  title: "Eldin Volcano",
+  region: "Kakariko · Goron City · Eldin Temple",
+  teaser: "Eldin Volcano",
+  intro: "Climb from Kakariko to Goron City, open the crater shortcut and clear Eldin Temple. Learn a flying echo you can pick up, a Lava Rock, and a fire echo for the climb.",
+  sources: [
+    ["Eldin route, four city groups and crater shortcut", "https://www.nintendolife.com/guides/zelda-echoes-of-wisdom-the-rift-on-eldin-volcano-main-quest"],
+    ["Eldin Temple route", "https://www.nintendolife.com/guides/zelda-echoes-of-wisdom-eldin-temple-dungeon-walkthrough"],
+    ["Eldin Temple key and chest cross-check", "https://www.zeldadungeon.net/wiki/Walkthrough:Eldin_Temple_(Echoes_of_Wisdom"],
+    ["Volvagia strategy", "https://www.nintendolife.com/guides/zelda-echoes-of-wisdom-how-to-defeat-volvagia"],
+    ["Stamp Stands", "https://www.zeldadungeon.net/wiki/Echoes_of_Wisdom_Stamp_Locations"],
+  ],
+  groups: [
+    {
+      title: "Eldin Trail and Goron City",
+      rows: [
+      ["waypoint-kakariko", "waypoint", "Activate Kakariko Village's Waypoint", "Approach from Hyrule Field and use the stone in town. Take the trail behind the village up toward Eldin."],
+      ["stamp-kakariko", "stamp", "Stamp the stand at the Kakariko entrance", "Look on the village approach before taking the trail north."],
+      ["echo-ghirro", "echo", "Learn Ghirro on the Eldin trail", "Use a ranged echo on a Ghirro and learn it. Grab a summoned Ghirro and jump to glide. A rising air vent lifts Zelda while she's holding it."],
+      ["echo-lizalfos", "echo", "Learn Lizalfos on the climb toward Goron City", "Draw it out with an echo and strike from behind. Continue uphill."],
+      ["echo-fire-octo", "echo", "Learn Fire Octo by the upper lava pools", "Send an echo that can attack it from solid ground and learn its remnant."],
+      ["echo-fire-keese", "echo", "Learn Fire Keese on the volcano", "Put out its flame with wind or fight it at range. The echo can light braziers in later side-view passages."],
+      ["waypoint-goron-city", "waypoint", "Activate the Goron City Waypoint", "Look for the flags and hot spring outside the city. Speak to the Goron at the entrance and let Tri open the city rift."],
+      ["stamp-goron-city", "stamp", "Stamp the stand southeast of Goron City", "Take the short path to the right of the city entrance."],
+      ["crystal-stilled-goron-city", "might-crystal", "Free four groups in Stilled Goron City", "Go left to the Mini-Moldorm platform, then climb north to the highest ledge on the left. Go right and drop to the dark ledge for a third group. Return to the entrance statue and enter the interior passage, where breaking the crates exposes the last group.", 2],
+      ["story-eldin-elders", "story", "Speak to Darston about the elders", "After restoring the city, speak to him to open the quarry and burrow objectives. Go east around the rising path and work northwest to Lizalfos Burrow first."],
+      ],
+    },
+    {
+      title: "Burrow, quarry and crater shortcut",
+      rows: [
+      ["echo-tweelus", "echo", "Learn Tweelus around the lava lake", "Explosions work against the rocky body. Learn it when you can reach the remnant safely."],
+      ["echo-lava-rock", "echo", "Learn Lava Rock near Lizalfos Burrow", "Copy a shimmering rock on the lava. Place it on a geyser to ride up with the lava."],
+      ["echo-lizalfos-2", "echo", "Learn Lizalfos Lv. 2 inside the burrow", "Approach the elder, then clear the Lizalfos deeper inside. Bind can drop them into lava when the layout allows. Learn a remnant from a defeated Lizalfos before you leave."],
+      ["story-lizalfos-burrow", "story", "Finish the Lizalfos Burrow objective", "Clear every enemy in the final room and return to the elder."],
+      ["heart-eldin-lava-platform", "heart-piece", "Take the Heart Piece on the small platform in the lava lake", "Look east of the burrow. Use Lava Rocks to get to the isolated platform."],
+      ["heart-eldin-cliff", "heart-piece", "Take the Heart Piece on the cliff west of the burrow", "Climb the high ground to the left of the lava lake using a Platboom or a stair of echoes from solid rock."],
+      ["stamp-eldin-west-lava", "stamp", "Stamp the western lava lake island", "Follow the path from Goron City toward the quarry and cross to the stamp's island on Lava Rocks."],
+      ["echo-rock-roast", "echo", "Learn Rock-Roast in the quarry", "Approach the meat-shaped rocks across the lava and copy one."],
+      ["story-eldin-rock-roast", "story", "Bring Rock-Roast to the three Gorons", "Carry roasts with Bind and follow the route back left and down. Give a roast to each of the hungry Gorons."],
+      ["story-eldin-crater-door", "story", "Open Darston's hidden crater shortcut", "Return to the city, speak to the elders and then to Darston in the upper back room. Use Bind on the protrusion beside the large portrait and pull to expose the passage."],
+      ["chest-eldin-crater-stones", "chest", "Open the Monster Stone chest in the crater shortcut", "Glide over the first lava gap. In the next chamber, move a Lava Rock to a geyser and ride to the chest ledge."],
+      ["chest-eldin-crater-rupees", "chest", "Open the 50-rupee chest in the side-view lava passage", "Use Lava Rocks to work left to the chest. Ride the tall lava jet up, then cross the bridge and let Darston break the rock. Enter the rift."],
+      ["chest-stilled-eldin-rocktatoes", "chest", "Open the chest of five Rocktatoes in Stilled Eldin Volcano", "Climb north from the entrance and detour east to the chest. Return to the main climb, use the wall and lava geysers, and go north to the temple."],
+      ],
+    },
+    {
+      title: "Eldin Temple first floor",
+      rows: [
+      ["dungeon-waypoint-eldin-entry", "dungeon-waypoint", "Activate the Eldin Temple entrance Waypoint", "Use the hot spring to the left if you need hearts, then go north. Explore both optional and key routes before opening the west locked door."],
+      ["chest-eldin-pumpkins", "chest dungeon-chest", "Free the chest of eight Twisted Pumpkins", "In the north side chamber, use a bomb or a Zirro to break the cracked block near the upper-right corner. Pull the buried chest out with Bind."],
+      ["chest-eldin-key-1", "chest dungeon-chest", "Glide to the first Small Key chest", "From the main room go east, riding Lava Rocks up the jets. In the updraft chamber, grab Ghirro or Mothula and ride the air across to the far ledge. Return to the central room and unlock the west door."],
+      ["chest-eldin-golden-egg", "chest dungeon-chest", "Open the Golden Egg chest in the rising-lava room", "When the lava falls, go to the south side and pull the chest clear. Retreat to a Lava Rock or solid ground before the lava rises."],
+      ["story-eldin-lava-switch", "story", "Clear the switch under the Lava Rock", "When the floor is clear, lift the Lava Rock on the left and press the floor switch. Cross on Lava Rocks and take the opened route to the ladder."],
+      ["chest-eldin-key-2", "chest dungeon-chest", "Open the second Small Key chest below the vent shaft", "Go down the side-view route, using Lava Rocks at the geysers and boulders to block hot wind. Hit the crystal switch to open the east gate and take the chest beyond it."],
+      ["chest-eldin-dungeon-map", "chest dungeon-chest", "Pull the Dungeon Map chest away from the vents", "Return to the climbing shaft and go up. Bind the chest from below and bring it away from the hot air. Open it and use the right ladder."],
+      ],
+    },
+    {
+      title: "Bombs of Might and the upper keys",
+      rows: [
+      ["dungeon-waypoint-eldin-miniboss", "dungeon-waypoint", "Unlock the miniboss route and activate its Waypoint", "Use the second key at the door above the vent shaft. Touch the stone before entering the arena."],
+      ["gear-bombs-of-might", "equipment", "Beat the bomb wielder and take the Bombs of Might", "Keep the cracked blocks between you and the bombs until they break. Use ranged attacks or corner the fighter with fast echoes. Move away from the Bombchus in the second phase."],
+      ["chest-eldin-key-3", "chest dungeon-chest", "Blast the cracked blocks hiding the third Small Key", "Take the ladder beyond the arena and cut the dark barrier. Use a bomb on the cracked blocks below it and open the revealed chest. Continue right and up the ladder."],
+      ["chest-eldin-silver-rupee", "chest dungeon-chest", "Open the 100-rupee chest in the bomb-block chamber", "Clear the Tweelus and break the obstacles. Take the chest at the northwest end. Bomb the blocked route on the right for the next fight."],
+      ["echo-fire-wizzrobe", "echo", "Learn Fire Wizzrobe after the upper chamber fight", "Summon a quick flying or ranged echo each time the Wizzrobe reappears. Learn the remnant before opening the reward chest."],
+      ["chest-eldin-key-4", "chest dungeon-chest", "Open the Small Key chest from the Fire Wizzrobe fight", "Return to the side-view bomb-block passage with both keys. Use one on the southwest gate and descend into the Big Key chamber."],
+      ["chest-eldin-big-key", "chest dungeon-chest", "Open the Big Key chest and escape the rising lava", "Clear enemies along the descent. Open the chest at the bottom, then climb immediately. Use echoes only where you need them to get across a gap. Reach the ladder above the rising lava."],
+      ["dungeon-waypoint-eldin-boss", "dungeon-waypoint", "Cross the last lava river and activate the boss Waypoint", "Use the remaining Small Key on the upper-left door. Glide over the air vents in each section and use Lava Rocks on lava geysers between landings. Activate the stone by the boss door."],
+      ],
+    },
+    {
+      title: "Volvagia and the return to Goron City",
+      note: "The Fireworks Artist, the gliding trials and the Goron race are in the collection sweep.",
+      rows: [
+      ["crystal-eldin-temple-clear", "might-crystal", "Defeat Volvagia and receive five Might Crystals", "Dodge the tracking orb and watch where the dragon emerges. Pull the green bead off its neck with Bind or break it with ranged attacks, then strike while it's stunned. In the second phase, switch platforms before its fire beam covers the one you're on. Ranged echoes help when the dragon stays out of reach.", 5],
+      ["container-volvagia", "heart-container", "Collect Volvagia's Heart Container", "Take the full heart before leaving with Din's Sanction."],
+      ["stamp-eldin-summit", "stamp", "Stamp the northwest summit of Eldin Volcano", "After the clear, return to the highest northwest ledge and build up to the stand."],
+      ["stamp-eldin-east-drop", "stamp", "Glide down to the stamp on Eldin's far east ledge", "From the eastern rim, look below the wind updraft for the stand. Grab a flying echo and glide down to land on the lower shelf."],
+      ],
+    },
+  ],
+};
+
+export default chapter;
