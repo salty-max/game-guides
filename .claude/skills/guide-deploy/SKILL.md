@@ -41,10 +41,10 @@ Work out which projects will build before asking for the push. The ignore step, 
    mkdir -p <scratchpad>/link-<project> && cd <scratchpad>/link-<project> && vercel link --project <project> --scope jellycat --yes
    ```
 
-   Then run the helper from that folder. It refuses to run anywhere else.
+   Then run the helper from that folder, in the same command: a `cd` lasts one command in this repository's sessions (`CLAUDE_BASH_MAINTAIN_PROJECT_WORKING_DIR` in `.claude/settings.json`). It refuses to run anywhere else.
 
    ```bash
-   bash <repo>/.claude/skills/guide-deploy/scripts/headers.sh <deployment-url>
+   cd <scratchpad>/link-<project> && bash <repo>/.claude/skills/guide-deploy/scripts/headers.sh <deployment-url>
    ```
 
    Hold its output against the app's `vercel.json`, which is the source of truth for every value:

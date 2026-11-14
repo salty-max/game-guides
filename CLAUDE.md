@@ -7,7 +7,7 @@ Spoiler-aware PWA field guides for single-player games: a pnpm workspace with on
 - `pnpm install` at the root (pnpm 11, pinned in `packageManager`; Node 26 like Vercel and CI).
 - `pnpm check`: lint (warnings fail), typecheck, tests and build in every package. Through the harness: `bun harness/q.ts check -- bun run check`, which stamps the tree for the push gate.
 - `bun harness/hooks.ts install .`, once per clone, from the main checkout's root: it points `core.hooksPath` at `harness/githooks`. `bun harness/hooks.ts status` shows whether they're on. Never run it from a worktree, which would point the whole repository at that worktree's copy.
-- In an app folder: `pnpm dev`, `pnpm test`, `pnpm build`, `pnpm preview`, `pnpm icons`.
+- In an app folder: `pnpm dev`, `pnpm test`, `pnpm build`, `pnpm preview`, `pnpm icons`. A `cd` lasts one command in a session here (`.claude/settings.json`), so reach the folder in the same command, `cd apps/<name> && pnpm test`, or use `pnpm -C apps/<name> test`.
 - Browser pane: `preview_start` with `koholint`, `red-dead` or `echoes` for dev, or `<name>-preview` for a production build (`.claude/launch.json`). These load only in a session started in this repository.
 - Screenshots: `node .claude/skills/guide-check/scripts/shoot.mjs --out <dir>` (the `guide-check` skill).
 
