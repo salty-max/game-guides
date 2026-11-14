@@ -2,6 +2,7 @@ import { allRows, chapters, coreRows, missablesLeft } from "@hundo/core/guide";
 import { STORAGE_KEY, defaultState, validateState } from "@hundo/core/progress-state";
 import { calibrationDelta, estimate, pointsLeft, readPercent } from "./estimate";
 import { THEME_KEY } from "@hundo/core/store/theme";
+import { brand } from "./brand";
 
 const all = Object.fromEntries(allRows.map((row) => [row.id, true as const]));
 const [a] = allRows.map((row) => row.id);
@@ -68,5 +69,16 @@ describe("storage", () => {
   it("keeps its storage keys", () => {
     expect(STORAGE_KEY).toBe("red-dead-field-guide.v1");
     expect(THEME_KEY).toBe("red-dead-field-guide.theme");
+  });
+
+  // Every saved state and backup carries this id, and one with another id is refused.
+  it("keeps its guide id", () => {
+    expect(brand.id).toBe("red-dead-redemption");
+  });
+
+  // Moved from reddead.hundo.quest: the old address hands each reader's progress over to the new one.
+  it("hands readers over from its old address", () => {
+    expect(brand.home).toBe("https://rdr.hundo.quest");
+    expect(brand.movedFrom).toContain("reddead.hundo.quest");
   });
 });

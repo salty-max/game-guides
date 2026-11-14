@@ -38,8 +38,8 @@ The tests don't see layout, fonts, colour or how a page reads. Look at every vis
 
 | Name | What | URL |
 | --- | --- | --- |
-| `koholint`, `red-dead`, `echoes` | dev server | http://localhost:5173, 5174, 5175 |
-| `koholint-preview`, `red-dead-preview`, `echoes-preview` | production build, then `vite preview` | http://localhost:4173, 4174, 4175 |
+| `koholint`, `rdr`, `echoes` | dev server | http://localhost:5173, 5174, 5175 |
+| `koholint-preview`, `rdr-preview`, `echoes-preview` | production build, then `vite preview` | http://localhost:4173, 4174, 4175 |
 
 By hand:
 

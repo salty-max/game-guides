@@ -4,11 +4,11 @@ Every push, deploy and release needs the user's go, asked in the session that wa
 
 ## The projects
 
-Each guide is its own Vercel project on the team jellycat, built from this repository. The project is named after the app's package (`hundo-koholint` for `apps/koholint`). The guide lives at `https://<sub>.hundo.quest`, attached to its project as a domain. The subdomain is chosen per guide (`koholint`, `reddead`, `echoes`) and set as `brand.home`. `hundo.quest` is registered through Vercel on the same team, so Vercel's DNS does the rest. The first three guides moved here from `*.vercel.app` addresses with the hand-off below; once their readers had moved, the old addresses were detached and `movedFrom` removed from their brands. The root README's apps table lists the projects and their sites.
+Each guide is its own Vercel project on the team jellycat, built from this repository. The project is named after the app's package (`hundo-koholint` for `apps/koholint`). The guide lives at `https://<sub>.hundo.quest`, attached to its project as a domain. The subdomain is chosen per guide (`koholint`, `rdr`, `echoes`) and set as `brand.home`. `hundo.quest` is registered through Vercel on the same team, so Vercel's DNS does the rest. The first three guides moved here from `*.vercel.app` addresses with the hand-off below; once their readers had moved, the old addresses were detached and `movedFrom` removed from their brands. Red Dead then moved from `reddead.hundo.quest` to `rdr.hundo.quest`: `reddead.hundo.quest` stays attached to `hundo-rdr` and listed in its `movedFrom` until it's detached on a later go. The root README's apps table lists the projects and their sites.
 
 Settings that live in the Vercel dashboard rather than in the repository:
 
-- **Root Directory:** `apps/<name>`.
+- **Root Directory:** `apps/<name>`. It covers every branch, so renaming an app's folder means changing it just before that branch is pushed and merging without delay: until the merge, `main` has no such folder and the project's builds of it fail.
 - **"Include files outside the Root Directory":** on, the default. The build needs `packages/core` and the root workspace files.
 - **Production branch:** `main`.
 - **Node.js version:** 26.x. CI runs the same major.
@@ -50,6 +50,7 @@ Each of these broke something or nearly did. `packages/core/src/deploy.test.ts` 
 - **No inline scripts.** The CSP forbids them, so `theme-init.js`, which sets the theme before first paint, stays an external file. Don't fold it into `index.html`, and don't add `'unsafe-inline'` to make something work.
 - **Storage keys never change, and an address changes only with a hand-off.** Progress lives in the reader's browser, in localStorage, under `<storagePrefix>.v1`, and localStorage belongs to one origin, so a new prefix or a bare redirect starts every reader from nothing. Each guide's `guide.test.ts` pins its full keys. To move a guide:
   - set `brand.home` to the new address and list the old hostnames in `brand.movedFrom`;
+  - attach the new address to the project and check it serves before the merge, or the redirect lands on nothing;
   - keep the old address attached and serving.
 
   On every visit there, `packages/core/src/boot.ts` redirects to the same page on `home`, with the saved progress and theme in the URL fragment. The new address imports them only when the visit came from an old address and it has no checks yet. `boot.test.ts` covers it.

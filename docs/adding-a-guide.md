@@ -12,7 +12,7 @@ rsync -a --exclude node_modules --exclude dist apps/echoes/ apps/<name>/
 
 Then, in `apps/<name>`:
 
-- **`package.json`**: set `name` to `hundo-<sub>`, after the guide's subdomain (as in `hundo-reddead`), and `version` to `1.0.0`. The Vercel project uses the same name, so there's one name to look up. A new guide uses it as its storage prefix too. The first three guides keep their older prefixes (`koholint-field-guide`, `red-dead-field-guide`, `echoes-of-wisdom-field-guide`), which never change.
+- **`package.json`**: set `name` to `hundo-<sub>`, after the guide's subdomain (as in `hundo-rdr`), and `version` to `1.0.0`. The Vercel project uses the same name, so there's one name to look up. A new guide uses it as its storage prefix too. The first three guides keep their older prefixes (`koholint-field-guide`, `red-dead-field-guide`, `echoes-of-wisdom-field-guide`), which never change.
 - **`vercel.json`**: leave it as copied. `packages/core/src/deploy.test.ts` fails unless every guide's file is the same, and checks the parts that broke before ([deploying.md](deploying.md)).
 - **`tsconfig.json`** and **`vite.config.ts`**: leave them. They're identical in every guide.
 
@@ -46,7 +46,7 @@ Delete what's Echoes' own:
 - `icon`: any name from `packages/core/src/components/Icon.tsx`.
 - `game` (the breadcrumb root) and `credit` (small print under the rail).
 - `corners` and `fonts`: [house-style.md](house-style.md#fonts-and-corners).
-- `home`: the guide's address, `https://<sub>.hundo.quest`. The subdomain is chosen per guide: Red Dead's folder is `red-dead`, but its address is `reddead`. `movedFrom` stays out of a new guide; it's only for a guide that changes address ([deploying.md](deploying.md#pitfalls)).
+- `home`: the guide's address, `https://<sub>.hundo.quest`. The subdomain is chosen per guide, and the folder and package follow it (`apps/rdr`, `hundo-rdr`, `rdr.hundo.quest`). `movedFrom` stays out of a new guide; it's only for a guide that changes address ([deploying.md](deploying.md#pitfalls)).
 
 ### `config.ts`
 
