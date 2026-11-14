@@ -1,5 +1,5 @@
-import { byChapter } from "@game-guides/core/format";
-import type { GuideConfig } from "@game-guides/core/types";
+import { byChapter } from "@hundo/core/format";
+import type { GuideConfig } from "@hundo/core/types";
 import { brand } from "./brand";
 import chapter1 from "./data/chapter-1";
 import chapter2 from "./data/chapter-2";

@@ -4,7 +4,7 @@ A spoiler-aware, unofficial companion for the original *Red Dead Redemption* cam
 
 ## Work on it
 
-This folder is one app in the [game-guides](../../README.md) monorepo; the app itself is `packages/core`. Install once at the repository root with `pnpm install`, then run these from here:
+This folder is one app in the [hundo](../../README.md) monorepo; the app itself is `packages/core`. Install once at the repository root with `pnpm install`, then run these from here:
 
 ```bash
 pnpm dev        # http://localhost:5173
@@ -19,7 +19,7 @@ pnpm icons      # regenerate public/icons from the compass motif in scripts/icon
 
 ## Deploy
 
-The Vercel project `red-dead-field-guide` builds this folder as its Root Directory and serves [reddead.hundo.quest](https://reddead.hundo.quest). The old address, red-dead-field-guide.vercel.app, still answers and hands each reader's progress over (see [docs/deploying.md](../../docs/deploying.md#pitfalls)). `vercel.json` here sets the install, build, ignore command, rewrites, CSP and cache rules; [docs/deploying.md](../../docs/deploying.md) explains them.
+The Vercel project `hundo-reddead` builds this folder as its Root Directory and serves [reddead.hundo.quest](https://reddead.hundo.quest). The old address, red-dead-field-guide.vercel.app, still answers and hands each reader's progress over (see [docs/deploying.md](../../docs/deploying.md#pitfalls)). `vercel.json` here sets the install, build, ignore command, rewrites, CSP and cache rules; [docs/deploying.md](../../docs/deploying.md) explains them.
 
 ## Use the guide
 

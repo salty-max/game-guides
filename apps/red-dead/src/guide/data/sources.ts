@@ -1,4 +1,4 @@
-import type { SourceLink } from "@game-guides/core/types";
+import type { SourceLink } from "@hundo/core/types";
 
 /** References for the whole guide; per-chapter ones live with each chapter. */
 export const sources: SourceLink[] = [

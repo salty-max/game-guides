@@ -1,4 +1,4 @@
-import type { Missable, SourceLink } from "@game-guides/core/types";
+import type { Missable, SourceLink } from "@hundo/core/types";
 
 /**
  * Entries that can be lost for good if you move on. A row is listed here only when two independent sources agree on

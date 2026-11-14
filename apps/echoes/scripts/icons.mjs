@@ -1,5 +1,5 @@
 // Regenerates the PWA icons in public/icons from the tri-rod motif. Run: pnpm icons
-import { writeIcons } from "@game-guides/core/icons";
+import { writeIcons } from "@hundo/core/icons";
 
 const motif = `
 <path d="M150 392 316 226" stroke="#ffe9a8" stroke-width="30" stroke-linecap="round"/>

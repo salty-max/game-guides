@@ -80,7 +80,7 @@ importers:
 
   apps/echoes:
     dependencies:
-      '@game-guides/core':
+      '@hundo/core':
         specifier: workspace:*
         version: link:../../packages/core
       react:
@@ -89,7 +89,7 @@ importers:
 
   apps/koholint:
     dependencies:
-      '@game-guides/core':
+      '@hundo/core':
         specifier: workspace:*
         version: link:../../packages/core
       react:
@@ -98,7 +98,7 @@ importers:
 
   apps/red-dead:
     dependencies:
-      '@game-guides/core':
+      '@hundo/core':
         specifier: workspace:*
         version: link:../../packages/core
       react:

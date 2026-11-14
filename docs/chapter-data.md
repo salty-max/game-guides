@@ -5,7 +5,7 @@ A guide's content is plain TypeScript in `apps/<name>/src/guide/data`: one modul
 ## A chapter
 
 ```ts
-import type { RawChapter } from "@game-guides/core/types";
+import type { RawChapter } from "@hundo/core/types";
 
 export default {
   id: 2,

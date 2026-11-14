@@ -1,4 +1,4 @@
-import type { RawChapter } from "@game-guides/core/types";
+import type { RawChapter } from "@hundo/core/types";
 
 export default {
   id: 6,

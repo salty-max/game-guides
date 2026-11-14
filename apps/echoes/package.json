@@ -1,5 +1,5 @@
 {
-  "name": "echoes-of-wisdom-field-guide",
+  "name": "hundo-echoes",
   "private": true,
   "version": "1.0.0",
   "type": "module",
@@ -13,7 +13,7 @@
     "icons": "node scripts/icons.mjs"
   },
   "dependencies": {
-    "@game-guides/core": "workspace:*",
+    "@hundo/core": "workspace:*",
     "react": "catalog:"
   }
 }

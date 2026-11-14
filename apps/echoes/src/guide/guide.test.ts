@@ -1,7 +1,7 @@
-import { allRows, chapters, rowsByTag, tally } from "@game-guides/core/guide";
-import { STORAGE_KEY, validateState } from "@game-guides/core/progress-state";
+import { allRows, chapters, rowsByTag, tally } from "@hundo/core/guide";
+import { STORAGE_KEY, validateState } from "@hundo/core/progress-state";
 import { targets } from "./config";
-import { THEME_KEY } from "@game-guides/core/store/theme";
+import { THEME_KEY } from "@hundo/core/store/theme";
 
 const [a] = allRows.map((row) => row.id);
 

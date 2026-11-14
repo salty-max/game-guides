@@ -1,11 +1,11 @@
-import type { Checks, LeftItem, Row } from "@game-guides/core/types";
+import type { Checks, LeftItem, Row } from "@hundo/core/types";
 
 /** The percentage the player read in the game (Stats → General), saved as the progress state's `extra`. */
 export interface Reported {
   reported: number | null;
 }
 
-declare module "@game-guides/core/types" {
+declare module "@hundo/core/types" {
   interface Register {
     extra: Reported;
   }

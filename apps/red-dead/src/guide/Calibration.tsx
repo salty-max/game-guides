@@ -1,8 +1,8 @@
 import { useState, type FormEvent } from "react";
-import { Button } from "@game-guides/core/components/ui";
-import { coreRows } from "@game-guides/core/guide";
-import { useProgress } from "@game-guides/core/store/progress";
-import { useUi } from "@game-guides/core/store/ui";
+import { Button } from "@hundo/core/components/ui";
+import { coreRows } from "@hundo/core/guide";
+import { useProgress } from "@hundo/core/store/progress";
+import { useUi } from "@hundo/core/store/ui";
 import { calibrationDelta, estimate, readPercent } from "./estimate";
 
 export function Calibration() {

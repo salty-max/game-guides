@@ -44,11 +44,11 @@ The tests don't see layout, fonts, colour or how a page reads. Look at every vis
 By hand:
 
 ```bash
-pnpm --filter echoes-of-wisdom-field-guide dev
+pnpm --filter hundo-echoes dev
 ```
 
 ```bash
-pnpm --filter echoes-of-wisdom-field-guide build && pnpm --filter echoes-of-wisdom-field-guide preview
+pnpm --filter hundo-echoes build && pnpm --filter hundo-echoes preview
 ```
 
 Check a release-bound change on the production build. Dev mode skips the service worker and serves unbundled modules.

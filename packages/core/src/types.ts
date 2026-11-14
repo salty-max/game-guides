@@ -75,7 +75,7 @@ export interface Missable {
 
 /**
  * Per-guide state saved beside the shared fields. A guide that keeps some declares its type here through
- * declaration merging: `declare module "@game-guides/core/types" { interface Register { extra: MyExtra } }`.
+ * declaration merging: `declare module "@hundo/core/types" { interface Register { extra: MyExtra } }`.
  */
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type -- filled in by a guide through declaration merging
 export interface Register {}

@@ -12,7 +12,7 @@ rsync -a --exclude node_modules --exclude dist apps/echoes/ apps/<name>/
 
 Then, in `apps/<name>`:
 
-- **`package.json`**: set `name` to `<name>-field-guide` and `version` to `1.0.0`. The package name, the Vercel project, the `.vercel.app` subdomain and the storage prefix all use the same string in the existing guides. Keep that, so there's one name to look up.
+- **`package.json`**: set `name` to `hundo-<sub>`, after the guide's subdomain (as in `hundo-reddead`), and `version` to `1.0.0`. The Vercel project uses the same name, so there's one name to look up. A new guide uses it as its storage prefix too. The first three guides keep their older prefixes (`koholint-field-guide`, `red-dead-field-guide`, `echoes-of-wisdom-field-guide`), which never change.
 - **`vercel.json`**: leave it as copied. `packages/core/src/deploy.test.ts` fails unless every guide's file is the same, and checks the parts that broke before ([deploying.md](deploying.md)).
 - **`tsconfig.json`** and **`vite.config.ts`**: leave them. They're identical in every guide.
 
@@ -71,14 +71,14 @@ The full type is `GuideConfig` in `packages/core/src/types.ts`, and every field 
 ### `guide.test.ts`
 
 - Pin the game's own totals, as Echoes does with `targets`, so a missing row fails a count.
-- Pin the storage keys, as every guide does at the bottom of its test. `STORAGE_KEY` comes from `@game-guides/core/progress-state` and `THEME_KEY` from `@game-guides/core/store/theme`:
+- Pin the storage keys, as every guide does at the bottom of its test. `STORAGE_KEY` comes from `@hundo/core/progress-state` and `THEME_KEY` from `@hundo/core/store/theme`:
 
   ```ts
   describe("storage", () => {
     // Readers' progress and theme live under these keys on this domain: new keys start every reader from nothing.
     it("keeps its storage keys", () => {
-      expect(STORAGE_KEY).toBe("<name>-field-guide.v1");
-      expect(THEME_KEY).toBe("<name>-field-guide.theme");
+      expect(STORAGE_KEY).toBe("hundo-<sub>.v1");
+      expect(THEME_KEY).toBe("hundo-<sub>.theme");
     });
   });
   ```

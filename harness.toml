@@ -1,6 +1,6 @@
 # The harness's config (docs: harness/docs/design.md in the harness repository).
 [project]
-name = "game-guides"
+name = "hundo"
 
 [tools]
 dir = "harness"

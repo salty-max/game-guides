@@ -4,7 +4,7 @@ Every push, deploy and release needs the user's go, asked in the session that wa
 
 ## The projects
 
-Each guide is its own Vercel project on the team jellycat, built from this repository. The project is named after the app's package (`koholint-field-guide` for `apps/koholint`). The guide lives at `https://<sub>.hundo.quest`, attached to its project as a domain. The subdomain is chosen per guide (`koholint`, `reddead`, `echoes`) and set as `brand.home`. `hundo.quest` is registered through Vercel on the same team, so Vercel's DNS does the rest. The project's own `<project>.vercel.app` is the guide's old address, kept attached so it can hand readers over (see the pitfalls). The root README's apps table lists them.
+Each guide is its own Vercel project on the team jellycat, built from this repository. The project is named after the app's package (`hundo-koholint` for `apps/koholint`). The guide lives at `https://<sub>.hundo.quest`, attached to its project as a domain. The subdomain is chosen per guide (`koholint`, `reddead`, `echoes`) and set as `brand.home`. `hundo.quest` is registered through Vercel on the same team, so Vercel's DNS does the rest. The first three guides' old addresses (`koholint-field-guide.vercel.app`, `red-dead-field-guide.vercel.app`, `echoes-of-wisdom-field-guide.vercel.app`) stay attached to their projects so they can hand readers over (see the pitfalls); each brand lists its own in `brand.movedFrom`. The root README's apps table lists the projects and their sites.
 
 Settings that live in the Vercel dashboard rather than in the repository:
 
@@ -75,8 +75,8 @@ Previews may sit behind Vercel's deployment protection. If so, `curl` gets a 401
 
 For a new guide, after its folder passes `pnpm check` ([adding-a-guide.md](adding-a-guide.md)), and with the user's go:
 
-1. In Vercel, on the team jellycat: add a project and import `salty-max/game-guides`.
-2. Name it after the app's package, `<name>-field-guide`, which gives it `<name>-field-guide.vercel.app`.
+1. In Vercel, on the team jellycat: add a project and import `salty-max/hundo`.
+2. Name it after the app's package, `hundo-<sub>`.
 3. Set the Root Directory to `apps/<name>`. Leave "Include files outside the Root Directory" on. Vercel picks up the framework, install, build and output from the app's `vercel.json`.
 4. Set the Node.js version to 26.x and the production branch to `main`.
 5. Add the guide's `<sub>.hundo.quest` to the project's domains. Its `brand.home` is already set in `brand.ts`.

@@ -1,6 +1,6 @@
-import { Button, Chip } from "@game-guides/core/components/ui";
-import { useProgress } from "@game-guides/core/store/progress";
-import { useUi } from "@game-guides/core/store/ui";
+import { Button, Chip } from "@hundo/core/components/ui";
+import { useProgress } from "@hundo/core/store/progress";
+import { useUi } from "@hundo/core/store/ui";
 import { blankRun, modeNames, type RunMode } from "./run-log";
 
 export function DeathlessRun() {

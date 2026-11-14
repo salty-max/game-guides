@@ -6,8 +6,8 @@
 
 - **Core reads a guide only through `virtual:guide/…`.** `guide.ts` imports `virtual:guide/config`, `Layout.tsx` and `DashboardPage.tsx` import `virtual:guide/panels`, and `main.tsx` imports `virtual:guide/theme.css`. `vite.ts` aliases `virtual:guide/` to the app's `src/guide/`, and each app's `tsconfig.json` maps the same path for the typechecker. A new file core reads this way must then exist in every guide.
 - **A guide reads core only through the subpath exports** in `packages/core/package.json`: `types`, `format`, `guide`, `progress-state`, `store/*`, `components/*`, `vite` and `icons`. To give guides something new, add an export. There's no barrel file, on purpose.
-- **`config.ts` stays at the bottom of the import graph.** A guide's `config.ts`, and the helpers it imports (`run-log.ts`, `estimate.ts`), use only `@game-guides/core/types` and `/format`. Core's `guide.ts` imports the config, and the stores import `guide.ts`. A config that reached for a store or a component would close the loop. Panels can use core's stores and components, because nothing in the config imports them.
-- **Per-guide saved state** goes in `extra`. A guide declares its type by declaration merging on `"@game-guides/core/types"`'s `Register`, as `run-log.ts` and `estimate.ts` do. `GuideConfig.state.extra` then reads and initialises it.
+- **`config.ts` stays at the bottom of the import graph.** A guide's `config.ts`, and the helpers it imports (`run-log.ts`, `estimate.ts`), use only `@hundo/core/types` and `/format`. Core's `guide.ts` imports the config, and the stores import `guide.ts`. A config that reached for a store or a component would close the loop. Panels can use core's stores and components, because nothing in the config imports them.
+- **Per-guide saved state** goes in `extra`. A guide declares its type by declaration merging on `"@hundo/core/types"`'s `Register`, as `run-log.ts` and `estimate.ts` do. `GuideConfig.state.extra` then reads and initialises it.
 
 ## Saved progress
 

@@ -1,18 +1,18 @@
-# Game guides
+# Hundo
 
 Spoiler-aware, installable field guides for single-player games: one app per game, all built on one shared core.
 
 | App | Game | Site | Vercel project |
 | --- | --- | --- | --- |
-| [`apps/koholint`](apps/koholint) | *Link’s Awakening* (Switch, 2019) | [koholint.hundo.quest](https://koholint.hundo.quest) | koholint-field-guide |
-| [`apps/red-dead`](apps/red-dead) | *Red Dead Redemption* | [reddead.hundo.quest](https://reddead.hundo.quest) | red-dead-field-guide |
-| [`apps/echoes`](apps/echoes) | *Echoes of Wisdom* (Switch, 2024) | [echoes.hundo.quest](https://echoes.hundo.quest) | echoes-of-wisdom-field-guide |
+| [`apps/koholint`](apps/koholint) | *Link’s Awakening* (Switch, 2019) | [koholint.hundo.quest](https://koholint.hundo.quest) | hundo-koholint |
+| [`apps/red-dead`](apps/red-dead) | *Red Dead Redemption* | [reddead.hundo.quest](https://reddead.hundo.quest) | hundo-reddead |
+| [`apps/echoes`](apps/echoes) | *Echoes of Wisdom* (Switch, 2024) | [echoes.hundo.quest](https://echoes.hundo.quest) | hundo-echoes |
 
 Each app's history from its old repository is kept under its folder, so `git log -- apps/koholint` goes back to the first commit.
 
 ## Layout
 
-- **`packages/core`** (`@game-guides/core`, used through the workspace, not published) is the app itself. It holds the React 19 pages, components, stores and styles. It also holds the page shell (`index.html`, `theme-init.js`), the shared test suites and `vite.ts`, which builds an app's whole Vite and Vitest config from its brand.
+- **`packages/core`** (`@hundo/core`, used through the workspace, not published) is the app itself. It holds the React 19 pages, components, stores and styles. It also holds the page shell (`index.html`, `theme-init.js`), the shared test suites and `vite.ts`, which builds an app's whole Vite and Vitest config from its brand.
 - **`apps/<name>`** is one guide:
   - `src/guide`: brand, config, chapter data, palette, panels (often none) and banners;
   - `public/fonts` and `public/icons`;
@@ -25,7 +25,7 @@ Each app's history from its old repository is kept under its folder, so `git log
 
 Every guide shares one house style. A guide chooses only its palette (`theme.css`), its two fonts and corner preset (`brand.ts`), its icon art and its banners ([docs/house-style.md](docs/house-style.md)).
 
-Core reaches the guide through `virtual:guide/config`, `virtual:guide/panels` and `virtual:guide/theme.css`, which `vite.ts` aliases to the app's `src/guide`. A guide reaches core through its subpath exports, such as `@game-guides/core/types`.
+Core reaches the guide through `virtual:guide/config`, `virtual:guide/panels` and `virtual:guide/theme.css`, which `vite.ts` aliases to the app's `src/guide`. A guide reaches core through its subpath exports, such as `@hundo/core/types`.
 
 Routes are real paths (`/guide/3`, `/checklist/heart`, `/dashboard/<panel>`, `/sources`), and old `#guide/3` hash links redirect. Each app is a PWA. It precaches the shell, fonts and banners, works offline, and asks before swapping in a new version.
 
@@ -42,7 +42,7 @@ pnpm check
 ```
 
 ```bash
-pnpm --filter koholint-field-guide dev
+pnpm --filter hundo-koholint dev
 ```
 
 `pnpm check` runs `pnpm lint`, `pnpm typecheck`, `pnpm test` and `pnpm build`, each across every package (`pnpm -r`). Lint fails on warnings. Inside an app folder, `pnpm dev`, `pnpm build`, `pnpm preview`, `pnpm test` and `pnpm icons` work on that guide alone.

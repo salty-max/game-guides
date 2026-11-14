@@ -9,7 +9,7 @@ export interface RunLog {
   runs: Record<RunMode, Run>;
 }
 
-declare module "@game-guides/core/types" {
+declare module "@hundo/core/types" {
   interface Register {
     extra: RunLog;
   }

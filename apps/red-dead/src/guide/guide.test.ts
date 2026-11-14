@@ -1,7 +1,7 @@
-import { allRows, chapters, coreRows, missablesLeft } from "@game-guides/core/guide";
-import { STORAGE_KEY, defaultState, validateState } from "@game-guides/core/progress-state";
+import { allRows, chapters, coreRows, missablesLeft } from "@hundo/core/guide";
+import { STORAGE_KEY, defaultState, validateState } from "@hundo/core/progress-state";
 import { calibrationDelta, estimate, pointsLeft, readPercent } from "./estimate";
-import { THEME_KEY } from "@game-guides/core/store/theme";
+import { THEME_KEY } from "@hundo/core/store/theme";
 
 const all = Object.fromEntries(allRows.map((row) => [row.id, true as const]));
 const [a] = allRows.map((row) => row.id);

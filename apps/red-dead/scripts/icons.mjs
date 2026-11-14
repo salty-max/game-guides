@@ -1,5 +1,5 @@
 // Regenerates the PWA icons in public/icons from the compass motif. Run: pnpm icons
-import { writeIcons } from "@game-guides/core/icons";
+import { writeIcons } from "@hundo/core/icons";
 
 const BG = "#231812";
 const FG = "#d7ad72";

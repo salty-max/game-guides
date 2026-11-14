@@ -1,4 +1,4 @@
-import type { Panel } from "@game-guides/core/types";
+import type { Panel } from "@hundo/core/types";
 import { DeathlessRun } from "./DeathlessRun";
 
 /** Opt-in panels for the Progress page; /dashboard/deathless scrolls to the run log. */

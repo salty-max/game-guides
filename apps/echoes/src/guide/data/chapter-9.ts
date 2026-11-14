@@ -1,4 +1,4 @@
-import type { RawChapter } from "@game-guides/core/types";
+import type { RawChapter } from "@hundo/core/types";
 import { sweepLists } from "./sweep-lists";
 
 export default {
