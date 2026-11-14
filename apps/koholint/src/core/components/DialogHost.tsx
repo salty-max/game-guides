@@ -6,7 +6,7 @@ import { exportProgress } from "../backup";
 import { validateState } from "../progress-state";
 import { isOpen, useProgress } from "../store/progress";
 import { themeOptions, useTheme, type ThemePreference } from "../store/theme";
-import { useUi } from "../store/ui";
+import { useUi, type DialogState } from "../store/ui";
 import type { ProgressState } from "../types";
 
 /** One native <dialog> for the whole app; its content switches on the store. */
@@ -54,7 +54,7 @@ export function DialogHost() {
   );
 }
 
-function ConfirmBody({ dialog }: { dialog: Extract<NonNullable<ReturnType<typeof useUi.getState>["dialog"]>, { kind: "confirm" }> }) {
+function ConfirmBody({ dialog }: { dialog: Extract<NonNullable<DialogState>, { kind: "confirm" }> }) {
   const closeDialog = useUi((s) => s.closeDialog);
   return (
     <>
@@ -105,7 +105,8 @@ function SettingsForm() {
       if (file.size > 1_000_000) throw new Error("The backup is too large.");
       const parsed = validateState(JSON.parse(await file.text()));
       setImported(parsed);
-      setFeedback({ text: `${Object.keys(parsed.checks).length} checked entries found. Select Replace with backup to load them.`, error: false });
+      const count = Object.keys(parsed.checks).length;
+      setFeedback({ text: `${count} checked ${count === 1 ? "entry" : "entries"} found. Select Replace with backup to load them.`, error: false });
     } catch {
       setFeedback({ text: `Couldn’t read this ${brand.name} progress backup.`, error: true });
     }

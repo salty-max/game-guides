@@ -24,6 +24,7 @@ export function NextUp({ chapter }: { chapter: number }) {
               <label htmlFor={`next-${row.id}`}>
                 <strong>{row.title}</strong>
                 <small>
+                  {row.chapter !== chapter && `Chapter ${row.chapter} · `}
                   {cats[primaryTag(row)][1]} · {row.group}
                 </small>
               </label>

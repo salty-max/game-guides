@@ -1,10 +1,14 @@
-import { allRows, coreRows } from "../core/guide";
+import { allRows, chapters, coreRows } from "../core/guide";
 import { defaultState, validateState } from "../core/progress-state";
 import { readRunLog } from "./run-log";
 
 const [a] = allRows.map((row) => row.id);
 
 describe("Koholint completion", () => {
+  it("cites sources for every chapter", () => {
+    for (const chapter of chapters) expect(chapter.sources.length, chapter.title).toBeGreaterThan(0);
+  });
+
   it("keeps optional amiibo out of overall completion", () => {
     expect(coreRows.length).toBeLessThan(allRows.length);
     expect(coreRows.every((row) => !row.tags.includes("amiibo"))).toBe(true);
