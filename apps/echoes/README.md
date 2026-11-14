@@ -38,4 +38,4 @@ The chapter text was drafted from community guides, which are linked per group a
 
 ## Credits
 
-Fraunces and Nunito are bundled with their SIL OFL licenses in `public/fonts`. The icon is drawn in SVG. Chapter banners use original AI-generated landscape illustrations stored in `src/guide/banners`. See the [banner prompts](docs/banner-art.md). *The Legend of Zelda* belongs to Nintendo; this is an unofficial fan guide.
+Fraunces and Nunito are bundled with their SIL OFL licenses in `public/fonts`. The icon is drawn in SVG. Chapter banners use original AI-generated landscape illustrations stored in `src/guide/banners`. *The Legend of Zelda* belongs to Nintendo; this is an unofficial fan guide.
