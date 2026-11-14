@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    { "name": "koholint", "runtimeExecutable": "pnpm", "runtimeArgs": ["--filter", "koholint-field-guide", "dev", "--port", "5173", "--strictPort"], "port": 5173 },
+    { "name": "red-dead", "runtimeExecutable": "pnpm", "runtimeArgs": ["--filter", "red-dead-field-guide", "dev", "--port", "5174", "--strictPort"], "port": 5174 },
+    { "name": "echoes", "runtimeExecutable": "pnpm", "runtimeArgs": ["--filter", "echoes-of-wisdom-field-guide", "dev", "--port", "5175", "--strictPort"], "port": 5175 },
+    { "name": "koholint-preview", "runtimeExecutable": "sh", "runtimeArgs": ["-c", "pnpm --filter koholint-field-guide build && pnpm --filter koholint-field-guide preview --port 4173 --strictPort"], "port": 4173 },
+    { "name": "red-dead-preview", "runtimeExecutable": "sh", "runtimeArgs": ["-c", "pnpm --filter red-dead-field-guide build && pnpm --filter red-dead-field-guide preview --port 4174 --strictPort"], "port": 4174 },
+    { "name": "echoes-preview", "runtimeExecutable": "sh", "runtimeArgs": ["-c", "pnpm --filter echoes-of-wisdom-field-guide build && pnpm --filter echoes-of-wisdom-field-guide preview --port 4175 --strictPort"], "port": 4175 }
+  ]
+}

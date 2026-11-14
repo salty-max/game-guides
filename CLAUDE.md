@@ -1,3 +1,49 @@
+# game-guides
+
+Spoiler-aware PWA field guides for single-player games: a pnpm workspace with one shared app in `packages/core` and one guide per folder in `apps/` (Koholint, Red Dead, Echoes). React 19, TypeScript, Vite, Vitest. GitHub `salty-max/game-guides`, deployed as three Vercel projects. The README has the layout. This file is the rules.
+
+## Commands
+
+- `pnpm install` at the root (pnpm 11, pinned in `packageManager`; Node 26 like Vercel and CI).
+- `pnpm check`: lint (warnings fail), typecheck, tests and build in every package. Through the harness: `bun harness/q.ts check -- bun run check`, which stamps the tree for the push gate.
+- `bun harness/hooks.ts install .`, once per clone, from the main checkout's root: it points `core.hooksPath` at `harness/githooks`. `bun harness/hooks.ts status` shows whether they're on. Never run it from a worktree, which would point the whole repository at that worktree's copy.
+- In an app folder: `pnpm dev`, `pnpm test`, `pnpm build`, `pnpm preview`, `pnpm icons`.
+- Browser pane: `preview_start` with `koholint`, `red-dead` or `echoes` for dev, or `<name>-preview` for a production build (`.claude/launch.json`).
+
+## Which doc for which task
+
+| Task | Read first |
+| --- | --- |
+| Add a guide | `docs/adding-a-guide.md` |
+| Write or fix chapter data, missables, counts, `facts-to-verify.md` | `docs/chapter-data.md` |
+| Palette, fonts, corners, icon, banners, buttons | `docs/house-style.md` |
+| Anything in `packages/core` | `docs/core.md` |
+| Run the checks, look at a change in a browser | `docs/testing.md` |
+| Vercel, previews, production, `vercel.json` | `docs/deploying.md` |
+
+## Hard rules
+
+Each one is a mistake already made, or one that would cost readers their progress.
+
+- **Storage keys and domains never change.** Progress lives in each reader's localStorage under `<storagePrefix>.v1` on the guide's origin, and the theme under `<storagePrefix>.theme`. A new key or domain starts everyone from nothing. The `.v1` stays even when the save format's `version` moves on. Each guide's `guide.test.ts` pins both keys.
+- **Row ids never change once live.** They're the saved checks, and a renamed id comes back unticked for every reader.
+- **`theme-init.js` stays an external file.** The CSP has `script-src 'self'` and no inline scripts. `deploy.test.ts` checks both.
+- **No `cleanUrls` in `vercel.json`.** It breaks the SPA rewrite, so deep links 404. `deploy.test.ts` checks it.
+- **The catch-all rewrite skips `/assets`, `/fonts` and `/icons`.** A missing hashed asset must 404, not come back as HTML. `deploy.test.ts` checks it.
+- **Every app's `vercel.json` is the same file**, and its ignore command watches the app, core and the root workspace files. `deploy.test.ts` checks both.
+- **A guide sets only its palette (`theme.css`), its fonts and `corners` (`brand.ts`), its icon art and its banners.** Every other look is core's. `theme.test.ts` holds the palette to eleven keys and to contrast in both themes.
+- **Never pass `className` (or `style`) to `Button`.** Pick a `look`. The type forbids both.
+- **Raw CSS imports load empty in Vitest unless they're let through.** Read a stylesheet as text with `?raw`, which `vite.ts`'s `test.css.include` allows. The theme test once passed on nothing because of this.
+- **A missable needs two independent sources on different hosts.** Anything weaker goes in the app's `docs/facts-to-verify.md`. So does every count, weight or claim nobody has confirmed, in the same commit as the data.
+- **Commit `pnpm-lock.yaml` with any `package.json` change.** CI and Vercel install with `--frozen-lockfile`.
+
+## Working rules
+
+- **Look before calling it done.** Every visible change gets opened in a browser on desktop and phone, in light and dark. For a core change, do that in an article guide and in Red Dead (`docs/testing.md`).
+- **Preview first.** Nothing reaches production without a look at its Vercel preview: headers, deep links, the service worker (`docs/deploying.md`).
+- **No push, deploy, merge to `main` or new Vercel project without the user's go**, asked in the session that wants it. A merge to `main` deploys every guide whose ignore command sees a change.
+- **No unverifiable claims** in the guides, the READMEs or these docs. Comments only where they explain a why.
+
 <!-- harness:start -->
 
 ## Harness
