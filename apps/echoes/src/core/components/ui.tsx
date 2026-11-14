@@ -1,7 +1,8 @@
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 import { Link } from "react-router";
 import { Icon, type IconName } from "./Icon";
-import { brand, cats } from "../guide";
+import { brand, cats, config, tagName } from "../guide";
+import type { Row } from "../types";
 import { pct } from "../format";
 
 export type ButtonStyle = "" | "outline" | "gold" | "ghost" | "danger";
@@ -107,6 +108,17 @@ export function Tag({ tag, children }: { tag: string; children?: ReactNode }) {
     <span className="tag" data-tone={tag === "missable" ? "missable" : cats[tag]?.[3]}>
       {children ?? cats[tag]?.[1] ?? (tag === "missable" ? "Missable" : tag)}
     </span>
+  );
+}
+
+/** "+3" for a row whose amount counts toward the guide's quantity category. */
+export function Quantity({ row }: { row: Row }) {
+  const tag = config.quantity ?? "";
+  return (
+    <Tag tag={tag}>
+      +{row.quantity}
+      <span className="sr-only"> {tagName(tag)}</span>
+    </Tag>
   );
 }
 

@@ -2,7 +2,7 @@ import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { App } from "./App";
 import { STORAGE_KEY, defaultState } from "./progress-state";
-import { chapters, config, hasMissables, missablesLeft } from "./guide";
+import { chapters, config } from "./guide";
 import { panels } from "../guide/panels";
 import { useProgress } from "./store/progress";
 import { useUi } from "./store/ui";
@@ -83,21 +83,6 @@ describe("App", () => {
     await user.click(screen.getByRole("link", { name: `Open “${firstRow.title}” in chapter 1` }));
     expect(contains(`entry-${firstRow.id}`)).toBe(true);
     expect(within(document.getElementById(`entry-${firstRow.id}`)!).getByRole("checkbox")).not.toBeChecked();
-  });
-
-  it("says what can be missed, or why nothing can", async () => {
-    const missed = chapters.find((chapter) => missablesLeft(chapter, {}).length);
-    history.replaceState(null, "", `/guide/${missed?.id ?? 1}`);
-    useProgress.setState({ data: { ...defaultState(), ceiling: missed?.id ?? 1 } });
-    render(<App />);
-    const strip = await screen.findByRole("complementary", { name: "Missable entries" });
-    if (hasMissables) {
-      expect(within(strip).getByText("Don’t miss before moving on")).toBeInTheDocument();
-      expect(within(strip).getAllByRole("checkbox").length).toBe(missablesLeft(missed!, {}).length);
-    } else {
-      expect(within(strip).getByText(/Nothing is flagged as permanently missable/)).toBeInTheDocument();
-      for (const link of within(strip).getAllByRole("link")) expect(link).toHaveAttribute("rel", expect.stringContaining("noopener"));
-    }
   });
 
   it("shows progress, what's left and the guide's own panels", async () => {

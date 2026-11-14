@@ -2,8 +2,8 @@ import { Link } from "react-router";
 import { Icon } from "./Icon";
 import { BulkCheck } from "./BulkCheck";
 import { CheckBox } from "./CheckBox";
-import { SourceLine, Tag } from "./ui";
-import { cats, config, primaryTag, tagName } from "../guide";
+import { Quantity, SourceLine, Tag } from "./ui";
+import { cats, config, primaryTag } from "../guide";
 import { useProgress } from "../store/progress";
 import { useUi } from "../store/ui";
 import type { IconName } from "./Icon";
@@ -55,17 +55,6 @@ export function RouteRow({ row, prefix, highlighted, origin = false, fallbackFoc
   );
 }
 
-/** "+3" for a row whose amount counts toward the guide's quantity category. */
-export function Quantity({ row }: { row: Row }) {
-  const tag = config.quantity ?? "";
-  return (
-    <Tag tag={tag}>
-      +{row.quantity}
-      <span className="sr-only"> {tagName(tag)}</span>
-    </Tag>
-  );
-}
-
 interface GroupProps {
   groupKey: string;
   title: string;
@@ -88,7 +77,7 @@ export function RouteGroup({ groupKey, title, location, icon, note, sources = []
   const graphic = icon ?? cats[primaryTag(rows[0])][2];
   const kinds = [...new Set(rows.map((row) => cats[primaryTag(row)][0]))].slice(0, 3).join(" · ");
   const done = rows.filter((row) => checks[row.id] === true).length;
-  const tools = !origin && rows.length > 1;
+  const tools = rows.length > 1;
 
   return (
     <details

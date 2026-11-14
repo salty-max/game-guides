@@ -3,8 +3,7 @@ import { Link } from "react-router";
 import { Icon } from "./Icon";
 import { BulkCheck } from "./BulkCheck";
 import { CheckBox } from "./CheckBox";
-import { Quantity } from "./RouteGroup";
-import { SourceLine, Tag } from "./ui";
+import { Quantity, SourceLine, Tag } from "./ui";
 import type { Chapter, Group, Row } from "../types";
 
 /** The chapter as prose: one section per group, each step's opening sentence is its checkbox. */

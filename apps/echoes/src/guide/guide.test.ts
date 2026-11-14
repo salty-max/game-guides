@@ -1,10 +1,14 @@
-import { allRows, rowsByTag, tally } from "../core/guide";
+import { allRows, chapters, rowsByTag, tally } from "../core/guide";
 import { validateState } from "../core/progress-state";
 import { targets } from "./config";
 
 const [a] = allRows.map((row) => row.id);
 
 describe("Echoes of Wisdom completion", () => {
+  it("cites sources for every chapter", () => {
+    for (const chapter of chapters) expect(chapter.sources.length, chapter.title).toBeGreaterThan(0);
+  });
+
   it("gives every entry directions", () => {
     for (const row of allRows) expect(row.text.trim(), row.id).not.toBe("");
   });
