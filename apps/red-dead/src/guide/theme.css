@@ -1,0 +1,46 @@
+/* Red Dead: token values only. Selectors and layout live in src/core/styles.css. */
+:root{
+  color-scheme:light;
+  --paper:#f3ecdf;--surface:#fffbf2;--raised:#f7ecdc;--ink:#32271f;--muted:#67584a;
+  --line:#e1d2bf;--line-soft:#eee2d1;--control-line:#d8c6ae;--edge:#b59d80;--scrollbar:#b6a38c;--focus:#bc7d27;
+  --primary:#873d29;--primary-hover:#70321f;--on-primary:#fff;--link:#873d29;--accent:#d7ad72;
+  --soft:#f1e4d1;--soft-ink:#773f2b;--done:#f8ecdc;--highlight:#f8e3b5;
+  --bar-track:#ebddca;--bar-fill:#a8563b;
+  --gold:#edda9e;--gold-hover:#fff0b9;--on-gold:#3a2418;
+  --ghost-bg:#42291cc7;--ghost-line:#ad9275;--ghost-ink:#fff9e5;--ghost-hover:#644631;
+  --error:#8e3f33;--danger:#8e3f33;--on-danger:#fff;--ok:#9bbf90;--warn:#ed9e75;
+  --check-edge:#ad957a;--check-bg:#fff;--check-on:#91482f;--check-mark:#fff;
+  --rose-bg:#f5e8e3;--rose-ink:#8f4a43;--violet-bg:#efeaf4;--violet-ink:#6c5683;--amber-bg:#f3eddb;--amber-ink:#755626;
+  --clay-bg:#f4ebe2;--clay-ink:#764a39;--sky-bg:#e8edf3;--sky-ink:#3f5b77;--mint-bg:#e6efe0;--mint-ink:#3d5a3a;
+  --missable-bg:#f8dccf;--missable-ink:#7a2d1d;--missable-line:#c4623f;
+  --chrome:#281b15;--chrome-ink:#f6f4e7;--chrome-muted:#e4ccbb;--chrome-accent:#e9dfba;--chrome-line:#594034;--chrome-edge:#7c5c42;--chrome-hover:#573529;--chrome-active:#513325;
+  --brand-bg:#e8c88b;--brand-ink:#3c241a;--brand-accent:#dfb980;--brand-size:24px;--brand-tracking:.04em;
+  --rail:#302019;--rail-ink:#ead9c4;--rail-border:#302019;--rail-heading:#d7bf88;--rail-muted:#c9ad97;--rail-line:#77523f;--rail-hover:#513529;
+  --rail-current:#633e2b;--rail-current-line:#845840;--rail-current-ink:#fff6da;--rail-number-on:#efcb8d;--rail-number-ink:#352217;
+  --rail-card:#251810;--rail-card-line:#694936;--rail-accent:#e5cd9b;
+  --display-weight:700;--display-tracking:-.015em;--display-case:uppercase;
+  --hero-min:210px;--hero-min-phone:150px;--hero-line:#5a3b29;--hero-bg:#442a1c;--hero-ink:#fff7e6;--hero-text:#edead9;--hero-meta:#e9e6d4;
+  --hero-shadow:0 7px 20px #43231626;
+  --hero-shade:linear-gradient(90deg,#251813fa 0%,#281a14e8 22%,#27191199 48%,#291a1422 83%);
+  --hero-shade-phone:linear-gradient(90deg,#251810f2 0%,#281b14c4 42%,#2a1b1366 100%);
+  --kicker-bg:#e5cc8f;--kicker-ink:#3a2418;
+  --hero-size:clamp(40px,5vw,66px);--hero-size-phone:38px;--hero-leading:.98;--hero-tracking:-.012em;
+  --shadow:#25160f73;--backdrop:#23160fd1;
+  --r-button:7px;--r-chip:6px;--r-tag:4px;--r-control:7px;--r-card:10px;--r-small:8px;--r-hero:15px;--r-dialog:12px;--r-check:7px;--r-brand:10px;
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --paper:#18130f;--surface:#231a14;--raised:#302217;--ink:#f5ead8;--muted:#d2c2b0;
+  --line:#513e31;--line-soft:#513e31;--control-line:#96745a;--edge:#96745a;--scrollbar:#96745a;--focus:#e5bf73;
+  --primary:#f1c59a;--primary-hover:#fbd9b4;--on-primary:#2a190f;--link:#f1c59a;
+  --soft:#452d21;--soft-ink:#f1c8a1;--done:#36261b;--highlight:#433820;
+  --bar-track:#513a29;--bar-fill:#d7956d;
+  --error:#f1bcaf;
+  --check-edge:#b49377;--check-bg:#18130f;--check-on:#e8b082;--check-mark:#312015;
+  --rose-bg:#452e30;--rose-ink:#f1bcaf;--violet-bg:#392d46;--violet-ink:#e1c8ee;--amber-bg:#433820;--amber-ink:#efd493;
+  --clay-bg:#463324;--clay-ink:#edc7aa;--sky-bg:#273949;--sky-ink:#c3daef;--mint-bg:#2c3b25;--mint-ink:#cfe3bf;
+  --missable-bg:#5a2a20;--missable-ink:#ffd2c0;
+  --chrome:#1e1410;--rail:#211610;--rail-border:#211610;
+  --hero-line:#513e31;--hero-shadow:0 7px 20px #0004;
+  --backdrop:#110a07d7;
+}
