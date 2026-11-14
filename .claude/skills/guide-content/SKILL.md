@@ -1,6 +1,6 @@
 ---
 name: guide-content
-description: Draft, source or fix a hundo guide chapter's data (apps/<name>/src/guide/data) from community guides or from a research folder such as ~/code/dragon-quest-1-hd2d-guide. Covers turning steps into rows with stable ids, tags and categories, compact catalogue lists, https sources, missables only on two independent sources, summarising instead of copying, and recording everything unconfirmed in docs/facts-to-verify.md. Use for a new guide's chapters, a new chapter, or a correction to existing rows.
+description: Draft, source or fix a hundo guide chapter's data (apps/<name>/src/guide/data) from community guides or from a research folder such as ~/code/dragon-quest-1-hd2d-guide. Covers turning steps into rows with stable ids, tags and categories, compact catalogue lists, https sources, missables only on two independent sources, summarising instead of copying, every claim checked against its source by the source-checker helper, and recording everything unconfirmed in docs/facts-to-verify.md. Use for a new guide's chapters, a new chapter, or a correction to existing rows.
 ---
 
 # Writing a guide's content
@@ -41,7 +41,21 @@ Follow [the doc's row rules](../../../docs/chapter-data.md#a-row). The calls it 
 - **Facts to verify:** update the app's `docs/facts-to-verify.md` in the same commit as the data. Carry over `SOURCES.md`'s disagreements, with which way the data went.
 - **Never claim more checking than happened.** No "tested", "verified" or "confirmed in game" unless someone played it and said so. `SOURCES.md` calls the Dragon Quest route "source-checked … with gameplay verification still outstanding". Keep that honesty in the README and the facts file.
 
-## 5. Check it
+## 5. Check every claim against its source
+
+Rewriting directions is where errors creep in: a turn smoothed into the wrong compass point, a chest moved to the other branch. So before the commit, someone who didn't write the rows checks them against the pages they cite.
+
+- **Who:** the `source-checker` helper, one per chapter, run in parallel. Give it the chapter's file, and for a fix, the row ids you touched. Rows carried over from a research folder get checked too: the research was drafted from community guides like everything else.
+- **What comes back:** pages the chapter follows without citing them, then the claims a source contradicts, those where the frames differ, those no cited source says, and those on a page it couldn't read. Matches aren't listed.
+- **What to do with each:**
+  - *An uncited page:* cite it. It often backs several "not on the page" claims at once.
+  - *Contradicted:* first make sure it isn't moves against positions. "Head west, then take the second turning north" and "the east side of B2" can both be true. In Dragon Quest's Erdrick's Hollow, one guide gives moves for the chests, the research gives positions, and another guide's chest labels back every position (the entry in its `SOURCES.md`). If it's a real contradiction, fix the row to match the source, keeping its id. Where two sources disagree with each other, follow the more direct one (a map pin or a position label over prose for a position) and record the disagreement in `facts-to-verify.md`.
+  - *Frame differs:* settle it with a page that gives positions, or record it in `facts-to-verify.md`.
+  - *Not on the page:* find a page that says it and cite it, cut the detail, or record it in `facts-to-verify.md`.
+  - *Unread:* record it in `facts-to-verify.md`, with how far the helper got.
+  - *Read in the browser:* the helper falls back to the built-in browser when a page refuses fetching, and names those pages. Say so in `facts-to-verify.md`: "read in the browser (fetching was refused)".
+
+## 6. Check it
 
 - In the app folder, `pnpm test` gives the quick loop: ids, categories, links, missables, and the totals pinned in `guide.test.ts`.
 - At the root, `bun harness/q.ts check -- bun run check`.
