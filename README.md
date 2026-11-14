@@ -131,7 +131,7 @@ What each `vercel.json` sets:
 
 - **Install:** `pnpm install --frozen-lockfile`. Run from the app folder, pnpm installs the whole workspace from the root lockfile.
 - **Build:** `pnpm build` (typecheck plus `vite build`), output in `dist`.
-- **Ignore command:** skips a build unless the app, `packages/core` or the root workspace files changed since the last deployment. It diffs against `VERCEL_GIT_PREVIOUS_SHA`, or the previous commit when Vercel leaves that empty. If that commit isn't in Vercel's shallow clone, `git diff` fails and the build runs anyway.
+- **Ignore command:** `scripts/vercel-ignore.sh` skips a build unless the app, `packages/core`, `scripts` or the root workspace files changed since the last deployment. It diffs against `VERCEL_GIT_PREVIOUS_SHA`, or the previous commit when Vercel leaves that empty. Vercel skips on exit 0 and builds on 1, but fails the deployment on any other code, so the script answers 1 whenever it can't compare: for example, when the earlier commit is missing from the shallow clone or was rewritten away. A bare `git diff` there exits with 128 and fails every deployment.
 - **Rewrites:** a catch-all to `index.html` that skips `/assets`, `/fonts` and `/icons`. Don't turn on `cleanUrls`, because it breaks this rewrite.
 - **Headers:**
   - a strict CSP with no inline scripts. That's why `theme-init.js` is a separate file;
