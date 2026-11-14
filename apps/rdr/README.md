@@ -19,7 +19,7 @@ pnpm icons      # regenerate public/icons from the compass motif in scripts/icon
 
 ## Deploy
 
-The Vercel project `hundo-reddead` builds this folder as its Root Directory and serves [reddead.hundo.quest](https://reddead.hundo.quest). `vercel.json` here sets the install, build, ignore command, rewrites, CSP and cache rules; [docs/deploying.md](../../docs/deploying.md) explains them.
+The Vercel project `hundo-rdr` builds this folder as its Root Directory and serves [rdr.hundo.quest](https://rdr.hundo.quest). It moved there from reddead.hundo.quest, which stays attached and hands each reader's progress over (`movedFrom` in `brand.ts`). `vercel.json` here sets the install, build, ignore command, rewrites, CSP and cache rules; [docs/deploying.md](../../docs/deploying.md) explains them.
 
 ## Use the guide
 

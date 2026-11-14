@@ -11,7 +11,7 @@ description: "Start a new hundo guide, the fourth and after, from apps/echoes: t
 
 - Open the card: `bun harness/board.ts add hundo "<Game> guide" --repos hundo …`. Work on a branch.
 - Settle with the user, through the question tool:
-  - **The subdomain**, `<sub>`: the address is `https://<sub>.hundo.quest` and goes in `brand.home` (Koholint is `koholint`, Red Dead `reddead`, Echoes `echoes`).
+  - **The subdomain**, `<sub>`: the address is `https://<sub>.hundo.quest` and goes in `brand.home` (Koholint is `koholint`, Red Dead `rdr`, Echoes `echoes`).
   - **The folder**, `apps/<name>`. The package, the Vercel project and the storage prefix are all `hundo-<sub>`, and the prefix can never change once the guide is live.
   - **The layout:** `article` (Koholint, Echoes) or `checklist` (Red Dead).
   - **The corners:** `narrow` (soft squares) or `normal` (pills).

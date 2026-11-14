@@ -5,7 +5,7 @@ Spoiler-aware, installable field guides for single-player games: one app per gam
 | App | Game | Site | Vercel project |
 | --- | --- | --- | --- |
 | [`apps/koholint`](apps/koholint) | *Link’s Awakening* (Switch, 2019) | [koholint.hundo.quest](https://koholint.hundo.quest) | hundo-koholint |
-| [`apps/red-dead`](apps/red-dead) | *Red Dead Redemption* | [reddead.hundo.quest](https://reddead.hundo.quest) | hundo-reddead |
+| [`apps/rdr`](apps/rdr) | *Red Dead Redemption* | [rdr.hundo.quest](https://rdr.hundo.quest) | hundo-rdr |
 | [`apps/echoes`](apps/echoes) | *Echoes of Wisdom* (Switch, 2024) | [echoes.hundo.quest](https://echoes.hundo.quest) | hundo-echoes |
 
 Each app's history from its old repository is kept under its folder, so `git log -- apps/koholint` goes back to the first commit.
