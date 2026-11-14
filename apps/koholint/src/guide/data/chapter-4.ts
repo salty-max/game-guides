@@ -1,0 +1,146 @@
+import type { RawChapter } from "../../core/types";
+
+export default {
+  id: 4,
+  title: "Angler’s Tunnel",
+  region: "Animal Village · Yarna Desert · Tal Tal Heights",
+  intro: "Cross the river to Animal Village, open the desert road with Marin’s help, and trace the waterfall back to its source. The Pegasus Boots also open two worthwhile detours.",
+  sources: [
+    ["Nintendo Life · Yarna Desert and the waterfall", "https://www.nintendolife.com/guides/zelda-links-awakening-angler-key-location-animal-village-yarna-desert-and-mountain-waterfall"],
+    ["ExtremePhobia · Angler’s Tunnel", "https://gamefaqs.gamespot.com/switch/258622-the-legend-of-zelda-links-awakening/faqs/77938/level-4-anglers-tunnel"],
+    ["Link’s Hideaway · Angler’s Tunnel", "https://www.linkshideaway.com/links-awakening-switch-walkthrough/anglers-tunnel/"],
+    ["ExtremePhobia · Color Dungeon", "https://gamefaqs.gamespot.com/switch/258622-the-legend-of-zelda-links-awakening/faqs/77938/the-color-dungeon"],
+    ["Thonky · Cemetery entrance", "https://www.thonky.com/zelda-links-awakening/color-dungeon"],
+  ],
+  groups: [
+    {
+      title: "The Dream Shrine and the desert road",
+      location: "Mabe Village → Animal Village → Yarna Desert",
+      rows: [
+        ["dream-rupees", ["chest"], "Dream Shrine chest · 100 rupees", "Lift the rocks in front of the shrine in northeast Mabe Village. Lie in its bed to enter. Use Pegasus Boots dashes around the perimeter to break through the Arm-Mimics before the floor gives way. Reach the central stairs and open the east chest."],
+        ["angler-ocarina", ["chest","gear"], "Dream Shrine chest · Ocarina", "Descend the central stairs, go around to the western staircase, and dash through the tent on the way to the second chest. After taking the Ocarina, exit the dream and return to the village."],
+        ["angler-ballad", ["gear","song"], "Learn Ballad of the Wind Fish", "Speak to Marin by the Mabe Village weather vane with the Ocarina. If she has already moved to the beach for the walrus errand, learn the song from her in Animal Village once she has woken it."],
+        ["angler-village", ["story"], "Find the tunnel to Animal Village", "Follow the west bank of the river south of Seashell Mansion. Near the stairs visible on the far bank, cut the lone bush to uncover matching stairs. Take the tunnel and go south to the village. Activate the warp there and visit the sleeping walrus on the path south."],
+        ["angler-marin", ["story"], "Bring Marin to the walrus", "Return to Mabe Village, then head east along Toronbo Shores. Find Marin sitting on a log and ask her to come with you. Take her to the walrus beyond Animal Village and speak to it to start the song. The desert path opens."],
+        ["angler-key", ["story"], "Defeat Lanmola and collect the Angler Key", "Enter the quicksand in northwest Yarna Desert. Keep moving around the edge and slash the head when Lanmola surfaces. If you fall through, use the cave exit and return to the fight. Pick up the key after the win. If it sinks through the middle, follow it down and collect it below."],
+      ],
+    },
+    {
+      title: "Optional · Color Dungeon",
+      location: "Koholint Cemetery",
+      rows: [
+        ["color-enter", ["story"], "Open the graveyard staircase", "Bring bombs and Magic Powder. For the in-game clue, dash into the rear shelf of Mabe Village’s library and read the fallen book. Find the five-grave group at the southeast corner of the cemetery. Push the lower-right grave down, lower-left left, upper-left up, upper-middle right, then upper-right up. Descend and speak to the colored skeleton guards."],
+        ["color-compass", ["chest"], "Color Dungeon chest · Compass", "North of the guards, slash the colored goblins when they surface, then go east. In the four-orb room, strike the northwest and southeast red orbs to make them all blue and reveal the chest."],
+        ["color-rupee-room", ["story"], "Collect the hidden 140 rupees", "Bomb the south wall of the Compass room and collect the loose blue rupees. Return north and continue east over the springy floor. These tiles break after repeated landings, so keep moving."],
+        ["color-beak", ["chest"], "Color Dungeon chest · Stone Beak", "In the room east of the first spring floor, hit each Karakoro to curl it up. Lift it and throw it into the hole with the same color and shape. Open the chest in the northeast, then leave south."],
+        ["color-key-chest", ["chest"], "Color Dungeon chest · Small Key", "Clear the surfacing enemies around the pit to open the west door. Cross the next bouncy strip, open the chest beyond it, and go north to the first spring-floor room."],
+        ["color-key-orbs", ["story"], "Collect the loose orb-puzzle key", "Go east through the matching-hole room, then north twice. Hit the upper-left orb twice and the lower-right orb once. Pick up the key that drops when all four turn blue. Go east, clear the surfacing enemies, and spend a key on the north door."],
+        ["color-buzz", ["story"], "Defeat Giant Buzz Blob", "Approach between volleys and dust it with Magic Powder to turn it into a blue hopping blob. Move clear of its shadow and slash as it lands. Reapply powder if it returns to its tall green form. Take the fairy and exit west."],
+        ["color-nightmare-key", ["chest"], "Color Dungeon chest · Nightmare Key", "At the three vertical blocks, push the top and bottom blocks west, then move the middle block up or down. Open the chest and retrace your steps to the first spring-floor room."],
+        ["color-hinox", ["story"], "Defeat Stone Hinox", "Unlock the north door with your spare key. Jump just before the Hinox lands, then sidestep the falling rocks and return for another sword strike. Collect the fairy and go west. Lift the northwest pot to find the floor switch and open the north door."],
+        ["color-map", ["chest"], "Color Dungeon chest · Dungeon Map", "Clear the Zols on both sides of the block divider. Open the chest that appears at the northeast and continue east."],
+        ["color-key-shells", ["story"], "Collect the loose matching-hole key", "Stun and throw all four Karakoros into their matching holes. Collect the dropped key. Return west, then south, then west to the nine-orb room. Hit the center orb of each edge, leaving the corners and center alone. Go north and spend the key on the west door after clearing the Zols."],
+        ["color-beetle", ["story"], "Defeat Hardhit Beetle", "Hit the crystal to reach the Nightmare door. Jump over the Beetle’s projectiles and slash in the air. Keep up the hits as its shell changes toward red, since it recovers when given time. Take the fairy, then go east."],
+        ["color-mail", ["gear"], "Choose Red Mail or Blue Mail", "Speak to the Fairy Queen. Red Mail doubles sword damage and Blue Mail halves damage taken. Either counts for this upgrade. Return to the fairy to change your choice."],
+      ],
+    },
+    {
+      title: "Climb above the waterfall",
+      location: "Tal Tal Heights → Tal Tal Mountain Range",
+      rows: [
+        ["angler-waterfall", ["story"], "Use the Angler Key below the waterfall", "From the path by Dampé’s Shack, head east along the foot of the cliffs, pass the ladders leading up, and descend the ladder farther east. Check the fish-shaped keyhole across from the waterfall. Continue a short way east to activate the Tal Tal Heights warp if needed."],
+        ["angler-ledge-rupees", ["chest"], "Mountain cave ledge chest · 50 rupees", "Double back west, take the first climb into the mountains, and lift the rocks in front of the cave. Work east through the crystal and block room, take the staircase, and follow the passage. Use the first south exit to reach the chest on a short outdoor ledge."],
+        ["angler-enter", ["story"], "Drop onto the dungeon entrance ledge", "Go back inside from the rupee ledge. Dash through the tent to the east with the Pegasus Boots and take the farther south exit. Follow the shallow water east to the opening in the cliff edge above the drained waterfall, then drop down to the door."],
+      ],
+    },
+    {
+      title: "From the prairie to Animal Village",
+      location: "Ukuku Prairie · Animal Village · Tal Tal Mountains",
+      rows: [
+        ["trade-honey", ["trade"], "Honeycomb", "After Key Cavern, find Tarin by the tree in Ukuku Prairie and hand him the Stick. Pick up the Honeycomb when he runs off."],
+        ["trade-pineapple", ["trade"], "Pineapple", "Give the Honeycomb to Chef Bear in Animal Village."],
+        ["trade-hibiscus", ["trade"], "Hibiscus", "On the mountain route above Angler’s Tunnel, find the hungry Papahl on the ledge beyond the first cave and give him the Pineapple."],
+        ["trade-letter", ["trade"], "Goat’s Letter", "Give the Hibiscus to Christine, the goat in Animal Village."],
+        ["trade-broom", ["trade"], "Broom", "Take Christine’s letter to Mr. Write in the house northwest of the forest."],
+        ["trade-hook", ["trade"], "Fishing Hook", "Give the Broom to Grandma Yahoo. Look outside the house with a broom in Mabe Village. If she has moved, look for her in Animal Village."],
+      ],
+    },
+    {
+      title: "Desert and dash-jump detours",
+      location: "Animal Village · Yarna Desert · Ukuku Prairie · Cemetery",
+      rows: [
+        ["heart-animal", ["heart"], "Piece of Heart · Behind Animal Village", "From the desert approach, turn north before the walrus clearing. Follow the path behind the houses to the visible heart piece."],
+        ["heart-lanmola", ["heart"], "Piece of Heart · Below the sand pit", "After the Lanmola fight, descend through the sand pit or use the stairs to the east. Bomb the cracked north wall in the cave below."],
+        ["heart-ukuku-boots", ["heart"], "Piece of Heart · Behind the black barriers", "Enter the prairie cave north of the path east of its warp. Dash through the black obstacles with the Pegasus Boots. Bomb the cracked wall in the upper-right of the cave."],
+        ["heart-cemetery", ["heart"], "Piece of Heart · Cemetery tunnel", "Push the lower-right grave in the southwest group of four north. In the cave, bomb the cracked block below the stairs and dash-jump to the right, then jump north. The Hookshot offers another crossing later."],
+      ],
+    },
+    {
+      title: "Boots, beach and desert shells",
+      location: "Toronbo Shores · Martha’s Bay · Yarna Desert",
+      rows: [
+        ["shell-palm", ["shell"], "Secret Seashell · Beach palm", "Dash into the lower palm above the western approach to Toronbo Shores, south of the village library."],
+        ["shell-tail-tree", ["shell"], "Secret Seashell · Tail Cave tree", "Dash into the lone tree just west of the Tail Cave entrance."],
+        ["shell-ukuku-tree", ["shell"], "Secret Seashell · Prairie telephone tree", "Dash into the tree beside the telephone booth south of the western entrance to Ukuku Prairie."],
+        ["shell-bay-owl", ["shell"], "Secret Seashell · Bay owl islet", "From the path west of Animal Village, go south, cross the bridge and dig just west of the owl statue."],
+        ["shell-desert-dig", ["shell"], "Secret Seashell · Desert cactus clearing", "Find the owl statue in northeast Yarna Desert. Go south into the dead end ringed by cacti and dig."],
+        ["shell-desert-rock", ["shell"], "Secret Seashell · Desert cliff boulder", "Climb onto the raised path along the east edge of Yarna Desert and follow it south. Lift the loose rock at the end."],
+        ["shell-walrus", ["shell"], "Secret Seashell · Walrus encore", "After Marin wakes the walrus, face the water from the south edge of the clearing and play the Ballad of the Wind Fish on the Ocarina."],
+      ],
+    },
+    {
+      title: "Return to the crane",
+      location: "Mabe Village",
+      rows: [
+        ["fig-boo", ["figure","mini"], "Boo figure", "After Key Cavern, win Boo and place it on the round table by the right-hand door of the large family house at the north of the village."],
+      ],
+    },
+    {
+      title: "Island warp points",
+      location: "Koholint Island",
+      rows: [
+        ["warp-animal", ["warp"], "Animal Village warp", "Step on the pad just south of the village houses."],
+        ["warp-tal", ["warp"], "Tal Tal Heights warp", "Step on the visible pad south of the waterfall and dungeon entrance, beside the bomb-toss hole."],
+      ],
+    },
+    {
+      title: "Angler’s Tunnel · first four chest keys",
+      location: "Level 4",
+      rows: [
+        ["angler-compass", ["chest"], "Angler’s Tunnel chest · Compass", "Go north from the entrance. Flip the Spiked Beetles with your shield, clear them and the Zol, and go east. Clear the same enemies in the next room and open the chest on the east side."],
+        ["angler-key-crystals", ["chest"], "Angler’s Tunnel chest · Small Key in crystals", "Go south from the Compass. Use the shallow rim and hop the deep section. Clear the Water Tektites and cut a path through the purple crystals to the central chest. Return north, then west to the raised walkway."],
+        ["angler-beak", ["chest"], "Angler’s Tunnel chest · Stone Beak", "Take the stairs up in the room west of the Compass. Follow the south edge of the high walkway east, then descend its short stairs into the fenced-off side of the statue-lined room."],
+        ["angler-map", ["chest"], "Angler’s Tunnel chest · Dungeon Map", "Return west along the high walkway and take its north branch, then turn east again. Open the chest on the high ledge before descending toward the cross-shaped pit."],
+        ["angler-key-blocks", ["chest"], "Angler’s Tunnel chest · Small Key by two blocks", "Dash-jump east over the cross-shaped gap with the Boots and Feather. In the next area, go east along the shallow water. Bomb the cracked block beside the chest, then push its neighbor into the water."],
+        ["angler-key-northeast", ["chest"], "Angler’s Tunnel chest · Small Key behind cracked blocks", "Follow the shallow path north into the next room. Bomb the cracked stones screening the chest and jump or sidestep the Anti-Fairies while the bomb burns. Take the key and return to the Compass room."],
+        ["angler-key-gates", ["story"], "Spend three keys and drop the basement key", "Unlock the door east of the Compass, hop the gap, and unlock the north door. Continue north, passing the unreachable rupee chest. Dash-jump north across the cross-shaped pit, unlock the key block, and push the adjacent block up. Leave west, then defeat the two red Zols. A Small Key drops into a hole. Leave it for now."],
+        ["angler-trap", ["chest"], "Angler’s Tunnel chest · Green Zol trap", "Go south from the dropped-key room and work across the platforms to the southwest exit. In the next room a chest is guarded by Stalfos. It releases a Green Zol. Open it and defeat the Zol for a literal chest sweep, then exit north."],
+        ["angler-key-fireballs", ["chest"], "Angler’s Tunnel chest · Small Key by fireball statues", "From the lower room with five metal plates, go east. Shield against the statues’ fireballs and jump past the Spark to open the chest. Retrace the southwest loop to the room where the key fell and use this key on the north door."],
+      ],
+    },
+    {
+      title: "Angler’s Tunnel · swim to the Nightmare",
+      location: "Level 4",
+      rows: [
+        ["angler-cue", ["story"], "Defeat Cue Ball", "Watch which way Cue Ball runs around the island. Wait near an inside corner and swing at its exposed rear as it turns. Use the Feather to clear it if cornered. Collect the fairy and go north."],
+        ["angler-flippers", ["chest","gear"], "Angler’s Tunnel chest · Flippers", "Pass the closing blocks and take the west door. If they shut first, pull the lever at the northeast and run west before they close again. Defeat the two red Zols by the fireball statues and open the chest."],
+        ["angler-light-plates", ["story"], "Memorize the light sequence", "Leave the Flippers room to the south. Follow the light onto each successive metal plate and note the order shown on your screen. The same sequence opens the staircase in the lower room with five plates."],
+        ["angler-dive-key", ["story"], "Dive for the dropped Small Key", "Exit the glowing-plate room southeast, swim east across the pool, then go east from the room south of Cue Ball to the stairs. Take the underground passage west. Swim to the bottom of the pool for the fallen key and climb back out the way you came."],
+        ["angler-rupees-peahat", ["chest"], "Angler’s Tunnel chest · 50 rupees by a Peahat", "Back above ground, push the leftmost block south, cross the large pit, and swim west to the chest. Wait for the Peahat to land before fighting it. Go back north across the pit and west through the room below Cue Ball."],
+        ["angler-nightmare-key", ["chest"], "Angler’s Tunnel chest · Nightmare Key", "Swim west through the fireball room, pushing the block aside. In the lower plate room, replay the observed sequence. Descend the new stairs. Bait the Thwomps into falling and pass as they rise. At the far end, jump on the left Thwomp as it rises to reach the upper ladder. Surface and follow the high platform south to the chest."],
+        ["angler-rupees-basement", ["chest"], "Angler’s Tunnel chest · 50 rupees beyond the key block", "Leave the Nightmare Key ledge to the north, swim east via the lower exit, and cross the pool to the north-wall floor switch. Go through and unlock the key block. Push the adjacent block right and swim around to the chest."],
+        ["angler-boss", ["story"], "Defeat Angler Fish", "Return to the stairs by the key block. Swim west past the Cheep Cheeps, climb out, and go west to the Nightmare door. Unlock it and dive downstairs. Swim up to the glowing lure and slash it. Move out of the fish’s charge lane and stay clear of falling rocks before closing in again."],
+        ["angler-heart", ["container"], "Angler Fish · Heart Container", "Collect the full Heart Container in the underwater arena before swimming back up the stairs."],
+        ["angler-harp", ["instrument","story"], "Claim the Surf Harp", "Take the north door at the top of the stairs and collect the instrument."],
+      ],
+    },
+    {
+      title: "Shop Chamber Stones",
+      location: "Mabe Village",
+      rows: [
+        ["stone-shop-1", ["stone"], "Shop Chamber Stone · 1 of 7", "After completing the Color Dungeon, check the Town Tool Shop for Chamber Stones. Buy the first for 1,280 rupees."],
+        ["stone-shop-2", ["stone"], "Shop Chamber Stone · 2 of 7", "Leave and return to restock after the first purchase. Buy another for 1,280 rupees."],
+      ],
+    },
+  ],
+} satisfies RawChapter;

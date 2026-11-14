@@ -1,6 +1,6 @@
 # Facts still to verify
 
-The "Don't miss" strip (`src/data/missables.ts`) lists an entry only when two independent sources agree on the exact condition. Right now nothing qualifies, and the strip says so. These are the open questions, checked on 2026-11-12:
+The "Don't miss" strip (`src/guide/data/missables.ts`) lists an entry only when two independent sources agree on the exact condition. Right now nothing qualifies, and the strip says so. These are the open questions, checked on 2026-11-12:
 
 | Claim | State | What would settle it |
 | --- | --- | --- |
