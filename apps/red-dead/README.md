@@ -15,7 +15,7 @@ pnpm lint
 pnpm icons      # regenerate public/icons from the compass motif in scripts/icons.mjs
 ```
 
-`src/guide` is what makes this guide Red Dead: `brand.ts` (names, colours, storage keys, fonts), `config.ts` (checklist layout, categories, completion rules), `estimate.ts` (the weighted in-game estimate), the chapter data in `src/guide/data`, the calibration panel (at `/dashboard/calibration`), the banners and `theme.css`, which only sets colour and shape tokens.
+`src/guide` is what makes this guide Red Dead: `brand.ts` (names, storage keys, fonts, corner style), `config.ts` (checklist layout, categories, completion rules), `estimate.ts` (the weighted in-game estimate), the chapter data in `src/guide/data`, the calibration panel (at `/dashboard/calibration`), the banners and `theme.css`, which sets only the palette.
 
 ## Deploy
 

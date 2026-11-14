@@ -15,7 +15,7 @@ pnpm lint
 pnpm icons      # regenerate public/icons from the tri-rod motif in scripts/icons.mjs
 ```
 
-`src/guide` is what makes this guide Echoes of Wisdom: `brand.ts` (names, colours, storage keys, fonts), `config.ts` (article layout, categories, completion targets), the chapter data in `src/guide/data` (one module per chapter, plus `sweep-lists.ts`), the banners and `theme.css`, which only sets colour and shape tokens.
+`src/guide` is what makes this guide Echoes of Wisdom: `brand.ts` (names, storage keys, fonts, corner style), `config.ts` (article layout, categories, completion targets), the chapter data in `src/guide/data` (one module per chapter, plus `sweep-lists.ts`), the banners and `theme.css`, which sets only the palette.
 
 ## Deploy
 

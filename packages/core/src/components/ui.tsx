@@ -5,7 +5,7 @@ import { brand, cats, config, tagName } from "../guide";
 import type { Row } from "../types";
 import { pct } from "../format";
 
-export type ButtonStyle = "" | "outline" | "gold" | "ghost" | "danger";
+export type ButtonStyle = "" | "outline" | "accent" | "danger";
 const buttonClass = (style: ButtonStyle) => ["button", style].filter(Boolean).join(" ");
 
 interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "style" | "className"> {

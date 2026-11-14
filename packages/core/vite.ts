@@ -10,6 +10,13 @@ const here = (path: string) => fileURLToPath(new URL(path, import.meta.url));
 // index.html loads the app through this id, which resolves to core's main.tsx.
 const ENTRY = "/@core/main.tsx";
 
+/** The light palette from the guide's theme.css, for the colours the browser and the installed app show before CSS loads. */
+const lightPalette = (root: string) => {
+  const css = readFileSync(`${root}/src/guide/theme.css`, "utf8");
+  const block = css.split(":root{")[1]?.split("}")[0] ?? "";
+  return Object.fromEntries([...block.matchAll(/(--[a-z-]+):([^;]+)/g)].map(([, key, value]) => [key, value.trim()]));
+};
+
 const font = (face: FontFace) =>
   `@font-face{font-family:"${face.family}";src:url("/fonts/${face.file}") format("woff2");font-weight:${face.weight};font-display:swap}`;
 
@@ -17,7 +24,7 @@ const font = (face: FontFace) =>
  * Serves the page every guide shares: core's index.html with the brand filled in, and theme-init.js beside it.
  * theme-init.js stays an external file so the CSP can forbid inline scripts.
  */
-const guideShell = (root: string, brand: Brand): Plugin => {
+const guideShell = (root: string, brand: Brand, palette: Record<string, string>): Plugin => {
   const page = `${root}/index.html`;
   const template = readFileSync(here("./index.html"), "utf8");
   const themeInit = readFileSync(here("./theme-init.js"), "utf8");
@@ -25,7 +32,8 @@ const guideShell = (root: string, brand: Brand): Plugin => {
     TITLE: brand.title,
     SHORT_NAME: brand.shortName,
     DESCRIPTION: brand.description,
-    THEME_COLOR: brand.colors.light,
+    THEME_COLOR: palette["--surface"],
+    CORNERS: brand.corners,
     STORAGE: brand.storagePrefix,
     FONTS: [
       font(brand.fonts.display),
@@ -62,14 +70,15 @@ const guideShell = (root: string, brand: Brand): Plugin => {
 };
 
 /** The whole Vite and Vitest setup for a guide app: pass the app's folder and its brand. */
-export const guideConfig = (root: string, brand: Brand) =>
-  defineConfig({
+export const guideConfig = (root: string, brand: Brand) => {
+  const palette = lightPalette(root);
+  return defineConfig({
     resolve: {
       // Core imports the guide's config, panels and theme through virtual:guide/…, which is the app's src/guide.
       alias: [{ find: /^virtual:guide\//, replacement: `${root}/src/guide/` }],
     },
     plugins: [
-      guideShell(root, brand),
+      guideShell(root, brand, palette),
       react(),
       VitePWA({
         // "prompt": a new version waits until the reader accepts, so a reload never lands mid-checklist.
@@ -84,8 +93,8 @@ export const guideConfig = (root: string, brand: Brand) =>
           scope: "/",
           display: "standalone",
           orientation: "any",
-          theme_color: brand.colors.light,
-          background_color: brand.colors.background,
+          theme_color: palette["--surface"],
+          background_color: palette["--paper"],
           categories: ["games", "utilities"],
           icons: [
             { src: "icons/icon-192.png", sizes: "192x192", type: "image/png" },
@@ -109,8 +118,10 @@ export const guideConfig = (root: string, brand: Brand) =>
       environment: "jsdom",
       globals: true,
       setupFiles: [here("./src/test/setup.ts")],
-      css: false,
+      // Stylesheets load empty in tests, except the ?raw text the theme test reads.
+      css: { include: [/\.css\?raw$/] },
       // Core's shared suites run against this guide, beside the guide's own tests.
       include: ["src/**/*.test.{ts,tsx}", `${here("./src")}/**/*.test.{ts,tsx}`],
     },
   });
+};

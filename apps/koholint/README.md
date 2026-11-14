@@ -15,7 +15,7 @@ pnpm lint
 pnpm icons      # regenerate public/icons from the compass motif in scripts/icons.mjs
 ```
 
-`src/guide` is what makes this guide Koholint: `brand.ts` (names, colours, storage keys, fonts), `config.ts` (article layout, categories, completion rules), the chapter data in `src/guide/data`, the deathless-run panel (`run-log.ts` and `DeathlessRun.tsx`, at `/dashboard/deathless`), the banners and `theme.css`, which only sets colour and shape tokens.
+`src/guide` is what makes this guide Koholint: `brand.ts` (names, storage keys, fonts, corner style), `config.ts` (article layout, categories, completion rules), the chapter data in `src/guide/data`, the deathless-run panel (`run-log.ts` and `DeathlessRun.tsx`, at `/dashboard/deathless`), the banners and `theme.css`, which sets only the palette.
 
 ## Deploy
 

@@ -1,7 +1,6 @@
 import { useEffect, useSyncExternalStore } from "react";
 import { THEME_KEY, useTheme } from "./store/theme";
 import { STORAGE_KEY } from "./progress-state";
-import { brand } from "./guide";
 import { useProgress } from "./store/progress";
 
 const query = () => matchMedia("(prefers-color-scheme: dark)");
@@ -23,8 +22,11 @@ export function useGlobalEffects() {
   const resolved = useResolvedTheme();
 
   useEffect(() => {
-    document.documentElement.dataset.theme = resolved;
-    document.querySelector<HTMLMetaElement>('meta[name="theme-color"]')?.setAttribute("content", brand.colors[resolved]);
+    const root = document.documentElement;
+    root.dataset.theme = resolved;
+    // The topbar is the surface colour, so the browser's own bar matches it.
+    const surface = getComputedStyle(root).getPropertyValue("--surface").trim();
+    document.querySelector<HTMLMetaElement>('meta[name="theme-color"]')?.setAttribute("content", surface);
   }, [resolved]);
 
   useEffect(() => {

@@ -14,12 +14,20 @@ Each app's history from its old repository is kept under its folder, so `git log
 
 - **`packages/core`** (`@game-guides/core`, used through the workspace, not published) is the app itself. It holds the React 19 pages, components, stores and styles. It also holds the page shell (`index.html`, `theme-init.js`), the shared test suites and `vite.ts`, which builds an app's whole Vite and Vitest config from its brand.
 - **`apps/<name>`** is one guide:
-  - `src/guide`: brand, config, chapter data, theme tokens, optional panels and banners;
+  - `src/guide`: brand, config, chapter data, palette, optional panels and banners;
   - `public/fonts` and `public/icons`;
   - `scripts/icons.mjs`, which holds the guide's icon art;
   - `vercel.json`, a README and `docs/facts-to-verify.md`.
 
   Its `vite.config.ts` is a single call to `guideConfig`.
+
+Every guide shares one house style:
+- a topbar and rail that follow the light or dark theme;
+- a banner tinted from the palette, with the chapter art fading in on the right;
+- one 26px checkbox;
+- headings set in the display font at weight 700, in the case they're written.
+
+A guide chooses only its palette (`theme.css`), its two fonts and corner preset (`brand.ts`), its icon art and its banners.
 
 Core reaches the guide through `virtual:guide/config`, `virtual:guide/panels` and `virtual:guide/theme.css`. `vite.ts` aliases these to the app's `src/guide`, and the app's `tsconfig.json` maps them the same way. A guide's `config.ts` imports only core's `types` and `format`, so the two never import each other in a loop.
 
@@ -56,8 +64,7 @@ Start from `apps/echoes`, the plainest of the three: article layout, no panels a
    - `backupFile`;
    - `mark`, and `icon` (any name from `packages/core/src/components/Icon.tsx`);
    - `game` and `credit`;
-   - `hero`: `"overlay"` puts a dark banner under a shade, `"inset"` gives a tinted hero with the art on the right;
-   - `colors`: the light and dark theme colours and the manifest background;
+   - `corners`: `"narrow"` for soft square corners (Koholint, Red Dead) or `"normal"` for round buttons, chips and tags (Echoes);
    - `fonts`: display and body, each with a family, a file in `public/fonts`, a weight range and a fallback.
 2. **`config.ts`** holds the guide's rules:
    - `layout: "article"`, or `"checklist"` for a mission list like Red Dead's;
@@ -90,7 +97,7 @@ Start from `apps/echoes`, the plainest of the three: article layout, no panels a
    } satisfies RawChapter;
    ```
 
-4. **`theme.css`**: copy the closest theme and change the values only.
+4. **`theme.css`**: the palette and nothing else. Set the same eleven colours for `:root` and `:root[data-theme="dark"]`: `paper`, `surface`, `raised`, `ink`, `muted`, `line`, `primary`, `on-primary`, `accent`, `on-accent` and `focus`. Core derives every border, tint, hover, the banner tint and the browser's theme colour from them.
 5. **`panels.ts`**: `export const panels: Panel[] = [];`, unless the game needs its own tracker.
 6. **`guide.test.ts`**: pin the game's own totals, as Echoes does with `targets`, so a missing row fails a count.
 7. **The rest**:
@@ -105,7 +112,7 @@ The shared tests then hold the new guide to the same rules:
 - the first tag is the label and must be a category;
 - every link is https;
 - each flagged missable has two sources on different hosts;
-- the theme sets every token core uses and nothing but tokens.
+- the theme sets exactly the palette, and keeps text at 4.5:1 and checkbox edges and the focus ring at 3:1 in both themes.
 
 ## Deploy
 

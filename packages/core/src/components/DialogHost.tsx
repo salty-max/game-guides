@@ -136,8 +136,8 @@ function SettingsForm() {
             ))}
           </select>
         </label>
-        <label>
-          <input type="checkbox" name="spoilers" defaultChecked={data.spoilers} /> Hide later chapters
+        <label className="check-label">
+          <input type="checkbox" className="check" name="spoilers" defaultChecked={data.spoilers} /> Hide later chapters
         </label>
         <label className="field">
           Reveal through

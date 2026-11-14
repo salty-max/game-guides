@@ -13,8 +13,7 @@ export const brand = {
   icon: "compass",
   game: "Link’s Awakening",
   credit: "Nintendo Switch · 2019 remake",
-  hero: "overlay",
-  colors: { light: "#172d25", dark: "#102019", background: "#152b23" },
+  corners: "narrow",
   fonts: {
     display: { family: "Playfair Display", file: "playfair.woff2", weight: "500 700", fallback: "Georgia,serif" },
     sans: { family: "DM Sans", file: "dm-sans.woff2", weight: "400 700", fallback: "system-ui,sans-serif" },

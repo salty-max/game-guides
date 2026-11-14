@@ -13,8 +13,7 @@ export const brand = {
   icon: "tri",
   game: "Echoes of Wisdom",
   credit: "Nintendo Switch · 2024",
-  hero: "inset",
-  colors: { light: "#e9e2f7", dark: "#1a1730", background: "#f8f4fc" },
+  corners: "normal",
   fonts: {
     display: { family: "Fraunces", file: "fraunces.woff2", weight: "100 900", fallback: "Georgia,serif" },
     sans: { family: "Nunito", file: "nunito.woff2", weight: "200 1000", fallback: "system-ui,sans-serif" },

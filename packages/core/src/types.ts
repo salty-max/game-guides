@@ -117,9 +117,8 @@ export interface Brand {
   game: string;
   /** Small print under the rail. */
   credit: string;
-  /** "overlay": the banner fills the hero under a shade. "inset": a tinted hero with the banner on its right. */
-  hero: "overlay" | "inset";
-  colors: { light: string; dark: string; background: string };
+  /** "narrow": soft square corners. "normal": round buttons, chips and tags. */
+  corners: "narrow" | "normal";
   fonts: { display: FontFace; sans: FontFace };
 }
 

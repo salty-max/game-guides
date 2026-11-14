@@ -13,8 +13,7 @@ export const brand = {
   icon: "compass",
   game: "Red Dead Redemption",
   credit: "Original campaign · 2010",
-  hero: "overlay",
-  colors: { light: "#281b15", dark: "#1e1410", background: "#231812" },
+  corners: "narrow",
   fonts: {
     display: { family: "Barlow Condensed", file: "barlow-condensed.woff2", weight: "700", fallback: '"Arial Narrow",sans-serif' },
     sans: { family: "DM Sans", file: "dm-sans.woff2", weight: "400 700", fallback: "system-ui,sans-serif" },

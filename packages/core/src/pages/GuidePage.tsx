@@ -7,7 +7,7 @@ import { MissablesStrip } from "../components/MissablesStrip";
 import { NextUp } from "../components/NextUp";
 import { SourceLinks } from "../components/SourceLinks";
 import { Breadcrumb, Button, LinkButton } from "../components/ui";
-import { brand, CHAPTER_COUNT, chapterRows, chapters, completion, config, guideAnchor, overall, readChapter, text } from "../guide";
+import { CHAPTER_COUNT, chapterRows, chapters, completion, config, guideAnchor, overall, readChapter, text } from "../guide";
 import { two } from "../format";
 import { useReveal } from "../useReveal";
 import { isOpen, useProgress } from "../store/progress";
@@ -97,7 +97,7 @@ function GuideView({ chapter, target }: { chapter: Chapter; target?: string }) {
   return (
     <>
       <Breadcrumb current={chapter.title} />
-      <section className="hero" data-style={brand.hero} data-chapter={chapter.id}>
+      <section className="hero">
         {config.banners[chapter.id] && (
           <img className="hero-art" src={config.banners[chapter.id]} alt="" width={1800} height={600} fetchPriority="high" />
         )}
@@ -112,15 +112,15 @@ function GuideView({ chapter, target }: { chapter: Chapter; target?: string }) {
           <p>{chapter.intro}</p>
           <div className="hero-actions">
             {config.layout === "article" ? (
-              <LinkButton to={`${path}/${chapter.groups[0].key}`} look="gold" icon="down">
+              <LinkButton to={`${path}/${chapter.groups[0].key}`} look="accent" icon="down">
                 Read walkthrough
               </LinkButton>
             ) : (
-              <LinkButton to={`${path}/${firstLeft?.id ?? chapter.groups[0].key}`} look="gold" icon="play">
+              <LinkButton to={`${path}/${firstLeft?.id ?? chapter.groups[0].key}`} look="accent" icon="play">
                 {started ? "Resume route" : "Start walkthrough"}
               </LinkButton>
             )}
-            <LinkButton to={`/checklist/all/${chapter.id}`} look="ghost" icon="checkList">
+            <LinkButton to={`/checklist/all/${chapter.id}`} icon="checkList">
               Chapter checklist
             </LinkButton>
           </div>
