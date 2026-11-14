@@ -19,7 +19,7 @@ pnpm icons      # regenerate public/icons from the tri-rod motif in scripts/icon
 
 ## Deploy
 
-The Vercel project `echoes-of-wisdom-field-guide` builds this folder as its Root Directory and serves [echoes-of-wisdom-field-guide.vercel.app](https://echoes-of-wisdom-field-guide.vercel.app). `vercel.json` here sets the install, build, ignore command, rewrites, CSP and cache rules; the [root README](../../README.md#deploy) explains them.
+The Vercel project `echoes-of-wisdom-field-guide` builds this folder as its Root Directory and serves [echoes.hundo.quest](https://echoes.hundo.quest). The old address, echoes-of-wisdom-field-guide.vercel.app, still answers and hands each reader's progress over (see the root README). `vercel.json` here sets the install, build, ignore command, rewrites, CSP and cache rules; the [root README](../../README.md#deploy) explains them.
 
 ## Use the guide
 

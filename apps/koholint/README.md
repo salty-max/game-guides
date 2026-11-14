@@ -19,7 +19,7 @@ pnpm icons      # regenerate public/icons from the compass motif in scripts/icon
 
 ## Deploy
 
-The Vercel project `koholint-field-guide` builds this folder as its Root Directory and serves [koholint-field-guide.vercel.app](https://koholint-field-guide.vercel.app). `vercel.json` here sets the install, build, ignore command, rewrites, CSP and cache rules; the [root README](../../README.md#deploy) explains them.
+The Vercel project `koholint-field-guide` builds this folder as its Root Directory and serves [koholint.hundo.quest](https://koholint.hundo.quest). The old address, koholint-field-guide.vercel.app, still answers and hands each reader's progress over (see the root README). `vercel.json` here sets the install, build, ignore command, rewrites, CSP and cache rules; the [root README](../../README.md#deploy) explains them.
 
 ## Use the guide
 

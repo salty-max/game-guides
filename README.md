@@ -4,9 +4,9 @@ Spoiler-aware, installable field guides for single-player games: one app per gam
 
 | App | Game | Site |
 | --- | --- | --- |
-| [`apps/koholint`](apps/koholint) | *Link’s Awakening* (Switch, 2019) | [koholint-field-guide.vercel.app](https://koholint-field-guide.vercel.app) |
-| [`apps/red-dead`](apps/red-dead) | *Red Dead Redemption* | [red-dead-field-guide.vercel.app](https://red-dead-field-guide.vercel.app) |
-| [`apps/echoes`](apps/echoes) | *Echoes of Wisdom* (Switch, 2024) | [echoes-of-wisdom-field-guide.vercel.app](https://echoes-of-wisdom-field-guide.vercel.app) |
+| [`apps/koholint`](apps/koholint) | *Link’s Awakening* (Switch, 2019) | [koholint.hundo.quest](https://koholint.hundo.quest) |
+| [`apps/red-dead`](apps/red-dead) | *Red Dead Redemption* | [reddead.hundo.quest](https://reddead.hundo.quest) |
+| [`apps/echoes`](apps/echoes) | *Echoes of Wisdom* (Switch, 2024) | [echoes.hundo.quest](https://echoes.hundo.quest) |
 
 Each app's history from its old repository is kept under its folder, so `git log -- apps/koholint` goes back to the first commit.
 
@@ -65,6 +65,7 @@ Start from `apps/echoes`, the plainest of the three: article layout, no panels a
    - `mark`, and `icon` (any name from `packages/core/src/components/Icon.tsx`);
    - `game` and `credit`;
    - `corners`: `"narrow"` for soft square corners (Koholint, Red Dead) or `"normal"` for round buttons, chips and tags (Echoes);
+   - `home`: the guide's address, `https://<name>.hundo.quest`;
    - `fonts`: display and body, each with a family, a file in `public/fonts`, a weight range and a fallback.
 2. **`config.ts`** holds the guide's rules:
    - `layout: "article"`, or `"checklist"` for a mission list like Red Dead's;
@@ -140,4 +141,13 @@ What each `vercel.json` sets:
 
 Check header changes against a real preview deployment, not just locally.
 
-Storage keys come from each brand's `storagePrefix` and haven't changed, so readers keep their progress as long as each guide stays on its domain.
+Each guide lives on a subdomain of `hundo.quest`, which is registered through Vercel in team jellycat. The subdomain is added to its project, and Vercel's DNS does the rest.
+
+Progress lives in the browser, per address. When a guide moves address:
+- `brand.movedFrom` lists the old hostnames, and `brand.home` gives the new address;
+- the old address keeps serving the guide, so its own service worker updates as usual;
+- on a reader's first visit there, `packages/core/src/boot.ts` redirects to the same page on `home`;
+- the saved progress and theme travel in the URL fragment, which never reaches a server;
+- the new address imports them only when the visit came from an old address and it has no checks yet, then clears the fragment.
+
+Keep the old addresses attached while readers may still use them. Never change `storagePrefix`.

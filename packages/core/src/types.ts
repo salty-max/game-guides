@@ -119,6 +119,10 @@ export interface Brand {
   credit: string;
   /** "narrow": soft square corners. "normal": round buttons, chips and tags. */
   corners: "narrow" | "normal";
+  /** The guide's own address, such as "https://koholint.hundo.quest". */
+  home?: string;
+  /** Hostnames the guide used to live on. They hand readers and their progress over to `home`. */
+  movedFrom?: string[];
   fonts: { display: FontFace; sans: FontFace };
 }
 
