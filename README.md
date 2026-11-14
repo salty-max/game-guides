@@ -68,4 +68,6 @@ bun harness/hooks.ts install .
 | Run the checks, look at a change in a browser | [docs/testing.md](docs/testing.md) |
 | Deploy: Vercel projects, the ignore command, previews | [docs/deploying.md](docs/deploying.md) |
 
+For Claude Code sessions, `.claude/skills/` turns the recurring tasks into procedures: `guide-new`, `guide-content`, `guide-banners`, `guide-check` and `guide-deploy`.
+
 Adding a guide starts from a copy of `apps/echoes`. Each guide deploys as its own Vercel project with its folder as the Root Directory and lives on a hundo.quest subdomain. Every change is checked on a preview deployment before production.

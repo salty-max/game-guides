@@ -81,7 +81,8 @@ The second argument sets how much of the canvas the motif fills for each kind, s
 One WebP per chapter, `src/guide/banners/chapter-N.webp`, picked up by `byChapter(import.meta.glob(…))` in `config.ts`.
 
 - The current banners are 1700 to 1800 pixels wide and 567 to 630 tall, about 3:1. Echoes' are 1800×600.
-- The art fills the right 68% of the banner, anchored at 76% across, and fades in from the left over the palette tint. At 1050px and narrower it stacks above the text. Keep the subject right of centre, and keep the left third quiet.
+- The art fills the right 68% of the banner, anchored at 76% across. It fades in from the left over the palette tint: fully transparent for the first 9% of the art's width, fully opaque from 66%. At 1050px and narrower, the whole image stacks above the text. Keep the subject right of centre, and keep the left third quiet.
+- The page crops any image that isn't 3:1 to fit (`object-fit: cover`), so make them exactly 1800×600.
 - The service worker precaches every banner, so its size counts toward a reader's first install. The three guides' sets run from about 0.6 MB to 1.5 MB.
 - Credit the art in the guide's README.
 

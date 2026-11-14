@@ -30,7 +30,7 @@ Each guide's own `guide.test.ts` adds its totals, its legacy saves, its extra st
 
 ## In a browser
 
-The tests don't see layout, fonts, colour or how a page reads. Look at every visible change in a browser before calling it done.
+The tests don't see layout, fonts, colour or how a page reads. Look at every visible change in a browser before calling it done. The `guide-check` skill (`.claude/skills/guide-check`) scripts what follows. It builds, serves and screenshots each guide at 1280×860 and 390×844 in both themes, and makes a before/after page.
 
 ### Start a guide
 
@@ -57,7 +57,7 @@ Every entry uses `--strictPort`, so it fails rather than drifting to another por
 
 ### What to look at
 
-Do each of these on desktop and on a phone-sized viewport (375×812: `resize_window` with the `mobile` preset in the pane, or the browser's device toolbar), in light and dark:
+Do each of these on desktop and on a phone-sized viewport, in light and dark. The pane's `mobile` preset in `resize_window` is 375×812, and the browser's device toolbar works too. Any phone width from 375 to 390 will do.
 
 1. **The page you changed**, and the guide, checklist, progress and sources pages if the change is in core.
 2. **The theme:** the sun or moon in the header switches it, and the choice is saved under `<storagePrefix>.theme`. With nothing saved, the page follows the system setting.

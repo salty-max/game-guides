@@ -8,18 +8,22 @@ Spoiler-aware PWA field guides for single-player games: a pnpm workspace with on
 - `pnpm check`: lint (warnings fail), typecheck, tests and build in every package. Through the harness: `bun harness/q.ts check -- bun run check`, which stamps the tree for the push gate.
 - `bun harness/hooks.ts install .`, once per clone, from the main checkout's root: it points `core.hooksPath` at `harness/githooks`. `bun harness/hooks.ts status` shows whether they're on. Never run it from a worktree, which would point the whole repository at that worktree's copy.
 - In an app folder: `pnpm dev`, `pnpm test`, `pnpm build`, `pnpm preview`, `pnpm icons`.
-- Browser pane: `preview_start` with `koholint`, `red-dead` or `echoes` for dev, or `<name>-preview` for a production build (`.claude/launch.json`).
+- Browser pane: `preview_start` with `koholint`, `red-dead` or `echoes` for dev, or `<name>-preview` for a production build (`.claude/launch.json`). These load only in a session started in this repository.
+- Screenshots: `node .claude/skills/guide-check/scripts/shoot.mjs --out <dir>` (the `guide-check` skill).
 
-## Which doc for which task
+## Which skill and doc for which task
 
-| Task | Read first |
-| --- | --- |
-| Add a guide | `docs/adding-a-guide.md` |
-| Write or fix chapter data, missables, counts, `facts-to-verify.md` | `docs/chapter-data.md` |
-| Palette, fonts, corners, icon, banners, buttons | `docs/house-style.md` |
-| Anything in `packages/core` | `docs/core.md` |
-| Run the checks, look at a change in a browser | `docs/testing.md` |
-| Vercel, previews, production, `vercel.json` | `docs/deploying.md` |
+The skills, in `.claude/skills/`, hold the procedures. The docs hold the reference they point to.
+
+| Task | Skill | Doc |
+| --- | --- | --- |
+| Add a guide | `guide-new` | `docs/adding-a-guide.md` |
+| Write or fix chapter data, missables, counts, `facts-to-verify.md` | `guide-content` | `docs/chapter-data.md` |
+| Chapter banners | `guide-banners` | `docs/house-style.md` |
+| Palette, fonts, corners, icon, buttons | | `docs/house-style.md` |
+| Anything in `packages/core` | | `docs/core.md` |
+| Look at a change in a browser, before and after | `guide-check` | `docs/testing.md` |
+| Vercel, previews, production, a new project | `guide-deploy` | `docs/deploying.md` |
 
 ## Hard rules
 

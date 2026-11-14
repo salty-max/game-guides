@@ -57,7 +57,7 @@ Each of these broke something or nearly did. `packages/core/src/deploy.test.ts` 
 
 ## Preview first
 
-Nothing reaches production without being looked at on a preview deployment first.
+Nothing reaches production without being looked at on a preview deployment first. The `guide-deploy` skill (`.claude/skills/guide-deploy`) has the commands, including a header check that gets through deployment protection.
 
 1. Push a branch. Each project whose ignore command sees a change builds a preview deployment of it, and the Vercel dashboard and the GitHub pull request link to each one.
 2. On each preview that built:
@@ -69,7 +69,7 @@ Nothing reaches production without being looked at on a preview deployment first
    - in a regular browser, the service worker registers, the guide works offline after one visit, and a newer deploy shows the update prompt.
 3. Once every preview is right, merge to `main` with the user's go. Each project that sees a change builds production from `main`.
 
-Previews may sit behind Vercel's deployment protection. If so, `curl` gets a 401, and the header check is done in a signed-in browser's network panel instead.
+Previews sit behind Vercel's deployment protection, so a plain `curl` doesn't get through. `vercel curl`, run from a folder linked to the project, does. Anywhere else it gets a 302. The `guide-deploy` skill's `headers.sh` does this. A signed-in browser's network panel works too.
 
 ## A new project
 
