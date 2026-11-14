@@ -1,0 +1,20 @@
+import { useNavigate } from "react-router";
+import { useProgress } from "./store/progress";
+import { useUi } from "./store/ui";
+
+/** Ask, then reveal through `chapter` and open it, at `target` (a row id or section key) when given. */
+export function useReveal() {
+  const navigate = useNavigate();
+  const openDialog = useUi((s) => s.openDialog);
+  return (chapter: number, target?: string) =>
+    openDialog({
+      kind: "confirm",
+      title: `Reveal through Chapter ${chapter}?`,
+      explanation: "This also reveals earlier chapters in navigation, checklist and search.",
+      label: "Reveal and open",
+      onConfirm: () => {
+        useProgress.getState().reveal(chapter);
+        navigate(target ? `/guide/${chapter}/${target}` : `/guide/${chapter}`);
+      },
+    });
+}

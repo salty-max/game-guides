@@ -1,0 +1,67 @@
+/* Echoes of Wisdom: token values and chapter banners only. Selectors and layout live in src/core/styles.css. */
+:root{
+  color-scheme:light;
+  --paper:#f8f4fc;--surface:#fffefb;--raised:#f3ecfb;--ink:#2a2444;--muted:#5b5576;
+  --line:#e1d8ef;--line-soft:#e1d8ef;--control-line:#a99bc9;--edge:#a99bc9;--scrollbar:#a99bc9;--focus:#7a4fd0;
+  --primary:#6648b0;--primary-hover:#553b97;--on-primary:#fff;--link:#6648b0;--accent:#f0bd4a;
+  --soft:#efe7fb;--soft-ink:#4a3689;--done:#f1ecf9;--highlight:#fdf0c9;
+  --bar-track:#efe7fb;--bar-fill:#6648b0;
+  --gold:#f0bd4a;--gold-hover:#f7cf72;--on-gold:#3b2a05;
+  --ghost-bg:#ffffff66;--ghost-line:#2a244466;--ghost-ink:#2a2444;--ghost-hover:#ffffffa6;
+  --error:#a02d4c;--danger:#a02d4c;--on-danger:#fff;--ok:#43a778;--warn:#e0663f;
+  --check-edge:#a99bc9;--check-bg:#fffefb;--check-on:#6648b0;--check-mark:#fff;
+  --rose-bg:#fbe3ea;--rose-ink:#8a2f4d;--violet-bg:#ece6fb;--violet-ink:#4a3689;--amber-bg:#fbf0cc;--amber-ink:#6d4d06;
+  --clay-bg:#f8e6dc;--clay-ink:#7a4330;--sky-bg:#e1effb;--sky-ink:#25558a;--mint-bg:#def3e8;--mint-ink:#1f5a42;
+  --missable-bg:#fbe3ea;--missable-ink:#8a2f4d;--missable-line:#8a2f4d;
+  --chrome:#efe7fb;--chrome-ink:#2a2444;--chrome-muted:#2a2444;--chrome-accent:#2a2444;--chrome-line:#d9cdee;--chrome-edge:#d9cdee;--chrome-hover:#e1d4f5;--chrome-active:#d4c4f2;
+  --brand-bg:linear-gradient(145deg,#8b6bd6,#5a3fa0);--brand-ink:#ffe9a8;--brand-accent:#6648b0;--brand-size:20px;--brand-tracking:-.01em;
+  --rail:#f4eefb;--rail-ink:#2a2444;--rail-border:#e1d8ef;--rail-heading:#5b5576;--rail-muted:#5b5576;--rail-line:#a99bc9;--rail-hover:#f3ecfb;
+  --rail-current:#efe7fb;--rail-current-line:#a99bc9;--rail-current-ink:#2a2444;--rail-number-on:#6648b0;--rail-number-ink:#fff;
+  --rail-card:#fffefb;--rail-card-line:#e1d8ef;--rail-accent:#6648b0;
+  --display-weight:700;--display-tracking:-.015em;--display-case:none;
+  --hero-min:245px;--hero-min-phone:0px;--hero-line:#e1d8ef;--hero-bg:linear-gradient(120deg,#d9ecf8,#e6dcf8);--hero-ink:#2a2444;--hero-text:#2a2444;--hero-meta:#2a2444;
+  --hero-shadow:none;--hero-shade:none;--hero-shade-phone:none;--kicker-bg:#2a2444;--kicker-ink:#fff;
+  --hero-size:clamp(38px,5vw,62px);--hero-size-phone:34px;--hero-leading:1.02;--hero-tracking:-.02em;
+  --shadow:#1a103d4d;--backdrop:#150e2fcc;
+  --r-button:999px;--r-chip:999px;--r-tag:999px;--r-control:12px;--r-card:16px;--r-small:10px;--r-hero:22px;--r-dialog:20px;--r-check:8px;--r-brand:12px;
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --paper:#131025;--surface:#1d1936;--raised:#262046;--ink:#f0ebff;--muted:#c5bde0;
+  --line:#3b3468;--line-soft:#3b3468;--control-line:#7f72b5;--edge:#7f72b5;--scrollbar:#7f72b5;--focus:#e5c06a;
+  --primary:#c4b0ff;--primary-hover:#d8cbff;--on-primary:#1c1438;--link:#c4b0ff;
+  --soft:#2f2756;--soft-ink:#d9ccff;--done:#26204a;--highlight:#4a3d1c;
+  --bar-track:#2f2756;--bar-fill:#c4b0ff;
+  --ghost-bg:#ffffff14;--ghost-line:#ffffff55;--ghost-ink:#f4efff;--ghost-hover:#ffffff26;
+  --error:#ffb3c6;--danger:#ffb3c6;--on-danger:#2a0e18;
+  --check-edge:#7f72b5;--check-bg:#1d1936;--check-on:#c4b0ff;--check-mark:#1c1438;
+  --rose-bg:#4a2437;--rose-ink:#ffc3d5;--violet-bg:#2f2756;--violet-ink:#d9ccff;--amber-bg:#463a17;--amber-ink:#f4dd96;
+  --clay-bg:#4a2f24;--clay-ink:#f3c9b3;--sky-bg:#1f3350;--sky-ink:#bddaf7;--mint-bg:#1d3d33;--mint-ink:#b4ecd2;
+  --missable-bg:#4a2437;--missable-ink:#ffc3d5;--missable-line:#ffc3d5;
+  --chrome:#17142b;--chrome-ink:#f0ebff;--chrome-muted:#f0ebff;--chrome-accent:#f0ebff;--chrome-line:#332c5c;--chrome-edge:#332c5c;--chrome-hover:#262049;--chrome-active:#342b63;
+  --brand-accent:#c4b0ff;
+  --rail:#1a1630;--rail-ink:#f0ebff;--rail-border:#3b3468;--rail-heading:#c5bde0;--rail-muted:#c5bde0;--rail-line:#7f72b5;--rail-hover:#262046;
+  --rail-current:#2f2756;--rail-current-line:#7f72b5;--rail-current-ink:#f0ebff;--rail-number-on:#c4b0ff;--rail-number-ink:#1c1438;
+  --rail-card:#1d1936;--rail-card-line:#3b3468;--rail-accent:#c4b0ff;
+  --hero-line:#3b3468;--hero-ink:#f4efff;--hero-text:#f4efff;--hero-meta:#f4efff;--kicker-bg:#f4efff;--kicker-ink:#1c1438;
+}
+
+/* chapter banners: a tint per chapter behind the illustration */
+.hero[data-chapter="1"]{--hero-bg:linear-gradient(120deg,#cdeedd,#c2e0f4)}
+.hero[data-chapter="2"]{--hero-bg:linear-gradient(120deg,#fbe6bd,#f8cfc0)}
+.hero[data-chapter="3"]{--hero-bg:linear-gradient(120deg,#c3e5f6,#c4d0f5)}
+.hero[data-chapter="4"]{--hero-bg:linear-gradient(120deg,#e2d4f7,#f6d3e3)}
+.hero[data-chapter="5"]{--hero-bg:linear-gradient(120deg,#fbd1c2,#f9e0b3)}
+.hero[data-chapter="6"]{--hero-bg:linear-gradient(120deg,#e3effa,#d6dcf6)}
+.hero[data-chapter="7"]{--hero-bg:linear-gradient(120deg,#d6efc9,#bfe6dc)}
+.hero[data-chapter="8"]{--hero-bg:linear-gradient(120deg,#d4d0f3,#e9cbea)}
+.hero[data-chapter="9"]{--hero-bg:linear-gradient(120deg,#fbeab8,#f6d2e2)}
+:root[data-theme="dark"] .hero[data-chapter="1"]{--hero-bg:linear-gradient(120deg,#1b4344,#1e3a63)}
+:root[data-theme="dark"] .hero[data-chapter="2"]{--hero-bg:linear-gradient(120deg,#5a4220,#5a2f35)}
+:root[data-theme="dark"] .hero[data-chapter="3"]{--hero-bg:linear-gradient(120deg,#1c3f5d,#2a3466)}
+:root[data-theme="dark"] .hero[data-chapter="4"]{--hero-bg:linear-gradient(120deg,#392861,#5a2b48)}
+:root[data-theme="dark"] .hero[data-chapter="5"]{--hero-bg:linear-gradient(120deg,#612f27,#5c4520)}
+:root[data-theme="dark"] .hero[data-chapter="6"]{--hero-bg:linear-gradient(120deg,#27395a,#30305f)}
+:root[data-theme="dark"] .hero[data-chapter="7"]{--hero-bg:linear-gradient(120deg,#27471f,#1b4a42)}
+:root[data-theme="dark"] .hero[data-chapter="8"]{--hero-bg:linear-gradient(120deg,#2f2a63,#512a5a)}
+:root[data-theme="dark"] .hero[data-chapter="9"]{--hero-bg:linear-gradient(120deg,#5a4a1c,#552944)}
