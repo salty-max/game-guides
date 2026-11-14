@@ -1,6 +1,7 @@
 import { allRows, chapters, rowsByTag, tally } from "@game-guides/core/guide";
-import { validateState } from "@game-guides/core/progress-state";
+import { STORAGE_KEY, validateState } from "@game-guides/core/progress-state";
 import { targets } from "./config";
+import { THEME_KEY } from "@game-guides/core/store/theme";
 
 const [a] = allRows.map((row) => row.id);
 
@@ -38,5 +39,13 @@ describe("Echoes of Wisdom saves from before the shared format", () => {
 
   it("refuses other guides' and unknown versions", () => {
     for (const bad of [{ ...v1, version: 2 }, { ...v1, guide: "red-dead-redemption" }, { ...v1, guide: undefined }]) expect(() => validateState(bad)).toThrow();
+  });
+});
+
+describe("storage", () => {
+  // Readers' progress and theme live under these keys on this domain: new keys start every reader from nothing.
+  it("keeps its storage keys", () => {
+    expect(STORAGE_KEY).toBe("echoes-of-wisdom-field-guide.v1");
+    expect(THEME_KEY).toBe("echoes-of-wisdom-field-guide.theme");
   });
 });

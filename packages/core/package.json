@@ -13,7 +13,7 @@
     "./icons": "./icons.mjs"
   },
   "scripts": {
-    "lint": "eslint ."
+    "lint": "eslint . --max-warnings 0"
   },
   "dependencies": {
     "react": "catalog:",

@@ -1,6 +1,7 @@
 import { allRows, chapters, coreRows, missablesLeft } from "@game-guides/core/guide";
-import { defaultState, validateState } from "@game-guides/core/progress-state";
+import { STORAGE_KEY, defaultState, validateState } from "@game-guides/core/progress-state";
 import { calibrationDelta, estimate, pointsLeft, readPercent } from "./estimate";
+import { THEME_KEY } from "@game-guides/core/store/theme";
 
 const all = Object.fromEntries(allRows.map((row) => [row.id, true as const]));
 const [a] = allRows.map((row) => row.id);
@@ -59,5 +60,13 @@ describe("in-game percentage", () => {
     expect(readPercent("12")).toBe(12);
     expect(readPercent(0)).toBe(0);
     for (const bad of [140, -1, "x", NaN, null, undefined, true, {}]) expect(readPercent(bad)).toBeNull();
+  });
+});
+
+describe("storage", () => {
+  // Readers' progress and theme live under these keys on this domain: new keys start every reader from nothing.
+  it("keeps its storage keys", () => {
+    expect(STORAGE_KEY).toBe("red-dead-field-guide.v1");
+    expect(THEME_KEY).toBe("red-dead-field-guide.theme");
   });
 });

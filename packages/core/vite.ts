@@ -118,6 +118,8 @@ export const guideConfig = (root: string, brand: Brand) => {
       environment: "jsdom",
       globals: true,
       setupFiles: [here("./src/test/setup.ts")],
+      // The deploy test reads this app's vercel.json.
+      env: { GUIDE_ROOT: root },
       // Stylesheets load empty in tests, except the ?raw text the theme test reads.
       css: { include: [/\.css\?raw$/] },
       // Core's shared suites run against this guide, beside the guide's own tests.

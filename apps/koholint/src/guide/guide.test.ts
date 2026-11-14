@@ -1,6 +1,7 @@
 import { allRows, chapters, coreRows } from "@game-guides/core/guide";
-import { defaultState, validateState } from "@game-guides/core/progress-state";
+import { STORAGE_KEY, defaultState, validateState } from "@game-guides/core/progress-state";
 import { readRunLog } from "./run-log";
+import { THEME_KEY } from "@game-guides/core/store/theme";
 
 const [a] = allRows.map((row) => row.id);
 
@@ -44,5 +45,13 @@ describe("run log", () => {
     expect(log.runs.hero).toEqual({ deaths: 0, cleared: false });
     expect(log.runs.normal).toEqual({ deaths: 2, cleared: true });
     expect(readRunLog(undefined)).toEqual({ mode: "normal", runs: { normal: { deaths: 0, cleared: false }, hero: { deaths: 0, cleared: false } } });
+  });
+});
+
+describe("storage", () => {
+  // Readers' progress and theme live under these keys on this domain: new keys start every reader from nothing.
+  it("keeps its storage keys", () => {
+    expect(STORAGE_KEY).toBe("koholint-field-guide.v1");
+    expect(THEME_KEY).toBe("koholint-field-guide.theme");
   });
 });
