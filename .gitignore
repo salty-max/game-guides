@@ -6,4 +6,10 @@ coverage
 .vercel
 .DS_Store
 .env*
-.claude/
+# .claude/settings.json, agents/ and launch.json are shared; these stay local
+.claude/settings.local.json
+.claude/worktrees/
+
+# the harness's local state
+.harness/
+.cache/
