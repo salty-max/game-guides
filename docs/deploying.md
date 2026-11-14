@@ -4,7 +4,7 @@ Every push, deploy and release needs the user's go, asked in the session that wa
 
 ## The projects
 
-Each guide is its own Vercel project on the team jellycat, built from this repository. The project is named after the app's package (`hundo-koholint` for `apps/koholint`). The guide lives at `https://<sub>.hundo.quest`, attached to its project as a domain. The subdomain is chosen per guide (`koholint`, `reddead`, `echoes`) and set as `brand.home`. `hundo.quest` is registered through Vercel on the same team, so Vercel's DNS does the rest. The first three guides' old addresses (`koholint-field-guide.vercel.app`, `red-dead-field-guide.vercel.app`, `echoes-of-wisdom-field-guide.vercel.app`) stay attached to their projects so they can hand readers over (see the pitfalls); each brand lists its own in `brand.movedFrom`. The root README's apps table lists the projects and their sites.
+Each guide is its own Vercel project on the team jellycat, built from this repository. The project is named after the app's package (`hundo-koholint` for `apps/koholint`). The guide lives at `https://<sub>.hundo.quest`, attached to its project as a domain. The subdomain is chosen per guide (`koholint`, `reddead`, `echoes`) and set as `brand.home`. `hundo.quest` is registered through Vercel on the same team, so Vercel's DNS does the rest. The first three guides moved here from `*.vercel.app` addresses with the hand-off below; once their readers had moved, the old addresses were detached and `movedFrom` removed from their brands. The root README's apps table lists the projects and their sites.
 
 Settings that live in the Vercel dashboard rather than in the repository:
 

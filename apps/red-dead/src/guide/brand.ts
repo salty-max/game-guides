@@ -15,7 +15,6 @@ export const brand = {
   credit: "Original campaign · 2010",
   corners: "narrow",
   home: "https://reddead.hundo.quest",
-  movedFrom: ["red-dead-field-guide.vercel.app"],
   fonts: {
     display: { family: "Barlow Condensed", file: "barlow-condensed.woff2", weight: "700", fallback: '"Arial Narrow",sans-serif' },
     sans: { family: "DM Sans", file: "dm-sans.woff2", weight: "400 700", fallback: "system-ui,sans-serif" },

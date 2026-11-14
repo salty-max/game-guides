@@ -15,7 +15,6 @@ export const brand = {
   credit: "Nintendo Switch · 2019 remake",
   corners: "narrow",
   home: "https://koholint.hundo.quest",
-  movedFrom: ["koholint-field-guide.vercel.app"],
   fonts: {
     display: { family: "Playfair Display", file: "playfair.woff2", weight: "500 700", fallback: "Georgia,serif" },
     sans: { family: "DM Sans", file: "dm-sans.woff2", weight: "400 700", fallback: "system-ui,sans-serif" },

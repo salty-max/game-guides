@@ -68,4 +68,4 @@ bun harness/hooks.ts install .
 | Run the checks, look at a change in a browser | [docs/testing.md](docs/testing.md) |
 | Deploy: Vercel projects, the ignore command, previews | [docs/deploying.md](docs/deploying.md) |
 
-Adding a guide starts from a copy of `apps/echoes`. Each guide deploys as its own Vercel project with its folder as the Root Directory and lives on a hundo.quest subdomain. Its old `.vercel.app` address hands readers and their progress over. Every change is checked on a preview deployment before production.
+Adding a guide starts from a copy of `apps/echoes`. Each guide deploys as its own Vercel project with its folder as the Root Directory and lives on a hundo.quest subdomain. Every change is checked on a preview deployment before production.
