@@ -59,6 +59,7 @@ export default {
 - Every link is https and has a label **(tested)**. That covers guide, chapter and group sources, the reassurance's sources and row references.
 - Label a source by what it settles ("Sanctum interior and roof chest"), not just by the site's name. Red Dead adds the site in front: "iRedDead · story missions".
 - Draft from the pages you link, and link the page you actually used. Where two pages disagree, note it in `docs/facts-to-verify.md`, with which one the data follows.
+- Before rows are committed, someone who didn't write them checks every claim against the page it cites (the `guide-content` skill, step 5).
 - Each guide's README says the content was drafted from community guides and not replayed in the game. Keep that true: anything you did check in the game, say so in `facts-to-verify.md`.
 
 ## Missables
@@ -92,7 +93,7 @@ What goes in:
 - **Counts and weights** taken from sources and not recounted in the game, with where they came from.
 - **Missable candidates** with fewer than two sources, and what each source says.
 - **Disagreements** between sources, and which one the data follows.
-- **How a source was read.** Say "read directly on 2026-11-14" or "search summary only": a page that blocked fetching and was only seen through a search summary is weaker.
+- **How a source was read.** Say "read directly on 2026-11-14", "read in the browser (fetching was refused)" or "search summary only": a page that blocked fetching and was only seen through a search summary is weaker.
 - **Spoiler checks** done by eye, not by a playtester.
 - **Content left out on purpose**, and why, so nobody adds it back as a "fix".
 
