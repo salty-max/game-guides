@@ -14,6 +14,7 @@
 Readers' progress lives in their browser, so a careless change can wipe it.
 
 - The keys are `<storagePrefix>.v1` for progress (`progress-state.ts`) and `<storagePrefix>.theme` for the theme (`store/theme.ts`). `theme-init.js` reads the theme key before the app loads. Don't change how either key is built. Each guide's `guide.test.ts` pins both full keys.
+- `boot.ts` runs before any store reads storage. It redirects the old hash routes (`#guide/3`). For a guide that moved address (`brand.home` and `brand.movedFrom`), it also hands each reader's progress over from the old address to the new one, through the URL fragment. `boot.test.ts` covers the handover, and [deploying.md](deploying.md#pitfalls) says when to use it. `main.tsx` imports it first, and renders nothing while it's leaving for the new address. Keep that order.
 - Saves and backups use one format, `{ version: 3, guide, checks, ceiling, spoilers, chapter, extra }`. `validateState` reads every save on load and every imported backup, and quietly drops checks for ids the data doesn't have.
 - To change the format: bump `version` inside the saved object (not the key's `.v1`, which stays forever), keep reading every older version, and write only the new one. Then extend `progress-state.test.ts` and each guide's legacy cases in `guide.test.ts`, the ones that load real older saves. The three guides still read their saves from before the shared format through `config.state.legacy`.
 

@@ -25,12 +25,12 @@ Spoiler-aware PWA field guides for single-player games: a pnpm workspace with on
 
 Each one is a mistake already made, or one that would cost readers their progress.
 
-- **Storage keys and domains never change.** Progress lives in each reader's localStorage under `<storagePrefix>.v1` on the guide's origin, and the theme under `<storagePrefix>.theme`. A new key or domain starts everyone from nothing. The `.v1` stays even when the save format's `version` moves on. Each guide's `guide.test.ts` pins both keys.
+- **Storage keys never change, and an address changes only with a hand-off.** Progress lives in each reader's localStorage under `<storagePrefix>.v1` on the guide's origin, and the theme under `<storagePrefix>.theme`. A new key, or a bare move to a new address, starts everyone from nothing. A move needs `brand.home`, `brand.movedFrom` and the old address left serving ([docs/deploying.md](docs/deploying.md#pitfalls)). The `.v1` stays even when the save format's `version` moves on. Each guide's `guide.test.ts` pins both keys.
 - **Row ids never change once live.** They're the saved checks, and a renamed id comes back unticked for every reader.
 - **`theme-init.js` stays an external file.** The CSP has `script-src 'self'` and no inline scripts. `deploy.test.ts` checks both.
 - **No `cleanUrls` in `vercel.json`.** It breaks the SPA rewrite, so deep links 404. `deploy.test.ts` checks it.
 - **The catch-all rewrite skips `/assets`, `/fonts` and `/icons`.** A missing hashed asset must 404, not come back as HTML. `deploy.test.ts` checks it.
-- **Every app's `vercel.json` is the same file**, and its ignore command watches the app, core and the root workspace files. `deploy.test.ts` checks both.
+- **Every app's `vercel.json` is the same file**, and its ignore command (`scripts/vercel-ignore.sh`) watches the app, core, `scripts` and the root workspace files, and only ever exits 0 or 1: Vercel fails a deployment on any other code. `deploy.test.ts` checks all of it.
 - **A guide sets only its palette (`theme.css`), its fonts and `corners` (`brand.ts`), its icon art and its banners.** Every other look is core's. `theme.test.ts` holds the palette to eleven keys and to contrast in both themes.
 - **Never pass `className` (or `style`) to `Button`.** Pick a `look`. The type forbids both.
 - **Raw CSS imports load empty in Vitest unless they're let through.** Read a stylesheet as text with `?raw`, which `vite.ts`'s `test.css.include` allows. The theme test once passed on nothing because of this.

@@ -4,7 +4,7 @@ Every push, deploy and release needs the user's go, asked in the session that wa
 
 ## The projects
 
-Each guide is its own Vercel project on the team jellycat, built from this repository. The project is named after the app's package (`koholint-field-guide` for `apps/koholint`) and serves `<project>.vercel.app`. The root README's apps table lists them.
+Each guide is its own Vercel project on the team jellycat, built from this repository. The project is named after the app's package (`koholint-field-guide` for `apps/koholint`). The guide lives at `https://<sub>.hundo.quest`, attached to its project as a domain. The subdomain is chosen per guide (`koholint`, `reddead`, `echoes`) and set as `brand.home`. `hundo.quest` is registered through Vercel on the same team, so Vercel's DNS does the rest. The project's own `<project>.vercel.app` is the guide's old address, kept attached so it can hand readers over (see the pitfalls). The root README's apps table lists them.
 
 Settings that live in the Vercel dashboard rather than in the repository:
 
@@ -19,20 +19,16 @@ Every app's `vercel.json` is the same, and `deploy.test.ts` fails if one drifts:
 
 - **Install:** `pnpm install --frozen-lockfile`. Run from the app folder, pnpm finds the workspace root and installs everything from the root lockfile. A lockfile that doesn't match a `package.json` fails the deploy, the same way it fails CI.
 - **Build:** `pnpm build`, which is `tsc && vite build`, with output in `dist`.
-- **Ignore command:**
-
-  ```
-  git diff --quiet ${VERCEL_GIT_PREVIOUS_SHA:-HEAD^} HEAD -- . ../../packages/core ../../package.json ../../pnpm-lock.yaml ../../pnpm-workspace.yaml ../../tsconfig.base.json
-  ```
-
-  Vercel skips the build when this exits 0 and builds on anything else. It diffs from the last deployed commit (`VERCEL_GIT_PREVIOUS_SHA`, or the previous commit when that's empty) over the app's own folder, core and the root files the build reads. These cases were tried on real commit ranges when the monorepo was set up:
+- **Ignore command:** `sh ../../scripts/vercel-ignore.sh`, one script for every app. Vercel skips the build when it exits 0 and builds when it exits 1. **Any other exit code fails the deployment.** The script diffs from the last deployed commit (`VERCEL_GIT_PREVIOUS_SHA`, or the previous commit when that's empty) over the app's own folder, core, `scripts` and the root files the build reads. It answers 1 whenever it can't compare. What it answers:
 
   | Case | Exit | Result |
   | --- | --- | --- |
   | a commit touching only Echoes, on the Koholint project | 0 | skipped |
   | the same commit on the Echoes project | 1 | built |
   | `VERCEL_GIT_PREVIOUS_SHA` empty | 1 | compared with `HEAD^`, built |
-  | the previous commit missing from Vercel's shallow clone | 128 | built |
+  | the previous deployed commit no longer in history | 1 | built |
+
+  The last case once failed all three production deploys. A bare `git diff` in the ignore command exited 128 on a commit that had been rewritten away, and Vercel treats that as an error, not a build. `deploy.test.ts` holds the script to literal exits 0 and 1, ending in `exit 1`, and to valid shell syntax. The first three rows were tried on real commit ranges with the earlier bare `git diff`, when the monorepo was set up.
 
   So a change to one guide deploys only that guide, and a change to core, the lockfile or the root `package.json` deploys all three. The root `docs/`, `README.md` and `CLAUDE.md`, the harness, the ESLint config and `.github/` aren't in the list, and a commit touching only those deploys nothing. An app's own `README.md` and `docs/facts-to-verify.md` sit inside its folder, though, so editing them redeploys that guide. If the build starts to read another root file, add it to the list in every app. `deploy.test.ts` checks that core and the root workspace files stay in it.
 
@@ -52,7 +48,11 @@ Each of these broke something or nearly did. `packages/core/src/deploy.test.ts` 
 - **Never turn on `cleanUrls`.** It made deep links like `/guide/3` return 404, because the catch-all rewrite stopped applying (fixed in `38e8d39`).
 - **Keep `/assets`, `/fonts` and `/icons` out of the catch-all.** A request for a hashed asset from an older deploy must be a real 404. Rewritten, it gets `index.html` back in place of JavaScript. That breaks the page, and the one-year cache rule on `/assets` can keep the HTML cached.
 - **No inline scripts.** The CSP forbids them, so `theme-init.js`, which sets the theme before first paint, stays an external file. Don't fold it into `index.html`, and don't add `'unsafe-inline'` to make something work.
-- **Storage keys and domains never change.** Progress lives in the reader's browser, in localStorage, under `<storagePrefix>.v1`, and localStorage belongs to one origin. A new domain or a new prefix starts every reader from nothing. Each guide's `guide.test.ts` pins its full keys. Keep each project on its `.vercel.app` domain. If a custom domain is ever added, keep the old one serving the guide: a redirect would strand everyone's progress on the old origin.
+- **Storage keys never change, and an address changes only with a hand-off.** Progress lives in the reader's browser, in localStorage, under `<storagePrefix>.v1`, and localStorage belongs to one origin, so a new prefix or a bare redirect starts every reader from nothing. Each guide's `guide.test.ts` pins its full keys. To move a guide:
+  - set `brand.home` to the new address and list the old hostnames in `brand.movedFrom`;
+  - keep the old address attached and serving.
+
+  On every visit there, `packages/core/src/boot.ts` redirects to the same page on `home`, with the saved progress and theme in the URL fragment. The new address imports them only when the visit came from an old address and it has no checks yet. `boot.test.ts` covers it.
 - **Check headers on a real preview.** `vite preview` doesn't send them.
 
 ## Preview first
@@ -79,5 +79,6 @@ For a new guide, after its folder passes `pnpm check` ([adding-a-guide.md](addin
 2. Name it after the app's package, `<name>-field-guide`, which gives it `<name>-field-guide.vercel.app`.
 3. Set the Root Directory to `apps/<name>`. Leave "Include files outside the Root Directory" on. Vercel picks up the framework, install, build and output from the app's `vercel.json`.
 4. Set the Node.js version to 26.x and the production branch to `main`.
-5. Deploy a preview first, and check it as above, before the first production deploy.
-6. Add the guide to the root README's apps table.
+5. Add the guide's `<sub>.hundo.quest` to the project's domains. Its `brand.home` is already set in `brand.ts`.
+6. Deploy a preview first, and check it as above, before the first production deploy.
+7. Add the guide to the root README's apps table.

@@ -46,6 +46,7 @@ Delete what's Echoes' own:
 - `icon`: any name from `packages/core/src/components/Icon.tsx`.
 - `game` (the breadcrumb root) and `credit` (small print under the rail).
 - `corners` and `fonts`: [house-style.md](house-style.md#fonts-and-corners).
+- `home`: the guide's address, `https://<sub>.hundo.quest`. The subdomain is chosen per guide: Red Dead's folder is `red-dead`, but its address is `reddead`. `movedFrom` stays out of a new guide; it's only for a guide that changes address ([deploying.md](deploying.md#pitfalls)).
 
 ### `config.ts`
 
