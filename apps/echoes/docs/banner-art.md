@@ -1,0 +1,19 @@
+# Chapter banner prompts
+
+The chapter artwork in `src/assets/banners` was created with built-in image generation and exported as 1800 × 600 WebP files.
+
+## Shared prompt
+
+Use case: stylized-concept. Original environmental illustration for a chapter banner in a fan walkthrough for The Legend of Zelda: Echoes of Wisdom. Make a cohesive, beautifully lit miniature fantasy diorama with rounded handcrafted shapes, hand-painted wood and stone, touchable moss and vegetation, soft shadows, subtle depth of field, and the warmth of a storybook. Recognizable Echoes of Wisdom toy-world atmosphere. No characters, bosses, plot reveals, glyphs, text, logos, borders, UI, watermarks, or panels. Full-bleed wide landscape, one scene. Aim for ultrawide 3:1 banner framing if supported. Keep the main silhouette and setting legible when cropped vertically to the central band, with focal detail around 70 percent of the way across and slightly below mid-height. Lower-contrast atmospheric scenery on the left, where the companion website may overlay type. Deliberate palette, clear shapes, inviting composition.
+
+## Scenes
+
+- `chapter-1.webp` · Suthorn Ruins. An intimate, moss-covered stone ruin with a round doorway in a sunny southern Hyrule woodland, winding path, fern banks and a little shallow stream. Fresh mint and warm green, honey-colored sunlight through leaves, small cream wildflowers. Emphasize the stone arch right of center.
+- `chapter-2.webp` · Gerudo Desert. A domed sandstone desert settlement and stepped temple ruins amid peach dunes and red-brown cliffs, with a slender turquoise oasis and palms as a crisp accent. Amber dusk, dusty rose, copper and warm gold. Emphasize the sandstone silhouette and oasis right of center.
+- `chapter-3.webp` · Jabul Waters. Bright turquoise pools with tiny wooded islands, rounded white-blue cascades between limestone terraces, a few colorful stilt cottages and reeds. Aquamarine, celadon and blue-violet shade. A waterfall into a lagoon is the main focal point right of center.
+- `chapter-4.webp` · Hyrule Castle. Broad fairy-tale castle approach, ivory stone gate and blue slate towers rising behind terraced flower gardens and a stone bridge, gently lit under lavender morning clouds. Royal blue, rose and warm cream. The gate and towers sit right of center.
+- `chapter-5.webp` · Eldin Volcano. Rugged red basalt cliffs and a small rounded stone settlement cut into the lower flank of a rocky volcano, thin ribbons of incandescent lava glowing in channels. Rich rust red, candlelit orange and charcoal. Frame the settlement under the mountain on the right, with a small clear eruption-free summit.
+- `chapter-6.webp` · Hebra Mountain. A snowy alpine trail and tiny welcoming wooden cabin beneath high pale peaks, rounded pines with heavy snow, blue-violet shadows and a hint of warm window light. Icy blue, silver and mauve. Cabin and softly lit peaks on the right.
+- `chapter-7.webp` · Faron Wetlands. A deep green tropical marsh with giant leaves and roots, round lily pads across jade pools, weathered carved stone temple frontage partly covered by leafy vines. Emerald, teal, ochre and specks of sun. Concentrate the moss-covered stone entrance right of center.
+- `chapter-8.webp` · Eternal Forest. Ancient dense broadleaf woodland at blue hour, towering dark indigo trunks and twisted roots framing a path leading to a small quiet opening with faint violet mist and warm fireflies. Amethyst, blue-green and dusty pink. Mysterious but inviting. No climactic or otherworldly location.
+- `chapter-9.webp` · A final journey through Hyrule. Wide view from a flower-dotted grassy hill over winding trails, a river, a distant blue-roofed village and layered mountains in soft golden-hour light. In the right foreground, a small trail signpost with blank wooden arms points towards the broad landscape. Warm amber, moss green, lilac haze, and peach light. No lettering on the sign.

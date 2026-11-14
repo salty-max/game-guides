@@ -12,6 +12,12 @@ import { isOpen, useProgress } from "../store/progress";
 import { useUi } from "../store/ui";
 import type { Chapter } from "../types";
 
+const chapterBanners = import.meta.glob<string>("../assets/banners/chapter-*.webp", {
+  eager: true,
+  query: "?url",
+  import: "default",
+});
+
 const routeLabels: [string, string][] = [
   ["all", "All steps"],
   ["echo", "Echoes"],
@@ -130,6 +136,14 @@ function GuideView({ chapter, initialHighlight }: { chapter: Chapter; initialHig
     <>
       <Breadcrumb current={chapter.title} />
       <section className="hero" data-chapter={chapter.id}>
+        <img
+          className="hero-art"
+          src={chapterBanners[`../assets/banners/chapter-${chapter.id}.webp`]}
+          alt=""
+          width={1800}
+          height={600}
+          fetchPriority="high"
+        />
         <div className="hero-content">
           <div className="hero-meta">
             <span className="kicker">Chapter {two(chapter.id)} / {two(CHAPTER_COUNT)}</span>
