@@ -1,4 +1,4 @@
-/* Echoes of Wisdom: token values and chapter banners only. Selectors and layout live in src/core/styles.css. */
+/* Echoes of Wisdom: token values and chapter banners only. Selectors and layout live in packages/core/src/styles.css. */
 :root{
   color-scheme:light;
   --paper:#f8f4fc;--surface:#fffefb;--raised:#f3ecfb;--ink:#2a2444;--muted:#5b5576;

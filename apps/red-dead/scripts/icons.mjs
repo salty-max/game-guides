@@ -1,6 +1,5 @@
 // Regenerates the PWA icons in public/icons from the compass motif. Run: pnpm icons
-import { mkdir, writeFile } from "node:fs/promises";
-import sharp from "sharp";
+import { writeIcons } from "@game-guides/core/icons";
 
 const BG = "#231812";
 const FG = "#d7ad72";
@@ -17,17 +16,4 @@ const svg = (glyph, radius) => {
 </svg>`;
 };
 
-const out = "public/icons";
-await mkdir(out, { recursive: true });
-const png = (name, markup, px) => sharp(Buffer.from(markup)).resize(px, px).png().toFile(`${out}/${name}`);
-
-await Promise.all([
-  png("icon-192.png", svg(0.62, 0.22), 192),
-  png("icon-512.png", svg(0.62, 0.22), 512),
-  // Maskable: full-bleed background, glyph inside the 80% safe zone.
-  png("maskable-512.png", svg(0.5, 0), 512),
-  // iOS rounds the corners itself, so the background must be opaque and square.
-  png("apple-touch-icon.png", svg(0.6, 0), 180),
-  writeFile(`${out}/favicon.svg`, svg(0.62, 0.22)),
-]);
-console.log("icons written to", out);
+await writeIcons(svg, { icon: 0.62, maskable: 0.5, apple: 0.6 });

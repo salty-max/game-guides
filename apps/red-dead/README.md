@@ -2,27 +2,24 @@
 
 A spoiler-aware, unofficial companion for the original *Red Dead Redemption* campaign. The checklist targets the game’s **Redeemed** 100% stat and works with the original and modern releases of that campaign.
 
-## Run it locally
+## Work on it
 
-A React 19 + TypeScript single-page app built with Vite. You need Node 20+ and pnpm.
+This folder is one app in the [game-guides](../../README.md) monorepo; the app itself is `packages/core`. Install once at the repository root with `pnpm install`, then run these from here:
 
 ```bash
-pnpm install
 pnpm dev        # http://localhost:5173
 pnpm build      # typecheck + production build into dist/
 pnpm preview    # serve the production build
-pnpm test       # Vitest data, state and app-flow tests
+pnpm test       # this guide's tests plus core's shared suites, run against this guide
 pnpm lint
-pnpm icons      # regenerate public/icons
+pnpm icons      # regenerate public/icons from the compass motif in scripts/icons.mjs
 ```
 
-Routes are real paths (`/guide/3`, `/checklist/location`, `/dashboard/calibration`, `/sources`), so a static host needs a fallback to `index.html`. Old hash links such as `#guide/3` redirect. The app is an installable PWA (vite-plugin-pwa): it precaches the shell, fonts and banners, works offline, and asks before swapping in a new version.
-
-The code is split in two. `src/core` is the app itself and is byte-for-byte the same in the Koholint and Echoes of Wisdom guides. `src/guide` is what makes this guide Red Dead: `brand.ts` (names, colours, storage keys, fonts), `config.ts` (checklist layout, categories, completion rules), `estimate.ts` (the weighted in-game estimate), the chapter data in `src/guide/data`, the calibration panel, the banners and `theme.css`, which only sets colour and shape tokens.
+`src/guide` is what makes this guide Red Dead: `brand.ts` (names, colours, storage keys, fonts), `config.ts` (checklist layout, categories, completion rules), `estimate.ts` (the weighted in-game estimate), the chapter data in `src/guide/data`, the calibration panel (at `/dashboard/calibration`), the banners and `theme.css`, which only sets colour and shape tokens.
 
 ## Deploy
 
-Intended for Vercel from `main`. `vercel.json` sets the build (`pnpm build` → `dist`), a catch-all rewrite to `index.html`, a strict CSP (no inline scripts), security headers and cache rules. Check header changes against a real preview deployment, not just locally.
+The Vercel project `red-dead-field-guide` builds this folder as its Root Directory and serves [red-dead-field-guide.vercel.app](https://red-dead-field-guide.vercel.app). `vercel.json` here sets the install, build, ignore command, rewrites, CSP and cache rules; the [root README](../../README.md#deploy) explains them.
 
 ## Use the guide
 

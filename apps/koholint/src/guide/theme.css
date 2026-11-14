@@ -1,4 +1,4 @@
-/* Koholint: token values and chapter banners only. Selectors and layout live in src/core/styles.css. */
+/* Koholint: token values and chapter banners only. Selectors and layout live in packages/core/src/styles.css. */
 :root{
   color-scheme:light;
   --paper:#f6f5ee;--surface:#fffef9;--raised:#f1f4eb;--ink:#25342b;--muted:#5e6b61;

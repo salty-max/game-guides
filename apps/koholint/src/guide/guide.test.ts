@@ -1,5 +1,5 @@
-import { allRows, chapters, coreRows } from "../core/guide";
-import { defaultState, validateState } from "../core/progress-state";
+import { allRows, chapters, coreRows } from "@game-guides/core/guide";
+import { defaultState, validateState } from "@game-guides/core/progress-state";
 import { readRunLog } from "./run-log";
 
 const [a] = allRows.map((row) => row.id);

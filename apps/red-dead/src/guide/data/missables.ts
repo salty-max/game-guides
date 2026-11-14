@@ -1,4 +1,4 @@
-import type { Missable } from "../../core/types";
+import type { Missable } from "@game-guides/core/types";
 
 /**
  * Entries that can be lost if you move on. A row is listed here only when two independent sources agree;

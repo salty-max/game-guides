@@ -1,6 +1,6 @@
-import type { Brand } from "../core/types";
+import type { Brand } from "@game-guides/core/types";
 
-/** Names, colours, storage and fonts. Also read by vite.config.ts for the manifest and index.html. */
+/** Names, colours, storage and fonts. Also read by the build for the manifest and the page head. */
 export const brand = {
   id: "links-awakening",
   name: "Koholint Field Guide",

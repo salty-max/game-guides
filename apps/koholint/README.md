@@ -2,27 +2,24 @@
 
 A responsive companion for *The Legend of Zelda: Link’s Awakening* on Nintendo Switch (2019).
 
-## Run it locally
+## Work on it
 
-The app is a React 19 + TypeScript single-page app built with Vite. You need Node 20+ and pnpm.
+This folder is one app in the [game-guides](../../README.md) monorepo; the app itself is `packages/core`. Install once at the repository root with `pnpm install`, then run these from here:
 
 ```bash
-pnpm install
 pnpm dev        # http://localhost:5173
 pnpm build      # typecheck + production build into dist/
 pnpm preview    # serve the production build
-pnpm test       # Vitest unit and component tests
+pnpm test       # this guide's tests plus core's shared suites, run against this guide
 pnpm lint
-pnpm icons      # regenerate public/icons from the compass motif
+pnpm icons      # regenerate public/icons from the compass motif in scripts/icons.mjs
 ```
 
-Routes are real paths (`/guide/3`, `/checklist/heart`, `/dashboard/deathless`, `/sources`), so any static host needs a fallback to `index.html`. Old hash links such as `#guide/3` still redirect. The app is an installable PWA (vite-plugin-pwa): it precaches the shell, fonts and banners, works offline, and asks before swapping in a new version.
-
-The code is split in two. `src/core` is the app itself and is byte-for-byte the same in the Red Dead and Echoes of Wisdom guides. `src/guide` is what makes this guide Koholint: `brand.ts` (names, colours, storage keys, fonts), `config.ts` (article layout, categories, completion rules), the chapter data in `src/guide/data`, the deathless-run panel, the banners and `theme.css`, which only sets colour and shape tokens.
+`src/guide` is what makes this guide Koholint: `brand.ts` (names, colours, storage keys, fonts), `config.ts` (article layout, categories, completion rules), the chapter data in `src/guide/data`, the deathless-run panel (`run-log.ts` and `DeathlessRun.tsx`, at `/dashboard/deathless`), the banners and `theme.css`, which only sets colour and shape tokens.
 
 ## Deploy
 
-Hosted on Vercel from `main`. `vercel.json` sets the build (`pnpm build` → `dist`), a catch-all rewrite to `index.html`, a strict CSP (no inline scripts), security headers, and cache rules: `no-cache` for `index.html`, `sw.js`, `theme-init.js` and the manifest, and one-year `immutable` for hashed `/assets`. Check header changes against a real preview deployment, not just locally.
+The Vercel project `koholint-field-guide` builds this folder as its Root Directory and serves [koholint-field-guide.vercel.app](https://koholint-field-guide.vercel.app). `vercel.json` here sets the install, build, ignore command, rewrites, CSP and cache rules; the [root README](../../README.md#deploy) explains them.
 
 ## Use the guide
 

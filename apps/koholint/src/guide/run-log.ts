@@ -9,7 +9,7 @@ export interface RunLog {
   runs: Record<RunMode, Run>;
 }
 
-declare module "../core/types" {
+declare module "@game-guides/core/types" {
   interface Register {
     extra: RunLog;
   }

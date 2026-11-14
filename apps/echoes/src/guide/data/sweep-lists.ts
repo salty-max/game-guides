@@ -1,4 +1,4 @@
-import type { RawGroup } from "../../core/types";
+import type { RawGroup } from "@game-guides/core/types";
 
 /** Catalogue lists and completion milestones the chapter routes don't walk through. They close the final chapter. */
 export const sweepLists: RawGroup[] = [

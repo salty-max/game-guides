@@ -1,4 +1,4 @@
-/* Red Dead: token values only. Selectors and layout live in src/core/styles.css. */
+/* Red Dead: token values only. Selectors and layout live in packages/core/src/styles.css. */
 :root{
   color-scheme:light;
   --paper:#f3ecdf;--surface:#fffbf2;--raised:#f7ecdc;--ink:#32271f;--muted:#67584a;

@@ -1,5 +1,5 @@
-import { allRows, chapters, coreRows, missablesLeft } from "../core/guide";
-import { defaultState, validateState } from "../core/progress-state";
+import { allRows, chapters, coreRows, missablesLeft } from "@game-guides/core/guide";
+import { defaultState, validateState } from "@game-guides/core/progress-state";
 import { calibrationDelta, estimate, pointsLeft, readPercent } from "./estimate";
 
 const all = Object.fromEntries(allRows.map((row) => [row.id, true as const]));

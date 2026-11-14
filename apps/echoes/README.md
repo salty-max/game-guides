@@ -2,27 +2,24 @@
 
 A spoiler-aware, unofficial companion for *The Legend of Zelda: Echoes of Wisdom* (Nintendo Switch, 2024): a nine-chapter walkthrough with a checklist for the game's completion list.
 
-## Run it locally
+## Work on it
 
-A React 19 + TypeScript single-page app built with Vite. You need Node 20+ and pnpm.
+This folder is one app in the [game-guides](../../README.md) monorepo; the app itself is `packages/core`. Install once at the repository root with `pnpm install`, then run these from here:
 
 ```bash
-pnpm install
 pnpm dev        # http://localhost:5173
 pnpm build      # typecheck + production build into dist/
 pnpm preview    # serve the production build
-pnpm test       # Vitest data, state and app-flow tests
+pnpm test       # this guide's tests plus core's shared suites, run against this guide
 pnpm lint
-pnpm icons      # regenerate public/icons
+pnpm icons      # regenerate public/icons from the tri-rod motif in scripts/icons.mjs
 ```
 
-Routes are real paths (`/guide/3`, `/checklist/echo`, `/dashboard`, `/sources`), so a static host needs a fallback to `index.html`. The app is an installable PWA (vite-plugin-pwa): it precaches the shell, chapter banners and fonts, works offline, and asks before swapping in a new version.
-
-The code is split in two. `src/core` is the app itself and is byte-for-byte the same in the Koholint and Red Dead guides. `src/guide` is what makes this guide Echoes of Wisdom: `brand.ts` (names, colours, storage keys, fonts), `config.ts` (article layout, categories, completion targets), the chapter data in `src/guide/data` (one module per chapter, plus `sweep-lists.ts`), the banners and `theme.css`, which only sets colour and shape tokens.
+`src/guide` is what makes this guide Echoes of Wisdom: `brand.ts` (names, colours, storage keys, fonts), `config.ts` (article layout, categories, completion targets), the chapter data in `src/guide/data` (one module per chapter, plus `sweep-lists.ts`), the banners and `theme.css`, which only sets colour and shape tokens.
 
 ## Deploy
 
-Meant for Vercel from `main`. `vercel.json` sets the build (`pnpm build` → `dist`), a rewrite to `index.html` that skips `/assets`, `/fonts` and `/icons`, a strict CSP (no inline scripts), security headers and cache rules. Check header changes against a real preview deployment, not just locally.
+The Vercel project `echoes-of-wisdom-field-guide` builds this folder as its Root Directory and serves [echoes-of-wisdom-field-guide.vercel.app](https://echoes-of-wisdom-field-guide.vercel.app). `vercel.json` here sets the install, build, ignore command, rewrites, CSP and cache rules; the [root README](../../README.md#deploy) explains them.
 
 ## Use the guide
 

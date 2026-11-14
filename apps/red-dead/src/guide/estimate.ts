@@ -1,11 +1,11 @@
-import type { Checks, LeftItem, Row } from "../core/types";
+import type { Checks, LeftItem, Row } from "@game-guides/core/types";
 
 /** The percentage the player read in the game (Stats → General), saved as the progress state's `extra`. */
 export interface Reported {
   reported: number | null;
 }
 
-declare module "../core/types" {
+declare module "@game-guides/core/types" {
   interface Register {
     extra: Reported;
   }

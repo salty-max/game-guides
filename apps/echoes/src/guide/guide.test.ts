@@ -1,5 +1,5 @@
-import { allRows, chapters, rowsByTag, tally } from "../core/guide";
-import { validateState } from "../core/progress-state";
+import { allRows, chapters, rowsByTag, tally } from "@game-guides/core/guide";
+import { validateState } from "@game-guides/core/progress-state";
 import { targets } from "./config";
 
 const [a] = allRows.map((row) => row.id);

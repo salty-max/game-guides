@@ -1,0 +1,24 @@
+{
+  "name": "@game-guides/core",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./types": "./src/types.ts",
+    "./format": "./src/format.ts",
+    "./guide": "./src/guide.ts",
+    "./progress-state": "./src/progress-state.ts",
+    "./store/*": "./src/store/*.ts",
+    "./components/*": "./src/components/*.tsx",
+    "./vite": "./vite.ts",
+    "./icons": "./icons.mjs"
+  },
+  "scripts": {
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "react-router": "^8.5.1",
+    "zustand": "^5.1.0"
+  }
+}

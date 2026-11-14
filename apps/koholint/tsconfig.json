@@ -1,20 +1,7 @@
 {
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "target": "ES2022",
-    "lib": ["ES2023", "DOM", "DOM.Iterable"],
-    "module": "ESNext",
-    "moduleResolution": "bundler",
-    "jsx": "react-jsx",
-    "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true,
-    "isolatedModules": true,
-    "verbatimModuleSyntax": true,
-    "allowImportingTsExtensions": true,
-    "skipLibCheck": true,
-    "noEmit": true,
-    "types": ["vite/client", "vite-plugin-pwa/react", "vitest/globals", "@testing-library/jest-dom"]
+    "paths": { "virtual:guide/*": ["./src/guide/*"] }
   },
-  "include": ["src", "vite.config.ts"]
+  "include": ["src", "vite.config.ts", "../../packages/core/src", "../../packages/core/vite.ts"]
 }

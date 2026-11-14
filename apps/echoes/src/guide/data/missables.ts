@@ -1,4 +1,4 @@
-import type { Missable, SourceLink } from "../../core/types";
+import type { Missable, SourceLink } from "@game-guides/core/types";
 
 /**
  * Entries that can be lost for good. An entry belongs here only when two independent sources agree on the exact

@@ -1,4 +1,4 @@
-import type { RawChapter } from "../../core/types";
+import type { RawChapter } from "@game-guides/core/types";
 
 export default {
   id: 8,
