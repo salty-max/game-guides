@@ -5,6 +5,7 @@ import tailwind from "eslint-plugin-better-tailwindcss";
 import globals from "globals";
 import reactHooks from "eslint-plugin-react-hooks";
 import reactRefresh from "eslint-plugin-react-refresh";
+import storybook from "eslint-plugin-storybook";
 import tseslint from "typescript-eslint";
 
 const core = new URL("./packages/core/src/", import.meta.url);
@@ -24,6 +25,12 @@ export default tseslint.config(
       ...reactHooks.configs.recommended.rules,
       "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
     },
+  },
+  ...storybook.configs["flat/recommended"],
+  {
+    // A story file exports its meta and stories, not components.
+    files: ["**/*.stories.tsx"],
+    rules: { "react-refresh/only-export-components": "off" },
   },
   {
     // Tailwind classes in components: spelled right, in one order, none doubled or fighting, and only the house tokens (tokens.css).

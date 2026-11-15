@@ -1,0 +1,7 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "paths": { "virtual:guide/*": ["../../apps/koholint/src/guide/*"] }
+  },
+  "include": [".storybook", "src", "vitest.config.ts"]
+}

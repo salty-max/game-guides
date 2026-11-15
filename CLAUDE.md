@@ -11,6 +11,7 @@ Spoiler-aware PWA completion guides for single-player games: a pnpm workspace wi
 - Browser pane: `preview_start` with `koholint`, `rdr` or `echoes` for dev, or `<name>-preview` for a production build (`.claude/launch.json`). These load only in a session started in this repository. A port that's taken moves to the next free one, so read the port from the result (`docs/testing.md`).
 - Sync API: `services/sync` serves sync codes. `pnpm -C services/sync test`, or `preview_start` with `sync-api` for it on port 8787 with an in-memory store. Its notes are `services/sync/README.md`.
 - Screenshots: `node .claude/skills/guide-check/scripts/shoot.mjs --out <dir>` (the `guide-check` skill).
+- Component stories: `pnpm --filter hundo-stories storybook`, or `preview_start` with `storybook`. They run as tests, axe in every guide's palette and theme, inside `pnpm check`, and need the system Google Chrome ([docs/testing.md](docs/testing.md#stories)).
 
 ## Which skill and doc for which task
 

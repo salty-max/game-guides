@@ -5,12 +5,14 @@
   "exports": {
     "./types": "./src/types.ts",
     "./format": "./src/format.ts",
+    "./fonts": "./src/fonts.ts",
     "./guide": "./src/guide.ts",
     "./progress-state": "./src/progress-state.ts",
     "./store/*": "./src/store/*.ts",
     "./components/*": "./src/components/*.tsx",
     "./vite": "./vite.ts",
-    "./icons": "./icons.mjs"
+    "./icons": "./icons.mjs",
+    "./app.css": "./src/app.css"
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0"
