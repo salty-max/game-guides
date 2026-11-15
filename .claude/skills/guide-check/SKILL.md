@@ -26,7 +26,7 @@ node .claude/skills/guide-check/scripts/shoot.mjs --out <scratchpad>/after --app
 
 What `shoot.mjs` does, so you don't redo it by hand:
 
-- builds each guide and serves the build with `vite preview` on a free port, so nothing clashes with a server someone left running;
+- builds each guide from `--root` (the folder you run it from unless you say otherwise) and serves the build with `vite preview` on a free port, so nothing clashes with a server someone left running. From a worktree it shoots that worktree's code, whatever the pane's servers serve. From a session whose own folder is the main checkout, pass `--root <worktree>`;
 - opens it in the system Chrome (`playwright-core` from the workspace, `channel: "chrome"`), so no browser download is needed;
 - shoots desktop 1280×860 and phone 390×844, each in light and dark, at 2× scale;
 - seeds `<storagePrefix>.theme` in localStorage before the first paint, the way `theme-init.js` reads it, and blocks service workers so every shot is the fresh build;
@@ -43,6 +43,7 @@ Add `--full` for whole-page shots.
    - text that wraps badly at 390px;
    - focus rings and checkboxes.
 3. **Interactions** (a tick and its undo toast, the settings dialog): drive them in the browser pane, or write a few lines of Playwright in the scratchpad on top of what `shoot.mjs` does. Each new browser context starts with empty storage, so there's nothing to clean up.
+   - **Which code the pane shows.** `preview_start` serves the folder the session works in: its worktree if the app opened it in one, the main checkout otherwise. Before trusting a page, read the `cwd` in `preview_list` (or `lsof -a -p $(lsof -nP -iTCP:<port> -sTCP:LISTEN -t | head -1) -d cwd`) and make sure it's the worktree you edit in. If it's main, build and `vite preview` from your worktree on a free port, as [docs/testing.md](../../../docs/testing.md#which-folder-the-pane-serves) lists.
 
 ## 5. Before and after, for a visual change
 
