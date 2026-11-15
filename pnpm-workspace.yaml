@@ -1,6 +1,7 @@
 packages:
   - apps/*
   - packages/*
+  - services/*
 
 # One React for core and every guide that ships its own components.
 catalog:

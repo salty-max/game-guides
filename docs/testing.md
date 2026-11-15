@@ -12,6 +12,7 @@
 - Lint fails on any warning (`--max-warnings 0`). The rule that matters most is `react-hooks/exhaustive-deps`.
 - Typecheck runs per app and includes core's source, so core is checked against each real guide config.
 - `pnpm build` runs `tsc` and `vite build` per app, which is what Vercel runs.
+- `services/sync` is a package too, so `pnpm check` runs its lint, typecheck and tests (`pnpm -C services/sync test` alone). Its store contract also runs against real Upstash when `SYNC_TEST_REDIS_URL` and `SYNC_TEST_REDIS_TOKEN` name a test database ([its README](../services/sync/README.md#run-it)).
 
 CI (`.github/workflows/ci.yml`) runs the same four steps after `pnpm install --frozen-lockfile`, on every pull request and every push to `main`. A red CI and a green `pnpm check` on your machine usually means a lockfile left out of the commit or a file that isn't committed.
 

@@ -3,6 +3,7 @@
   "configurations": [
     { "name": "koholint", "runtimeExecutable": "pnpm", "runtimeArgs": ["--filter", "hundo-koholint", "dev", "--port", "5200", "--strictPort"], "port": 5200, "autoPort": true },
     { "name": "rdr", "runtimeExecutable": "pnpm", "runtimeArgs": ["--filter", "hundo-rdr", "dev", "--port", "5300", "--strictPort"], "port": 5300, "autoPort": true },
+    { "name": "sync-api", "runtimeExecutable": "pnpm", "runtimeArgs": ["--filter", "hundo-sync", "dev"], "port": 8787 },
     { "name": "echoes", "runtimeExecutable": "pnpm", "runtimeArgs": ["--filter", "hundo-echoes", "dev", "--port", "5400", "--strictPort"], "port": 5400, "autoPort": true },
     { "name": "koholint-preview", "runtimeExecutable": "sh", "runtimeArgs": ["-c", "pnpm --filter hundo-koholint build && pnpm --filter hundo-koholint preview --port ${PORT:-4200} --strictPort"], "port": 4200, "autoPort": true },
     { "name": "rdr-preview", "runtimeExecutable": "sh", "runtimeArgs": ["-c", "pnpm --filter hundo-rdr build && pnpm --filter hundo-rdr preview --port ${PORT:-4300} --strictPort"], "port": 4300, "autoPort": true },

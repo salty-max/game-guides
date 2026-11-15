@@ -20,6 +20,7 @@ Each app's history from its old repository is kept under its folder, so `git log
   - `vercel.json`, a README and `docs/facts-to-verify.md`.
 
   Its `vite.config.ts` is a single call to `guideConfig`.
+- **`services/sync`** is the sync API, a small server of its own: it lets a reader's devices share a guide's progress through a six-digit code, with no account. It is a separate Vercel project, `hundo-api`, at `api.hundo.quest` ([its README](services/sync/README.md)).
 - **`docs/`**: how to do each recurring task (below).
 - **`harness/`**, `harness.toml`, `.claude/`: the git hooks, the task board and the review helpers sessions work under. The rules are in [CLAUDE.md](CLAUDE.md).
 

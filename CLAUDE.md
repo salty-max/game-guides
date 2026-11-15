@@ -9,6 +9,7 @@ Spoiler-aware PWA completion guides for single-player games: a pnpm workspace wi
 - `bun harness/hooks.ts install .`, once per clone, from the main checkout's root: it points `core.hooksPath` at `harness/githooks`. `bun harness/hooks.ts status` shows whether they're on. Never run it from a worktree, which would point the whole repository at that worktree's copy.
 - In an app folder: `pnpm dev`, `pnpm test`, `pnpm build`, `pnpm preview`, `pnpm icons`. A `cd` lasts one command in a session here (`.claude/settings.json`), so reach the folder in the same command, `cd apps/<name> && pnpm test`, or use `pnpm -C apps/<name> test`.
 - Browser pane: `preview_start` with `koholint`, `rdr` or `echoes` for dev, or `<name>-preview` for a production build (`.claude/launch.json`). These load only in a session started in this repository. A port that's taken moves to the next free one, so read the port from the result (`docs/testing.md`).
+- Sync API: `services/sync` serves sync codes. `pnpm -C services/sync test`, or `preview_start` with `sync-api` for it on port 8787 with an in-memory store. Its notes are `services/sync/README.md`.
 - Screenshots: `node .claude/skills/guide-check/scripts/shoot.mjs --out <dir>` (the `guide-check` skill).
 
 ## Which skill and doc for which task
@@ -24,12 +25,14 @@ The skills, in `.claude/skills/`, hold the procedures. The docs hold the referen
 | Anything in `packages/core` | | `docs/core.md` |
 | Look at a change in a browser, before and after | `guide-check` | `docs/testing.md` |
 | Vercel, previews, production, a new project | `guide-deploy` | `docs/deploying.md` |
+| The sync API (`services/sync`) | | `services/sync/README.md`, `docs/deploying.md` |
 
 ## Hard rules
 
 Each one is a mistake already made, or one that would cost readers their progress.
 
 - **Storage keys never change, and an address changes only with a hand-off.** Progress lives in each reader's localStorage under `<storagePrefix>.v1` on the guide's origin, and the theme under `<storagePrefix>.theme`. A new key, or a bare move to a new address, starts everyone from nothing. A move needs `brand.home`, `brand.movedFrom` and the old address left serving ([docs/deploying.md](docs/deploying.md#pitfalls)). The `.v1` stays even when the save format's `version` moves on. Each guide's `guide.test.ts` pins both keys.
+- **A guide's `brand.id` never changes.** It's the `guide` written into every backup, and the name the sync API (`services/sync`) stores a guide's progress under. The API's `GUIDES` list must hold every guide's id, and `services/sync/src/project.test.ts` fails when it doesn't.
 - **Row ids never change once live.** They're the saved checks, and a renamed id comes back unticked for every reader.
 - **`theme-init.js` stays an external file.** The CSP has `script-src 'self'` and no inline scripts. `deploy.test.ts` checks both.
 - **No `cleanUrls` in `vercel.json`.** It breaks the SPA rewrite, so deep links 404. `deploy.test.ts` checks it.
