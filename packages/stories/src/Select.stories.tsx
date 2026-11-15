@@ -1,4 +1,4 @@
-import { Select } from "@hundo/core/components/controls";
+import { Select } from "@hundo/core/components/Select";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState, type ComponentProps } from "react";
 import { expect, userEvent, waitFor, within } from "storybook/test";

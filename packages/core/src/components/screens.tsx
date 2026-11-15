@@ -1,6 +1,8 @@
 import { useState, type FormEvent } from "react";
 import { useLocation, useNavigate } from "react-router";
-import { Checkbox, FileField, RadioGroup, Select } from "./controls";
+import { Checkbox, FileField, RadioGroup } from "./controls";
+// The settings screen is in the dialog's chunk, so it uses the select itself: the shell's stand-in would flash while the select loaded.
+import { SelectImpl as Select } from "./select-impl";
 import { DialogDescription, DialogFooter, DialogSeparator, DialogStatus, DialogText } from "./dialog";
 import { Button } from "./ui";
 import { brand, chapters, readChapter, text } from "../guide";
