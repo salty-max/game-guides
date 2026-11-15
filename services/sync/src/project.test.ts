@@ -57,6 +57,14 @@ describe("a self-contained function", () => {
     }
   });
 
+  it("is compiled by Vercel as CommonJS with the DOM types, so the tsconfig keeps verbatimModuleSyntax off and the DOM lib on", () => {
+    // (the base tsconfig turns the first on for the guides, and without them every function build logs TypeScript errors:
+    // TS1295 for the imports, and Request and Response without members, seen on the first preview)
+    const { compilerOptions } = JSON.parse(read("tsconfig.json"));
+    expect(compilerOptions.verbatimModuleSyntax).toBe(false);
+    expect(compilerOptions.lib).toContain("DOM");
+  });
+
   it("has no runtime dependencies to install", () => {
     const manifest = JSON.parse(read("package.json"));
     expect(manifest.dependencies).toBeUndefined();
@@ -69,11 +77,14 @@ describe("vercel.json", () => {
   const headers: { key: string; value: string }[] = vercel.headers.flatMap((rule: { headers: { key: string; value: string }[] }) => rule.headers);
   const header = (key: string) => headers.find((h) => h.key === key)?.value;
 
-  it("installs from the lockfile, builds with the typecheck and runs in Frankfurt, next to the store", () => {
+  it("installs from the lockfile and builds with the typecheck", () => {
     expect(vercel.installCommand).toBe("pnpm install --frozen-lockfile");
     expect(vercel.buildCommand).toBe("pnpm typecheck");
     expect(JSON.parse(read("package.json")).scripts.typecheck).toBeDefined();
-    expect(vercel.regions).toEqual(["fra1"]);
+  });
+
+  it("sets no regions: with [\"fra1\"] set, the functions still ran in iad1 on the first preview", () => {
+    expect(vercel.regions).toBeUndefined();
   });
 
   it("has a static output folder, so a functions-only project still deploys", () => {

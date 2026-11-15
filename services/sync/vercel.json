@@ -5,7 +5,6 @@
   "buildCommand": "pnpm typecheck",
   "outputDirectory": "public",
   "ignoreCommand": "sh scripts/vercel-ignore.sh",
-  "regions": ["fra1"],
   "headers": [
     {
       "source": "/(.*)",
