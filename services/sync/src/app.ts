@@ -65,15 +65,20 @@ interface Ctx {
 const ttl = (ns: Ns) => (ns === "test" ? KEEP_TEST_SECONDS : KEEP_SECONDS);
 const key = (ns: Ns, ...parts: string[]) => ["hs", ns, ...parts].join(":");
 
-/** The team's preview hosts: a deployment (`hundo-koholint-2b16reepd-jellycat.vercel.app`) or a branch (`hundo-koholint-git-<branch>-jellycat.vercel.app`). */
+/**
+ * The team's preview hosts by their name: a deployment (`hundo-koholint-2b16reepd-jellycat.vercel.app`) or a branch
+ * (`hundo-koholint-git-<branch>-jellycat.vercel.app`). It's a shape, not proof of ownership: another account could name a project to fit
+ * (whether Vercel reserves it isn't known), and what that page could do is use its own cookies in the test namespace.
+ */
 const PREVIEW_HOST = /^hundo-[a-z0-9-]+-jellycat\.vercel\.app$/;
 
 /**
  * Which page is calling, and so which part of the store it may touch, from the `Origin` alone: only a guide's own hosts, the team's
  * previews and localhost are served. The page's host can't be checked against Origin: behind a guide's /api rewrite Vercel hands this
  * API its own host in Host, and no x-forwarded-host that names the guide's (seen on the first preview, against what Vercel's docs say).
- * Origin is set by the browser and no page script can change it. A script on another site can't read an answer (it needs a CORS
- * preflight, which this API never answers), and a form or text/plain post, which needs none, is refused for its content type.
+ * Origin is set by the browser and no page script can change it. A script on another site is refused for its Origin, and couldn't
+ * read an answer anyway: this API never sends Access-Control-Allow-Origin, nor answers a preflight. A form or text/plain post, which
+ * needs no preflight, is refused for its content type wherever it comes from.
  */
 function whereFrom(request: Request): Where | null {
   const origin = request.headers.get("origin");

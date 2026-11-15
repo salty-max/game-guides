@@ -127,7 +127,10 @@ describe("vercel.json", () => {
 describe("the ignore step, run against real history", () => {
   // What Vercel does: runs the script from services/sync in a clone of the repository, with the last deployed commit in
   // VERCEL_GIT_PREVIOUS_SHA, or nothing there. The answers are the exit codes: 0 skips the build, 1 builds it.
-  const git = (cwd: string, ...args: string[]) => execFileSync("git", ["-c", "user.name=t", "-c", "user.email=t@example.com", "-c", "commit.gpgsign=false", ...args], { cwd, encoding: "utf8" }).trim();
+  // (without GIT_DIR and the like, which a git hook running the tests would set, and which would point this at the real repository)
+  const clean = () => Object.fromEntries(Object.entries(process.env).filter(([name]) => !name.startsWith("GIT_")));
+  const git = (cwd: string, ...args: string[]) =>
+    execFileSync("git", ["-c", "user.name=t", "-c", "user.email=t@example.com", "-c", "commit.gpgsign=false", ...args], { cwd, encoding: "utf8", env: clean() }).trim();
   const repo = mkdtempSync(join(tmpdir(), "hundo-ignore-"));
   const sync = join(repo, "services/sync");
   const commit = (file: string, text: string) => {
@@ -138,7 +141,7 @@ describe("the ignore step, run against real history", () => {
     return git(repo, "rev-parse", "HEAD");
   };
   const answer = (previous?: string) => {
-    const env = { ...process.env };
+    const env = clean();
     delete env.VERCEL_GIT_PREVIOUS_SHA;
     if (previous !== undefined) env.VERCEL_GIT_PREVIOUS_SHA = previous;
     try {
