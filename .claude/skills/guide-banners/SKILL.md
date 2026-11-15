@@ -24,7 +24,7 @@ Codex wasn't on this Mac's `PATH` when this skill was written (2026-11-14). Look
 which codex || /bin/ls ~/.volta/bin ~/.npm-global/bin /opt/homebrew/bin 2>/dev/null | grep -i codex
 ```
 
-If it isn't there, ask the user before installing it, saying the package and the command (`npm install -g @openai/codex`, or `brew install codex`). Installing software is their call, and so is signing it in. Then run `codex --help`, and check that this version can generate images and how: a tool it uses inside `codex exec`, or a flag. If it can't, stop and tell the user. Don't fall back to another image service without asking.
+If it isn't there, ask the user before installing it (a child sends the question to its opener), saying the package and the command (`npm install -g @openai/codex`, or `brew install codex`). Installing software is their call, and so is signing it in. Then run `codex --help`, and check that this version can generate images and how: a tool it uses inside `codex exec`, or a flag. If it can't, stop and tell the user. Don't fall back to another image service without asking.
 
 ## 3. Fix the guide's style once
 

@@ -5,7 +5,7 @@ description: Ship a hundo change through Vercel. Get preview deployments of the 
 
 # Deploying a guide
 
-[docs/deploying.md](../../../docs/deploying.md) explains the projects, the addresses, `vercel.json`, the ignore command and the pitfalls. This is the procedure. Every push, merge to `main`, production deploy and new project needs the user's go, asked in this session, with exactly what will happen.
+[docs/deploying.md](../../../docs/deploying.md) explains the projects, the addresses, `vercel.json`, the ignore command and the pitfalls. This is the procedure. Every push, merge to `main`, production deploy and new project needs the user's go, with exactly what will happen: asked of the user in the session that opened this work (a child sends the question there and asks nothing itself), or in this session when it has no opener. A child never pushes, merges or deploys: its opener does, on the user's go, so for a child the steps below that push, merge or deploy are what it reports it is ready for.
 
 ## 1. Which guides deploy
 

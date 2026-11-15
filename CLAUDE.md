@@ -49,16 +49,18 @@ Each one is a mistake already made, or one that would cost readers their progres
 
 - **Look before calling it done.** Every visible change gets opened in a browser on desktop and phone, in light and dark. For a core change, do that in an article guide and in Red Dead (`docs/testing.md`).
 - **Preview first.** Nothing reaches production without a look at its Vercel preview: headers, deep links, the service worker (`docs/deploying.md`).
-- **No push, deploy, merge to `main` or new Vercel project without the user's go**, asked in the session that wants it. A merge to `main` deploys every guide whose ignore command sees a change.
+- **No push, deploy, merge to `main` or new Vercel project without the user's go**, asked of the user in the opener when a child wants it (a child asks nothing, see Harness below), in the session itself when it has no opener. A merge to `main` deploys every guide whose ignore command sees a change.
 - **No unverifiable claims** in the guides, the READMEs or these docs. Comments only where they explain a why.
 
 ## Sessions and worktrees
 
-hundo sets `[hooks] lock = false` and `[session] worktrees = true` in `harness.toml`. Each child session works in its own git worktree on its own branch, cut from `main`. Nothing commits to `main` here and the work meets in pull requests, so no session waits for another's. The board is the list of who does what, not a lock. A card can still be `blocked --on` another, as a choice (the last item).
+hundo sets `[hooks] lock = false`, `[session] worktrees = true` and `[session] decisions = "opener"` in `harness.toml`. Each child session works in its own git worktree on its own branch, cut from `main`, and asks the user nothing (a plan child's approval of its plan aside): its questions and every go go to its opener. Nothing commits to `main` here and the work meets in pull requests, so no session waits for another's. The board is the list of who does what, not a lock. A card can still be `blocked --on` another, as a choice (the last item).
 
 - **`pnpm install` first in a new worktree.** It has no `node_modules`.
 - **Open a child from the desktop app.** The harness's CLI path adds `--worktree` to `claude --bg` (`claude --help` lists `-w, --worktree [name]`), but nobody has run the two together here, so a CLI-opened child may start in the main checkout: look at its folder first.
-- **Where the harness reads the main checkout.** The git hooks (`core.hooksPath` is absolute) and `harness.toml` come from the main checkout, so a change to either only takes effect once the main checkout has it merged and pulled. The board and the check stamps are shared by every worktree. `hooks.ts install` refuses in a worktree.
+- **Where the harness reads the main checkout.** The git hooks (`core.hooksPath` is absolute) and everything the tools read from `harness.toml` while they run (`lock`, `queue`, `decisions`, `worktrees`, the check) come from the main checkout, so a change to either only takes effect once the main checkout has it merged and pulled: until then `session.ts` run in a worktree still prints the old rules. The board and the check stamps are shared by every worktree. `hooks.ts install` refuses in a worktree.
+- **A sync, `init` or `doctor` acts on the worktree it is given.** `bun ~/code/wow-addons/harness/harness-sync.ts <worktree>` writes that worktree's own `harness/` and `init.ts <worktree> --section-only` its own CLAUDE.md section, rendered from its own `harness.toml`: a harness update is a commit on a branch like any other, not an edit in the main checkout. `doctor.ts <worktree>` judges the worktree's files and the hooks as the main checkout has them.
+- **`session.ts check` may say "git fetch first".** Unpushed commits are counted by content against the remote as last fetched, so a branch merged since the last fetch still reads unpushed. Fetch and run it again: a rebase-merged branch then reads nothing unpushed, whatever new ids the rebase gave its commits (a patch changed in the rebase still counts).
 - **A queued check can wait minutes.** `[checks] queue = true` runs one `check` at a time on the Mac, so `bun harness/q.ts check -- bun run check` may print one waiting line and sit in the line behind another session's check. Run it in the background: a foreground Bash call is capped at 10 minutes with the wait and the check both inside it, and the waiting line warns that a call that times out loses its place.
 - **Rewrites of core are sequenced on purpose.** The component rewrite, and anything else that rewrites core under every guide, goes one at a time: a worktree spares the wait, not the rebase. The card that comes second is set `blocked --on` the first (`board.ts set <id> --status blocked --on <card>`), which is a choice and the board then reads as it always did, or it starts once the first has landed.
 
@@ -86,8 +88,10 @@ below are checked by git hooks or by tools, so they are not advice.
   (`[session] worktrees = true`): commit there, never in the main checkout. The board,
   its cards and the check stamps are shared by every worktree, and `harness/packet.ts`,
   `review.ts` and `session.ts check` act on the worktree they are run from or asked
-  about. The git hooks and `harness.toml` come from the main checkout: install the
-  hooks there (`bun harness/hooks.ts install .`), never from a worktree.
+  about. The git hooks run from the main checkout (`core.hooksPath` is the absolute
+  path `hooks.ts install` wrote there, so a worktree's own copy of the tools is never
+  the one that runs) and the tools read `harness.toml` from it: install the hooks
+  there (`bun harness/hooks.ts install .`), never from a worktree.
 - **Review before the commit**: `bun harness/packet.ts <repo>` on the uncommitted files,
   the `reviewer` helper reads the packet, fix what it finds, then
   `bun harness/review.ts <repo> "<verdict>"`, then one commit. A push is refused for a
@@ -102,13 +106,17 @@ How sessions work together (behaviour: no hook checks these):
 - **A new task asked in a session that has its own is opened as a child** (the `child`
   skill): tell the user its name and where to find it, write nothing for it here. A
   small follow-up of the same thread stays.
-- **Questions go through the question tool** (`AskUserQuestion`, or `wrap_up`'s ask),
-  the recommended answer first and marked "(Recommended)". Never a question buried in
-  prose.
-- **A go belongs to the session that asks it.** A child asks its own go in its own
-  session and never pushes. Its opener pushes only on a go the user gave in the opener,
-  or on the child's quote of the user's words with their scope (repository, sha range,
-  push only). A push go never covers a deploy or a release: each is asked again.
+- **Every decision is taken in the opener, never in a child**
+  (`[session] decisions = "opener"`). A child asks the user nothing: it sends each
+  question (a push, a merge, any choice) to its opener with the options and its
+  recommendation, and stops. The opener asks the user through the question tool
+  (`AskUserQuestion`, or `wrap_up`'s ask), the recommended answer first and marked
+  "(Recommended)". Never a question buried in prose.
+- **A go is the user's, asked in the opener.** A child never pushes and never asks
+  for a go: its report says what is committed and what a push would send
+  (repository, sha range, push only). The opener asks the user, then pushes on their
+  answer or relays it to the child quoted. A push go never covers a deploy or a
+  release: each is asked again.
 - **Close a finished child yourself**: its work pushed (or dropped) and its card done,
   then `bun harness/session.ts check <local_id>` and archive it (desktop) or
   `session.ts close` (CLI). Never wait to be told. Never one that waits on the user,
