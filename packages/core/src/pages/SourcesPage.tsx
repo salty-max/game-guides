@@ -1,5 +1,5 @@
 import { ExternalLink } from "../components/SourceLinks";
-import { Breadcrumb, PageHeading } from "../components/ui";
+import { Breadcrumb, PageHeading, Panel, PanelTitle } from "../components/ui";
 import { chapters, config, text } from "../guide";
 import { isOpen, useProgress } from "../store/progress";
 
@@ -13,8 +13,8 @@ export function SourcesPage() {
         <p>{text.sourcesIntro}</p>
       </PageHeading>
       {config.sources.length > 0 && (
-        <section className="panel">
-          <h2>{text.sourcesTitle ?? "References"}</h2>
+        <Panel>
+          <PanelTitle>{text.sourcesTitle ?? "References"}</PanelTitle>
           <ul className="source-list">
             {config.sources.map(([label, url]) => (
               <li key={url}>
@@ -22,14 +22,14 @@ export function SourcesPage() {
               </li>
             ))}
           </ul>
-        </section>
+        </Panel>
       )}
       {revealed.length > 0 && (
-        <section className="panel source-panel">
-          <h2>Walkthrough references</h2>
+        <Panel space="above">
+          <PanelTitle>Walkthrough references</PanelTitle>
           {revealed.map((chapter) => (
             <div key={chapter.id}>
-              <h3>{chapter.title}</h3>
+              <h3 className="mt-[13px] mb-0 text-[15px] leading-[1.17] font-bold">{chapter.title}</h3>
               <ul className="source-list">
                 {chapter.sources.map(([label, url]) => (
                   <li key={url}>
@@ -39,7 +39,7 @@ export function SourcesPage() {
               </ul>
             </div>
           ))}
-        </section>
+        </Panel>
       )}
     </>
   );

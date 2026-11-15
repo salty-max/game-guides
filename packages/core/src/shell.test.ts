@@ -100,7 +100,7 @@ describe("the installed app in app.css", () => {
 
 describe("the legacy styles", () => {
   it("have none of the page's frame left: the top bar, rail, main area, scrim, skip link and toasts are Tailwind in their components", () => {
-    for (const name of ["topbar", "rail", "brand", "top-nav", "icon-button", "save-status", "chapter-link", "scrim", "mobile-menu", "skip", "toast-stack", "layout", "main"]) {
+    for (const name of ["topbar", "rail", "brand", "top-nav", "icon-button", "save-status", "chapter-link", "scrim", "mobile-menu", "skip", "toast-stack", "toast", "layout", "main"]) {
       expect(styles, `.${name} is back in styles.css`).not.toMatch(new RegExp(`\\.${name}(?![\\w-])`));
     }
   });

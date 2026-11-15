@@ -1,4 +1,4 @@
-import { Button, Chip } from "@hundo/core/components/ui";
+import { Button, Chip, Panel, PanelActions, PanelText, PanelTitle } from "@hundo/core/components/ui";
 import { useProgress } from "@hundo/core/store/progress";
 import { useUi } from "@hundo/core/store/ui";
 import { blankRun, modeNames, type RunMode } from "./run-log";
@@ -26,8 +26,8 @@ export function DeathlessRun() {
   };
 
   return (
-    <section id="deathless" className="panel">
-      <h2>Deathless run</h2>
+    <Panel id="deathless">
+      <PanelTitle>Deathless run</PanelTitle>
       <div className="run-mode" aria-label="Run mode">
         {(Object.entries(modeNames) as [RunMode, string][]).map(([id, name]) => (
           <Chip key={id} label={name} value={id} current={mode} onSelect={(value) => setExtra((current) => ({ ...current, mode: value as RunMode }))} />
@@ -37,8 +37,8 @@ export function DeathlessRun() {
         {run.deaths}
         <small>{run.deaths === 1 ? "death" : "deaths"}</small>
       </div>
-      <p>{message}</p>
-      <div className="controls">
+      <PanelText>{message}</PanelText>
+      <PanelActions>
         <Button icon="plus" onClick={() => log(1)} id="death-plus">
           Log death
         </Button>
@@ -67,9 +67,9 @@ export function DeathlessRun() {
         >
           Reset this run
         </Button>
-      </div>
-      <p>Log a Game Over. Secret Medicine can revive you automatically without adding a death. Use bottled fairies before health reaches zero.</p>
-      <p>Normal and Hero runs are logged separately. The collection checklist is shared.</p>
-    </section>
+      </PanelActions>
+      <PanelText>Log a Game Over. Secret Medicine can revive you automatically without adding a death. Use bottled fairies before health reaches zero.</PanelText>
+      <PanelText>Normal and Hero runs are logged separately. The collection checklist is shared.</PanelText>
+    </Panel>
   );
 }
