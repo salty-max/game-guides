@@ -12,18 +12,23 @@ const here = (path: string) => fileURLToPath(new URL(path, import.meta.url));
 // index.html loads the app through this id, which resolves to core's main.tsx.
 const ENTRY = "/@core/main.tsx";
 
-/** The light palette from the guide's theme.css, for the colours the browser and the installed app show before CSS loads. */
-const lightPalette = (root: string) => {
+/** One palette from the guide's theme.css (the light one opens `:root{`, the dark one `:root[data-theme="dark"]{`). */
+const readPalette = (root: string, opening: string) => {
   const css = readFileSync(`${root}/src/guide/theme.css`, "utf8");
-  const block = css.split(":root{")[1]?.split("}")[0] ?? "";
+  const block = css.split(opening)[1]?.split("}")[0] ?? "";
   return Object.fromEntries([...block.matchAll(/(--[a-z-]+):([^;]+)/g)].map(([, key, value]) => [key, value.trim()]));
 };
+
+/** The light palette, for the colours the browser and the installed app show before CSS loads. */
+const lightPalette = (root: string) => readPalette(root, ":root{");
+/** The dark one, whose surface colour theme-init.js puts in the theme-color tag when the page opens in dark. */
+const darkPalette = (root: string) => readPalette(root, ':root[data-theme="dark"]{');
 
 /**
  * Serves the page every guide shares: core's index.html with the brand filled in, and theme-init.js beside it.
  * theme-init.js stays an external file so the CSP can forbid inline scripts.
  */
-const guideShell = (root: string, brand: Brand, palette: Record<string, string>): Plugin => {
+const guideShell = (root: string, brand: Brand, palette: Record<string, string>, dark: Record<string, string>): Plugin => {
   const page = `${root}/index.html`;
   const template = readFileSync(here("./index.html"), "utf8");
   const themeInit = readFileSync(here("./theme-init.js"), "utf8");
@@ -32,6 +37,7 @@ const guideShell = (root: string, brand: Brand, palette: Record<string, string>)
     SHORT_NAME: brand.shortName,
     DESCRIPTION: brand.description,
     THEME_COLOR: palette["--surface"],
+    THEME_COLOR_DARK: dark["--surface"],
     CORNERS: brand.corners,
     STORAGE: brand.storagePrefix,
     FONTS: fontCss(brand),
@@ -67,6 +73,7 @@ const guideShell = (root: string, brand: Brand, palette: Record<string, string>)
 /** The whole Vite and Vitest setup for a guide app: pass the app's folder and its brand. */
 export const guideConfig = (root: string, brand: Brand) => {
   const palette = lightPalette(root);
+  const dark = darkPalette(root);
   // In production /api is a rewrite to the sync API (vercel.json). Here the dev and preview servers send it to the local one
   // (`pnpm -C services/sync dev`, on 8787), keeping the page's own host so the API sees what it would see behind the rewrite.
   const proxy = { "/api": { target: process.env.SYNC_API ?? "http://127.0.0.1:8787" } };
@@ -78,7 +85,7 @@ export const guideConfig = (root: string, brand: Brand) => {
       alias: [{ find: /^virtual:guide\//, replacement: `${root}/src/guide/` }],
     },
     plugins: [
-      guideShell(root, brand, palette),
+      guideShell(root, brand, palette, dark),
       react(),
       // The jsdom tests never process CSS (only ?raw text gets through), so Tailwind sits them out.
       ...(process.env.VITEST ? [] : [tailwindcss()]),

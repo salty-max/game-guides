@@ -5,6 +5,9 @@ if (typeof window !== "undefined") {
   // jsdom lacks these browser APIs; the app only needs them to exist.
   window.matchMedia ??= ((query: string) => ({ matches: false, media: query, addEventListener() {}, removeEventListener() {} })) as unknown as typeof window.matchMedia;
   Element.prototype.scrollIntoView ??= () => {};
+  Element.prototype.scrollTo ??= () => {};
+  // jsdom has no canvas (it would log "not implemented"): code that draws on one gets nothing and falls back.
+  HTMLCanvasElement.prototype.getContext = (() => null) as typeof HTMLCanvasElement.prototype.getContext;
   window.scrollTo = () => {};
 
   // The dialog and the select load on use (components/chunks.ts). Load them before any test renders, so that a test sees the real

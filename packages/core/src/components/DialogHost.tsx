@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { chunks, loadFailed } from "./chunks";
+import "../lastInput";
 import { useLoadable, whenIdle } from "../loadable";
 import { useUi } from "../store/ui";
 

@@ -1,6 +1,6 @@
-/* The one stylesheet core ships, imported by main.tsx. Layer order, lowest first: Tailwind's theme (and core's tokens), then the
-   legacy rules (styles.css, which moves out a component at a time until it's empty), then components, then utilities. A guide's
-   theme.css loads after this and only sets the palette variables.
+/* The one stylesheet core ships, imported by main.tsx. Layer order, lowest first: Tailwind's theme (and core's tokens), then
+   core's few global rules, then the legacy rules (styles.css, which moves out a component at a time until it's empty), then
+   components, then utilities. A guide's theme.css loads after this and only sets the palette variables.
 
    Tailwind's preflight is left out for now. It strips list bullets, heading weights, table borders and the like, and the legacy
    pages rely on the browser's defaults for those. It joins when styles.css is gone, after a look at every page. Until then a new
@@ -16,3 +16,62 @@
 
 @import "./tokens.css";
 @import "./styles.css" layer(legacy);
+
+/* The guide opened as an app, from the home screen or an install button, not in a browser tab. theme-init.js marks the page
+   `data-standalone` before the first paint (navigator.standalone is how iOS Safari says it; other browsers say it with the
+   display-mode media feature). `standalone:` is a variant like `max-[800px]:`: a class with it applies only in the app, so a
+   browser tab stays an ordinary website. It matches the root element as well as what's inside it. */
+@custom-variant standalone (&:where([data-standalone], [data-standalone] *));
+
+/* The widths the layout changes at, named for what changes there. They are inclusive (`max-width: 800px` matches an 800px screen),
+   which Tailwind's own `max-*` variants are not, and they are declared widest first so that the narrower one wins. The matching
+   tokens (--bar-h, --rail-w) change at the same widths, in tokens.css. */
+@custom-variant mid (@media (max-width: 1040px));
+@custom-variant drawer (@media (max-width: 800px));
+@custom-variant phone (@media (max-width: 550px));
+@custom-variant slim (@media (max-width: 405px));
+@custom-variant tiny (@media (max-width: 360px));
+
+@layer base {
+  /* A link or a "jump to" that scrolls the page lands clear of the top bar. */
+  html {
+    @apply scroll-pt-[calc(var(--bar)+24px)];
+  }
+
+  /* The app is a fixed frame: the top bar and the rail stay put and only the content area scrolls (Layout), so the page behind
+     has nothing to scroll or rubber-band, and nothing to pull to refresh. It is `fixed`, not 100vh or 100dvh: a standalone page on
+     iOS has been reported with the screen taller than the viewport (WebKit bug 301994). */
+  html,
+  body {
+    @apply standalone:h-full standalone:overflow-hidden standalone:overscroll-none;
+  }
+  /* Overflow hidden alone is not known to keep iOS from rubber-banding the page, and overscroll-behavior is only partly supported
+     there, so the body is fixed as well: a page whose body is fixed has nothing to scroll. */
+  body {
+    @apply standalone:fixed standalone:inset-0 standalone:w-full;
+  }
+  html {
+    @apply standalone:[-webkit-text-size-adjust:100%];
+  }
+  #root {
+    @apply standalone:fixed standalone:inset-0 standalone:flex standalone:flex-col;
+  }
+
+  /* An app's manners: no tap flash, no double-tap zoom delay (pinch zoom stays), and a button is not text to select or a link to
+     preview with a long press. */
+  [data-standalone] * {
+    @apply touch-manipulation [-webkit-tap-highlight-color:transparent];
+  }
+  [data-standalone] button {
+    @apply select-none [-webkit-touch-callout:none];
+  }
+}
+
+@layer components {
+  /* iOS zooms the page when a field under 16px takes the focus, in a browser tab as much as in an app, so every text field on a
+     touch screen is 16px. This is in `components`, above the legacy rules the older fields get their size from. */
+  input:not([type="checkbox"], [type="radio"], [type="file"], [type="hidden"], [type="range"]),
+  textarea {
+    @apply pointer-coarse:text-base;
+  }
+}

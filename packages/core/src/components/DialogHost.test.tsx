@@ -1,4 +1,4 @@
-import { act, render, screen, waitFor, within } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { App } from "../App";
 import { defaultState } from "../progress-state";
@@ -38,7 +38,7 @@ describe("settings dialog", () => {
   it("opens on the chosen appearance, saves what was changed, and announces it once the dialog has gone", async () => {
     const user = userEvent.setup();
     const { dialog } = await openSettings(user);
-    expect(within(dialog).getByRole("radio", { name: "Use device setting" })).toHaveFocus();
+    await waitFor(() => expect(within(dialog).getByRole("radio", { name: "Use device setting" })).toHaveFocus());
 
     await user.click(within(dialog).getByRole("radio", { name: "Dark" }));
     await user.click(within(dialog).getByRole("checkbox", { name: "Hide later chapters" }));
@@ -56,7 +56,7 @@ describe("settings dialog", () => {
     // Each radio's hidden input is aria-hidden and sits before the next radio: it must not take the focus.
     useTheme.setState({ preference: "dark" });
     const { dialog } = await openSettings(userEvent.setup());
-    expect(within(dialog).getByRole("radio", { name: "Dark" })).toHaveFocus();
+    await waitFor(() => expect(within(dialog).getByRole("radio", { name: "Dark" })).toHaveFocus());
     expect(within(dialog).getByRole("radio", { name: "Dark" })).toBeChecked();
   });
 
@@ -106,6 +106,15 @@ describe("settings dialog", () => {
     expect(screen.queryByRole("dialog")).toBeNull();
   });
 
+  it("closes on a press on the dimmed area, which is Base UI's viewport layer round the popup, and not on a press inside it", async () => {
+    const user = userEvent.setup();
+    const { dialog } = await openSettings(user);
+    await user.click(within(dialog).getByText("Choose your theme and how far the guide can reveal."));
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
+    await user.click(dialog.parentElement!);
+    await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
+  });
+
   it("refuses a file that isn't a backup, and says so where a screen reader will hear it", async () => {
     const user = userEvent.setup();
     const { dialog } = await openSettings(user);
@@ -127,14 +136,14 @@ describe("confirm dialog", () => {
     ask(true);
     const dialog = await screen.findByRole("alertdialog", { name: "Uncheck 11 entries?" });
     expect(dialog).toHaveAccessibleDescription("This clears every entry.");
-    expect(within(dialog).getByRole("button", { name: "Cancel" })).toHaveFocus();
+    await waitFor(() => expect(within(dialog).getByRole("button", { name: "Cancel" })).toHaveFocus());
   });
 
   it("focuses the confirm button when nothing is destroyed", async () => {
     render(<App />);
     ask(false);
     const dialog = await screen.findByRole("alertdialog");
-    expect(within(dialog).getByRole("button", { name: "Uncheck all" })).toHaveFocus();
+    await waitFor(() => expect(within(dialog).getByRole("button", { name: "Uncheck all" })).toHaveFocus());
   });
 
   it("isn't dismissed by a click outside it, and runs the action once, after it has closed", async () => {
@@ -149,6 +158,15 @@ describe("confirm dialog", () => {
     await user.click(within(dialog).getByRole("button", { name: "Uncheck all" }));
     await waitFor(() => expect(onConfirm).toHaveBeenCalledTimes(1));
     await waitFor(() => expect(screen.queryByRole("alertdialog")).toBeNull());
+  });
+
+  it("isn't dismissed by a press on the dimmed area either, which is Base UI's viewport layer round the popup", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    ask(true);
+    const layer = (await screen.findByRole("alertdialog")).parentElement!;
+    await user.click(layer);
+    expect(screen.getByRole("alertdialog")).toBeInTheDocument();
   });
 
   it("runs the action only once the page behind has come back for screen readers", async () => {
@@ -186,5 +204,41 @@ describe("an action waiting for a dialog to finish closing", () => {
     act(() => useUi.getState().openDialog({ kind: "settings" }));
     expect(after).toHaveBeenCalledTimes(1);
     expect(useUi.getState().afterClose).toBeNull();
+  });
+});
+
+describe("on a phone", () => {
+  afterEach(() => {
+    Reflect.deleteProperty(window, "visualViewport");
+    fireEvent.keyDown(document.body, { key: "Shift" });
+  });
+
+  it("sits in what the reader can see, which an on-screen keyboard shrinks", async () => {
+    const viewport = Object.assign(new EventTarget(), { offsetTop: 0, height: 700 });
+    Object.defineProperty(window, "visualViewport", { value: viewport, configurable: true });
+    render(<App />);
+    act(() => useUi.getState().openDialog({ kind: "settings" }));
+    // Base UI's dialog viewport is the layer that holds the popup, and the one that sits in the visible part
+    const layer = (await screen.findByRole("dialog", { name: "Guide settings" })).parentElement!;
+    expect(layer).toHaveAttribute("role", "presentation");
+    expect(layer.style.getPropertyValue("--vv-height")).toBe("700px");
+    expect(layer.style.getPropertyValue("--vv-top")).toBe("0px");
+
+    // the keyboard opens: the visible part is shorter, and the page may have been moved up to show the field
+    act(() => {
+      Object.assign(viewport, { offsetTop: 40, height: 380 });
+      viewport.dispatchEvent(new Event("resize"));
+    });
+    expect(layer.style.getPropertyValue("--vv-height")).toBe("380px");
+    expect(layer.style.getPropertyValue("--vv-top")).toBe("40px");
+  });
+
+  it("takes the focus itself when a touch opened it, so no ring is drawn round a radio nobody pressed", async () => {
+    render(<App />);
+    fireEvent.pointerDown(document.body, { pointerType: "touch" });
+    act(() => useUi.getState().openDialog({ kind: "settings" }));
+    const popup = await screen.findByRole("dialog", { name: "Guide settings" });
+    await waitFor(() => expect(popup).toHaveFocus());
+    expect(within(popup).getByRole("radio", { name: "Use device setting" })).not.toHaveFocus();
   });
 });
