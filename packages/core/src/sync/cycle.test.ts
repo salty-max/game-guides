@@ -474,3 +474,50 @@ describe("a poll with nothing to send", () => {
   });
 });
 
+describe("linking two devices that don't link in the same moment", () => {
+  it("brings the device that typed the code what the other pushes a moment later, on its next round", async () => {
+    await tick(a, [r1]);
+    await tick(b, [r2]);
+    // a shows the code and b types it: b joins at once, to a group that has nothing yet, and a only learns of the link a moment after
+    await pair(a, b);
+    expect(await sync(b)).toMatchObject({ kind: "ok", pulled: true });
+    expect(await checked(b)).toEqual([r2]);
+    later(3000);
+    expect(await sync(a)).toMatchObject({ kind: "ok", pulled: true });
+    expect(await checked(a)).toEqual(sorted(r1, r2));
+    // b's next round, the follow-up, finds a's progress, with no reopening
+    later(3000);
+    expect(await sync(b)).toMatchObject({ kind: "ok", pulled: true });
+    expect(await checked(b)).toEqual(sorted(r1, r2));
+  });
+});
+
+describe("a device removed from the group by another", () => {
+  it("is unlinked on its next call, keeps its progress, and the rest carry on", async () => {
+    const { checkStatus, removeDevice } = await import("./pairing");
+    await tick(a, [r1]);
+    await tick(b, [r2]);
+    await pair(a, b);
+    await sync(a);
+    later();
+    await sync(b);
+    later();
+    // a looks for b in the list, by what the list says of it, and removes it
+    const removal = await a.run(async () => {
+      const list = await checkStatus();
+      const other = list.ok ? list.devices.find((device) => !device.self) : undefined;
+      return { other, result: other?.id ? await removeDevice(other.id) : "none" };
+    });
+    expect(removal.result).toBe("removed");
+    later();
+    expect(await sync(b)).toEqual({ kind: "unlinked" });
+    expect(await b.run(() => readRecord())).toBeNull();
+    expect(await checked(b)).toEqual(sorted(r1, r2));
+    // a is unaffected, and so is everything it has
+    expect(await sync(a)).toMatchObject({ kind: "ok" });
+    expect(await checked(a)).toEqual(sorted(r1, r2));
+    const list = await a.run(() => checkStatus());
+    expect(list.ok && list.devices).toHaveLength(1);
+  });
+});
+

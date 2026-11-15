@@ -3,7 +3,7 @@ import { defaultState } from "../progress-state";
 import { useProgress } from "../store/progress";
 import { useSyncStatus } from "../store/sync";
 import { flushOnExit, syncOnce, type Outcome } from "./cycle";
-import { BACKOFF_FIRST, BACKOFF_MAX, DEBOUNCE, FOREGROUND_GAP, MAX_WAIT, POLL_FAST, POLL_GROWTH, POLL_SLOW, backoff, startEngine, syncSoon } from "./engine";
+import { BACKOFF_FIRST, BACKOFF_MAX, DEBOUNCE, FOREGROUND_GAP, LINK_FOLLOW_UPS, MAX_WAIT, POLL_FAST, POLL_GROWTH, POLL_SLOW, backoff, startEngine, syncAfterLinking, syncSoon } from "./engine";
 import { writeRecord } from "./local";
 
 vi.mock("./cycle", () => ({ syncOnce: vi.fn(), flushOnExit: vi.fn() }));
@@ -15,6 +15,10 @@ const [a, b, c] = allRows.map((row) => row.id);
 
 let stop: (() => void) | undefined;
 const start = () => (stop = startEngine());
+const halt = () => {
+  stop?.();
+  stop = undefined;
+};
 const link = (on = true) => {
   document.cookie = on ? "hundo_link=abc; path=/" : "hundo_link=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
 };
@@ -340,6 +344,79 @@ describe("when sync runs", () => {
     syncSoon();
     await vi.advanceTimersByTimeAsync(0);
     expect(run).toHaveBeenCalledTimes(1);
+  });
+
+  it("runs a round at once on linking and again after about 3, 8 and 15 seconds, for the other device to have joined and pushed", async () => {
+    vi.spyOn(Math, "random").mockReturnValue(0.5);
+    link();
+    record();
+    start();
+    await vi.advanceTimersByTimeAsync(0);
+    run.mockClear();
+    syncAfterLinking();
+    await vi.advanceTimersByTimeAsync(0);
+    expect(run).toHaveBeenCalledTimes(1);
+    let elapsed = 0;
+    for (const [index, at] of LINK_FOLLOW_UPS.entries()) {
+      await vi.advanceTimersByTimeAsync(at - 1 - elapsed);
+      expect(run, `before ${at} ms`).toHaveBeenCalledTimes(index + 1);
+      await vi.advanceTimersByTimeAsync(2);
+      elapsed = at + 1;
+      expect(run, `at ${at} ms`).toHaveBeenCalledTimes(index + 2);
+    }
+    // after those, the polls take over at the quick pace, which is 20 seconds from the last round
+    run.mockClear();
+    await vi.advanceTimersByTimeAsync(POLL_FAST - 1000);
+    expect(run).not.toHaveBeenCalled();
+    await vi.advanceTimersByTimeAsync(2000);
+    expect(run).toHaveBeenCalledTimes(1);
+  });
+
+  it("doesn't start a round on top of one in progress, nor over a failure's backoff, nor on a hidden page, and does nothing once stopped", async () => {
+    link();
+    record();
+    start();
+    await vi.advanceTimersByTimeAsync(0);
+    run.mockClear();
+    let finish!: (outcome: Outcome) => void;
+    run.mockReturnValueOnce(new Promise<Outcome>((resolve) => (finish = resolve)));
+    syncAfterLinking();
+    await vi.advanceTimersByTimeAsync(3_100);
+    // the first round is still going, so the 3 s follow-up is dropped, not queued behind it
+    expect(run).toHaveBeenCalledTimes(1);
+    finish(ok());
+    await vi.advanceTimersByTimeAsync(100);
+    expect(run).toHaveBeenCalledTimes(1);
+    // the 8 s one, with the round over, goes
+    await vi.advanceTimersByTimeAsync(5_000);
+    expect(run).toHaveBeenCalledTimes(2);
+    // a failure puts the rest behind its backoff
+    run.mockResolvedValue({ kind: "retry", why: "paused" });
+    await vi.advanceTimersByTimeAsync(7_000);
+    const failed = run.mock.calls.length;
+    expect(failed).toBe(3);
+    syncAfterLinking();
+    await vi.advanceTimersByTimeAsync(1);
+    run.mockClear();
+    await vi.advanceTimersByTimeAsync(3_100);
+    expect(run).not.toHaveBeenCalled();
+    // a hidden page asks for none
+    halt();
+    run.mockReset().mockResolvedValue(ok());
+    start();
+    await vi.advanceTimersByTimeAsync(0);
+    run.mockClear();
+    syncAfterLinking();
+    await vi.advanceTimersByTimeAsync(0);
+    visibility("hidden");
+    await vi.advanceTimersByTimeAsync(20_000);
+    expect(run).toHaveBeenCalledTimes(1);
+    visibility("visible");
+    halt();
+    run.mockClear();
+    syncAfterLinking();
+    await vi.advanceTimersByTimeAsync(20_000);
+    expect(run).not.toHaveBeenCalled();
   });
 
   it("goes off when the server says the device is unlinked", async () => {

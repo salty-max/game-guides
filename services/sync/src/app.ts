@@ -26,9 +26,9 @@ const PENDING_SECONDS = 900;
 const KEEP_SECONDS = 400 * DAY;
 const KEEP_TEST_SECONDS = 7 * DAY;
 const MAX_BODY = 256 * 1024;
-/** Devices in one group. A device not seen for three months drops off the list by itself (and comes back on its next sync). */
+/** Devices in one group. A device not seen for 60 days is taken out of it by itself, the next time its group is looked at. */
 const MAX_DEVICES = 12;
-const STALE_MS = 90 * 86_400_000;
+const STALE_MS = 60 * 86_400_000;
 /** Syncs a minute from one device: a runaway client or a stolen cookie gets a trickle. It does not guard the store's quota. */
 const SYNCS_PER_MINUTE = 120;
 const SEEN_EVERY = 60_000;
@@ -218,20 +218,28 @@ async function attach(ctx: Ctx, id: string, group: string, label: string, from =
   if (from && from !== group) await dropIfEmpty(ctx, from);
 }
 
-/** A group's devices as the store holds them, apart into those seen within three months and those not. */
-function devicesOf(flat: unknown, now: number) {
+/** A group's devices as the store holds them, apart into those seen within 60 days and those not. */
+function devicesOf(flat: unknown, now: number, caller = "") {
   const all = toPairs(flat).map(([id, value]) => {
     const [label, seen] = value.split("\t");
     return { id, label, seen: Number(seen) };
   });
-  return { all, live: all.filter((device) => now - device.seen <= STALE_MS), stale: all.filter((device) => now - device.seen > STALE_MS) };
+  // The device making this call is here, whatever its record says: a long-quiet device that comes back is heard before it is judged.
+  const quiet = (device: { id: string; seen: number }) => device.id !== caller && now - device.seen > STALE_MS;
+  return { all, live: all.filter((device) => !quiet(device)), stale: all.filter(quiet) };
 }
 
-/** Whether a group has room for a device. A device that went quiet for three months, a browser cleared and never unlinked, is dropped first. */
+/** Take devices quiet for 60 days out of the group for good, their records too: a lost phone doesn't come back on its own, and has to be linked again. */
+async function dropStale(ctx: Ctx, group: string, stale: { id: string }[]) {
+  if (stale.length === 0) return;
+  await exec(ctx, [["DEL", ...stale.map((device) => dvKey(ctx, device.id))], ["HDEL", gdKey(ctx, group), ...stale.map((device) => device.id)]]);
+}
+
+/** Whether a group has room for a device. A device that went quiet for 60 days, a browser cleared and never unlinked, is dropped first. */
 async function hasRoom(ctx: Ctx, group: string): Promise<boolean> {
   const [flat] = await exec(ctx, [["HGETALL", gdKey(ctx, group)]]);
   const { live, stale } = devicesOf(flat, ctx.now);
-  if (stale.length > 0) await exec(ctx, [["HDEL", gdKey(ctx, group), ...stale.map((device) => device.id)]]);
+  await dropStale(ctx, group, stale);
   return live.length < MAX_DEVICES;
 }
 
@@ -328,7 +336,10 @@ async function status(ctx: Ctx) {
   if (!me) return unlinked(ctx);
   if (!me.group) return reply(200, { linked: false, pending: true });
   const [flat] = await exec(ctx, [["HGETALL", gdKey(ctx, me.group)]]);
-  const devices = devicesOf(flat, ctx.now).live.map(({ id, label, seen }) => ({ label, seen, self: id === me.id }));
+  // The id is what another device names to remove this one: half of what would open it (the secret is the other), so it opens nothing.
+  const { live, stale } = devicesOf(flat, ctx.now, me.id);
+  await dropStale(ctx, me.group, stale);
+  const devices = live.map(({ id, label, seen }) => ({ id, label, seen, self: id === me.id }));
   // Also how a device that was showing a code learns its code was used: its next poll carries the new cookies.
   return reply(200, { linked: true, devices, now: ctx.now }, sessionCookies(ctx, tokenOf(me), me.group));
 }
@@ -390,9 +401,10 @@ async function sync(ctx: Ctx) {
 
   const keep = ttl(ctx.where.ns);
   const touch = ctx.body.touch === true;
-  const { all, live } = devicesOf(flat, ctx.now);
+  const { all, live, stale } = devicesOf(flat, ctx.now, me.id);
   const mine = all.find((device) => device.id === me.id);
   const commands: Command[] = [];
+  if (stale.length > 0) commands.push(["DEL", ...stale.map((device) => dvKey(ctx, device.id))], ["HDEL", devicesKey, ...stale.map((device) => device.id)]);
   // Always an expiry with the data, so a push that lands after a "forget" leaves nothing that lasts.
   if (add.length > 0) commands.push(["ZADD", set, ...add.flatMap(([at, member]) => [at, member])], ["EXPIRE", set, keep]);
   if (drop.length > 0) commands.push(["ZREM", set, ...drop]);
@@ -425,6 +437,22 @@ async function unlink(ctx: Ctx) {
   return reply(200, { ok: true }, clearCookies(ctx));
 }
 
+/** Take another device out of this device's group, as that device could itself: its next call finds it unlinked, and its own progress is its own. */
+async function remove(ctx: Ctx) {
+  const id = ctx.body.id;
+  if (typeof id !== "string" || !/^[A-Za-z0-9_-]{16}$/.test(id)) return reply(400, { error: "device" });
+  const me = await identify(ctx);
+  if (!me?.group) return unlinked(ctx);
+  // A device takes itself out by unlinking, which also clears its cookies.
+  if (id === me.id) return reply(400, { error: "self" });
+  // Only a device of this group, by its own record: one that was never in it, or has moved to another, isn't here to remove. A row in the
+  // list whose record is gone (a device removed in the middle of its own sync writes itself back) is tidied away.
+  const [group, listed] = await exec(ctx, [["HGET", dvKey(ctx, id), "g"], ["HGET", gdKey(ctx, me.group), id]]);
+  if (group !== me.group && !(group === null && listed !== null)) return reply(400, { error: "device" });
+  await exec(ctx, [["DEL", dvKey(ctx, id)], ["HDEL", gdKey(ctx, me.group), id]]);
+  return reply(200, { ok: true });
+}
+
 async function forget(ctx: Ctx) {
   const me = await identify(ctx);
   if (!me?.group) return unlinked(ctx);
@@ -440,6 +468,7 @@ const routes: Record<string, (ctx: Ctx) => Promise<Response>> = {
   "/api/status": status,
   "/api/sync": sync,
   "/api/unlink": unlink,
+  "/api/remove": remove,
   "/api/forget": forget,
 };
 

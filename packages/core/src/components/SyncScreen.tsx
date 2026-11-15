@@ -5,11 +5,11 @@ import { ItemList, ItemRow } from "./list";
 import { Button } from "./ui";
 import { ago } from "../format";
 import { installed } from "../persistence";
-import { useSyncStatus, type SyncPhase } from "../store/sync";
+import { setSyncStatus, useSyncStatus, type SyncPhase } from "../store/sync";
 import { useUi } from "../store/ui";
-import { syncSoon } from "../sync/engine";
+import { syncAfterLinking, syncSoon } from "../sync/engine";
 import { browserOf, isApple } from "../sync/label";
-import { afterLinked, checkStatus, claimCode, forgetGroup, startCode, unlinkDevice, type ClaimResult, type CodeResult, type Device } from "../sync/pairing";
+import { afterLinked, checkStatus, claimCode, forgetGroup, removeDevice, startCode, unlinkDevice, type ClaimResult, type CodeResult, type Device } from "../sync/pairing";
 
 /** How long a code works, which the server holds to as well. Counted from when it arrives, so a clock that's off can't shorten it. */
 const CODE_LIFETIME = 10 * 60_000;
@@ -38,6 +38,15 @@ const claimProblems: Record<Exclude<ClaimResult, { ok: true }>["why"], string> =
 const codeProblems: Record<Exclude<CodeResult, { ok: true }>["why"], string> = {
   offline: claimProblems.offline,
   limit: "Too many codes for now. Wait a while and try again.",
+  error: claimProblems.error,
+};
+
+/** What a device row says about when it was last heard from. */
+const deviceDetail = (device: Device, now: number) => (now - device.seen < ACTIVE_WITHIN ? "Seen in the last 15 minutes" : `Last synced ${ago(device.seen, now)}`);
+
+const removeProblems = {
+  gone: "That device is no longer in the group.",
+  offline: claimProblems.offline,
   error: claimProblems.error,
 };
 
@@ -228,7 +237,29 @@ function EnterCode({ onLinked, onBack }: { onLinked: () => void; onBack: () => v
   );
 }
 
-function Linked({ onShow, busy, said, onUnlink, onForget }: { onShow: () => void; busy: boolean; said: Said | null; onUnlink: () => void; onForget: () => void }) {
+function Linked({
+  onShow,
+  busy,
+  said,
+  refresh,
+  onUnlink,
+  onForget,
+  onRemove,
+  focusId,
+  onFocused,
+}: {
+  onShow: () => void;
+  busy: boolean;
+  said: Said | null;
+  /** Counts what should make the list be read again, beyond a sync finishing: a device was removed. */
+  refresh: number;
+  onUnlink: () => void;
+  onForget: () => void;
+  onRemove: (device: Device, now: number) => void;
+  /** The device whose Remove button opened the question the reader backed out of: the focus goes back to it once the list is there. */
+  focusId: string | null;
+  onFocused: () => void;
+}) {
   const { phase, devices: count, lastSync } = useSyncStatus();
   const [devices, setDevices] = useState<{ list: Device[]; now: number } | "failed" | null>(null);
   const shown = devices === "failed" ? null : devices;
@@ -237,13 +268,24 @@ function Linked({ onShow, busy, said, onUnlink, onForget }: { onShow: () => void
   useEffect(() => {
     let stopped = false;
     void checkStatus().then((result) => {
+      if (stopped) return;
       // A refresh that fails keeps the list already shown.
-      if (!stopped) setDevices((shown) => (result.ok ? { list: result.devices, now: result.now } : (shown ?? "failed")));
+      setDevices((shown) => (result.ok ? { list: result.devices, now: result.now } : (shown ?? "failed")));
+      // The list is the count: after a device is removed, the sync's count (from its last full answer) would lag it.
+      if (result.ok && useSyncStatus.getState().devices !== result.devices.length) setSyncStatus({ devices: result.devices.length });
+      // This device was removed from the group by another: let the engine find out now, so this screen goes back to being unlinked.
+      if (!result.ok && result.why === "unlinked") syncSoon();
     });
     return () => {
       stopped = true;
     };
-  }, [lastSync, count]);
+  }, [lastSync, count, refresh]);
+
+  useEffect(() => {
+    if (!focusId || !shown) return;
+    document.querySelector<HTMLElement>(`[data-remove="${focusId}"]`)?.focus();
+    onFocused();
+  }, [focusId, shown, onFocused]);
 
   return (
     <View>
@@ -252,7 +294,20 @@ function Linked({ onShow, busy, said, onUnlink, onForget }: { onShow: () => void
       <ItemList label="Linked devices" empty={devices === "failed" ? "Couldn’t load the list of devices. Check your connection." : "Loading the devices…"}>
         {shown?.list.map((device, index) => (
           // (by position: two devices can share a label, and a second)
-          <ItemRow key={index} title={device.self ? `${device.label} (this device)` : device.label} detail={shown.now - device.seen < ACTIVE_WITHIN ? "Seen in the last 15 minutes" : `Last synced ${ago(device.seen, shown.now)}`} />
+          <ItemRow key={index} title={device.self ? `${device.label} (this device)` : device.label} detail={deviceDetail(device, shown.now)}>
+            {/* Another device of the group can be taken out of it. This one leaves by unlinking, below. An older server's list has no ids to name one by. */}
+            {!device.self && device.id && (
+              <Button
+                size="compact"
+                data-remove={device.id}
+                aria-label={`Remove ${device.label} (${deviceDetail(device, shown.now)})`}
+                aria-disabled={busy || undefined}
+                onClick={() => onRemove(device, shown.now)}
+              >
+                Remove
+              </Button>
+            )}
+          </ItemRow>
         ))}
       </ItemList>
       {isApple() && (
@@ -302,7 +357,28 @@ function Forget({ busy, onDelete, onBack }: { busy: boolean; onDelete: () => voi
   );
 }
 
-type Screen = "home" | "show" | "enter" | "forget";
+/** The question before a device is taken out of the group, on the screen itself: the safe answer takes the focus. */
+function Remove({ device, detail, busy, onRemove, onBack }: { device: Device; detail: string; busy: boolean; onRemove: () => void; onBack: () => void }) {
+  return (
+    <View>
+      <DialogDescription>Remove “{device.label}” from your synced devices?</DialogDescription>
+      <DialogText>{detail}.</DialogText>
+      <DialogText>
+        It stops syncing, and is unlinked the next time it connects. Its own progress stays on it, and nothing is deleted from your other devices. It can be linked again with a code.
+      </DialogText>
+      <DialogFooter>
+        <Button look="danger" aria-disabled={busy || undefined} onClick={onRemove}>
+          Remove
+        </Button>
+        <Button data-autofocus="" aria-disabled={busy || undefined} onClick={onBack}>
+          Cancel
+        </Button>
+      </DialogFooter>
+    </View>
+  );
+}
+
+type Screen = "home" | "show" | "enter" | "forget" | "remove";
 
 /** Sync devices: link a device with a six-digit code, see the linked ones, and leave. */
 export function SyncScreen() {
@@ -311,6 +387,9 @@ export function SyncScreen() {
   const [view, setView] = useState<Screen>("home");
   const [shown, setShown] = useState<{ code: string; at: number; linked: boolean } | null>(null);
   const [busy, setBusy] = useState(false);
+  const [target, setTarget] = useState<{ device: Device; detail: string } | null>(null);
+  const [refresh, setRefresh] = useState(0);
+  const [focusId, setFocusId] = useState<string | null>(null);
   const lastSync = useSyncStatus((s) => s.lastSync);
   // What just happened ("Linked", "This device is unlinked"). While linked, it gives way to the sync status once the next sync finishes.
   const [said, setSaid] = useState<(Said & { at: number | null }) | null>(null);
@@ -347,6 +426,18 @@ export function SyncScreen() {
     else tell("Couldn’t reach the sync service, so this device is still linked. Try again when you’re online.", true);
   };
 
+  const remove = async () => {
+    if (busy || !target?.device.id) return;
+    const { device } = target;
+    setBusy(true);
+    const result = await removeDevice(device.id!);
+    setBusy(false);
+    setRefresh((count) => count + 1);
+    if (result === "removed") return finished(`Removed “${device.label}”. Its progress stays on it, and it is unlinked the next time it connects.`);
+    setView("home");
+    tell(removeProblems[result], result !== "gone");
+  };
+
   const forget = async () => {
     if (busy) return;
     setBusy(true);
@@ -368,7 +459,7 @@ export function SyncScreen() {
         onLinked={() => {
           const first = useSyncStatus.getState().phase === "off";
           if (first) afterLinked();
-          else syncSoon();
+          else syncAfterLinking();
           finished(first ? "Linked. Syncing your progress." : "A device joined.");
         }}
         onNewCode={() => void show()}
@@ -376,6 +467,11 @@ export function SyncScreen() {
       />
     );
   }
+  if (view === "remove" && target) return <Remove device={target.device} detail={target.detail} busy={busy} onRemove={() => void remove()} onBack={() => {
+          if (busy) return;
+          setFocusId(target.device.id ?? null);
+          setView("home");
+        }} />;
   if (view === "forget") return <Forget busy={busy} onDelete={() => void forget()} onBack={() => !busy && setView("home")} />;
   if (view === "enter") {
     return (
@@ -386,7 +482,21 @@ export function SyncScreen() {
     );
   }
   return linked ? (
-    <Linked onShow={() => void show()} busy={busy} said={status} onUnlink={() => void unlink()} onForget={() => !busy && setView("forget")} />
+    <Linked
+      onShow={() => void show()}
+      busy={busy}
+      said={status}
+      refresh={refresh}
+      focusId={focusId}
+      onFocused={() => setFocusId(null)}
+      onUnlink={() => void unlink()}
+      onForget={() => !busy && setView("forget")}
+      onRemove={(device, now) => {
+        if (busy) return;
+        setTarget({ device, detail: deviceDetail(device, now) });
+        setView("remove");
+      }}
+    />
   ) : (
     <Off onShow={() => void show()} onEnter={() => !busy && setView("enter")} busy={busy} said={status} />
   );

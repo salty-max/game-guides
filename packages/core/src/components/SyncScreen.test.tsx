@@ -5,11 +5,14 @@ import { defaultState } from "../progress-state";
 import { useProgress } from "../store/progress";
 import { useSyncStatus } from "../store/sync";
 import { useUi } from "../store/ui";
-import { afterLinked, checkStatus, claimCode, forgetGroup, startCode, unlinkDevice } from "../sync/pairing";
+import { afterLinked, checkStatus, claimCode, forgetGroup, removeDevice, startCode, unlinkDevice } from "../sync/pairing";
+import { syncSoon } from "../sync/engine";
 import { allowSlowMounts } from "../test/slow";
 import { ago } from "../format";
 
 allowSlowMounts();
+
+vi.mock("../sync/engine", async (original) => ({ ...(await original<typeof import("../sync/engine")>()), syncSoon: vi.fn() }));
 
 vi.mock("../sync/pairing", () => ({
   startCode: vi.fn(),
@@ -18,12 +21,21 @@ vi.mock("../sync/pairing", () => ({
   afterLinked: vi.fn(),
   unlinkDevice: vi.fn(),
   forgetGroup: vi.fn(),
+  removeDevice: vi.fn(),
 }));
 
-const pairing = { startCode: vi.mocked(startCode), checkStatus: vi.mocked(checkStatus), claimCode: vi.mocked(claimCode), afterLinked: vi.mocked(afterLinked), unlinkDevice: vi.mocked(unlinkDevice), forgetGroup: vi.mocked(forgetGroup) };
+const pairing = { startCode: vi.mocked(startCode), checkStatus: vi.mocked(checkStatus), claimCode: vi.mocked(claimCode), afterLinked: vi.mocked(afterLinked), unlinkDevice: vi.mocked(unlinkDevice), forgetGroup: vi.mocked(forgetGroup), removeDevice: vi.mocked(removeDevice) };
 
 const NOW = Date.UTC(2026, 10, 15, 12, 0, 0);
-const group = (now = NOW) => ({ ok: true as const, linked: true, now, devices: [{ label: "Safari · iPhone", seen: now - 30_000, self: true }, { label: "Chrome · Windows", seen: now - 3 * 3_600_000, self: false }] });
+const group = (now = NOW) => ({
+  ok: true as const,
+  linked: true,
+  now,
+  devices: [
+    { id: "SELF000000000000", label: "Safari · iPhone", seen: now - 30_000, self: true },
+    { id: "OTHER00000000000", label: "Chrome · Windows", seen: now - 3 * 3_600_000, self: false },
+  ],
+});
 
 beforeEach(() => {
   localStorage.clear();
@@ -220,10 +232,10 @@ describe("a linked device", () => {
     const dialog = await open(synced());
     expect(await within(dialog).findByText(/Couldn’t load the list of devices/)).toBeInTheDocument();
     pairing.checkStatus.mockResolvedValue(group(Date.now()));
-    act(() => useSyncStatus.setState({ devices: 3, lastSync: Date.now() + 1 }));
+    act(() => useSyncStatus.setState({ devices: 2, lastSync: Date.now() + 1 }));
     expect(await within(dialog).findByText("Safari · iPhone (this device)")).toBeInTheDocument();
     pairing.checkStatus.mockResolvedValue({ ok: false, why: "offline" });
-    act(() => useSyncStatus.setState({ devices: 4, lastSync: Date.now() + 2 }));
+    act(() => useSyncStatus.setState({ devices: 2, lastSync: Date.now() + 2 }));
     await waitFor(() => expect(pairing.checkStatus).toHaveBeenCalledTimes(3));
     expect(within(dialog).getByText("Safari · iPhone (this device)")).toBeInTheDocument();
   });
@@ -268,6 +280,107 @@ describe("a linked device", () => {
     pairing.checkStatus.mockResolvedValue({ ...group(Date.now()), devices: [...group().devices, { label: "Edge · Windows", seen: Date.now(), self: false }] });
     await waitFor(() => expect(within(dialog).getByRole("status")).toHaveTextContent("A device joined."), { timeout: 6000 });
     expect(pairing.afterLinked).not.toHaveBeenCalled();
+  });
+});
+
+describe("removing another device", () => {
+  const linked = () => ({ phase: "synced" as const, devices: 2, lastSync: Date.now() });
+  beforeEach(() => {
+    pairing.checkStatus.mockResolvedValue(group(Date.now()));
+  });
+
+  it("puts a Remove button on the other devices' rows and none on this device's", async () => {
+    const dialog = await open(linked());
+    const rows = await within(dialog).findAllByRole("listitem");
+    expect(rows).toHaveLength(2);
+    expect(within(rows[0]).queryByRole("button")).not.toBeInTheDocument();
+    expect(within(rows[1]).getByRole("button", { name: "Remove Chrome · Windows (Last synced 3 hours ago)" })).toBeInTheDocument();
+  });
+
+  it("asks first, with the cancel button focused, and says what removing does", async () => {
+    const user = userEvent.setup();
+    const dialog = await open(linked());
+    await user.click(await within(dialog).findByRole("button", { name: /^Remove Chrome · Windows/ }));
+    expect(await within(dialog).findByText(/Remove “Chrome · Windows” from your synced devices\?/)).toBeInTheDocument();
+    expect(within(dialog).getByText("Last synced 3 hours ago.")).toBeInTheDocument();
+    expect(within(dialog).getByText(/Its own progress stays on it, and nothing is deleted from your other devices/)).toBeInTheDocument();
+    expect(within(dialog).getByRole("button", { name: "Cancel" })).toHaveFocus();
+    expect(pairing.removeDevice).not.toHaveBeenCalled();
+    await user.click(within(dialog).getByRole("button", { name: "Cancel" }));
+    expect(await within(dialog).findByRole("button", { name: /^Remove Chrome · Windows/ })).toBeInTheDocument();
+    expect(pairing.removeDevice).not.toHaveBeenCalled();
+  });
+
+  it("gives two devices of the same name buttons that can be told apart, and puts the focus back on the one it came from after Cancel", async () => {
+    const user = userEvent.setup();
+    const now = Date.now();
+    pairing.checkStatus.mockResolvedValue({
+      ok: true,
+      linked: true,
+      now,
+      devices: [
+        { id: "SELF000000000000", label: "Safari · iPhone", seen: now - 30_000, self: true },
+        { id: "PHONE10000000000", label: "Safari · iPhone", seen: now - 2 * 86_400_000, self: false },
+        { id: "PHONE20000000000", label: "Safari · iPhone", seen: now - 9 * 3_600_000, self: false },
+      ],
+    });
+    const dialog = await open(linked());
+    const buttons = await within(dialog).findAllByRole("button", { name: /^Remove Safari · iPhone/ });
+    expect(buttons.map((button) => button.getAttribute("aria-label"))).toEqual(["Remove Safari · iPhone (Last synced 2 days ago)", "Remove Safari · iPhone (Last synced 9 hours ago)"]);
+    await user.click(buttons[1]);
+    await user.click(await within(dialog).findByRole("button", { name: "Cancel" }));
+    await waitFor(() => expect(within(dialog).getByRole("button", { name: "Remove Safari · iPhone (Last synced 9 hours ago)" })).toHaveFocus());
+  });
+
+  it("brings the device count down with the list after a removal, and lets the engine hear of a removal of this device", async () => {
+    const user = userEvent.setup();
+    pairing.removeDevice.mockResolvedValue("removed");
+    const dialog = await open(linked());
+    await user.click(await within(dialog).findByRole("button", { name: /^Remove Chrome · Windows/ }));
+    pairing.checkStatus.mockResolvedValue({ ...group(Date.now()), devices: group().devices.slice(0, 1) });
+    await user.click(await within(dialog).findByRole("button", { name: "Remove" }));
+    await waitFor(() => expect(useSyncStatus.getState().devices).toBe(1));
+    cleanup();
+    vi.mocked(syncSoon).mockClear();
+    pairing.checkStatus.mockResolvedValue({ ok: false, why: "unlinked" });
+    await open(linked());
+    await waitFor(() => expect(syncSoon).toHaveBeenCalled());
+  });
+
+  it("removes it on the second press, says so, and reads the list again", async () => {
+    const user = userEvent.setup();
+    pairing.removeDevice.mockResolvedValue("removed");
+    const dialog = await open(linked());
+    await user.click(await within(dialog).findByRole("button", { name: /^Remove Chrome · Windows/ }));
+    const reads = pairing.checkStatus.mock.calls.length;
+    pairing.checkStatus.mockResolvedValue({ ...group(Date.now()), devices: group().devices.slice(0, 1) });
+    await user.click(await within(dialog).findByRole("button", { name: "Remove" }));
+    await waitFor(() => expect(pairing.removeDevice).toHaveBeenCalledWith("OTHER00000000000"));
+    expect(await within(dialog).findByText(/Removed “Chrome · Windows”. Its progress stays on it, and it is unlinked the next time it connects/)).toBeInTheDocument();
+    await waitFor(() => expect(pairing.checkStatus.mock.calls.length).toBeGreaterThan(reads));
+    await waitFor(() => expect(within(dialog).queryByText("Chrome · Windows")).not.toBeInTheDocument());
+    expect(useUi.getState().announcement).toMatch(/^Removed “Chrome · Windows”/);
+  });
+
+  it("says so when the device is already gone, and when the service can't be reached, and removes nothing", async () => {
+    const user = userEvent.setup();
+    const dialog = await open(linked());
+    pairing.removeDevice.mockResolvedValueOnce("gone");
+    await user.click(await within(dialog).findByRole("button", { name: /^Remove Chrome · Windows/ }));
+    await user.click(await within(dialog).findByRole("button", { name: "Remove" }));
+    expect(await within(dialog).findByText("That device is no longer in the group.")).toBeInTheDocument();
+    pairing.removeDevice.mockResolvedValueOnce("offline");
+    await user.click(await within(dialog).findByRole("button", { name: /^Remove Chrome · Windows/ }));
+    await user.click(await within(dialog).findByRole("button", { name: "Remove" }));
+    expect(await within(dialog).findByText(/Couldn’t reach the sync service/)).toBeInTheDocument();
+    expect(within(dialog).getByRole("button", { name: "Unlink this device" })).toBeInTheDocument();
+  });
+
+  it("offers no Remove for a device an older server listed without an id", async () => {
+    pairing.checkStatus.mockResolvedValue({ ...group(Date.now()), devices: group().devices.map(({ label, seen, self }) => ({ label, seen, self })) });
+    const dialog = await open(linked());
+    await within(dialog).findByText("Chrome · Windows");
+    expect(within(dialog).queryByRole("button", { name: /^Remove/ })).not.toBeInTheDocument();
   });
 });
 
