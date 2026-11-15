@@ -22,7 +22,8 @@ const TOUCH_AFTER = 20 * 60 * 60 * 1000;
 
 export type Outcome =
   | { kind: "off" }
-  | { kind: "ok"; devices: number; dirty: boolean }
+  /** `pulled`: the group had something this device didn't, and it was applied here. */
+  | { kind: "ok"; devices: number; dirty: boolean; pulled: boolean }
   | { kind: "unlinked" }
   | { kind: "retry"; why: "offline" | "paused" | "error" };
 
@@ -50,17 +51,18 @@ const pick = (entries: Entries, keys: string[]): Entries => Object.fromEntries(k
 
 const sameProgress = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b);
 
-/** Lay the merged ledger over this device's progress. Returns what changed, for the announcement. */
-function apply(entries: Entries, first: boolean) {
+/** Lay the merged ledger over this device's progress, announcing it. Whether it changed anything. */
+function apply(entries: Entries, first: boolean): boolean {
   const progress = useProgress.getState();
   const next = viewFrom(entries, progress.data);
-  if (sameProgress(next, progress.data)) return;
+  if (sameProgress(next, progress.data)) return false;
   const ticks = !sameProgress(next.checks, progress.data.checks);
   // What the group had isn't a tick the reader made here, so it doesn't start the request to keep storage (Firefox would ask them).
   notATick(() => progress.applySynced(next));
   const ui = useUi.getState();
   ui.announce(first ? "Progress merged with your other devices." : "Progress updated from your other device.");
   if (ticks && !first) ui.showToast("Progress updated from your other device.");
+  return true;
 }
 
 /** The server's entries in a reply, or null when the reply isn't what the protocol says. */
@@ -112,6 +114,7 @@ async function join(hint: string): Promise<{ joined: true } | { outcome: Outcome
 /** Send what is waiting, take the group's state and apply it. Repeats while more than one batch is waiting. */
 async function exchange(): Promise<Outcome> {
   let devices = 0;
+  let pulled = false;
   for (let round = 0, rebased = false; round < ROUNDS; ) {
     const record = readRecord();
     if (!record || !readHint()) return { kind: "off" };
@@ -146,13 +149,13 @@ async function exchange(): Promise<Outcome> {
     latest.dirty = latest.dirty.filter((key) => !delivered(key));
     latest.entries = merge(latest.entries, server.entries);
     if (touch) latest.touched = Date.now();
-    apply(latest.entries, false);
+    pulled = apply(latest.entries, false) || pulled;
     if (!writeRecord(latest)) return retry("error");
     devices = server.devices;
     round++;
-    if (latest.dirty.length === 0) return { kind: "ok", devices, dirty: false };
+    if (latest.dirty.length === 0) return { kind: "ok", devices, dirty: false, pulled };
   }
-  return { kind: "ok", devices, dirty: true };
+  return { kind: "ok", devices, dirty: true, pulled };
 }
 
 async function once(): Promise<Outcome> {
@@ -165,12 +168,16 @@ async function once(): Promise<Outcome> {
   }
   // No ledger, or one from another group (this device moved): join afresh. The old stamps mean nothing in the new group, and sending them
   // as they are could untick what the group has ticked.
+  let first = false;
   if (!record || record.group !== hint) {
     if (record) dropRecord();
     const joined = await join(hint);
     if ("outcome" in joined) return joined.outcome;
+    first = true;
   }
-  return exchange();
+  const outcome = await exchange();
+  // Joining a group is a pull of everything it has.
+  return outcome.kind === "ok" && first ? { ...outcome, pulled: true } : outcome;
 }
 
 /** One cycle, alone: a second tab of this guide waits its turn, and then finds the first one's work done. */
