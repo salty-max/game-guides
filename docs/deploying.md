@@ -33,20 +33,35 @@ Every app's `vercel.json` is the same, and `deploy.test.ts` fails if one drifts:
   So a change to one guide deploys only that guide, and a change to core, the lockfile or the root `package.json` deploys all three. The root `docs/`, `README.md` and `CLAUDE.md`, the harness, the ESLint config and `.github/` aren't in the list, and a commit touching only those deploys nothing. An app's own `README.md` and `docs/facts-to-verify.md` sit inside its folder, though, so editing them redeploys that guide. If the build starts to read another root file, add it to the list in every app. `deploy.test.ts` checks that core and the root workspace files stay in it.
 
   Vercel leaves `VERCEL_GIT_PREVIOUS_SHA` empty on a branch's first deployment ([its docs](https://vercel.com/docs/environment-variables/system-environment-variables)). So on a new branch only the last commit decides: when that commit touches only docs, no preview gets built, even if earlier commits on the branch changed a guide. Push a commit that touches the app, or build it with `vercel deploy` (a redeploy runs the same ignore command and is skipped the same way, see Pitfalls).
-- **Rewrites:** two, in this order. `/api/:path*` goes to `https://api.hundo.quest/api/:path*` (the sync API, so a call is same-origin and its cookies are the guide's own, and the CSP keeps `connect-src 'self'`). Then one catch-all sends every other path except `/assets/`, `/fonts/` and `/icons/` to `/index.html`, so deep links like `/guide/3` load the app.
-- **Headers:**
+- **Routes only.** The file has `routes` and none of `headers`, `rewrites`, `redirects` or `trailingSlash`. Vercel runs routes in phases: what comes before the first `{ "handle": … }` runs on every request, before the file lookup; `filesystem` runs after a miss; `hit` runs after a file was found. A `headers` rule is compiled into the first kind, so it matches by path whether or not the file exists, and that is how a missing `/assets/nope.js` came back with a year of cache. Hence the long cache rules sit in `hit`, and the rest of the file is what `headers` and `rewrites` used to build, in the same order. Why not keep `headers` and add a few `routes`: Vercel puts a file's `routes` ahead of what it builds from the other properties, so a `handle` in them takes everything after it into its phase, the CSP included (seen in `vercel build`'s `.vercel/output/config.json`, 2026-11-15). Vercel's docs list `handle` among the [deprecated route properties](https://vercel.com/docs/project-configuration/vercel-json#deprecated-route-properties), but `hit` did what the [Build Output API](https://vercel.com/docs/build-output-api/configuration#handler-route) says on a real preview (see Pitfalls).
+- **Before the file lookup**, on every request, 404s included:
   - a strict Content-Security-Policy, with `script-src 'self'` and no inline scripts;
   - `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy`, `Strict-Transport-Security` and `Cross-Origin-Opener-Policy`;
   - `public, max-age=0, must-revalidate` on `index.html`, `sw.js`, `theme-init.js` and the manifest, so a new version is seen at once;
-  - one year `immutable` on hashed `/assets/*` and the Workbox runtime;
+  - `Service-Worker-Allowed: /` on `sw.js`.
+- **After a miss**, two routes, in this order. `/api` and what follows it goes to `https://api.hundo.quest/api/…` (the sync API, so a call is same-origin and its cookies are the guide's own, and the CSP keeps `connect-src 'self'`). Then one catch-all sends every other path except `/api/`, `/assets/`, `/fonts/`, `/icons/` and `/workbox-` to `/index.html`, so deep links like `/guide/3` load the app.
+- **After a hit**, a long cache, only for a file that exists:
+  - one year `immutable` on hashed `/assets/*` and the Workbox runtime (`/workbox-<hash>.js`);
   - a week, with stale-while-revalidate, on fonts and icons.
+
+  A missing file is Vercel's plain-text 404 with `public, max-age=0, must-revalidate`.
 
 ## Pitfalls
 
-Each of these broke something or nearly did. `packages/core/src/deploy.test.ts` checks the first three in every app, and each guide's `guide.test.ts` checks the fourth.
+Each of these broke something or nearly did. `packages/core/src/deploy.test.ts` checks `cleanUrls`, the catch-all, the long cache and the inline scripts in every app, and each guide's `guide.test.ts` checks the storage keys.
 
 - **Never turn on `cleanUrls`.** It made deep links like `/guide/3` return 404, because the catch-all rewrite stopped applying (fixed in `38e8d39`).
-- **Keep `/api`, `/assets`, `/fonts` and `/icons` out of the catch-all.** A request for a hashed asset from an older deploy must be a real 404. Rewritten, it gets `index.html` back in place of JavaScript. That breaks the page, and the one-year cache rule on `/assets` can keep the HTML cached. A call to `/api` that missed would come back as the app's page, which a client reads as an answer. The `/api` rewrite to the sync API sits before the catch-all, and `deploy.test.ts` checks both and their order.
+- **Keep `/api`, `/assets`, `/fonts`, `/icons` and `/workbox-` out of the catch-all.** A request for a hashed asset from an older deploy must be a real 404. Rewritten, it gets `index.html` back in place of JavaScript. That breaks the page, and a one-year cache rule can keep the HTML cached. `/workbox-nope.js` did exactly that (seen on production, 2026-11-15): 200, `text/html`, `immutable`, and the CDN had it cached. `sw.js` imports its Workbox chunk by that name, so a stuck HTML copy would have given the worker HTML to run (an inference; not reproduced). A call to `/api` that missed would come back as the app's page, which a client reads as an answer. The `/api` route to the sync API sits before the catch-all, and `deploy.test.ts` checks both and their order.
+- **A long cache comes only with a found file.** A deploy race, or an old page asking for a file from a newer build, can ask for an asset that isn't there yet. A one-year `immutable` on that 404 sticks in the browser (and [Vercel's CDN caches 404s too](https://vercel.com/docs/caching/cdn-cache#cacheable-response-criteria)), and the file stays "missing" for that reader after it exists. A `headers` rule can't tell: its `has` and `missing` match request headers, cookies, host and query only, never the status or whether the file exists. So the cache rules live in the `hit` phase of `routes` (see above). On 2026-11-15 a scratch static site (a preview of `hundo-echoes`, removed after) put four ways side by side, each against a file that exists and one that doesn't:
+
+  | Rule | Missing file |
+  | --- | --- |
+  | before the file lookup, as `headers` did | 404 with the year |
+  | in the `hit` phase | 404 with `max-age=0, must-revalidate` (**used**) |
+  | an override in the `miss` phase | no effect |
+  | an override in the `error` phase | 404 with `no-store` |
+
+  Found files kept their rule in the `hit` phase, from the CDN on repeat requests, and with ranges and query strings. SvelteKit's adapter ran into the same ([thread](https://community.vercel.com/t/svelte-cache-404-bug/350)), and its fix ([sveltejs/kit#12530](https://github.com/sveltejs/kit/pull/12530)) has its server function set the header itself, which a static guide has no function for. The `error` phase would do as well, but it needs the long rule to be set first and then undone. `deploy.test.ts` holds the file to the phases, and `headers.sh` checks a preview's 404s. If `hit` ever stops working, `headers.sh` is what shows it, since the test only reads the file.
 - **The preview toolbar's script is blocked on previews.** Each preview's console shows one CSP error, for the Vercel toolbar's script from `vercel.live` (`script-src 'self'`). Production has no toolbar. It is left as it is, since allowing it would loosen the CSP every guide ships, production's too (not tried: a header rule that matches preview hosts only).
 - **No inline scripts.** The CSP forbids them, so `theme-init.js`, which sets the theme before first paint, stays an external file. Don't fold it into `index.html`, and don't add `'unsafe-inline'` to make something work.
 - **Storage keys never change, and an address changes only with a hand-off.** Progress lives in the reader's browser, in localStorage, under `<storagePrefix>.v1`, and localStorage belongs to one origin, so a new prefix or a bare redirect starts every reader from nothing. Each guide's `guide.test.ts` pins its full keys. To move a guide:
@@ -68,7 +83,7 @@ Nothing reaches production without being looked at on a preview deployment first
 2. On each preview that built:
    - the change itself, on desktop and phone, in light and dark ([testing.md](testing.md#in-a-browser));
    - a deep link such as `/guide/3` loads the app;
-   - a made-up hashed asset such as `/assets/nope.js` returns 404;
+   - a made-up hashed asset such as `/assets/nope.js` returns 404 with no long cache, and so do a made-up font, icon and `/workbox-nope.js` (`headers.sh` checks all four), while `/api/sync` and `/api/nope` are the sync API's own answers;
    - the headers: `curl -sI <preview-url>/` shows the Content-Security-Policy and the security headers;
    - `/theme-init.js` loads, and the page doesn't flash the wrong theme on reload;
    - in a regular browser, the service worker registers, the guide works offline after one visit, and a newer deploy shows the update prompt.

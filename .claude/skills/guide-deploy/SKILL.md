@@ -47,12 +47,13 @@ Work out which projects will build before asking for the push. The ignore step, 
    cd <scratchpad>/link-<project> && bash <repo>/.claude/skills/guide-deploy/scripts/headers.sh <deployment-url>
    ```
 
-   Hold its output against the app's `vercel.json`, which is the source of truth for every value:
+   It holds each row to what it should be, says `WRONG` beside any that isn't and exits 1, so read every row, not only the verdict. The app's `vercel.json` is the source of truth for every value:
    - `/` and the deep link `/guide/3` return 200 HTML: the app, not a 404;
-   - `/assets/nope.js` returns a 404, not HTML;
+   - `/assets/nope.js`, `/workbox-nope.js`, `/fonts/nope.woff2` and `/icons/nope.svg` return a 404 (not the app's HTML) with no long cache: no `immutable`, no `max-age` above 0. The long cache rules apply only to a file that exists;
+   - `/api/sync` (405) and `/api/nope` (404) are the sync API's own answers, not the app's page;
    - every route has the CSP;
    - `index.html`, `sw.js`, `theme-init.js` and the manifest carry the revalidate rule, and `sw.js` has `Service-Worker-Allowed: /` (`swa=/`);
-   - hashed `/assets` carry the one-year immutable rule, and `/fonts` and `/icons` the week-long one;
+   - hashed `/assets` and the Workbox chunk (`/workbox-<hash>.js`) carry the one-year immutable rule, and `/fonts` and `/icons` the week-long one;
    - the first line shows the page's `data-corners`, its `theme-color` (filled in, not `%GUIDE_THEME_COLOR%`) and the external `theme-init.js`.
 2. **The page itself.** Open the preview URL in the browser pane, signed in to Vercel if it asks. Look at the change on desktop and phone, in light and dark, as in the `guide-check` skill.
 3. **The service worker,** in a regular browser. It registers, the guide loads offline after one visit, and nothing in the console complains about the CSP.
