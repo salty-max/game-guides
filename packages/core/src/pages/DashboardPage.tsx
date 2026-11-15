@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { Link, useParams } from "react-router";
 import { Stat } from "../components/Stats";
-import { Breadcrumb, Button, PageHeading, ProgressBar } from "../components/ui";
+import { Breadcrumb, Button, PageHeading, Panel, PanelActions, PanelText, PanelTitle, ProgressBar } from "../components/ui";
 import { CHAPTER_COUNT, cats, chapterRows, chapters, completion, overallLine, text, whatsLeft } from "../guide";
 import { two } from "../format";
 import { exportProgress } from "../backup";
@@ -29,9 +29,9 @@ export function DashboardPage() {
         <span className="inline-stat">{overallLine(data.checks)}</span>
       </PageHeading>
       <div className="dashboard-grid">
-        <section className="panel">
-          <h2>Chapter progress</h2>
-          <p>Open a revealed chapter.</p>
+        <Panel>
+          <PanelTitle>Chapter progress</PanelTitle>
+          <PanelText>Open a revealed chapter.</PanelText>
           {visible.map((chapter) => {
             const rows = chapterRows(chapter);
             const count = rows.filter((row) => data.checks[row.id] === true).length;
@@ -46,42 +46,42 @@ export function DashboardPage() {
               </Link>
             );
           })}
-          {data.spoilers && data.ceiling < CHAPTER_COUNT && <p>{CHAPTER_COUNT - data.ceiling} chapters hidden by spoiler protection.</p>}
-        </section>
+          {data.spoilers && data.ceiling < CHAPTER_COUNT && <PanelText>{CHAPTER_COUNT - data.ceiling} chapters hidden by spoiler protection.</PanelText>}
+        </Panel>
         <div className="dashboard-side">
-          <section className="panel">
-            <h2>Progress backup</h2>
-            <p>Progress lives in this browser. Export a backup to move it to another device or keep a copy.</p>
+          <Panel>
+            <PanelTitle>Progress backup</PanelTitle>
+            <PanelText>Progress lives in this browser. Export a backup to move it to another device or keep a copy.</PanelText>
             {persisted === false && (
-              <p>
+              <PanelText>
                 This browser hasn’t agreed to keep your progress, so it may clear it when space runs low, or in Safari after
                 you stay away a while.{" "}
                 {installed()
                   ? "Export a backup now and then."
                   : "Export a backup now and then, or add the guide to your home screen and import the backup there."}
-              </p>
+              </PanelText>
             )}
-            <div className="controls">
+            <PanelActions>
               <Button onClick={exportProgress}>Export progress</Button>
               <Button onClick={() => openDialog({ kind: "settings" })}>Import progress</Button>
               <Button onClick={() => openDialog({ kind: "sync" })}>Sync devices</Button>
-            </div>
-          </section>
+            </PanelActions>
+          </Panel>
           {panels.map(({ id, Component }) => (
             <Component key={id} />
           ))}
         </div>
       </div>
       <WhatsLeft />
-      <section className="panel">
-        <h2>{text.boardTitle}</h2>
-        <p>{text.boardNote}</p>
-        <div className="category-board">
+      <Panel>
+        <PanelTitle>{text.boardTitle}</PanelTitle>
+        <PanelText>{text.boardNote}</PanelText>
+        <div className="category-board mt-[13px]">
           {completion.board.map(({ tag, goal }) => (
             <Stat key={tag} tag={tag} goal={goal} />
           ))}
         </div>
-      </section>
+      </Panel>
     </>
   );
 }
@@ -95,15 +95,15 @@ function WhatsLeft() {
   const inPoints = completion.unit === "points";
   const figure = inPoints ? points : String;
   return (
-    <section className="panel whats-left" aria-labelledby="whats-left-title">
-      <h2 id="whats-left-title">What’s left</h2>
+    <Panel space="below" aria-labelledby="whats-left-title">
+      <PanelTitle id="whats-left-title">What’s left</PanelTitle>
       {items.length ? (
-        <>
-          <p>
+        <div className="whats-left">
+          <PanelText>
             {inPoints
               ? `About ${points(items.reduce((sum, item) => sum + item.left, 0))} points to go. Biggest remaining first, using the estimate’s weights.`
               : "Biggest gaps first."}
-          </p>
+          </PanelText>
           <ul>
             {items.map((item) => (
               <li key={item.tag}>
@@ -121,10 +121,10 @@ function WhatsLeft() {
               </li>
             ))}
           </ul>
-        </>
+        </div>
       ) : (
-        <p>Nothing left. That’s a 100%.</p>
+        <PanelText>Nothing left. That’s a 100%.</PanelText>
       )}
-    </section>
+    </Panel>
   );
 }

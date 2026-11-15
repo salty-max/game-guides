@@ -28,7 +28,7 @@ export function ArticleRoute({ chapter, target, footer }: { chapter: Chapter; ta
 
   return (
     <div className="walkthrough-layout">
-      {/* Up to 1000px wide the contents fold away above the article; wider, they sit beside it. */}
+      {/* Up to 1000px wide the list of sections folds away above the article; wider, it sits beside it. */}
       <Collapsible.Root className="hidden max-w-[72ch] rounded-small border border-line bg-surface px-3 [@media(max-width:1000px)]:block">
         <Collapsible.Trigger className="group/trigger flex min-h-11 w-full cursor-pointer items-center justify-between border-0 bg-transparent p-0 text-left font-sans text-[14px] leading-tight font-bold text-ink">
           In this chapter <Icon name="down" className="svg-icon size-4 text-muted group-data-panel-open/trigger:rotate-180" />

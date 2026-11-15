@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { Button } from "@hundo/core/components/ui";
+import { Button, Panel, PanelText, PanelTitle } from "@hundo/core/components/ui";
 import { coreRows } from "@hundo/core/guide";
 import { useProgress } from "@hundo/core/store/progress";
 import { useUi } from "@hundo/core/store/ui";
@@ -36,9 +36,9 @@ export function Calibration() {
 
   const delta = reported === null ? null : calibrationDelta(estimated, reported);
   return (
-    <section id="calibration" className="panel" aria-labelledby="calibration-title">
-      <h2 id="calibration-title">Check against the game</h2>
-      <p>Enter the completion percentage from Stats → General to see how far this guide’s estimate is off.</p>
+    <Panel id="calibration" aria-labelledby="calibration-title">
+      <PanelTitle id="calibration-title">Check against the game</PanelTitle>
+      <PanelText>Enter the completion percentage from Stats → General to see how far this guide’s estimate is off.</PanelText>
       <form className="calibration" onSubmit={submit} noValidate>
         <label className="field" htmlFor="reported">
           <span>In-game completion (%)</span>
@@ -68,20 +68,20 @@ export function Calibration() {
         )}
       </form>
       {error && (
-        <p id="reported-error" className="inline-error" role="alert">
+        <PanelText id="reported-error" tone="error" role="alert">
           {error}
-        </p>
+        </PanelText>
       )}
       {delta !== null && (
-        <p className="delta" role="status">
+        <PanelText tone="ink" role="status">
           Guide {estimated}% · game {reported}% ·{" "}
           {delta === 0
             ? "they match."
             : delta > 0
               ? `the game is ${delta} points ahead. Something is done in the game that isn’t checked here.`
               : `the guide is ${Math.abs(delta)} points ahead. Something checked here may not count in the game yet.`}
-        </p>
+        </PanelText>
       )}
-    </section>
+    </Panel>
   );
 }

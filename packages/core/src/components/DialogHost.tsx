@@ -16,6 +16,15 @@ export function DialogHost() {
     useUi.getState().closeDialog();
     loadFailed();
   });
-  useEffect(() => whenIdle(chunks.dialog.warm), []);
+  // The select's chunk too: the dialog's chunk brings its code anyway, and a page with a select (the checklist's filters) then shows the
+  // real one from the start, not the stand-in until the next idle moment after it opens.
+  useEffect(
+    () =>
+      whenIdle(() => {
+        chunks.dialog.warm();
+        chunks.select.warm();
+      }),
+    [],
+  );
   return loaded ? <loaded.DialogFrames /> : null;
 }

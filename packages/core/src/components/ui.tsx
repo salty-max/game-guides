@@ -1,3 +1,4 @@
+import { cva } from "class-variance-authority";
 import type { ButtonHTMLAttributes, ComponentPropsWithRef, ReactNode } from "react";
 import { Link } from "react-router";
 import { buttonClass, type ButtonSize, type ButtonStyle } from "./buttonStyle";
@@ -69,6 +70,42 @@ export function Breadcrumb({ current }: { current: string }) {
       <strong>{current}</strong>
     </div>
   );
+}
+
+// A card on the dashboard and the sources page, and a guide's own panels (Koholint's deathless run, Red Dead's calibration).
+const panel = cva("rounded-card border border-line bg-surface px-[18px] py-[17px]", {
+  variants: { space: { none: "", above: "mt-[13px]", below: "mb-3.5" } },
+  defaultVariants: { space: "none" },
+});
+
+type SectionProps = Omit<ComponentPropsWithRef<"section">, "className" | "style">;
+
+/** A panel: its title, its words and its actions are the Panel parts below; `space` is the room it keeps from what's next to it. */
+export function Panel({ space, ...rest }: SectionProps & { space?: "none" | "above" | "below" }) {
+  return <section className={panel({ space })} {...rest} />;
+}
+
+export function PanelTitle({ id, children }: { id?: string; children: ReactNode }) {
+  return (
+    <h2 id={id} className="m-0 font-display text-[24px] leading-[1.2] font-bold tracking-[-0.015em]">
+      {children}
+    </h2>
+  );
+}
+
+// What a panel says: muted as a rule, in ink for a result the reader asked for, in the error colour for what went wrong.
+const panelText = cva("mt-[7px] mb-0 text-[14px]", {
+  variants: { tone: { muted: "text-muted", ink: "text-ink", error: "text-error" } },
+  defaultVariants: { tone: "muted" },
+});
+
+export function PanelText({ tone, ...rest }: Omit<ComponentPropsWithRef<"p">, "className" | "style"> & { tone?: "muted" | "ink" | "error" }) {
+  return <p className={panelText({ tone })} {...rest} />;
+}
+
+/** A row of buttons in a panel. */
+export function PanelActions(props: Omit<ComponentPropsWithRef<"div">, "className" | "style">) {
+  return <div className="mt-[13px] flex flex-wrap items-center gap-2" {...props} />;
 }
 
 export const Empty = ({ children }: { children: ReactNode }) => <div className="empty">{children}</div>;

@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router";
 import { DialogHost } from "./DialogHost";
 import { Select } from "./Select";
+import { ToastHost } from "./ToastHost";
 import { chunks } from "./chunks";
 import { loadable } from "../loadable";
 import { defaultState } from "../progress-state";
@@ -20,6 +21,7 @@ vi.mock("./chunks", async (importActual) => ({ ...(await importActual<typeof imp
 
 type SelectModule = typeof import("./select-impl");
 type DialogModule = typeof import("./DialogFrames");
+type ToastsModule = typeof import("./Toasts");
 
 /** A promise settled from outside. */
 const deferred = <T,>() => {
@@ -226,5 +228,23 @@ describe("the dialog while its chunk loads", () => {
     renderHost();
     act(() => useUi.getState().openDialog({ kind: "settings" }));
     await waitFor(() => expect(useUi.getState().toast?.message).toMatch(/Check your connection/));
+  });
+});
+
+describe("the toasts while their chunk loads", () => {
+  it("say a toast in the status region and clear it when the chunk can't come, and ask again for the next one", async () => {
+    const importer = vi.fn<() => Promise<ToastsModule>>().mockRejectedValueOnce(new Error("offline"));
+    importer.mockImplementation(() => vi.importActual<ToastsModule>("./Toasts"));
+    chunks.toasts = loadable(importer);
+    render(<ToastHost />);
+
+    act(() => useUi.getState().showToast("Checked 7 steps.", () => {}));
+    await waitFor(() => expect(useUi.getState().toast).toBeNull());
+    expect(useUi.getState().announcement).toBe("Checked 7 steps.");
+
+    act(() => useUi.getState().showToast("Checked 3 steps.", () => {}));
+    expect(await screen.findByRole("button", { name: "Undo" })).toBeInTheDocument();
+    expect(screen.getByText("Checked 3 steps.")).toBeInTheDocument();
+    expect(importer).toHaveBeenCalledTimes(2);
   });
 });

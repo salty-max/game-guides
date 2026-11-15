@@ -3,8 +3,7 @@ import { useLocation } from "react-router";
 import { DialogHost } from "./DialogHost";
 import { Rail } from "./Rail";
 import { TopBar } from "./TopBar";
-import { UpdatePrompt } from "./UpdatePrompt";
-import { UndoToast } from "./UndoToast";
+import { ToastHost } from "./ToastHost";
 import { guideAnchor, readChapter } from "../guide";
 import { panels } from "virtual:guide/panels";
 import { isOpen, useProgress } from "../store/progress";
@@ -107,10 +106,7 @@ export function Layout({ children }: { children: ReactNode }) {
         </main>
       </div>
       <DialogHost />
-      <div className="pointer-events-none fixed right-[calc(16px+var(--safe-right))] bottom-[calc(16px+var(--safe-bottom))] z-40 grid max-w-[min(380px,calc(100%-32px))] gap-2.5 standalone:select-none standalone:[-webkit-touch-callout:none] phone:right-[calc(12px+var(--safe-right))] phone:bottom-[calc(12px+var(--safe-bottom))] phone:left-[calc(12px+var(--safe-left))] phone:max-w-none">
-        <UndoToast />
-        <UpdatePrompt />
-      </div>
+      <ToastHost />
       <div id="status" className="sr-only" role="status">
         {announcement}
       </div>
