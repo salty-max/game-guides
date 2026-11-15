@@ -1,6 +1,7 @@
 import { allRows, CHAPTER_COUNT } from "../guide";
 import { STORAGE_KEY, defaultState } from "../progress-state";
 import { useProgress } from "./progress";
+import { SYNC_KEY, readRecord, writeRecord } from "../sync/local";
 
 const [a, b, c] = allRows.map((row) => row.id);
 const last = CHAPTER_COUNT;
@@ -47,5 +48,63 @@ describe("progress store", () => {
     localStorage.setItem(STORAGE_KEY, "{not json");
     useProgress.getState().reloadFromStorage();
     expect(useProgress.getState()).toMatchObject({ storageError: true, data: defaultState() });
+  });
+});
+
+describe("sync stamping", () => {
+  const linked = () => writeRecord({ v: 1, group: "g", entries: {}, dirty: [], clock: { last: 0, offset: 0 }, touched: 0 });
+
+  it("writes nothing for sync while the device isn't linked", () => {
+    useProgress.getState().setCheck(a, true);
+    useProgress.getState().saveSettings({ spoilers: false, ceiling: last });
+    expect(localStorage.getItem(SYNC_KEY)).toBeNull();
+  });
+
+  it("stamps what a change touches, and marks it to send, once the device is linked", () => {
+    linked();
+    useProgress.getState().setMany([a, b], true);
+    useProgress.getState().setCheck(b, false);
+    const record = readRecord();
+    expect(record?.dirty.sort()).toEqual([`c:${a}`, `c:${b}`].sort());
+    expect(record?.entries[`c:${a}`][1]).toBe(1);
+    expect(record?.entries[`c:${b}`][1]).toBe(0);
+    expect(record!.entries[`c:${b}`][0]).toBeGreaterThan(record!.entries[`c:${a}`][0]);
+  });
+
+  it("stamps a setting and a chapter, and an import", () => {
+    linked();
+    useProgress.getState().reveal(2);
+    useProgress.getState().replaceAll({ ...defaultState(), checks: { [c]: true }, ceiling: 2, chapter: 2 });
+    const record = readRecord();
+    expect(record?.entries).toMatchObject({ ceiling: [expect.any(Number), 2], chapter: [expect.any(Number), 2], [`c:${c}`]: [expect.any(Number), 1] });
+  });
+
+  it("leaves the ledger alone when a change changes nothing", () => {
+    linked();
+    useProgress.getState().visitChapter(1);
+    useProgress.getState().setCheck(a, false);
+    expect(readRecord()?.dirty).toEqual([]);
+  });
+
+  it("doesn't stamp what sync applies, or what another tab saved", () => {
+    linked();
+    useProgress.getState().applySynced({ ...defaultState(), checks: { [a]: true }, ceiling: 2 });
+    expect(useProgress.getState().data.checks).toEqual({ [a]: true });
+    expect(JSON.parse(localStorage.getItem(STORAGE_KEY)!).checks).toEqual({ [a]: true });
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...defaultState(), checks: { [b]: true } }));
+    useProgress.getState().reloadFromStorage();
+    expect(useProgress.getState().data.checks).toEqual({ [b]: true });
+    expect(readRecord()).toMatchObject({ entries: {}, dirty: [] });
+  });
+
+  it("saves the progress before it writes the ledger", () => {
+    linked();
+    const order: string[] = [];
+    const setItem = vi.spyOn(Storage.prototype, "setItem").mockImplementation(function (this: Storage, key: string) {
+      order.push(key);
+    });
+    useProgress.getState().setCheck(a, true);
+    setItem.mockRestore();
+    expect(order).toEqual([STORAGE_KEY, SYNC_KEY]);
   });
 });

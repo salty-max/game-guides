@@ -1,7 +1,7 @@
 /*
  * The merge model of progress sync: stamped entries, the order that settles a clash, and the checks on what a device may
- * send. Pure: no I/O, no clock, no imports. The API uses it as is. The guides will carry a byte-identical copy at
- * packages/core/src/sync/ledger.ts, held equal by a test, so both sides always agree on who wins.
+ * send. Pure: no I/O, no clock, no imports. The API uses it as is, and the guides carry a byte-identical copy at
+ * packages/core/src/sync/ledger.ts, held equal by a test, so both sides always agree on who wins. Change both together.
  */
 
 export type Value = null | boolean | number | string | Value[] | { [key: string]: Value };

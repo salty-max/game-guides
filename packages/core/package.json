@@ -9,6 +9,7 @@
     "./guide": "./src/guide.ts",
     "./progress-state": "./src/progress-state.ts",
     "./store/*": "./src/store/*.ts",
+    "./sync/*": "./src/sync/*.ts",
     "./components/*": "./src/components/*.tsx",
     "./vite": "./vite.ts",
     "./icons": "./icons.mjs",
