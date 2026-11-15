@@ -1,4 +1,4 @@
-import { render, screen, within } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { App } from "./App";
 import { STORAGE_KEY, defaultState } from "./progress-state";
@@ -6,6 +6,7 @@ import { brand, chapters, config } from "./guide";
 import { panels } from "virtual:guide/panels";
 import { useProgress } from "./store/progress";
 import { useUi } from "./store/ui";
+import { usePersistence } from "./persistence";
 import { allowSlowMounts } from "./test/slow";
 
 allowSlowMounts();
@@ -113,6 +114,55 @@ describe("App", () => {
     const links = screen.getAllByRole("link").filter((link) => link.getAttribute("href")?.startsWith("https://"));
     expect(links.length).toBeGreaterThan(0);
     for (const link of links) expect(link).toHaveAccessibleName();
+  });
+});
+
+describe("keeping storage", () => {
+  const note = /hasn’t agreed to keep your progress/;
+  /** A StorageManager that answers persisted() with `granted` and persist() with `grant`. */
+  const fakeStorage = (granted: boolean, grant = false) => {
+    const storage = { persisted: vi.fn(async () => granted), persist: vi.fn(async () => grant) };
+    Object.defineProperty(navigator, "storage", { value: storage, configurable: true });
+    return storage;
+  };
+
+  beforeEach(() => usePersistence.setState({ persisted: null }));
+  afterEach(() => {
+    Reflect.deleteProperty(navigator, "storage");
+  });
+
+  it("asks the browser to keep progress after a tick, not on load", async () => {
+    const storage = fakeStorage(false, true);
+    const user = userEvent.setup();
+    render(<App />);
+    await screen.findByRole("heading", { level: 1, name: first.title });
+    await waitFor(() => expect(usePersistence.getState().persisted).toBe(false));
+    expect(storage.persist).not.toHaveBeenCalled();
+    await user.click(within(document.getElementById(`entry-${firstRow.id}`)!).getByRole("checkbox"));
+    await waitFor(() => expect(storage.persist).toHaveBeenCalledTimes(1));
+  });
+
+  it("says on the dashboard when the browser hasn't agreed to keep progress", async () => {
+    fakeStorage(false);
+    history.replaceState(null, "", "/dashboard");
+    render(<App />);
+    const panel = (await screen.findByRole("heading", { name: "Progress backup" })).closest("section")!;
+    expect(await within(panel).findByText(note)).toHaveTextContent("add the guide to your home screen and import the backup there");
+  });
+
+  it("says nothing more when storage is persistent or the browser can't say", async () => {
+    fakeStorage(true);
+    history.replaceState(null, "", "/dashboard");
+    const { unmount } = render(<App />);
+    await waitFor(() => expect(usePersistence.getState().persisted).toBe(true));
+    expect(screen.queryByText(note)).not.toBeInTheDocument();
+    unmount();
+
+    Reflect.deleteProperty(navigator, "storage");
+    usePersistence.setState({ persisted: null });
+    render(<App />);
+    expect(await screen.findByRole("heading", { name: "Progress backup" })).toBeInTheDocument();
+    expect(screen.queryByText(note)).not.toBeInTheDocument();
   });
 });
 

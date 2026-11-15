@@ -1,7 +1,7 @@
 import { useEffect, useSyncExternalStore } from "react";
 import { THEME_KEY, useTheme } from "./store/theme";
 import { STORAGE_KEY } from "./progress-state";
-import { useProgress } from "./store/progress";
+import { askAfterFirstTick, checkPersistence, reloadFromAnotherTab } from "./persistence";
 
 const query = () => matchMedia("(prefers-color-scheme: dark)");
 const subscribeSystem = (callback: () => void) => {
@@ -17,7 +17,7 @@ export function useResolvedTheme() {
   return preference === "system" ? (systemDark ? "dark" : "light") : preference;
 }
 
-/** Mirror the theme to the document, and keep every tab in sync through storage events. */
+/** Mirror the theme to the document, keep every tab in sync through storage events, and ask to keep storage. */
 export function useGlobalEffects() {
   const resolved = useResolvedTheme();
 
@@ -32,9 +32,14 @@ export function useGlobalEffects() {
   useEffect(() => {
     const onStorage = (event: StorageEvent) => {
       if (event.key === THEME_KEY || event.key === null) useTheme.getState().sync(event.newValue);
-      if (event.key === STORAGE_KEY) useProgress.getState().reloadFromStorage();
+      if (event.key === STORAGE_KEY) reloadFromAnotherTab();
     };
     window.addEventListener("storage", onStorage);
     return () => window.removeEventListener("storage", onStorage);
+  }, []);
+
+  useEffect(() => {
+    void checkPersistence();
+    return askAfterFirstTick();
   }, []);
 }
