@@ -2,6 +2,7 @@ import { create } from "zustand";
 import type { Checks, Extra, ProgressState } from "../types";
 import { STORAGE_KEY, defaultState, validateState } from "../progress-state";
 import { readChapter } from "../guide";
+import { recordLocalChange } from "../sync/local";
 
 interface Loaded {
   data: ProgressState;
@@ -29,15 +30,17 @@ interface ProgressStore {
   visitChapter: (chapter: number) => void;
   reveal: (chapter: number) => void;
   saveSettings: (settings: { spoilers: boolean; ceiling: number }) => void;
+  /** Replace the progress with a backup. When this device is synced, the other devices follow. */
   replaceAll: (next: ProgressState) => void;
+  /** Save what sync pulled from the group. It isn't a change made here, so it isn't stamped and isn't sent back. */
+  applySynced: (next: ProgressState) => void;
   reloadFromStorage: () => void;
 }
 
 const initial = load();
 
 export const useProgress = create<ProgressStore>((set, get) => {
-  const commit = (recipe: (draft: ProgressState) => ProgressState) => {
-    const next = recipe(get().data);
+  const save = (next: ProgressState) => {
     let storageError = false;
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
@@ -45,6 +48,13 @@ export const useProgress = create<ProgressStore>((set, get) => {
       storageError = true;
     }
     set({ data: next, storageError });
+  };
+  // A change made here: saved first, then stamped for sync (nothing happens there unless this device is linked).
+  const commit = (recipe: (draft: ProgressState) => ProgressState) => {
+    const prev = get().data;
+    const next = recipe(prev);
+    save(next);
+    recordLocalChange(prev, next);
   };
   const applyChecks = (ids: string[], isChecked: (id: string) => boolean) =>
     commit((s) => {
@@ -74,6 +84,7 @@ export const useProgress = create<ProgressStore>((set, get) => {
         return { ...s, spoilers, ceiling: safe, chapter: open ? s.chapter : safe };
       }),
     replaceAll: (next) => commit(() => next),
+    applySynced: save,
     reloadFromStorage: () => {
       const { data, error } = load();
       set({ data, storageError: error });

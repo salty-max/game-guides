@@ -59,22 +59,25 @@ export async function requestPersistence(storage = manager(), now = Date.now(), 
   }
 }
 
-let fromAnotherTab = false;
+let fromElsewhere = false;
 
-/** Loads what another tab saved. Its new checks aren't a tick in this tab, so they don't start the request here. */
-export function reloadFromAnotherTab() {
-  fromAnotherTab = true;
+/** Runs `change`, whose new checks aren't a tick the reader made in this tab (another tab's save, or what sync pulled): they don't start the request. */
+export function notATick(change: () => void) {
+  fromElsewhere = true;
   try {
-    useProgress.getState().reloadFromStorage();
+    change();
   } finally {
-    fromAnotherTab = false;
+    fromElsewhere = false;
   }
 }
+
+/** Loads what another tab saved. */
+export const reloadFromAnotherTab = () => notATick(() => useProgress.getState().reloadFromStorage());
 
 /** Requests persistence on the first tick of this visit in this tab, then stops listening. Returns the unsubscribe. */
 export function askAfterFirstTick(request: () => unknown = requestPersistence) {
   const stop = useProgress.subscribe((state, prev) => {
-    if (fromAnotherTab || state.data.checks === prev.data.checks) return;
+    if (fromElsewhere || state.data.checks === prev.data.checks) return;
     if (!Object.keys(state.data.checks).some((id) => prev.data.checks[id] !== true)) return;
     stop();
     void request();
