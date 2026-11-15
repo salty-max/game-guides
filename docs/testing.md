@@ -109,7 +109,7 @@ Two devices need two cookie jars: the pane is one, and a second Chrome profile i
 
 ### What a local check can't cover
 
-- **The `/api` rewrite on Vercel.** Locally the dev server's proxy stands in for it. Whether `Cookie`, `Origin`, `Set-Cookie`, `x-real-ip` and `x-forwarded-host` pass through the real rewrite has to be seen on a preview ([deploying.md](deploying.md#the-sync-api)).
+- **The `/api` rewrite on Vercel.** Locally the dev server's proxy stands in for it. Behind the real rewrite the API gets its own host and no `x-forwarded-host` naming the guide's, while `Cookie`, `Origin`, `Set-Cookie` and the visitor's address pass ([deploying.md](deploying.md#the-sync-api)). That was seen on a preview, so a change to the rewrite or to how the API reads who is calling has to be seen on one again.
 - **Safari and an installed phone app.** Cookies there behave as the iPhone probe found, over plain http on a LAN. Over https on the real hosts is checked on production.
 - **The service worker's offline mode.** The pane registers the service worker (it once refused to fetch `sw.js`, and an old one answering for a new build is how that shows now), but offline mode hasn't been checked in it. Check it in a regular browser, or on a Vercel preview. The update prompt does work in the pane, though it takes a deploy: on 2026-11-15 it showed on all three live guides, each open in the pane before the deploy, and its Reload brought in the new build.
 - **Headers.** The CSP, the security headers and the cache rules come from `vercel.json` and exist only on Vercel. Check them on a preview deployment ([deploying.md](deploying.md#preview-first)).

@@ -413,11 +413,6 @@ export async function handle(request: Request, deps: Deps | null): Promise<Respo
     if (request.method !== "POST") return reply(405, { error: "method" }, [], { Allow: "POST" });
     const where = whereFrom(request);
     if (!where) return reply(403, { error: "origin" });
-    // TEMPORARY, to be removed before the merge: what the address and host headers hold behind a guide's rewrite. Test namespace only.
-    if (where.ns === "test") {
-      const h = request.headers;
-      console.log("ip-probe", JSON.stringify(Object.fromEntries(["x-real-ip", "x-forwarded-for", "x-vercel-forwarded-for", "host", "x-forwarded-host", "origin", "x-vercel-id"].map((name) => [name, h.get(name)]))));
-    }
     if (!deps) return reply(503, { error: "unconfigured" });
     if (!/^application\/json\b/i.test(request.headers.get("content-type") ?? "")) return reply(400, { error: "body" });
     if (Number(request.headers.get("content-length") ?? 0) > MAX_BODY) return reply(413, { error: "size" });
