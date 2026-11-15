@@ -1,6 +1,6 @@
 import { dropRecord, readHint, readRecord, SYNC_KEY, writeRecord, type SyncRecord } from "./local";
 
-const record: SyncRecord = { v: 1, group: "abc", entries: { ceiling: [5, 2], "c:heart-well": [6, 1] }, dirty: ["ceiling"], clock: { last: 6, offset: -3000 }, touched: 9 };
+const record: SyncRecord = { v: 1, group: "abc", entries: { ceiling: [5, 2], "c:heart-well": [6, 1] }, dirty: ["ceiling"], clock: { last: 6, offset: -3000 }, touched: 9, rev: 4, fullAt: 8, devices: 3 };
 
 beforeEach(() => {
   localStorage.clear();
@@ -23,6 +23,17 @@ describe("the saved ledger", () => {
     }
     localStorage.setItem(SYNC_KEY, JSON.stringify({ ...record, entries: { ...record.entries, "c:Bad Key": [1, 1], ceiling: [-1, 2], chapter: [1, "x"] }, dirty: ["ceiling", "gone"], clock: { last: "x" } }));
     expect(readRecord()).toMatchObject({ entries: { "c:heart-well": [6, 1] }, dirty: [], clock: { last: 0, offset: 0 } });
+  });
+
+  it("reads a ledger saved before revisions as one with no revision to go by, and refuses a revision that isn't a whole number", () => {
+    const { rev, fullAt, devices, ...old } = record;
+    void [rev, fullAt, devices];
+    localStorage.setItem(SYNC_KEY, JSON.stringify(old));
+    expect(readRecord()).toMatchObject({ rev: null, fullAt: 0, devices: 1 });
+    for (const bad of ["3", -1, 1.5, null, Number.MAX_SAFE_INTEGER + 2]) {
+      localStorage.setItem(SYNC_KEY, JSON.stringify({ ...record, rev: bad, devices: 0 }));
+      expect(readRecord(), JSON.stringify(bad)).toMatchObject({ rev: null, devices: 1 });
+    }
   });
 
   it("says no when storage refuses", () => {

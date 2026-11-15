@@ -387,3 +387,90 @@ describe("what a pull must not do", () => {
   });
 });
 
+describe("a poll with nothing to send", () => {
+  /** What the page asked of /api/sync, from the call log. */
+  const syncBodies = (browser: Browser) => browser.calls.filter((call) => call.path === "/api/sync").map((call) => call.body);
+
+  beforeEach(async () => {
+    await tick(a, [r1]);
+    await pair(a, b);
+    await sync(a);
+    later();
+    await sync(b);
+    later();
+    await sync(a);
+    later();
+  });
+
+  it("asks only whether anything changed, with the revision it has, and costs the store two commands", async () => {
+    a.calls = [];
+    world.store.commands = 0;
+    expect(await sync(a)).toMatchObject({ kind: "ok", dirty: false, pulled: false, devices: 2 });
+    expect(syncBodies(a)).toEqual([{ p: 1, guide: expect.any(String), entries: {}, rev: expect.any(Number) }]);
+    expect(world.store.commands).toBe(2);
+  });
+
+  it("writes nothing on this side when the answer is that nothing changed", async () => {
+    await a.run(async () => {
+      const setItem = vi.spyOn(Storage.prototype, "setItem");
+      expect(await syncOnce()).toMatchObject({ kind: "ok", pulled: false });
+      expect(setItem).not.toHaveBeenCalled();
+      setItem.mockRestore();
+    });
+  });
+
+  it("pulls in full, with a new revision, once the other device has changed something, and is quiet again after", async () => {
+    await tick(b, [r2]);
+    await sync(b);
+    later();
+    a.calls = [];
+    expect(await sync(a)).toMatchObject({ kind: "ok", pulled: true });
+    expect(await checked(a)).toEqual(sorted(r1, r2));
+    later();
+    expect(await sync(a)).toMatchObject({ kind: "ok", pulled: false });
+    expect(syncBodies(a).map((body) => "rev" in body)).toEqual([true, true]);
+    expect((await a.run(() => readRecord()))?.rev).toBe(2);
+  });
+
+  it("never takes a quiet answer for a push: what this device changed is sent in full", async () => {
+    await tick(a, [r3]);
+    a.calls = [];
+    expect(await sync(a)).toMatchObject({ kind: "ok", dirty: false });
+    expect(syncBodies(a)[0]).toMatchObject({ entries: { [`c:${r3}`]: [expect.any(Number), 1] } });
+    expect(syncBodies(a)[0]).not.toHaveProperty("rev");
+    later();
+    await sync(b);
+    expect(await checked(b)).toEqual(sorted(r1, r3));
+  });
+
+  it("is a full sync again every ten minutes, to refresh its last-seen and the device count, and when the daily touch is due", async () => {
+    a.calls = [];
+    vi.setSystemTime(Date.now() + 9 * 60_000);
+    await sync(a);
+    expect(syncBodies(a)[0]).toHaveProperty("rev");
+    vi.setSystemTime(Date.now() + 2 * 60_000);
+    await sync(a);
+    expect(syncBodies(a)[1]).not.toHaveProperty("rev");
+    expect(syncBodies(a)[1]).toMatchObject({ touch: false });
+    vi.setSystemTime(Date.now() + 21 * 3_600_000);
+    await sync(a);
+    expect(syncBodies(a)[2]).toMatchObject({ touch: true });
+    expect(syncBodies(a)[2]).not.toHaveProperty("rev");
+  });
+
+  it("goes on in full against a server that gives no revision", async () => {
+    a.fail = () => new Response(JSON.stringify({ p: 1, entries: {}, devices: 2, now: Date.now() }), { status: 200 });
+    await sync(a);
+    expect((await a.run(() => readRecord()))?.rev).toBeNull();
+    a.calls = [];
+    await sync(a);
+    expect(syncBodies(a)[0]).not.toHaveProperty("rev");
+  });
+
+  it("doesn't take an unchanged answer for another revision than the one asked about as an answer", async () => {
+    a.fail = () => new Response(JSON.stringify({ p: 1, unchanged: true, rev: 999, now: Date.now() }), { status: 200 });
+    // an answer that says unchanged for another revision than the one asked about isn't taken as one
+    expect(await sync(a)).toEqual({ kind: "retry", why: "error" });
+  });
+});
+

@@ -52,7 +52,7 @@ describe("progress store", () => {
 });
 
 describe("sync stamping", () => {
-  const linked = () => writeRecord({ v: 1, group: "g", entries: {}, dirty: [], clock: { last: 0, offset: 0 }, touched: 0 });
+  const linked = () => writeRecord({ v: 1, group: "g", entries: {}, dirty: [], clock: { last: 0, offset: 0 }, touched: 0, rev: null, fullAt: 0, devices: 1 });
 
   it("writes nothing for sync while the device isn't linked", () => {
     useProgress.getState().setCheck(a, true);

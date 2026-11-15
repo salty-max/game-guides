@@ -24,6 +24,15 @@ export interface SyncRecord {
   clock: Clock;
   /** When the server was last told this device is still here, which pushes its expiry out. */
   touched: number;
+  /**
+   * The revision of this guide's data in the group, as the last full answer gave it, or null (a server that doesn't say). With one, a
+   * poll that has nothing to send can be answered "unchanged" for the price of one read, and nothing is pulled.
+   */
+  rev: number | null;
+  /** When the last full answer came. A poll is turned into a full sync now and then, which also refreshes this device's last-seen. */
+  fullAt: number;
+  /** Devices in the group, as the last full answer counted them. */
+  devices: number;
 }
 
 /** Keep what the ledger accepts, and drop the rest, so one bad entry can't make the server refuse every push. */
@@ -56,6 +65,9 @@ export function readRecord(): SyncRecord | null {
       dirty: Array.isArray(r.dirty) ? r.dirty.filter((key): key is string => typeof key === "string" && key in entries) : [],
       clock: { last: finite(clock.last, 0), offset: finite(clock.offset, 0) },
       touched: finite(r.touched, 0),
+      rev: typeof r.rev === "number" && Number.isSafeInteger(r.rev) && r.rev >= 0 ? r.rev : null,
+      fullAt: finite(r.fullAt, 0),
+      devices: Math.max(1, Math.trunc(finite(r.devices, 1))),
     };
   } catch {
     return null;

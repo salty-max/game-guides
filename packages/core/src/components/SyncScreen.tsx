@@ -14,6 +14,11 @@ import { afterLinked, checkStatus, claimCode, forgetGroup, startCode, unlinkDevi
 /** How long a code works, which the server holds to as well. Counted from when it arrives, so a clock that's off can't shorten it. */
 const CODE_LIFETIME = 10 * 60_000;
 const POLL_EVERY = 3_000;
+/**
+ * A device's last-seen is refreshed by full syncs only (quiet polls leave it alone), every ten minutes or so, so a device that is open and
+ * polling can show up to about twelve minutes old. Anything fresher than this says only that it was seen lately.
+ */
+const ACTIVE_WITHIN = 15 * 60_000;
 /** About ten minutes of polling, the life of a code. */
 const POLL_LIMIT = 200;
 
@@ -247,7 +252,7 @@ function Linked({ onShow, busy, said, onUnlink, onForget }: { onShow: () => void
       <ItemList label="Linked devices" empty={devices === "failed" ? "Couldn’t load the list of devices. Check your connection." : "Loading the devices…"}>
         {shown?.list.map((device, index) => (
           // (by position: two devices can share a label, and a second)
-          <ItemRow key={index} title={device.self ? `${device.label} (this device)` : device.label} detail={`Last synced ${ago(device.seen, shown.now)}`} />
+          <ItemRow key={index} title={device.self ? `${device.label} (this device)` : device.label} detail={shown.now - device.seen < ACTIVE_WITHIN ? "Seen in the last 15 minutes" : `Last synced ${ago(device.seen, shown.now)}`} />
         ))}
       </ItemList>
       {isApple() && (
