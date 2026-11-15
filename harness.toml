@@ -10,8 +10,8 @@ dir = "harness"
 check = "bun run check"
 rules = "CLAUDE.md"
 
-# [hooks]
+[hooks]
 # trailers = true   # refuse AI co-author / "generated with" trailers
-# lock     = true   # a Claude session's commit wants its running card
+lock     = false    # hundo: every child has its own worktree and branch, so the board is a list, not a lock (CLAUDE.md, "Sessions and worktrees")
 # stamp    = true   # a push wants a passing check on the tree
 # review   = true   # a push wants a recorded review

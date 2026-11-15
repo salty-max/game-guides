@@ -1,11 +1,11 @@
 {
   "version": "0.0.1",
   "configurations": [
-    { "name": "koholint", "runtimeExecutable": "pnpm", "runtimeArgs": ["--filter", "hundo-koholint", "dev", "--port", "5173", "--strictPort"], "port": 5173 },
-    { "name": "rdr", "runtimeExecutable": "pnpm", "runtimeArgs": ["--filter", "hundo-rdr", "dev", "--port", "5174", "--strictPort"], "port": 5174 },
-    { "name": "echoes", "runtimeExecutable": "pnpm", "runtimeArgs": ["--filter", "hundo-echoes", "dev", "--port", "5175", "--strictPort"], "port": 5175 },
-    { "name": "koholint-preview", "runtimeExecutable": "sh", "runtimeArgs": ["-c", "pnpm --filter hundo-koholint build && pnpm --filter hundo-koholint preview --port 4173 --strictPort"], "port": 4173 },
-    { "name": "rdr-preview", "runtimeExecutable": "sh", "runtimeArgs": ["-c", "pnpm --filter hundo-rdr build && pnpm --filter hundo-rdr preview --port 4174 --strictPort"], "port": 4174 },
-    { "name": "echoes-preview", "runtimeExecutable": "sh", "runtimeArgs": ["-c", "pnpm --filter hundo-echoes build && pnpm --filter hundo-echoes preview --port 4175 --strictPort"], "port": 4175 }
+    { "name": "koholint", "runtimeExecutable": "pnpm", "runtimeArgs": ["--filter", "hundo-koholint", "dev", "--port", "5200", "--strictPort"], "port": 5200, "autoPort": true },
+    { "name": "rdr", "runtimeExecutable": "pnpm", "runtimeArgs": ["--filter", "hundo-rdr", "dev", "--port", "5300", "--strictPort"], "port": 5300, "autoPort": true },
+    { "name": "echoes", "runtimeExecutable": "pnpm", "runtimeArgs": ["--filter", "hundo-echoes", "dev", "--port", "5400", "--strictPort"], "port": 5400, "autoPort": true },
+    { "name": "koholint-preview", "runtimeExecutable": "sh", "runtimeArgs": ["-c", "pnpm --filter hundo-koholint build && pnpm --filter hundo-koholint preview --port ${PORT:-4200} --strictPort"], "port": 4200, "autoPort": true },
+    { "name": "rdr-preview", "runtimeExecutable": "sh", "runtimeArgs": ["-c", "pnpm --filter hundo-rdr build && pnpm --filter hundo-rdr preview --port ${PORT:-4300} --strictPort"], "port": 4300, "autoPort": true },
+    { "name": "echoes-preview", "runtimeExecutable": "sh", "runtimeArgs": ["-c", "pnpm --filter hundo-echoes build && pnpm --filter hundo-echoes preview --port ${PORT:-4400} --strictPort"], "port": 4400, "autoPort": true }
   ]
 }

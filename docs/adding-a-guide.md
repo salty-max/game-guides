@@ -97,7 +97,7 @@ The full type is `GuideConfig` in `packages/core/src/types.ts`, and every field 
 
 - Run `pnpm install` at the root. A new workspace package changes `pnpm-lock.yaml`. Commit the lockfile with the app, or CI's and Vercel's `--frozen-lockfile` install fails.
 - Root `README.md`: add a row to the apps table. It's the one list of guides and their Vercel projects.
-- `.claude/launch.json`: add a dev entry and a preview entry on the next free ports (5176 and 4176 after Echoes).
+- `.claude/launch.json`: copy Echoes's two entries onto the next band, 5500 and 4500 (each guide's ports sit 100 apart, [testing.md](testing.md#start-a-guide) says why). Keep `"autoPort": true`, and `--port ${PORT:-<its port>}` in the preview's shell string.
 
 ## 5. Check it
 
