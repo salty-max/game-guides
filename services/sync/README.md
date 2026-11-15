@@ -19,7 +19,7 @@ Errors: `400` (bad body, code, guide, entries, or a stamp more than a day ahead,
 
 ### Who may call
 
-The caller's `Origin` must be the page's own host: `x-forwarded-host` behind the rewrite, `Host` when called direct. Hosts on `https://*.hundo.quest` (not `api.`) write to the `prod` namespace. Previews on `*.vercel.app` and `localhost` write to `test`, whose data is kept for a week. Anything else gets a 403. The body must be `application/json`, so a plain form post from another site is refused as well.
+Who is calling comes from the `Origin` alone: a guide on `https://*.hundo.quest` (not `api.`) writes to the `prod` namespace, and one of the team's previews (`hundo-<project>-<hash or git-branch>-jellycat.vercel.app`) or `localhost` writes to `test`, whose data is kept for a week. Anything else gets a 403, and so does a call with no `Origin`. The host isn't checked against it: behind a guide's rewrite this API gets its own host in `Host`, and no `x-forwarded-host` that names the guide's (seen on the first guide preview). A browser sets `Origin` and no page script can change it. A script on another site can't read an answer, since that takes a CORS preflight and this API never answers one (`OPTIONS` is a 405), and a form or `text/plain` post, which takes none, is refused: the body must be `application/json`, checked before anything touches the store.
 
 ### Cookies
 
@@ -55,7 +55,7 @@ No email, no name. The server sees IP addresses, as any web server does, and use
 
 ### Known limits, and what isn't checked yet
 
-- The API takes the visitor's address from `x-real-ip` and the page's host from `x-forwarded-host`. A forged `x-forwarded-host` that matched the `Origin` was still refused on the first preview, so on a direct call Vercel replaces it with the real host. Through a guide's rewrite to another origin, Vercel's docs say both are forwarded, and nothing here has seen that yet. It gets checked on the first guide preview, and if the headers differ the pairing limits and the origin check need changing. The pairing limits rest on that address, so if every request arrived with one address, or none, all readers would share them. The sync limit is per device and doesn't depend on it.
+- The API takes the visitor's address from `x-real-ip` (or `x-forwarded-for`). The pairing limits rest on it, so if every request arrived with one address, or none, all readers would share them. The sync limit is per device and doesn't depend on it.
 - Anyone can use up the wrong-try cap and so pause pairing for everyone for ten minutes. Devices already linked go on syncing. The cap is also what bounds guessing a six-digit code: with N codes showing, an attacker who keeps the cap used up hits one with a chance of at most 300 × N in a million every ten minutes.
 - Nothing in this service can stop a flood of requests from using up the store's commands: each request, even a refused one, costs it at least one, so the limits protect groups and not the quota. A rate-limit rule in the Vercel project's firewall on `api.hundo.quest` is the guard for that. It isn't set up, and what the team's plan allows hasn't been checked. When the quota runs out, syncing answers 503 and every guide keeps working on its own.
 - A guide's extra state keeps every path it has ever used, since a path can't be removed, so over its whole life it may use at most 60 distinct ones.
