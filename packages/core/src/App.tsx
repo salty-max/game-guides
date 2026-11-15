@@ -6,6 +6,7 @@ import { GuidePage } from "./pages/GuidePage";
 import { SourcesPage } from "./pages/SourcesPage";
 import { useGlobalEffects } from "./useThemeEffects";
 import { useProgress } from "./store/progress";
+import { useSync } from "./sync/engine";
 
 function Home() {
   const chapter = useProgress((s) => s.data.chapter);
@@ -14,6 +15,7 @@ function Home() {
 
 export function App() {
   useGlobalEffects();
+  useSync();
   return (
     <BrowserRouter>
       <Layout>

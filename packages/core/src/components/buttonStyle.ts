@@ -9,9 +9,9 @@ export type ButtonSize = "default" | "compact";
 const button = cva("inline-flex items-center justify-center gap-2 rounded-button border leading-[1.22] font-extrabold [&_.svg-icon]:size-4", {
   variants: {
     look: {
-      primary: "border-transparent bg-primary text-on-primary not-disabled:hover:bg-primary-hover",
-      outline: "border-control-line bg-surface text-primary not-disabled:hover:bg-raised",
-      accent: "border-accent bg-accent text-on-accent not-disabled:hover:border-accent-hover not-disabled:hover:bg-accent-hover",
+      primary: "border-transparent bg-primary text-on-primary not-disabled:not-aria-disabled:hover:bg-primary-hover",
+      outline: "border-control-line bg-surface text-primary not-disabled:not-aria-disabled:hover:bg-raised",
+      accent: "border-accent bg-accent text-on-accent not-disabled:not-aria-disabled:hover:border-accent-hover not-disabled:not-aria-disabled:hover:bg-accent-hover",
       danger: "border-transparent bg-danger text-on-danger",
     },
     size: {

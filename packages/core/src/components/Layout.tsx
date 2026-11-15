@@ -11,6 +11,7 @@ import { panels } from "virtual:guide/panels";
 import { isOpen, useProgress } from "../store/progress";
 import { useReveal } from "../useReveal";
 import { useTheme } from "../store/theme";
+import { useSyncStatus, type SyncPhase } from "../store/sync";
 import { useUi } from "../store/ui";
 import { useResolvedTheme } from "../useThemeEffects";
 
@@ -38,19 +39,39 @@ function ThemeToggle() {
   );
 }
 
+/** What the topbar says about sync, once a device is linked. */
+const syncWords: Record<Exclude<SyncPhase, "off">, string> = {
+  joining: "Syncing",
+  waiting: "Syncing",
+  synced: "Synced",
+  offline: "Offline",
+  paused: "Sync paused",
+  error: "Sync problem",
+};
+
 function SaveStatus() {
   const error = useProgress((s) => s.storageError);
+  const phase = useSyncStatus((s) => s.phase);
   const openDialog = useUi((s) => s.openDialog);
+  const linked = phase !== "off";
+  const word = linked && !error ? syncWords[phase] : "";
+  // A linked device opens the Sync screen from here, where the settings are one button away; one that isn't opens the settings as before.
   return (
     <button
       className="save-status"
       type="button"
-      data-error={error ? "" : undefined}
-      aria-label={error ? "Storage unavailable. Open progress settings" : "Progress saved. Open progress settings"}
-      onClick={() => openDialog({ kind: "settings" })}
+      data-error={error || ["offline", "paused", "error"].includes(phase) ? "" : undefined}
+      aria-label={
+        error
+          ? "Storage unavailable. Open progress settings"
+          : linked
+            ? `Progress saved. ${word}. Open sync`
+            : "Progress saved. Open progress settings"
+      }
+      onClick={() => openDialog({ kind: linked && !error ? "sync" : "settings" })}
     >
       <span />
-      {error ? "Storage unavailable" : "Progress saved"}
+      {error ? "Storage unavailable" : word ? `Progress saved · ${word}` : "Progress saved"}
     </button>
   );
 }

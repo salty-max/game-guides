@@ -2,6 +2,7 @@ import { create } from "zustand";
 
 export type DialogState =
   | { kind: "settings" }
+  | { kind: "sync" }
   | { kind: "confirm"; title: string; explanation: string; label: string; danger?: boolean; onConfirm: () => void }
   | null;
 
