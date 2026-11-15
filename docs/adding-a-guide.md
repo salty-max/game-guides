@@ -43,7 +43,7 @@ Delete what's Echoes' own:
 - `shortName`: the bare mark (`RDR`), without "Hundo", so the label under a home-screen icon isn't cut short.
 - `title`: the document and social title. The name, then enough to name the game, so a search for it finds the guide and a newcomer who doesn't know the word still knows what it is: `RDR Hundo · Red Dead Redemption 100% checklist`, or `Echoes of Wisdom Hundo · Zelda completion checklist`, where the name already holds the game's. Use the word its `description` uses for what it covers: "100%", or "completion" as in Echoes.
 - `description`.
-- `storagePrefix`: the localStorage prefix. Progress is saved under `<prefix>.v1` and the theme under `<prefix>.theme`. **Pick it once.** Changing it after launch starts every reader from nothing.
+- `storagePrefix`: the localStorage prefix. Progress is saved under `<prefix>.v1`, the theme under `<prefix>.theme` and a synced device's ledger under `<prefix>.sync`. **Pick it once.** Changing it after launch starts every reader from nothing.
 - `backupFile`: the name of the exported JSON file.
 - `mark`: the word in the header, above "HUNDO".
 - `icon`: any name from `packages/core/src/components/Icon.tsx`.
@@ -74,17 +74,20 @@ The full type is `GuideConfig` in `packages/core/src/types.ts`, and every field 
 ### `guide.test.ts`
 
 - Pin the game's own totals, as Echoes does with `targets`, so a missing row fails a count.
-- Pin the storage keys, as every guide does at the bottom of its test. `STORAGE_KEY` comes from `@hundo/core/progress-state` and `THEME_KEY` from `@hundo/core/store/theme`:
+- Pin the storage keys, as every guide does at the bottom of its test. `STORAGE_KEY` comes from `@hundo/core/progress-state`, `THEME_KEY` from `@hundo/core/store/theme` and `SYNC_KEY` from `@hundo/core/sync/local`:
 
   ```ts
   describe("storage", () => {
-    // Readers' progress and theme live under these keys on this domain: new keys start every reader from nothing.
+    // Readers' progress, theme and sync ledger live under these keys on this domain: new keys start every reader from nothing.
     it("keeps its storage keys", () => {
       expect(STORAGE_KEY).toBe("hundo-<sub>.v1");
       expect(THEME_KEY).toBe("hundo-<sub>.theme");
+      expect(SYNC_KEY).toBe("hundo-<sub>.sync");
     });
   });
   ```
+
+- If the guide keeps an `extra` state, pin how it syncs, as Koholint's and Red Dead's tests do: `flatten` from `@hundo/core/sync/fields` names one `x:<path>` key per leaf, and `viewFrom` rebuilds the state from keys through the guide's own `read`. Keep its keys to letters, digits, `_` and `-`, at most 60 leaves of at most 256 bytes each, or the leaf is left out of sync ([core.md](core.md#syncing-devices)).
 
 ## 3. Fonts, icons, README
 

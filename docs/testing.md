@@ -26,9 +26,10 @@ Core's suites run against each guide:
 - **`App.test.tsx`**: the main flows in the guide's layout. It ticks and saves, reveals chapters, uses Next up, bulk check and undo, the checklist and the dashboard, and asks the browser to keep progress after a tick, not on load, with the dashboard's line when it hasn't agreed.
 - **`MissablesStrip*.test.tsx`**: the strip with and without flagged rows.
 - **`persistence.test.ts`**: storage is asked to stay on the first tick in that tab, not for another tab's tick, at most every 30 days, and never with an error ([core.md](core.md#keeping-storage)).
-- **`deploy.test.ts`**: the app's `vercel.json`, the same in every app, and core's page template, held to the pitfalls in [deploying.md](deploying.md#pitfalls).
+- **`deploy.test.ts`**: the app's `vercel.json`, the same in every app, and core's page template, held to the pitfalls in [deploying.md](deploying.md#pitfalls), the `/api` rewrite and its place before the catch-all among them.
+- **`sync/*.test.ts`, `SyncScreen.test.tsx`**: sync, from the ledger's merge to the screen ([core.md](core.md#syncing-devices)). `cycle.test.ts` runs two simulated browsers against the real API handler on an in-memory store, so the guide and the API are tested against each other. `ledger.test.ts` holds core's ledger equal to the API's.
 
-Each guide's own `guide.test.ts` adds its totals, its legacy saves, its extra state and its two storage keys.
+Each guide's own `guide.test.ts` adds its totals, its legacy saves, its extra state (and how that syncs) and its three storage keys.
 
 ## Stories
 
@@ -100,7 +101,15 @@ For a core change, do this in an article guide (Koholint or Echoes) and in Red D
 
 Testing writes to the guide's localStorage on `localhost`. When you're done, remove what you added (`localStorage.removeItem("<storagePrefix>.v1")`, and `.theme` and `.persist`), so the next check starts blank.
 
+### Sync in a browser
+
+A guide's dev and preview servers send `/api` to the local sync API, so start it first (`preview_start` with `sync-api`, or `pnpm -C services/sync dev`, port 8787 with an in-memory store that a restart empties). `SYNC_API=http://127.0.0.1:<port>` points a guide's server somewhere else, which is how two sessions each run their own pair.
+
+Two devices need two cookie jars: the pane is one, and a second Chrome profile is the other (a `playwright-core` script with `executablePath` set to the system Chrome and a fresh context). To link them, show a code in one (settings, Sync devices, Show a code), type it in the other (Enter a code), then tick on one and, in the other, bring the page back after 10 seconds or more away (a `visibilitychange` to `hidden` and back) to see the tick arrive. localhost cookies ignore the port, so Koholint's and Red Dead's dev servers in one browser share a link, and the second guide joins by itself on opening. Linked browsers pile up as devices in the group; clear the in-memory store by restarting the API.
+
 ### What a local check can't cover
 
+- **The `/api` rewrite on Vercel.** Locally the dev server's proxy stands in for it. Whether `Cookie`, `Origin`, `Set-Cookie`, `x-real-ip` and `x-forwarded-host` pass through the real rewrite has to be seen on a preview ([deploying.md](deploying.md#the-sync-api)).
+- **Safari and an installed phone app.** Cookies there behave as the iPhone probe found, over plain http on a LAN. Over https on the real hosts is checked on production.
 - **The service worker's offline mode.** The pane registers the service worker (it once refused to fetch `sw.js`, and an old one answering for a new build is how that shows now), but offline mode hasn't been checked in it. Check it in a regular browser, or on a Vercel preview. The update prompt does work in the pane, though it takes a deploy: on 2026-11-15 it showed on all three live guides, each open in the pane before the deploy, and its Reload brought in the new build.
 - **Headers.** The CSP, the security headers and the cache rules come from `vercel.json` and exist only on Vercel. Check them on a preview deployment ([deploying.md](deploying.md#preview-first)).
