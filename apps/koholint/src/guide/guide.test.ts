@@ -2,6 +2,9 @@ import { allRows, chapters, coreRows } from "@hundo/core/guide";
 import { STORAGE_KEY, defaultState, validateState } from "@hundo/core/progress-state";
 import { readRunLog } from "./run-log";
 import { THEME_KEY } from "@hundo/core/store/theme";
+import { SYNC_KEY } from "@hundo/core/sync/local";
+import { flatten, viewFrom } from "@hundo/core/sync/fields";
+import type { Entries } from "@hundo/core/sync/ledger";
 
 const [a] = allRows.map((row) => row.id);
 
@@ -53,5 +56,26 @@ describe("storage", () => {
   it("keeps its storage keys", () => {
     expect(STORAGE_KEY).toBe("koholint-field-guide.v1");
     expect(THEME_KEY).toBe("koholint-field-guide.theme");
+    expect(SYNC_KEY).toBe("koholint-field-guide.sync");
+  });
+});
+
+const entries = (flat: Record<string, unknown>) => Object.fromEntries(Object.entries(flat).map(([key, value]) => [key, [1, value]])) as Entries;
+
+describe("Koholint sync", () => {
+  it("syncs the run log leaf by leaf, and rebuilds the same log from them", () => {
+    const extra = { mode: "hero" as const, runs: { normal: { deaths: 4, cleared: true }, hero: { deaths: 1, cleared: false } } };
+    const flat = flatten({ ...defaultState(), extra });
+    expect(Object.keys(flat).filter((key) => key.startsWith("x:")).sort()).toEqual(["x:mode", "x:runs.hero.cleared", "x:runs.hero.deaths", "x:runs.normal.cleared", "x:runs.normal.deaths"]);
+    expect(viewFrom(entries(flat), defaultState()).extra).toEqual(extra);
+  });
+
+  it("takes one changed leaf from the group and keeps the rest of the log", () => {
+    const mine = { ...defaultState(), extra: { mode: "normal" as const, runs: { normal: { deaths: 2, cleared: false }, hero: { deaths: 0, cleared: false } } } };
+    expect(viewFrom(entries({ "x:runs.hero.deaths": 5 }), mine).extra).toEqual({ mode: "normal", runs: { normal: { deaths: 2, cleared: false }, hero: { deaths: 5, cleared: false } } });
+  });
+
+  it("refuses what is not a run log's, as the guide's own reader does", () => {
+    expect(viewFrom(entries({ "x:mode": "godlike", "x:runs.normal.deaths": -3 }), defaultState()).extra).toEqual(defaultState().extra);
   });
 });

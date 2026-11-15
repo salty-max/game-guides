@@ -67,7 +67,12 @@ const guideShell = (root: string, brand: Brand, palette: Record<string, string>)
 /** The whole Vite and Vitest setup for a guide app: pass the app's folder and its brand. */
 export const guideConfig = (root: string, brand: Brand) => {
   const palette = lightPalette(root);
+  // In production /api is a rewrite to the sync API (vercel.json). Here the dev and preview servers send it to the local one
+  // (`pnpm -C services/sync dev`, on 8787), keeping the page's own host so the API sees what it would see behind the rewrite.
+  const proxy = { "/api": { target: process.env.SYNC_API ?? "http://127.0.0.1:8787" } };
   return defineConfig({
+    server: { proxy },
+    preview: { proxy },
     resolve: {
       // Core imports the guide's config, panels and theme through virtual:guide/…, which is the app's src/guide.
       alias: [{ find: /^virtual:guide\//, replacement: `${root}/src/guide/` }],
@@ -105,6 +110,8 @@ export const guideConfig = (root: string, brand: Brand) => {
           globPatterns: ["**/*.{js,css,html,webp,woff2,png,svg}"],
           // Client-side routes (/guide/3 …) all resolve to the app shell.
           navigateFallback: "index.html",
+          // /api is the sync API, never a page.
+          navigateFallbackDenylist: [/^\/api\//],
           cleanupOutdatedCaches: true,
         },
         devOptions: { enabled: false },

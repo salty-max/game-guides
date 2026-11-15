@@ -5,7 +5,10 @@
   "buildCommand": "pnpm build",
   "outputDirectory": "dist",
   "ignoreCommand": "sh ../../scripts/vercel-ignore.sh",
-  "rewrites": [{ "source": "/((?!assets/|fonts/|icons/).*)", "destination": "/index.html" }],
+  "rewrites": [
+    { "source": "/api/:path*", "destination": "https://api.hundo.quest/api/:path*" },
+    { "source": "/((?!api/|assets/|fonts/|icons/).*)", "destination": "/index.html" }
+  ],
   "headers": [
     {
       "source": "/(.*)",

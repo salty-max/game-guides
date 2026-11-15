@@ -2,6 +2,9 @@ import { allRows, chapters, coreRows, missablesLeft } from "@hundo/core/guide";
 import { STORAGE_KEY, defaultState, validateState } from "@hundo/core/progress-state";
 import { calibrationDelta, estimate, pointsLeft, readPercent } from "./estimate";
 import { THEME_KEY } from "@hundo/core/store/theme";
+import { SYNC_KEY } from "@hundo/core/sync/local";
+import { flatten, viewFrom } from "@hundo/core/sync/fields";
+import type { Entries } from "@hundo/core/sync/ledger";
 import { brand } from "./brand";
 
 const all = Object.fromEntries(allRows.map((row) => [row.id, true as const]));
@@ -69,6 +72,7 @@ describe("storage", () => {
   it("keeps its storage keys", () => {
     expect(STORAGE_KEY).toBe("red-dead-field-guide.v1");
     expect(THEME_KEY).toBe("red-dead-field-guide.theme");
+    expect(SYNC_KEY).toBe("red-dead-field-guide.sync");
   });
 
   // Every saved state and backup carries this id, and one with another id is refused.
@@ -80,5 +84,20 @@ describe("storage", () => {
   it("hands readers over from its old address", () => {
     expect(brand.home).toBe("https://rdr.hundo.quest");
     expect(brand.movedFrom).toContain("reddead.hundo.quest");
+  });
+});
+
+const entries = (flat: Record<string, unknown>) => Object.fromEntries(Object.entries(flat).map(([key, value]) => [key, [1, value]])) as Entries;
+
+describe("Red Dead sync", () => {
+  it("syncs the reported percentage as one leaf, empty or not, and gets it back", () => {
+    expect(Object.keys(flatten(defaultState())).filter((key) => key.startsWith("x:"))).toEqual(["x:reported"]);
+    expect(flatten({ ...defaultState(), extra: { reported: 37.5 } })["x:reported"]).toBe(37.5);
+    expect(viewFrom(entries({ "x:reported": 37.5 }), defaultState()).extra).toEqual({ reported: 37.5 });
+    expect(viewFrom(entries({ "x:reported": null }), { ...defaultState(), extra: { reported: 12 } }).extra).toEqual({ reported: null });
+  });
+
+  it("refuses a percentage that isn't one", () => {
+    expect(viewFrom(entries({ "x:reported": 400 }), defaultState()).extra).toEqual({ reported: null });
   });
 });

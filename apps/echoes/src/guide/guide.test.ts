@@ -2,6 +2,8 @@ import { allRows, chapters, rowsByTag, tally } from "@hundo/core/guide";
 import { STORAGE_KEY, validateState } from "@hundo/core/progress-state";
 import { targets } from "./config";
 import { THEME_KEY } from "@hundo/core/store/theme";
+import { SYNC_KEY } from "@hundo/core/sync/local";
+import { flatten } from "@hundo/core/sync/fields";
 
 const [a] = allRows.map((row) => row.id);
 
@@ -47,5 +49,12 @@ describe("storage", () => {
   it("keeps its storage keys", () => {
     expect(STORAGE_KEY).toBe("echoes-of-wisdom-field-guide.v1");
     expect(THEME_KEY).toBe("echoes-of-wisdom-field-guide.theme");
+    expect(SYNC_KEY).toBe("echoes-of-wisdom-field-guide.sync");
+  });
+});
+
+describe("Echoes sync", () => {
+  it("has no state of its own to sync beyond the shared fields", () => {
+    expect(Object.keys(flatten(validateState({ version: 3, guide: "echoes-of-wisdom", checks: { [a]: true }, ceiling: 2, chapter: 2, spoilers: true }))).sort()).toEqual([`c:${a}`, "ceiling", "chapter", "spoilers"].sort());
   });
 });
