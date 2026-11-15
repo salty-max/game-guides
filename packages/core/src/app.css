@@ -11,8 +11,8 @@
 @import "tailwindcss/utilities.css" layer(utilities) source(none);
 
 /* Tailwind reads class names from core's components only: a guide can't reach for a utility. */
-@source "./**/*.tsx";
-@source not "./**/*.test.tsx";
+@source "./**/*.{ts,tsx}";
+@source not "./**/*.test.{ts,tsx}";
 
 @import "./tokens.css";
 @import "./styles.css" layer(legacy);

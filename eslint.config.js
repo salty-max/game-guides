@@ -34,7 +34,7 @@ export default tseslint.config(
   },
   {
     // Tailwind classes in components: spelled right, in one order, none doubled or fighting, and only the house tokens (tokens.css).
-    files: ["**/*.tsx"],
+    files: ["**/*.{ts,tsx}"],
     plugins: { "better-tailwindcss": tailwind },
     settings: { "better-tailwindcss": { entryPoint: fileURLToPath(new URL("app.css", core)) } },
     rules: {
@@ -47,7 +47,7 @@ export default tseslint.config(
   {
     // A guide's own panels can't reach for Tailwind: it only reads core's files, so a utility class there would lint as valid and
     // build to nothing. They may use only the classes core's old stylesheet still defines, until their panels move onto core's components.
-    files: ["apps/**/*.tsx"],
+    files: ["apps/**/*.{ts,tsx}"],
     rules: {
       "better-tailwindcss/no-unknown-classes": "off",
       "better-tailwindcss/no-restricted-classes": [
