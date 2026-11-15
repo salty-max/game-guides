@@ -3,6 +3,7 @@ import { defaultState } from "@hundo/core/progress-state";
 import { useProgress } from "@hundo/core/store/progress";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { MemoryRouter } from "react-router";
+import { expect } from "storybook/test";
 
 // The chapter rail as a column beside the page. Under 800px it is a drawer: RailDrawer.stories.tsx.
 const meta = {
@@ -28,7 +29,13 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /** Spoiler protection on, as a new reader has it: the first chapter is open and the rest say what hides them. */
-export const Protected: Story = {};
+export const Protected: Story = {
+  play: async ({ canvas }) => {
+    // A hidden chapter and the settings link are buttons, not links: they act on the page.
+    await expect(canvas.getByRole("button", { name: /Reveal chapter 2/ })).toBeEnabled();
+    await expect(canvas.getByRole("button", { name: "Change settings" })).toBeEnabled();
+  },
+};
 
 /** Protection off: every chapter is a link with how far through it the reader is. */
 export const Revealed: Story = { parameters: { progress: { spoilers: false, ceiling: 9 } } };

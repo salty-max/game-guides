@@ -3,8 +3,8 @@ import appCss from "./app.css?raw";
 import tokensCss from "./tokens.css?raw";
 import themeCss from "virtual:guide/theme.css?raw";
 
-// Every stylesheet in core, as text, for the "only defined tokens" check: styles move between files as components move to Tailwind.
-const coreCss = Object.values(import.meta.glob<string>("./*.css", { query: "?raw", import: "default", eager: true })).join("\n");
+// Every stylesheet in core, as text, for the "only defined tokens" check.
+const coreCss = Object.values(import.meta.glob<string>("./**/*.css", { query: "?raw", import: "default", eager: true })).join("\n");
 
 const PALETTE = ["--paper", "--surface", "--raised", "--ink", "--muted", "--line", "--primary", "--on-primary", "--accent", "--on-accent", "--focus"];
 const LIGHT = ":root";
@@ -86,16 +86,16 @@ describe("guide theme", () => {
     }
   });
 
-  it("keeps core's tokens, and the media queries that resize them, in a layer below the legacy rules", () => {
+  it("keeps core's tokens, and the media queries that resize them, in the lowest layer, with preflight in the base above it", () => {
     // An unlayered rule beats every layer, so a token (or --bar-h and --rail-w on a phone) left outside @layer theme would beat the
     // palette and everything a guide sets after it.
     const app = appCss.replace(/\/\*[\s\S]*?\*\//g, "");
     const order = (/@layer\s+([\w\s,-]+);/.exec(app)?.[1] ?? "").split(",").map((name) => name.trim());
     expect(order.indexOf("theme"), "the layer order in app.css").toBeGreaterThanOrEqual(0);
-    expect(order.indexOf("theme")).toBeLessThan(order.indexOf("legacy"));
-    // tokens.css is imported as it is (its own @layer theme applies), and the legacy rules are imported into their layer.
+    expect(order).toEqual(["theme", "base", "components", "utilities"]);
+    // tokens.css is imported as it is (its own @layer theme applies), and Tailwind's preflight into the base layer.
     expect(app).toContain('@import "./tokens.css";');
-    expect(app).toContain('@import "./styles.css" layer(legacy);');
+    expect(app).toContain('@import "tailwindcss/preflight.css" layer(base);');
     // Every :root in tokens.css sits inside the `@layer theme { … }` block.
     const css = tokensCss.replace(/\/\*[\s\S]*?\*\//g, "");
     const start = css.indexOf("@layer theme");

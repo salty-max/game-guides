@@ -1,3 +1,4 @@
+import { Button as BaseButton } from "@base-ui/react/button";
 import { cva } from "class-variance-authority";
 import { useCallback, useEffect, useRef, type RefObject } from "react";
 import { Link, useLocation, useNavigate } from "react-router";
@@ -59,9 +60,8 @@ function SaveStatus() {
   const word = linked && !error ? syncWords[phase] : "";
   // A linked device opens the Sync screen from here, where the settings are one button away; one that isn't opens the settings as before.
   return (
-    <button
+    <BaseButton
       className="flex min-h-10 items-center gap-2 rounded-control border border-control-line bg-transparent px-3 py-1.5 text-[12px] font-bold whitespace-nowrap text-muted hover:bg-raised drawer:w-(--icon-w,2.5rem) drawer:justify-center drawer:gap-0 drawer:p-0 drawer:text-[0px]"
-      type="button"
       data-error={error || ["offline", "paused", "error"].includes(phase) ? "" : undefined}
       aria-label={
         error
@@ -74,7 +74,7 @@ function SaveStatus() {
     >
       <span className="block size-2 rounded-full bg-ok shadow-[0_0_0_3px_color-mix(in_srgb,var(--ok)_15%,transparent)] in-data-error:bg-warn" />
       {error ? "Storage unavailable" : word ? `Progress saved · ${word}` : "Progress saved"}
-    </button>
+    </BaseButton>
   );
 }
 
@@ -106,8 +106,8 @@ export function TopBar({ chapter, view, menuOpen, onToggleMenu, menuToggle }: To
   const navigate = useNavigate();
   const brandLinkRef = useRef<HTMLAnchorElement>(null);
   const backHadFocus = useRef(false);
-  // React runs a ref's cleanup before it removes the node, while the node still has the focus (a browser may fire blur as it goes, so a
-  // blur handler can't tell). The callback is stable, so the cleanup runs only when the button really goes.
+  // React runs a ref's cleanup before it removes the node, while the node still has the focus (a browser may report the focus leaving as it goes, so a
+  // focus-out handler can't tell). The callback is stable, so the cleanup runs only when the button really goes.
   const backRef = useCallback((node: HTMLButtonElement | null) => {
     return () => {
       if (node && document.activeElement === node) backHadFocus.current = true;

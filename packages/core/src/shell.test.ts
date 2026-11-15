@@ -1,7 +1,6 @@
 // @vitest-environment node
 import { runInNewContext } from "node:vm";
 import app from "./app.css?raw";
-import styles from "./styles.css?raw";
 import tokens from "./tokens.css?raw";
 import page from "../index.html?raw";
 import themeInit from "../theme-init.js?raw";
@@ -75,12 +74,13 @@ describe("the installed app in app.css", () => {
 
   it("changes nothing in a browser tab: every rule that makes the page a frame is behind the variant or the mark", () => {
     // The base layer's global rules are the only hand-written ones; each either is one of the page's own defaults, which every page has
-    // (the scroll padding under the top bar, the reduced motion), and none of what makes a frame, or is keyed on the mark.
+    // (the scroll padding under the top bar, the body's type and colours, the native controls' colour, a button's pointer, the focus
+    // ring, reduced motion) and none of what makes a frame, or is keyed on the mark.
     const base = /@layer base \{([\s\S]*?)\n\}\n/.exec(app)?.[1] ?? "";
     const rules = base.replace(/\/\*[\s\S]*?\*\//g, "").split("}").map((rule) => rule.trim()).filter(Boolean);
     expect(rules.length).toBeGreaterThan(4);
-    const pageWide = ["html", "@media (prefers-reduced-motion: reduce)"];
-    const frame = /fixed|overflow|overscroll|inset|h-full|touch-|position|height/;
+    const pageWide = ["html", "body", "button", ":focus-visible", "@media (prefers-reduced-motion: reduce)"];
+    const frame = /fixed|overflow|overscroll|inset|\bh-|min-h-|max-h-|touch-|position|height|dvh|screen/;
     for (const rule of rules) {
       const [selector, ...rest] = rule.split("{").map((part) => part.trim());
       const body = rest.join("{");
@@ -91,7 +91,7 @@ describe("the installed app in app.css", () => {
     }
   });
 
-  it("makes every text field 16px on a touch screen, above the legacy rules they got their size from", () => {
+  it("makes every text field 16px on a touch screen, above the base layer", () => {
     expect(/@layer components \{[\s\S]*pointer-coarse:text-base/.test(app)).toBe(true);
   });
 
@@ -101,11 +101,9 @@ describe("the installed app in app.css", () => {
   });
 });
 
-describe("the legacy styles", () => {
-  it("have none of the page's frame left: the top bar, rail, main area, scrim, skip link and toasts are Tailwind in their components", () => {
-    for (const name of ["topbar", "rail", "brand", "top-nav", "icon-button", "save-status", "chapter-link", "scrim", "mobile-menu", "skip", "toast-stack", "toast", "layout", "main"]) {
-      expect(styles, `.${name} is back in styles.css`).not.toMatch(new RegExp(`\\.${name}(?![\\w-])`));
-    }
+describe("core's stylesheets", () => {
+  it("are app.css and tokens.css only: every look is Tailwind in the part that draws it", () => {
+    expect(Object.keys(import.meta.glob("./**/*.css")).sort()).toEqual(["./app.css", "./tokens.css"]);
   });
 });
 

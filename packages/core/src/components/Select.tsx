@@ -1,3 +1,4 @@
+import { Button } from "@base-ui/react/button";
 import { useEffect, useState } from "react";
 import { chunks, loadFailed } from "./chunks";
 import { Icon } from "./Icon";
@@ -28,12 +29,10 @@ export function Select(props: SelectProps) {
       <label htmlFor={id} className={bare ? "sr-only" : undefined}>
         {label}
       </label>
-      <button
+      <Button
         id={id}
-        type="button"
         aria-haspopup="listbox"
         disabled={disabled}
-        data-disabled={disabled ? "" : undefined}
         className={selectTrigger}
         onClick={want}
         onKeyDown={(event) => {
@@ -54,7 +53,7 @@ export function Select(props: SelectProps) {
         <span className="text-muted">
           <Icon name="down" className="size-4" />
         </span>
-      </button>
+      </Button>
     </div>
   );
 }

@@ -1,13 +1,15 @@
-/* The one stylesheet core ships, imported by main.tsx. Layer order, lowest first: Tailwind's theme (and core's tokens), then
-   core's few global rules, then the legacy rules (styles.css, which moves out a component at a time until it's empty), then
-   components, then utilities. A guide's theme.css loads after this and only sets the palette variables.
+/* The one stylesheet core ships, imported by main.tsx. Layer order, lowest first: Tailwind's theme (and core's tokens), then the base
+   (Tailwind's preflight and core's few global rules below), then components, then utilities. A guide's theme.css loads after this and
+   only sets the palette variables.
 
-   Tailwind's preflight is left out for now. It strips list bullets, heading weights, table borders and the like, and the legacy
-   pages rely on the browser's defaults for those. It joins when styles.css is gone, after a look at every page. Until then a new
-   component sets its own resets (list-none, m-0, p-0, appearance-none) instead of leaning on preflight. */
-@layer theme, base, legacy, components, utilities;
+   Preflight clears the browser's own looks: margins, heading sizes and weights, list bullets, a button's own colours and frame. So
+   every page and part says what it looks like in its own classes, and nothing leans on a default. Preflight also brings two rules the
+   guides need: the until-found exception, which lets find-in-page reach and open a collapsible's closed panel, and no tap flash, set
+   on the root and inherited. */
+@layer theme, base, components, utilities;
 
 @import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/preflight.css" layer(base);
 @import "tailwindcss/utilities.css" layer(utilities) source(none);
 
 /* Tailwind reads class names from core's components only: a guide can't reach for a utility. */
@@ -15,9 +17,11 @@
 @source not "./**/*.test.{ts,tsx}";
 /* And from the page itself, for the line a browser without JavaScript shows. */
 @source "../index.html";
+/* Words in core's code that are also utilities nothing uses: an icon's SVG attribute, the arrays' filter calls, the outline look's name,
+   a window event's name, a variable and a sentence. */
+@source not inline("transform filter outline resize visible");
 
 @import "./tokens.css";
-@import "./styles.css" layer(legacy);
 
 /* The guide opened as an app, from the home screen or an install button, not in a browser tab. theme-init.js marks the page
    `data-standalone` before the first paint (navigator.standalone is how iOS Safari says it; other browsers say it with the
@@ -56,9 +60,6 @@
   body {
     @apply standalone:fixed standalone:inset-0 standalone:w-full;
   }
-  html {
-    @apply standalone:[-webkit-text-size-adjust:100%];
-  }
   #root {
     @apply standalone:fixed standalone:inset-0 standalone:flex standalone:flex-col;
   }
@@ -66,13 +67,28 @@
   /* An app's manners: no tap flash, no double-tap zoom delay (pinch zoom stays), and a button is not text to select or a link to
      preview with a long press. */
   [data-standalone] * {
-    @apply touch-manipulation [-webkit-tap-highlight-color:transparent];
+    @apply touch-manipulation;
   }
   [data-standalone] button {
     @apply select-none [-webkit-touch-callout:none];
   }
 
-  /* Every page: a reader who asks for less motion gets none, no smooth scrolling and no transitions. */
+  /* Every page: the guide's type and colours, the scrollbar and the native controls in the palette, the house focus ring (every
+     part relies on it), and a hand over anything that can be pressed. */
+  html {
+    @apply accent-primary [scrollbar-color:var(--edge)_var(--paper)];
+  }
+  body {
+    @apply bg-paper font-sans text-[16px]/[1.58] text-ink;
+  }
+  button {
+    @apply cursor-pointer;
+  }
+  :focus-visible {
+    @apply outline-3 outline-offset-3 outline-focus;
+  }
+
+  /* A reader who asks for less motion gets none: no smooth scrolling, no transitions. */
   @media (prefers-reduced-motion: reduce) {
     *,
     *::before,
@@ -85,7 +101,7 @@
 
 @layer components {
   /* iOS zooms the page when a field under 16px takes the focus, in a browser tab as much as in an app, so every text field on a
-     touch screen is 16px. This is in `components`, above the legacy rules the older fields get their size from. */
+     touch screen is 16px. This is in `components`, above the base layer. */
   input:not([type="checkbox"], [type="radio"], [type="file"], [type="hidden"], [type="range"]),
   textarea {
     @apply pointer-coarse:text-base;

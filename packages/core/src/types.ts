@@ -177,7 +177,7 @@ export interface GuideText {
 
 export interface GuideConfig {
   brand: Brand;
-  /** "article": prose sections with inline checks. "checklist": collapsible route groups with filters. */
+  /** "article": prose sections with their checks in the text. "checklist": collapsible route groups with filters. */
   layout: "article" | "checklist";
   chapters: RawChapter[];
   /** Guide-wide references; each chapter can carry its own. */

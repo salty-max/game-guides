@@ -15,7 +15,7 @@ export interface SelectProps {
 }
 
 export const selectTrigger =
-  "flex min-h-11 w-full items-center justify-between gap-2 rounded-control border border-control-line bg-surface px-2.5 py-1.5 text-start text-sm font-bold text-ink select-none not-data-disabled:hover:bg-raised data-popup-open:bg-raised";
+  "flex min-h-11 w-full items-center justify-between gap-2 rounded-control border border-control-line bg-surface px-2.5 py-1.5 text-start text-sm font-bold text-ink select-none not-data-disabled:hover:bg-raised data-disabled:cursor-not-allowed data-disabled:opacity-[.46] data-popup-open:bg-raised";
 
 /** A labelled control's frame: the label over the control, with a line of description or error under it. */
 export const field = "grid gap-1 text-[13px] font-bold";

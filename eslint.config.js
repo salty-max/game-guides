@@ -1,4 +1,3 @@
-import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import js from "@eslint/js";
 import tailwind from "eslint-plugin-better-tailwindcss";
@@ -9,10 +8,6 @@ import storybook from "eslint-plugin-storybook";
 import tseslint from "typescript-eslint";
 
 const core = new URL("./packages/core/src/", import.meta.url);
-// The classes core's old stylesheet still defines. Tailwind doesn't know them, so they're allowed until their rules move to
-// utilities; the list is read from the file, so it shrinks as styles.css does and is empty when styles.css is gone.
-const legacyCss = readFileSync(new URL("styles.css", core), "utf8").replace(/\/\*[\s\S]*?\*\//g, "");
-const legacy = [...new Set([...legacyCss.matchAll(/\.([a-zA-Z_][\w-]*)/g)].map(([, name]) => name))];
 
 export default tseslint.config(
   { ignores: ["**/dist", "**/dev-dist", "**/coverage"] },
@@ -39,7 +34,6 @@ export default tseslint.config(
     settings: { "better-tailwindcss": { entryPoint: fileURLToPath(new URL("app.css", core)) } },
     rules: {
       ...tailwind.configs["recommended-error"].rules,
-      "better-tailwindcss/no-unknown-classes": ["error", { ignore: legacy.length ? [`^(?:${legacy.join("|")})$`] : [] }],
       // No formatter wraps this repo's lines, so a class list stays on one line.
       "better-tailwindcss/enforce-consistent-line-wrapping": "off",
     },
