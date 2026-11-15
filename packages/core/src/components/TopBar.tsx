@@ -84,9 +84,10 @@ const navs = [
   ["dashboard", "Progress", "chart"],
 ] as const;
 
-// Where there is a way back, the brand gives its place to it on a phone: there's no room for both beside the menu and the pages.
+// Where there is a way back, the brand gives its place to it under 1041px (a phone, or an iPad in portrait): there's no room for both
+// beside the menu and the pages. Checked with Echoes, whose name is the longest, at 820px, where its text ran into the Guide link.
 const brandLink = cva("flex w-max shrink-0 items-center gap-[11px] px-6 mid:pl-[17px] drawer:gap-[7px] drawer:px-2.5 slim:px-1.5", {
-  variants: { canGoBack: { true: "drawer:hidden", false: "" } },
+  variants: { canGoBack: { true: "mid:hidden", false: "" } },
 });
 
 interface TopBarProps {
