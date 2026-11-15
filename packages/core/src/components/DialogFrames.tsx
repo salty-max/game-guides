@@ -9,10 +9,14 @@ import { lastInput } from "../lastInput";
 import { useUi } from "../store/ui";
 
 // Base UI's own dialog layers (the "inside scroll" pattern in https://base-ui.com/react/components/dialog): a backdrop, a viewport that
-// positions the popup, and a popup whose body scrolls inside it. `supports-[-webkit-touch-callout:none]:absolute` is the rule that page
-// gives the backdrop for iOS 26 and later, where a fixed backdrop doesn't cover everything the reader can see.
+// positions the popup, and a popup whose body scrolls inside it. That page makes the backdrop absolute where `@supports (-webkit-touch-callout: none)`
+// holds (iOS), for iOS 26 and later, where a fixed backdrop doesn't cover everything the reader can see. Here that is for the installed
+// app only (`standalone:`), where `body` is fixed and is what the backdrop is placed against. In a browser tab `body` isn't positioned, so an
+// absolute backdrop is probably placed at the top of the document and scrolled out of sight: a tab on an iPhone (iOS 18.7) showed no dim at
+// all, though the iOS 27.2 Simulator dimmed the same tab, so the cause isn't settled.
+// (Tailwind reads class names out of comments too: don't write the utility's own name here.)
 const backdrop =
-  "fixed inset-0 z-50 min-h-dvh bg-backdrop transition-opacity duration-100 supports-[-webkit-touch-callout:none]:absolute data-ending-style:opacity-0 data-starting-style:opacity-0 motion-reduce:transition-none";
+  "fixed inset-0 z-50 min-h-dvh bg-backdrop transition-opacity duration-100 standalone:supports-[-webkit-touch-callout:none]:absolute data-ending-style:opacity-0 data-starting-style:opacity-0 motion-reduce:transition-none";
 
 // The viewport is the part of the screen the reader can see: --vv-top and --vv-height are the visual viewport's (followVisualViewport),
 // which an on-screen keyboard shrinks, and fall back to the layout viewport where there is no visual viewport to ask. The notch and the

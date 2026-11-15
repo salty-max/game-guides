@@ -1,5 +1,6 @@
 import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { panels } from "virtual:guide/panels";
 import { App } from "../App";
 import { defaultState } from "../progress-state";
 import { useProgress } from "../store/progress";
@@ -39,8 +40,27 @@ describe("a way back in the installed app", () => {
     await user.click(screen.getByRole("button", { name: "Back" }));
     await waitFor(() => expect(location.pathname).toBe("/guide/1"));
     await waitFor(() => expect(screen.queryByRole("button", { name: "Back" })).toBeNull());
-    // The button had the focus when it went: the focus isn't left to fall to the page.
+    // The button had the focus when it went, and the focus isn't left to fall to the page. (Here Layout's own page-change effect takes it
+    // for <main>; the hand-off to the brand is the next test, at an address where the page takes none.)
     expect(document.body).not.toHaveFocus();
+  });
+
+  // A dashboard panel's address only scrolls to the panel: Layout leaves the focus alone for an address that points at something, and the
+  // page takes none, so the hand-off from the Back button that goes while pressed is all that keeps it off the document. (Echoes has no panel.)
+  const atAPanel = panels.length > 0 ? it : it.skip;
+  atAPanel("hands the focus to the brand when it goes while pressed and the page it returns to takes none", async () => {
+    installed();
+    const address = `/dashboard/${panels[0]?.id}`;
+    history.replaceState(null, "", address);
+    const user = userEvent.setup();
+    render(<App />);
+    await screen.findByRole("heading", { level: 1 });
+    await user.click(screen.getByRole("link", { name: /Checklist/ }));
+    await screen.findByRole("heading", { name: "Completion checklist" });
+    await user.click(screen.getByRole("button", { name: "Back" }));
+    await waitFor(() => expect(location.pathname).toBe(address));
+    await waitFor(() => expect(screen.queryByRole("button", { name: "Back" })).toBeNull());
+    await waitFor(() => expect(screen.getByRole("link", { name: /home$/ })).toHaveFocus());
   });
 
   it("is not in a browser tab, which has its own", async () => {

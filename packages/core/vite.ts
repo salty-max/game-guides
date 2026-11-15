@@ -12,17 +12,22 @@ const here = (path: string) => fileURLToPath(new URL(path, import.meta.url));
 // index.html loads the app through this id, which resolves to core's main.tsx.
 const ENTRY = "/@core/main.tsx";
 
-/** One palette from the guide's theme.css (the light one opens `:root{`, the dark one `:root[data-theme="dark"]{`). */
-const readPalette = (root: string, opening: string) => {
+/**
+ * One palette from the guide's theme.css (the light one opens `:root{`, the dark one `:root[data-theme="dark"]{`, with or without a space
+ * before the brace). Without a `--surface` the page would ship a placeholder as its theme colour, so a palette that has none stops the build.
+ */
+const readPalette = (root: string, opening: RegExp) => {
   const css = readFileSync(`${root}/src/guide/theme.css`, "utf8");
   const block = css.split(opening)[1]?.split("}")[0] ?? "";
-  return Object.fromEntries([...block.matchAll(/(--[a-z-]+):([^;]+)/g)].map(([, key, value]) => [key, value.trim()]));
+  const palette = Object.fromEntries([...block.matchAll(/(--[a-z-]+):([^;]+)/g)].map(([, key, value]) => [key, value.trim()]));
+  if (!palette["--surface"]) throw new Error(`${root}/src/guide/theme.css: no --surface after ${opening}, which the theme-color tag is built from`);
+  return palette;
 };
 
 /** The light palette, for the colours the browser and the installed app show before CSS loads. */
-const lightPalette = (root: string) => readPalette(root, ":root{");
+const lightPalette = (root: string) => readPalette(root, /:root\s*\{/);
 /** The dark one, whose surface colour theme-init.js puts in the theme-color tag when the page opens in dark. */
-const darkPalette = (root: string) => readPalette(root, ':root[data-theme="dark"]{');
+const darkPalette = (root: string) => readPalette(root, /:root\[data-theme="dark"\]\s*\{/);
 
 /**
  * Serves the page every guide shares: core's index.html with the brand filled in, and theme-init.js beside it.
