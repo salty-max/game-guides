@@ -130,7 +130,8 @@ export function TopBar({ chapter, view, menuOpen, onToggleMenu, menuToggle }: To
           ref={menuToggle}
           icon="menu"
           label={menuOpen ? "Close chapters" : "Open chapters"}
-          aria-controls="chapter-rail"
+          aria-haspopup="dialog"
+          aria-controls={menuOpen ? "chapter-rail" : undefined}
           aria-expanded={menuOpen}
           onClick={onToggleMenu}
         />

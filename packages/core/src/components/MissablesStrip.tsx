@@ -25,7 +25,7 @@ const caret = cva("svg-icon size-4 flex-none text-muted group-data-panel-open/tr
 function Reassurance({ text, sources }: NonNullable<typeof config.reassurance>) {
   return (
     <Collapsible.Root render={<aside />} className={frame({ tone: "clear" })} aria-label="Missable entries">
-      <Collapsible.Trigger className="group/trigger flex w-full cursor-pointer items-start justify-between gap-2.5 border-0 bg-transparent px-4 py-2.5 text-left font-sans text-[14px] leading-normal text-muted phone:px-3">
+      <Collapsible.Trigger className="group/trigger flex min-h-12 w-full cursor-pointer items-start justify-between gap-2.5 border-0 bg-transparent px-4 py-2.5 text-left font-sans text-[14px] leading-normal text-muted phone:px-3">
         <span>
           <strong className="font-extrabold text-ink">Nothing is flagged as permanently missable.</strong> {text}
         </span>

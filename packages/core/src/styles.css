@@ -201,6 +201,5 @@ h1,h2,h3{line-height:1.17}
   .whats-left li{grid-template-columns:1fr auto}
   .wl-bar{grid-column:1/-1;order:3}
   .next-up{padding-inline:12px}
-  .next-up li{gap:10px}
 }
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important}}
