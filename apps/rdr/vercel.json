@@ -5,33 +5,36 @@
   "buildCommand": "pnpm build",
   "outputDirectory": "dist",
   "ignoreCommand": "sh ../../scripts/vercel-ignore.sh",
-  "rewrites": [
-    { "source": "/api/:path*", "destination": "https://api.hundo.quest/api/:path*" },
-    { "source": "/((?!api/|assets/|fonts/|icons/).*)", "destination": "/index.html" }
-  ],
-  "headers": [
+  "routes": [
     {
-      "source": "/(.*)",
-      "headers": [
-        { "key": "Content-Security-Policy", "value": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'" },
-        { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
-        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=(), payment=()" },
-        { "key": "Strict-Transport-Security", "value": "max-age=63072000; includeSubDomains" },
-        { "key": "Cross-Origin-Opener-Policy", "value": "same-origin" }
-      ]
+      "src": "/(.*)",
+      "headers": {
+        "Content-Security-Policy": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'",
+        "X-Content-Type-Options": "nosniff",
+        "Referrer-Policy": "strict-origin-when-cross-origin",
+        "Permissions-Policy": "camera=(), microphone=(), geolocation=(), payment=()",
+        "Strict-Transport-Security": "max-age=63072000; includeSubDomains",
+        "Cross-Origin-Opener-Policy": "same-origin"
+      },
+      "continue": true
     },
-    { "source": "/(index.html)?", "headers": [{ "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }] },
+    { "src": "/(index\\.html)?", "headers": { "Cache-Control": "public, max-age=0, must-revalidate" }, "continue": true },
     {
-      "source": "/(sw.js|theme-init.js|manifest.webmanifest)",
-      "headers": [{ "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }]
+      "src": "/(sw\\.js|theme-init\\.js|manifest\\.webmanifest)",
+      "headers": { "Cache-Control": "public, max-age=0, must-revalidate" },
+      "continue": true
     },
-    { "source": "/sw.js", "headers": [{ "key": "Service-Worker-Allowed", "value": "/" }] },
-    { "source": "/assets/(.*)", "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }] },
-    { "source": "/workbox-(.*)\\.js", "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }] },
+    { "src": "/sw\\.js", "headers": { "Service-Worker-Allowed": "/" }, "continue": true },
+    { "handle": "filesystem" },
+    { "src": "/api(?:/(.*))?", "dest": "https://api.hundo.quest/api/$1", "check": true },
+    { "src": "/((?!api/|assets/|fonts/|icons/|workbox-).*)", "dest": "/index.html", "check": true },
+    { "handle": "hit" },
+    { "src": "/assets/(.*)", "headers": { "Cache-Control": "public, max-age=31536000, immutable" }, "continue": true },
+    { "src": "/workbox-(.*)\\.js", "headers": { "Cache-Control": "public, max-age=31536000, immutable" }, "continue": true },
     {
-      "source": "/(fonts|icons)/(.*)",
-      "headers": [{ "key": "Cache-Control", "value": "public, max-age=604800, stale-while-revalidate=86400" }]
+      "src": "/(fonts|icons)/(.*)",
+      "headers": { "Cache-Control": "public, max-age=604800, stale-while-revalidate=86400" },
+      "continue": true
     }
   ]
 }
