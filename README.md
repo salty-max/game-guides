@@ -33,7 +33,7 @@ Routes are real paths (`/guide/3`, `/checklist/heart`, `/dashboard/<panel>`, `/s
 
 ## Sync codes and privacy
 
-Progress lives in the reader's browser, and that stays true. To keep the same progress on another device (a Mac's browser and an installed phone app, say), a reader opens Sync devices in the guide, shows a six-digit code on one device and types it on the other, with no account. From then on each device sends its changes shortly after making them and picks up the others' when the guide opens or comes back to the front, and every 20 seconds to 2 minutes while it stays open. Export and import still work; an import on a synced device replaces progress on every linked device, and the settings say so.
+Progress lives in the reader's browser, and that stays true. To keep the same progress on another device (a Mac's browser and an installed phone app, say), a reader opens Sync devices in the guide, shows a six-digit code on one device and types it on the other, with no account. From then on each device sends its changes shortly after making them and picks up the others' when the guide opens or comes back to the front, and every 20 seconds to 2 minutes while it stays open (a short question, answered from one read when nothing has changed). Export and import still work; an import on a synced device replaces progress on every linked device, and the settings say so.
 
 What the server keeps ([services/sync](services/sync/README.md#what-it-keeps) has the detail):
 

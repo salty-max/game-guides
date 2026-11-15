@@ -11,7 +11,7 @@ Every endpoint is a POST with a JSON body that carries `"p": 1`, the protocol, w
 | `/api/pair/start` | `label` | a six-digit `code`, good for ten minutes and one use. A device with no link waits as pending for fifteen minutes. |
 | `/api/pair/claim` | `code`, `label` | `linked: true`, with `already` or `moved` when they apply. A wrong, expired or used code is `400 code`, and a group that already has twelve devices is `409 devices`. |
 | `/api/status` | | `linked` and the devices in the group (label, last seen, which is this one). A device that was showing a code finds out here that it was used. |
-| `/api/sync` | `guide`, `entries`, `touch` | the winning entries for the guide, the device count and the server's clock. |
+| `/api/sync` | `guide`, `entries`, `touch`, and `rev` (optional) | the winning entries for the guide, the device count, the server's clock and `rev`, the revision of the guide's data. A call with `rev`, no entries and no `touch` that finds the revision unchanged is answered `{"unchanged": true, "rev", "now"}` and nothing else. |
 | `/api/unlink` | | takes this device out and clears its cookies. The last device out deletes the group's data. |
 | `/api/forget` | | deletes the group's data and every device in it. |
 
@@ -38,9 +38,14 @@ All keys sit under `hs:<namespace>:`.
 | `gd:<group>` | each device's label and when it last synced | 400 days from the last touch |
 | `p:<group>:<guide>` | the guide's progress, as a sorted set with one member per entry, `key<TAB>stamp<TAB>value`, scored by the stamp | 400 days from the last touch |
 | `pc:<code>` | the device that showed the code | 10 minutes |
+| `rv:<group>:<guide>` | the revision of that guide's data in the group: a counter that goes up, last of all, whenever a sync writes it, and that a poll can read in one command to learn that nothing changed | 400 days from the last touch |
 | `rl:…` | counters for the limits: for pairing, keyed by a salted hash of the visitor's IP address, and for sync, by the device | the length of their window, an hour at most |
 
 No email, no name. The server sees IP addresses, as any web server does, and uses them only through those counters. A "touch" is the once-a-day request that pushes the expiry out.
+
+### Revisions
+
+Each guide's data in a group has a revision, a counter that goes up with every write, last of all (nobody who sees the new number can find the data not yet written). A device sends the revision it last saw, and when it is still current the answer is the one line above. The revision in an answer is the one read before the data, so a change another device makes in the middle of a call is found by the next poll, and is the new number only when this call's own write is the only one that landed. A client that sends no `rev` (an older build) is answered in full as before, and one that gets no `rev` back (an older server) never asks the short question. The protocol stays 1: the field is new and optional both ways.
 
 ### Merging
 
@@ -51,7 +56,7 @@ No email, no name. The server sees IP addresses, as any web server does, and use
 - Pairing: ten codes an hour and ten tries per fifteen minutes from one address (an IPv6 address counts by its /64), and 300 failed tries across everyone per ten minutes.
 - Sync: 120 a minute from one device. That holds a runaway client or a stolen cookie to a trickle. It doesn't guard the store (below).
 - A request is at most 256 KB and 1,500 entries. A guide's data holds at most 2,000 keys, of which at most 60 are extra-state leaves of at most 256 bytes. A group has at most twelve devices. One not seen for three months drops off the list by itself, and comes back on its next sync.
-- A sync costs five store commands to pull, seven to push a new key and eight to change one, and two more on any that comes more than a minute after the device was last marked seen. A guide left open polls every 20 seconds to 2 minutes ([core.md](../../docs/core.md#syncing-devices)): some 230 commands an hour untouched, some 1,000 an hour at the quick pace, so Upstash's free 500,000 commands a month goes to about a pair of devices in steady use, or several times that many left open and idle.
+- A sync costs six store commands to pull (the device's record, the sync counter and its expiry, the revision, the data and the device list), ten to push a new key and eleven to change one, and two more on any that comes more than a minute after the device was last marked seen. A poll that asks whether anything changed (`rev` given, nothing to send, no touch) costs two: the device's record and the revision. It isn't counted against the per-device limit: that counter is checked only after the data is read, so it never saved the store a command (a call it refused cost six), and the firewall's rate limit is what holds a flood (at its 120 calls a minute for one address, valid quiet calls cost 240 commands a minute, against 600 for the pulls they replace). The client turns a poll into a full sync every ten minutes, which refreshes the device's last-seen and the device count, and when its daily touch is due. A guide left open polls every 20 seconds to 2 minutes ([core.md](../../docs/core.md#syncing-devices)): about 100 commands an hour untouched, so Upstash's free 500,000 commands a month goes to something like a pair of devices in steady use, or many times that many left open and idle.
 
 ### Known limits, and what isn't checked yet
 
@@ -60,6 +65,8 @@ No email, no name. The server sees IP addresses, as any web server does, and use
 - Nothing in this service can stop a flood of requests from using up the store's commands: each request, even a refused one, costs it at least one, so the limits protect groups and not the quota. The guard for that is a pair of rate-limit rules in the Vercel project's firewall ([deploying.md](../../docs/deploying.md#the-sync-api) has them): a request they turn away never reaches the function, so it costs no store command. When the quota runs out, syncing answers 503 and every guide keeps working on its own.
 - A guide's extra state keeps every path it has ever used, since a path can't be removed, so over its whole life it may use at most 60 distinct ones.
 - A device can remove only itself. One that went quiet drops off by itself after three months, but nothing can remove another that is still being seen.
+- A group's data can be deleted (the last device leaves) and made again, and a guide's revision then starts over at 0. A device that held an old revision for that group and happens to hold exactly the new one would be told "unchanged" until its next full sync, at most ten minutes. Each device's revision is only used within one group's ledger, and linking again starts a ledger afresh, so it takes a stale device to hit it.
+- A device's last-seen is refreshed by full syncs only, so the list can show a device that is polling as last seen up to about twelve minutes ago.
 - Two devices joining a full group in the same instant can take it past twelve.
 - If the last device of a group leaves in the same instant that another joins, the group's data on the server can be lost. The devices keep theirs.
 - A push that lands just after "delete synced progress" can leave a few keys behind. They expire like the rest.
