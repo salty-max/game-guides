@@ -12,6 +12,12 @@ rules = "CLAUDE.md"
 
 [hooks]
 # trailers = true   # refuse AI co-author / "generated with" trailers
-lock     = false    # hundo: every child has its own worktree and branch, so the board is a list, not a lock (CLAUDE.md, "Sessions and worktrees")
+lock     = false    # hundo: every child works in its own worktree on its own branch, so the board is a list of who does what and nothing waits on it
 # stamp    = true   # a push wants a passing check on the tree
 # review   = true   # a push wants a recorded review
+
+[session]
+worktrees = true    # a child gets its own worktree: the child skill passes use_worktree for a desktop child (CLAUDE.md, "Sessions and worktrees")
+
+[checks]
+queue = true        # one `check` at a time on the machine: parallel worktrees' checks overloaded it (harness/queue.ts)

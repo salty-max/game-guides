@@ -5,8 +5,8 @@ Spoiler-aware PWA completion guides for single-player games: a pnpm workspace wi
 ## Commands
 
 - `pnpm install` at the root (pnpm 11, pinned in `packageManager`; Node 26 like Vercel and CI).
-- `pnpm check`: lint (warnings fail), typecheck, tests and build in every package. Through the harness: `bun harness/q.ts check -- bun run check`, which stamps the tree for the push gate.
-- `bun harness/hooks.ts install .`, once per clone, from the main checkout's root: it points `core.hooksPath` at `harness/githooks`. `bun harness/hooks.ts status` shows whether they're on. Never run it from a worktree, which would point the whole repository at that worktree's copy.
+- `pnpm check`: lint (warnings fail), typecheck, tests and build in every package. Through the harness: `bun harness/q.ts check -- bun run check`, which stamps the tree for the push gate and, with the check queue on, may wait its turn behind another session's check (see Sessions and worktrees).
+- `bun harness/hooks.ts install .`, once per clone, from the main checkout's root: it points `core.hooksPath` at `harness/githooks`. `bun harness/hooks.ts status` shows whether they're on. It refuses in a worktree.
 - In an app folder: `pnpm dev`, `pnpm test`, `pnpm build`, `pnpm preview`, `pnpm icons`. A `cd` lasts one command in a session here (`.claude/settings.json`), so reach the folder in the same command, `cd apps/<name> && pnpm test`, or use `pnpm -C apps/<name> test`.
 - Browser pane: `preview_start` with `koholint`, `rdr` or `echoes` for dev, or `<name>-preview` for a production build (`.claude/launch.json`). These load only in a session started in this repository. A port that's taken moves to the next free one, so read the port from the result (`docs/testing.md`).
 - Screenshots: `node .claude/skills/guide-check/scripts/shoot.mjs --out <dir>` (the `guide-check` skill).
@@ -50,14 +50,13 @@ Each one is a mistake already made, or one that would cost readers their progres
 
 ## Sessions and worktrees
 
-hundo sets `[hooks] lock = false` in `harness.toml`. Each child session works in its own git worktree on its own branch, cut from `main`. Nothing commits to `main` here and the work meets in pull requests, so there is nothing to queue for. The board is the list of who does what, not a lock. Anything in the Harness section below, or printed by a harness tool, that makes the board an automatic lock (a `held:` line, "write nothing until it's free", "the child will block on it", a commit refused for want of a card) doesn't apply. A card can still be `blocked --on` another, as a choice (the last item). The rest of that section does, except that `session.ts check` before archiving a child is replaced by the git checks below. Drop this paragraph once the template checks the lock setting itself.
+hundo sets `[hooks] lock = false` and `[session] worktrees = true` in `harness.toml`. Each child session works in its own git worktree on its own branch, cut from `main`. Nothing commits to `main` here and the work meets in pull requests, so no session waits for another's. The board is the list of who does what, not a lock. A card can still be `blocked --on` another, as a choice (the last item).
 
-- **A card is still the rule.** Nothing enforces it now, so add yours as the session's first write and move it at each stop. `bun harness/board.ts held` shows who else is on hundo: read it for overlap and talk to that session by its id, don't wait for it.
-- **Open a child from the desktop app with `use_worktree: true`** (the `child` skill's `false` is for the family's shared checkouts), cut from `main`: pass `source_branch: "main"` when the opener isn't on it. A child opened from a CLI session starts in the main checkout (`session.ts` runs `claude --bg` from the project root), so open them from the desktop app.
 - **`pnpm install` first in a new worktree.** It has no `node_modules`.
-- **Where the harness reads the main checkout.** The git hooks (`core.hooksPath` is absolute) and `harness.toml` come from the main checkout, so a change to either only takes effect once the main checkout has it merged and pulled. The board and the check stamps are shared by every worktree. Never run `hooks.ts install` in a worktree.
-- **A tool given the name `hundo` reads the main checkout, not your worktree.** In a worktree, review with `bun harness/packet.ts .` and `bun harness/review.ts . "<verdict>"` (a fresh branch's packet also lists `main`'s last commit: the change is the uncommitted files). `q.ts check` and the push gate are right from a worktree. `session.ts check` isn't: it reads the main checkout. Before archiving a child, run `git -C <worktree> status --porcelain` and `git -C <worktree> log HEAD --not --remotes` instead, and push or drop its branch first.
-- **Rewrites of core are sequenced on purpose.** The component rewrite, and anything else that rewrites core under every guide, goes one at a time, whatever the lock says: a worktree spares the queue, not the rebase. The card that comes second is set `blocked --on` the first (`board.ts set <id> --status blocked --on <card>`), which is a choice and the board then reads as it always did, or it starts once the first has landed.
+- **Open a child from the desktop app.** The harness's CLI path adds `--worktree` to `claude --bg` (`claude --help` lists `-w, --worktree [name]`), but nobody has run the two together here, so a CLI-opened child may start in the main checkout: look at its folder first.
+- **Where the harness reads the main checkout.** The git hooks (`core.hooksPath` is absolute) and `harness.toml` come from the main checkout, so a change to either only takes effect once the main checkout has it merged and pulled. The board and the check stamps are shared by every worktree. `hooks.ts install` refuses in a worktree.
+- **A queued check can wait minutes.** `[checks] queue = true` runs one `check` at a time on the Mac, so `bun harness/q.ts check -- bun run check` may print one waiting line and sit in the line behind another session's check. Run it in the background: a foreground Bash call is capped at 10 minutes with the wait and the check both inside it, and the waiting line warns that a call that times out loses its place.
+- **Rewrites of core are sequenced on purpose.** The component rewrite, and anything else that rewrites core under every guide, goes one at a time: a worktree spares the wait, not the rebase. The card that comes second is set `blocked --on` the first (`board.ts set <id> --status blocked --on <card>`), which is a choice and the board then reads as it always did, or it starts once the first has landed.
 
 <!-- harness:start -->
 
@@ -68,17 +67,23 @@ below are checked by git hooks or by tools, so they are not advice.
 
 - **One task, one session, one card.** A session's first write is its card:
   `bun harness/board.ts add <repo> "<title>" --repos <repo> --try "…" --committed "(none yet)" --left "…"`.
-  It holds the repositories it names, and a commit by a Claude session is refused unless
-  its running card names the repository (`board.ts held` says who got there first). Move
-  the card at each stop
+  It names the repositories the task writes. Nothing refuses a commit for want of it
+  (`[hooks] lock = false`): keeping it is the session's own rule. Move the card at each
+  stop
   (`board.ts set <id> --status waiting-test|waiting-review|ready-to-push|done`).
 - **Checks go through q**: `bun harness/q.ts check -- <the check>`. One verdict line,
   the log in `.cache/logs/`, the tree stamped. A push is refused for a tree with no
   passing check. Never pipe a check into `tail`; anything long goes to a file.
-- **The board is the lock.** A `held:` line means another card got there first: drop
-  that repository from yours (`set <id> --repos …` without it) and go on with the rest,
-  or commit what you have, `set <id> --on <holder>` and write nothing. A card whose
-  session is gone still holds until the user moves it.
+- **The board is a list, not a lock.** A `note:` that another card is running in a
+  repository only says who else is there: keep to your own files and talk to that
+  session by its id, don't wait for it. `board.ts held` shows who runs where. A card
+  can still be `blocked --on` another, as a choice.
+- **Each child works in a worktree of its own**, on a branch of its own
+  (`[session] worktrees = true`): commit there, never in the main checkout. The board,
+  its cards and the check stamps are shared by every worktree, and `harness/packet.ts`,
+  `review.ts` and `session.ts check` act on the worktree they are run from or asked
+  about. The git hooks and `harness.toml` come from the main checkout: install the
+  hooks there (`bun harness/hooks.ts install .`), never from a worktree.
 - **Review before the commit**: `bun harness/packet.ts <repo>` on the uncommitted files,
   the `reviewer` helper reads the packet, fix what it finds, then
   `bun harness/review.ts <repo> "<verdict>"`, then one commit. A push is refused for a
