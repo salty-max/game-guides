@@ -1,4 +1,4 @@
-# Red Dead Field Guide
+# RDR Hundo
 
 A spoiler-aware, unofficial companion for the original *Red Dead Redemption* campaign. The checklist targets the game’s **Redeemed** 100% stat and works with the original and modern releases of that campaign.
 

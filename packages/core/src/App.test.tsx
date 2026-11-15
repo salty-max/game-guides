@@ -2,7 +2,7 @@ import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { App } from "./App";
 import { STORAGE_KEY, defaultState } from "./progress-state";
-import { chapters, config } from "./guide";
+import { brand, chapters, config } from "./guide";
 import { panels } from "virtual:guide/panels";
 import { useProgress } from "./store/progress";
 import { useUi } from "./store/ui";
@@ -28,6 +28,16 @@ describe("App", () => {
     await user.click(box);
     expect(box).toBeChecked();
     expect(saved()).toEqual({ [firstRow.id]: true });
+  });
+
+  it("names the guide <mark> Hundo and puts the copyright under the rail", async () => {
+    render(<App />);
+    expect(brand.name).toBe(`${brand.mark} Hundo`);
+    expect(brand.title.startsWith(`${brand.name} · `)).toBe(true);
+    expect(await screen.findByRole("link", { name: `${brand.name} home` })).toHaveTextContent(`${brand.mark}Hundo`);
+    const rail = screen.getByRole("complementary", { name: "Chapters" });
+    expect(within(rail).getByText("© 2026 Hundo")).toBeInTheDocument();
+    expect(within(rail).getByText(`Unofficial fan guide, not affiliated with ${brand.publisher}.`)).toBeInTheDocument();
   });
 
   it("hides later chapters until revealed, then opens at the linked section", async () => {

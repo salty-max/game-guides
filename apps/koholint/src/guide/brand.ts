@@ -3,16 +3,16 @@ import type { Brand } from "@hundo/core/types";
 /** Names, colours, storage and fonts. Also read by the build for the manifest and the page head. */
 export const brand = {
   id: "links-awakening",
-  name: "Koholint Field Guide",
+  name: "Koholint Hundo",
   shortName: "Koholint",
-  title: "Koholint Field Guide · Link’s Awakening",
-  description: "A spoiler-conscious, interactive 100% field guide to Link’s Awakening on Nintendo Switch.",
+  title: "Koholint Hundo · Link’s Awakening 100% checklist",
+  description: "A spoiler-conscious, interactive 100% guide to Link’s Awakening on Nintendo Switch.",
   storagePrefix: "koholint-field-guide",
   backupFile: "koholint-progress.json",
   mark: "Koholint",
   icon: "compass",
   game: "Link’s Awakening",
-  credit: "Nintendo Switch · 2019 remake",
+  publisher: "Nintendo",
   corners: "narrow",
   home: "https://koholint.hundo.quest",
   fonts: {
