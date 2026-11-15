@@ -1,4 +1,7 @@
+import { Collapsible } from "@base-ui/react/collapsible";
+import { cva } from "class-variance-authority";
 import { Link } from "react-router";
+import { Icon } from "./Icon";
 import { CheckBox } from "./CheckBox";
 import { config, hasMissables, missablesLeft, missableWhy } from "../guide";
 import { useHeldRows } from "../useHeldRows";
@@ -15,24 +18,31 @@ export function MissablesStrip({ chapter }: { chapter: Chapter }) {
   return <MissablesList key={chapter.id} chapter={chapter} />;
 }
 
+// The strip's frame and its header, which opens and closes it.
+const frame = cva("mt-4 rounded-card border bg-surface", { variants: { tone: { clear: "border-line", flagged: "border-missable-line" } } });
+const caret = cva("svg-icon size-4 flex-none text-muted group-data-panel-open/trigger:rotate-180", { variants: { at: { top: "mt-1", middle: "" } } });
+
 function Reassurance({ text, sources }: NonNullable<typeof config.reassurance>) {
   return (
-    <aside className="missables missables-clear" aria-label="Missable entries">
-      <details>
-        <summary>
-          <strong>Nothing is flagged as permanently missable.</strong> {text}
-        </summary>
-        <ul>
+    <Collapsible.Root render={<aside />} className={frame({ tone: "clear" })} aria-label="Missable entries">
+      <Collapsible.Trigger className="group/trigger flex w-full cursor-pointer items-start justify-between gap-2.5 border-0 bg-transparent px-4 py-2.5 text-left font-sans text-[14px] leading-normal text-muted phone:px-3">
+        <span>
+          <strong className="font-extrabold text-ink">Nothing is flagged as permanently missable.</strong> {text}
+        </span>
+        <Icon name="down" className={caret({ at: "top" })} />
+      </Collapsible.Trigger>
+      <Collapsible.Panel hiddenUntilFound>
+        <ul className="m-0 list-none px-4 pb-2.5">
           {sources.map(([label, url]) => (
-            <li key={url}>
-              <a href={url} target="_blank" rel="noopener noreferrer">
+            <li key={url} className="py-[3px]">
+              <a className="text-[14px] text-primary underline underline-offset-[3px]" href={url} target="_blank" rel="noopener noreferrer">
                 {label}
               </a>
             </li>
           ))}
         </ul>
-      </details>
-    </aside>
+      </Collapsible.Panel>
+    </Collapsible.Root>
   );
 }
 
@@ -42,27 +52,41 @@ function MissablesList({ chapter }: { chapter: Chapter }) {
   if (!rows.length) return null;
   const left = rows.filter((row) => checks[row.id] !== true).length;
   return (
-    <aside className="missables" aria-label="Missable entries">
-      <details open>
-        <summary>
-          <strong>Don’t miss before moving on</strong>
-          <span className="group-count">{left} left</span>
-        </summary>
-        <ul onChangeCapture={hold}>
-          {rows.map((row) => (
-            <li key={row.id} className={checks[row.id] === true ? "ticked" : undefined}>
-              <CheckBox id={`missable-${row.id}`} row={row} />
-              <label htmlFor={`missable-${row.id}`}>
-                <strong>{row.title}</strong>
-                <small>{missableWhy(row.id) ?? row.group}</small>
-              </label>
-              <Link className="origin" to={`/guide/${row.chapter}/${row.id}`} aria-label={`Jump to “${row.title}”`}>
-                Jump to
-              </Link>
-            </li>
-          ))}
+    <Collapsible.Root render={<aside />} defaultOpen className={frame({ tone: "flagged" })} aria-label="Missable entries">
+      <Collapsible.Trigger className="group/trigger flex min-h-12 w-full cursor-pointer items-center justify-between gap-2.5 border-0 bg-transparent px-4 py-3 text-left font-sans text-base text-inherit phone:px-3">
+        <strong className="font-display text-[24px] leading-[1.2] font-bold tracking-[-0.015em]">Don’t miss before moving on</strong>
+        <span className="ml-auto flex items-center gap-2.5 text-[12px] whitespace-nowrap text-muted tabular-nums">
+          {left} left
+          <Icon name="down" className={caret({ at: "middle" })} />
+        </span>
+      </Collapsible.Trigger>
+      <Collapsible.Panel hiddenUntilFound>
+        <ul className="m-0 list-none px-4 pb-2" onChangeCapture={hold}>
+          {rows.map((row) => {
+            const ticked = checks[row.id] === true;
+            return (
+              <li
+                key={row.id}
+                className="relative grid grid-cols-[28px_minmax(0,1fr)_auto] items-center gap-3 border-t border-line-soft py-2.5 first:border-t-0 phone:gap-2.5"
+              >
+                <CheckBox id={`missable-${row.id}`} row={row} />
+                {/* The label stretches over the whole item, so the item is the tap target; the link sits above it. */}
+                <label className="grid cursor-pointer gap-0.5 leading-[1.3] after:absolute after:inset-0" htmlFor={`missable-${row.id}`}>
+                  <strong className={ticked ? "text-[15px] text-muted line-through decoration-1" : "text-[15px]"}>{row.title}</strong>
+                  <small className="text-[12px] text-muted">{missableWhy(row.id) ?? row.group}</small>
+                </label>
+                <Link
+                  className="relative z-1 -mx-0.5 -my-2 px-0.5 py-2 text-[13px] whitespace-nowrap text-primary underline underline-offset-[3px]"
+                  to={`/guide/${row.chapter}/${row.id}`}
+                  aria-label={`Jump to “${row.title}”`}
+                >
+                  Jump to
+                </Link>
+              </li>
+            );
+          })}
         </ul>
-      </details>
-    </aside>
+      </Collapsible.Panel>
+    </Collapsible.Root>
   );
 }
