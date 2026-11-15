@@ -201,6 +201,15 @@ describe.runIf(config.layout === "checklist")("checklist layout", () => {
     expect(contains(`entry-${firstRow.id}`)).toBe(true);
   });
 
+  it("opens a linked group with the focus on its header, the button that closes it", async () => {
+    const group = first.groups[first.groups.length - 1];
+    history.replaceState(null, "", `/guide/1/${group.key}`);
+    render(<App />);
+    const header = await waitFor(() => within(document.getElementById(group.key)!).getAllByRole("button")[0]);
+    expect(header).toHaveAttribute("aria-expanded", "true");
+    await waitFor(() => expect(header).toHaveFocus());
+  });
+
   it("returns focus to the status filter when ticking a step filters it out of the route", async () => {
     const user = userEvent.setup();
     render(<App />);

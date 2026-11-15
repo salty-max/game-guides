@@ -1,3 +1,4 @@
+import { Collapsible } from "@base-ui/react/collapsible";
 import type { ReactNode } from "react";
 import { Link } from "react-router";
 import { Icon } from "./Icon";
@@ -10,10 +11,14 @@ import type { Chapter, Group, Row } from "../types";
 export function ArticleRoute({ chapter, target, footer }: { chapter: Chapter; target?: string; footer: ReactNode }) {
   const current = chapter.groups.find((group) => group.key === target || group.rows.some((row) => `entry-${row.id}` === target))?.key;
   const links = (
-    <ul className="chapter-contents-list">
+    <ul className="m-0 grid list-none gap-[3px] p-0">
       {chapter.groups.map((group) => (
         <li key={group.key}>
-          <Link to={`/guide/${chapter.id}/${group.key}`} aria-current={current === group.key ? "location" : undefined}>
+          <Link
+            className="block rounded-tag px-1.5 py-2 text-[14px] leading-[1.4] text-muted no-underline hover:bg-surface hover:text-primary aria-[current=location]:bg-surface aria-[current=location]:font-bold aria-[current=location]:text-primary"
+            to={`/guide/${chapter.id}/${group.key}`}
+            aria-current={current === group.key ? "location" : undefined}
+          >
             {group.title}
           </Link>
         </li>
@@ -23,20 +28,28 @@ export function ArticleRoute({ chapter, target, footer }: { chapter: Chapter; ta
 
   return (
     <div className="walkthrough-layout">
-      <details className="chapter-contents chapter-contents-mobile">
-        <summary>
-          In this chapter <Icon name="down" className="svg-icon caret" />
-        </summary>
-        <nav aria-label="In this chapter">{links}</nav>
-      </details>
+      {/* Up to 1000px wide the contents fold away above the article; wider, they sit beside it. */}
+      <Collapsible.Root className="hidden max-w-[72ch] rounded-small border border-line bg-surface px-3 [@media(max-width:1000px)]:block">
+        <Collapsible.Trigger className="group/trigger flex min-h-11 w-full cursor-pointer items-center justify-between border-0 bg-transparent p-0 text-left font-sans text-[14px] leading-tight font-bold text-ink">
+          In this chapter <Icon name="down" className="svg-icon size-4 text-muted group-data-panel-open/trigger:rotate-180" />
+        </Collapsible.Trigger>
+        <Collapsible.Panel hiddenUntilFound>
+          <nav className="mb-2" aria-label="In this chapter">
+            {links}
+          </nav>
+        </Collapsible.Panel>
+      </Collapsible.Root>
       <article className="walkthrough-article" aria-label={`${chapter.title} walkthrough`}>
         {chapter.groups.map((group) => (
           <Section key={group.key} group={group} target={target} />
         ))}
         {footer}
       </article>
-      <nav className="chapter-contents chapter-contents-desktop standalone:top-6" aria-label="In this chapter">
-        <h2>In this chapter</h2>
+      <nav
+        className="sticky top-[calc(var(--bar)+24px)] max-h-[calc(100dvh-var(--bar)-44px)] scrollbar-thin overflow-auto border-s border-line pt-1 pr-1.5 pb-[5px] pl-[17px] standalone:top-6 [@media(max-width:1000px)]:hidden"
+        aria-label="In this chapter"
+      >
+        <h2 className="mt-0 mb-[0.6rem] text-[14px] leading-tight font-bold text-ink">In this chapter</h2>
         {links}
       </nav>
     </div>
