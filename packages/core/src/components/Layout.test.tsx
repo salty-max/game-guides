@@ -230,6 +230,24 @@ describe("the chapter drawer under 800px", () => {
     await waitFor(() => expect(document.getElementById("main")).toContainElement(document.activeElement as HTMLElement));
   });
 
+  it("stays open when a chapter is opened in a new tab with a modifier key", async () => {
+    useProgress.setState({ data: { ...defaultState(), spoilers: false, ceiling: 9 } });
+    const user = userEvent.setup();
+    render(<App />);
+    await screen.findByRole("heading", { level: 1 });
+    await user.click(toggle());
+    const drawer = await screen.findByRole("dialog", { name: "Chapters" });
+    const link = within(drawer).getAllByRole("link")[1];
+    // jsdom has no new tab to open; keep it from trying.
+    link.addEventListener("click", (event) => event.preventDefault());
+    await user.keyboard("{Meta>}");
+    await user.click(link);
+    await user.keyboard("{/Meta}");
+    // Layout's own state: it would flip at once if the drawer had asked to close, whatever its exit animation does.
+    expect(toggle()).toHaveAttribute("aria-expanded", "true");
+    expect(screen.getByRole("dialog", { name: "Chapters" })).toBeInTheDocument();
+  });
+
   it("stays open under the settings dialog opened from it, and Escape closes only the dialog", async () => {
     const user = userEvent.setup();
     render(<App />);

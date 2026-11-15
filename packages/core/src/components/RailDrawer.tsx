@@ -58,9 +58,11 @@ export function RailDrawer({ open, onOpenChange, activeChapter, view, returnFocu
           >
             <Drawer.Content
               className={railPanel({ frame: "drawer" })}
-              // A chapter followed from the drawer closes it, the current one too (its address doesn't change, so Layout wouldn't).
+              // A chapter followed from the drawer closes it, the current one too (its address doesn't change, so Layout wouldn't). One opened
+              // in a new tab or window (a modifier, or not the main button) leaves this page, and the drawer, as they are.
               onClick={(event) => {
                 if (!(event.target instanceof Element && event.target.closest("a"))) return;
+                if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
                 onFollowLink();
                 onOpenChange(false);
               }}
