@@ -1,4 +1,5 @@
-import { Panel, PanelActions, PanelText, PanelTitle, Button } from "@hundo/core/components/ui";
+import { TextField } from "@hundo/core/components/TextField";
+import { Button, ChipGroup, Panel, PanelActions, PanelFigure, PanelForm, PanelText, PanelTitle } from "@hundo/core/components/ui";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 // A panel on the dashboard or the sources page, or a guide's own (Koholint's deathless run, Red Dead's calibration): a title, words in
@@ -51,5 +52,46 @@ export const Spacing: Story = {
       </Panel>
       <p>Below</p>
     </>
+  ),
+};
+
+/** A guide's run log (Koholint's deathless run): its mode chips under the title, one big number, words, and buttons. */
+export const Figure: Story = {
+  render: (args) => (
+    <Panel {...args}>
+      <PanelTitle>Deathless run</PanelTitle>
+      <ChipGroup label="Run mode" choices={[["normal", "Normal"], ["hero", "Hero"]]} value="normal" onChange={() => {}} space="above" />
+      <PanelFigure value={3} unit="deaths" />
+      <PanelText>A Game Over ends this deathless attempt. Your collection checklist still works for this file.</PanelText>
+      <PanelActions>
+        <Button icon="plus">Log death</Button>
+        <Button icon="minus">Undo death</Button>
+      </PanelActions>
+    </Panel>
+  ),
+};
+
+/** A form in a panel (Red Dead's calibration): a short field with its buttons beside it. */
+export const Form: Story = {
+  render: (args) => (
+    <Panel {...args} aria-labelledby="form-title">
+      <PanelTitle id="form-title">Check against the game</PanelTitle>
+      <PanelText>Enter the completion percentage from Stats → General to see how far this guide’s estimate is off.</PanelText>
+      <PanelForm onSubmit={(event) => event.preventDefault()}>
+        <TextField
+          id="reported"
+          label="In-game completion (%)"
+          inputMode="decimal"
+          width="short"
+          value="42"
+          onChange={() => {}}
+          actions={
+            <Button type="submit" look="">
+              Save
+            </Button>
+          }
+        />
+      </PanelForm>
+    </Panel>
   ),
 };

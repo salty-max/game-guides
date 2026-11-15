@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { chunks, loadFailed } from "./chunks";
 import { Icon } from "./Icon";
-import { selectTrigger, type SelectProps } from "./select-style";
+import { selectField, selectTrigger, type SelectProps } from "./select-style";
 import { useLoadable, whenIdle } from "../loadable";
 
 /**
@@ -24,7 +24,7 @@ export function Select(props: SelectProps) {
   };
   const current = choices.find(([key]) => String(key) === String(value))?.[1];
   return (
-    <div className="field">
+    <div className={selectField}>
       <label htmlFor={id} className={bare ? "sr-only" : undefined}>
         {label}
       </label>

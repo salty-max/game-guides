@@ -21,7 +21,7 @@ const backdrop =
 // The viewport is the part of the screen the reader can see: --vv-top and --vv-height are the visual viewport's (followVisualViewport),
 // which an on-screen keyboard shrinks, and fall back to the layout viewport where there is no visual viewport to ask. The notch and the
 // home indicator are its padding. `touch-none` keeps a finger on the dimmed page, or on the dialog's frame, from dragging anything: the
-// body scrolls on its own (touch-action stops at a scroll container), and the page behind is inert.
+// body scrolls on its own (touch-action stops at an element that scrolls), and the page behind is inert.
 const viewport =
   "fixed top-[var(--vv-top,0px)] left-0 z-50 flex h-[var(--vv-height,100dvh)] w-full touch-none items-center justify-center overflow-hidden pt-[calc(15px+var(--safe-top))] pr-[calc(13px+var(--safe-right))] pb-[calc(15px+var(--safe-bottom))] pl-[calc(13px+var(--safe-left))]";
 
@@ -112,7 +112,7 @@ function Frame({ alert }: { alert: boolean }) {
               className={popup({ size: screen.size })}
               initialFocus={() => {
                 const field = firstField(popupRef.current);
-                // Opened by a touch: a button or a radio taking the focus would show the ring a keyboard user needs, round something nobody
+                // Opened by a touch: a button or a radio taking the focus would show the focus mark a keyboard user needs, round something nobody
                 // pressed. The dialog takes it instead (it is named, and a screen reader says so), except for a field you type in.
                 return field && lastInput() === "touch" && !takesText(field) ? (popupRef.current ?? true) : (field ?? true);
               }}

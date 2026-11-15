@@ -4,8 +4,8 @@ import { useUi } from "../store/ui";
 /**
  * The parts of core that load on use, each a chunk of its own. Base UI's popups (a dialog, a select's list) and the floating-ui code
  * under them are most of what it weighs, and a page can be read without any of them. Each has a shell the page imports, which loads the
- * chunk behind it: DialogHost for the dialogs, Select for the select, ToastHost for the toasts, Layout for the chapter drawer. Nothing else may import the modules behind them (a static import
- * from the page's own code puts them back in the first download). Tests and stories load these first (test/setup.ts, preview.tsx) so
+ * chunk behind it: DialogHost for the dialogs, Select for the select, ToastHost for the toasts, TooltipHost for the tooltip, Layout for the chapter drawer. Nothing else may import the modules behind them (an import at the top of a file
+ * in the page's own code puts them back in the first download). Tests and stories load these first (test/setup.ts, preview.tsx) so
  * that what they render is the real thing, not the stand-in.
  */
 export const chunks = {
@@ -17,6 +17,8 @@ export const chunks = {
   drawer: loadable(() => import("./RailDrawer")),
   /** The toasts: an undo, a sync note, a load failure, the service worker's news. */
   toasts: loadable(() => import("./Toasts")),
+  /** The icon buttons' tooltip. */
+  tooltips: loadable(() => import("./Tooltips")),
 };
 
 /**

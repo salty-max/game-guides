@@ -5,6 +5,7 @@ import { DialogHost } from "./DialogHost";
 import { Rail } from "./Rail";
 import { TopBar } from "./TopBar";
 import { ToastHost } from "./ToastHost";
+import { TooltipHost } from "./TooltipHost";
 import { guideAnchor, readChapter } from "../guide";
 import { panels } from "virtual:guide/panels";
 import { useLoadable, whenIdle } from "../loadable";
@@ -131,6 +132,7 @@ export function Layout({ children }: { children: ReactNode }) {
       </div>
       <DialogHost />
       <ToastHost />
+      <TooltipHost />
       <div id="status" className="sr-only" role="status">
         {announcement}
       </div>

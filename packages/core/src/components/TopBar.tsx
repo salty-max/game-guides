@@ -31,7 +31,7 @@ function ThemeToggle() {
     <IconButton
       icon={dark ? "sun" : "moon"}
       label={label}
-      title={label}
+      tooltip
       onClick={() => {
         const next = dark ? "light" : "dark";
         setPreference(next);
@@ -142,6 +142,7 @@ export function TopBar({ chapter, view, menuOpen, onToggleMenu, menuToggle }: To
             <IconButton
               icon="left"
               label="Back"
+              tooltip
               ref={backRef}
               onClick={() => void navigate(-1)}
             />

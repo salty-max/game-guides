@@ -3,7 +3,8 @@ import { useLocation, useParams } from "react-router";
 import { Icon } from "../components/Icon";
 import { RouteGroup } from "../components/RouteGroup";
 import { Select } from "../components/Select";
-import { Breadcrumb, Button, Chip, Empty, PageHeading } from "../components/ui";
+import { SearchField } from "../components/SearchField";
+import { Breadcrumb, Button, ChipGroup, Empty, PageHeading } from "../components/ui";
 import { allRows, CHAPTER_COUNT, cats, chapters, config, hasMissables, isCategory, readChapter, statusOptions, tagName, text } from "../guide";
 import { two } from "../format";
 import { isOpen, useProgress } from "../store/progress";
@@ -68,17 +69,11 @@ function ChecklistView() {
           <span>Showing chapters 1–{data.ceiling} only. Later entries unlock as you reveal chapters.</span>
         </div>
       )}
-      <div className="chips" aria-label="Checklist categories">
-        {topFilters.map(([id, label]) => (
-          <Chip key={id} label={label} value={id} current={filter} onSelect={setFilter} />
-        ))}
-      </div>
-      <div className="filters">
-        <label className="search" htmlFor="search">
-          <Icon name="search" />
-          <span className="sr-only">Search entries</span>
-          <input type="search" id="search" placeholder={text.searchPlaceholder} value={query} onChange={(event) => setQuery(event.target.value)} />
-        </label>
+      <ChipGroup label="Checklist categories" choices={topFilters} value={filter} onChange={setFilter} />
+      <div className="my-3 flex flex-wrap items-end gap-[9px] phone:*:max-w-full">
+        <div className="min-w-[185px] flex-1">
+          <SearchField id="search" label="Search entries" placeholder={text.searchPlaceholder} value={query} onChange={setQuery} />
+        </div>
         <Select id="collection-category" label="Category" choices={categoryChoices} value={filter} onChange={setFilter} />
         <Select
           id="collection-chapter"
@@ -90,11 +85,11 @@ function ChecklistView() {
         <Select id="collection-status" label="Status" choices={statusOptions} value={status} onChange={setStatus} />
         <Button onClick={clear}>Clear</Button>
       </div>
-      <div className="subhead">
-        <p id="results-count" role="status">
+      <div className="mb-[13px] flex items-end justify-between gap-[13px] text-[14px] text-muted phone:flex-wrap phone:items-start phone:gap-1">
+        <p id="results-count" className="mt-[5px]" role="status">
           {matches.length} {matches.length === 1 ? "match" : "matches"}
         </p>
-        <p>
+        <p className="mt-[5px]">
           {checked} of {visible.length} revealed entries checked
         </p>
       </div>

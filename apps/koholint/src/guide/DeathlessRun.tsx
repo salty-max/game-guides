@@ -1,4 +1,4 @@
-import { Button, Chip, Panel, PanelActions, PanelText, PanelTitle } from "@hundo/core/components/ui";
+import { Button, ChipGroup, Panel, PanelActions, PanelFigure, PanelText, PanelTitle } from "@hundo/core/components/ui";
 import { useProgress } from "@hundo/core/store/progress";
 import { useUi } from "@hundo/core/store/ui";
 import { blankRun, modeNames, type RunMode } from "./run-log";
@@ -21,28 +21,26 @@ export function DeathlessRun() {
     setRun((current) => ({ ...current, deaths: delta === 1 ? Math.min(Number.MAX_SAFE_INTEGER, current.deaths + 1) : Math.max(0, current.deaths - 1) }));
     const { deaths } = useProgress.getState().data.extra.runs[mode];
     announce(`${deaths} deaths logged.`);
-    // "Undo death" disables at zero; keep keyboard focus somewhere useful.
-    if (deaths === 0) document.getElementById("death-plus")?.focus();
   };
 
   return (
     <Panel id="deathless">
       <PanelTitle>Deathless run</PanelTitle>
-      <div className="run-mode" aria-label="Run mode">
-        {(Object.entries(modeNames) as [RunMode, string][]).map(([id, name]) => (
-          <Chip key={id} label={name} value={id} current={mode} onSelect={(value) => setExtra((current) => ({ ...current, mode: value as RunMode }))} />
-        ))}
-      </div>
-      <div className="run-number">
-        {run.deaths}
-        <small>{run.deaths === 1 ? "death" : "deaths"}</small>
-      </div>
+      <ChipGroup
+        label="Run mode"
+        choices={Object.entries(modeNames)}
+        value={mode}
+        onChange={(value) => value !== mode && setExtra((current) => ({ ...current, mode: value as RunMode }))}
+        space="above"
+      />
+      <PanelFigure value={run.deaths} unit={run.deaths === 1 ? "death" : "deaths"} />
       <PanelText>{message}</PanelText>
       <PanelActions>
-        <Button icon="plus" onClick={() => log(1)} id="death-plus">
+        <Button icon="plus" onClick={() => log(1)}>
           Log death
         </Button>
-        <Button icon="minus" onClick={() => log(-1)} disabled={run.deaths === 0}>
+        {/* At zero it stays where it is in the Tab order, so the focus that just undid the last death isn't dropped. */}
+        <Button icon="minus" onClick={() => log(-1)} disabled={run.deaths === 0} focusableWhenDisabled>
           Undo death
         </Button>
         <Button

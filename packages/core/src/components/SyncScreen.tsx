@@ -111,10 +111,10 @@ function Off({ onShow, onEnter, busy, said }: { onShow: () => void; onEnter: () 
         </DialogText>
       )}
       <DialogFooter>
-        <Button look="" data-autofocus="" aria-disabled={busy || undefined} onClick={onShow}>
+        <Button look="" data-autofocus="" disabled={busy} focusableWhenDisabled onClick={onShow}>
           Show a code
         </Button>
-        <Button aria-disabled={busy || undefined} onClick={onEnter}>
+        <Button disabled={busy} focusableWhenDisabled onClick={onEnter}>
           Enter a code
         </Button>
       </DialogFooter>
@@ -229,7 +229,7 @@ function EnterCode({ onLinked, onBack }: { onLinked: () => void; onBack: () => v
       </div>
       <DialogStatus error={!busy && problem !== ""}>{busy ? "Linking…" : problem}</DialogStatus>
       <DialogFooter>
-        <Button aria-disabled={busy || undefined} onClick={() => !busy && onBack()}>
+        <Button disabled={busy} focusableWhenDisabled onClick={onBack}>
           Back
         </Button>
       </DialogFooter>
@@ -301,7 +301,7 @@ function Linked({
                 size="compact"
                 data-remove={device.id}
                 aria-label={`Remove ${device.label} (${deviceDetail(device, shown.now)})`}
-                aria-disabled={busy || undefined}
+                disabled={busy} focusableWhenDisabled
                 onClick={() => onRemove(device, shown.now)}
               >
                 Remove
@@ -320,13 +320,13 @@ function Linked({
         </DialogText>
       )}
       <DialogFooter>
-        <Button look="" data-autofocus="" aria-disabled={busy || undefined} onClick={onShow}>
+        <Button look="" data-autofocus="" disabled={busy} focusableWhenDisabled onClick={onShow}>
           Link another device
         </Button>
-        <Button aria-disabled={busy || undefined} onClick={onUnlink}>
+        <Button disabled={busy} focusableWhenDisabled onClick={onUnlink}>
           Unlink this device
         </Button>
-        <Button look="danger" aria-disabled={busy || undefined} onClick={onForget}>
+        <Button look="danger" disabled={busy} focusableWhenDisabled onClick={onForget}>
           Delete synced progress…
         </Button>
       </DialogFooter>
@@ -346,10 +346,10 @@ function Forget({ busy, onDelete, onBack }: { busy: boolean; onDelete: () => voi
         This erases the synced copy of every Hundo guide’s progress and unlinks all your devices. The progress on each device stays, and each can be linked again.
       </DialogText>
       <DialogFooter>
-        <Button look="danger" aria-disabled={busy || undefined} onClick={onDelete}>
+        <Button look="danger" disabled={busy} focusableWhenDisabled onClick={onDelete}>
           Delete synced progress
         </Button>
-        <Button data-autofocus="" aria-disabled={busy || undefined} onClick={onBack}>
+        <Button data-autofocus="" disabled={busy} focusableWhenDisabled onClick={onBack}>
           Cancel
         </Button>
       </DialogFooter>
@@ -367,10 +367,10 @@ function Remove({ device, detail, busy, onRemove, onBack }: { device: Device; de
         It stops syncing, and is unlinked the next time it connects. Its own progress stays on it, and nothing is deleted from your other devices. It can be linked again with a code.
       </DialogText>
       <DialogFooter>
-        <Button look="danger" aria-disabled={busy || undefined} onClick={onRemove}>
+        <Button look="danger" disabled={busy} focusableWhenDisabled onClick={onRemove}>
           Remove
         </Button>
-        <Button data-autofocus="" aria-disabled={busy || undefined} onClick={onBack}>
+        <Button data-autofocus="" disabled={busy} focusableWhenDisabled onClick={onBack}>
           Cancel
         </Button>
       </DialogFooter>
