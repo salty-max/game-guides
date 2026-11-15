@@ -73,7 +73,7 @@ pnpm --filter hundo-echoes build && pnpm --filter hundo-echoes preview
 
 Check a release-bound change on the production build. Dev mode skips the service worker and serves unbundled modules.
 
-Sessions work in their own worktrees ([CLAUDE.md](../CLAUDE.md#sessions-and-worktrees)), so two of them can preview the same guide at once. Every entry has `"autoPort": true`: when its port is taken, the pane starts the server on the next free one, up to 20 above it, and says so in the result. The dev entries pass `--port` and the pane rewrites it. The preview entries run a shell string, where the pane can't rewrite a flag, so they read `$PORT`, which the pane sets to the port it chose; `${PORT:-<port>}` falls back to the entry's own port where nothing sets it. Each guide's port sits 100 from the next, so a busy port moves a guide up within its own band and never onto another guide's.
+A session the app opened in its own worktree ([CLAUDE.md](../CLAUDE.md#sessions-and-worktrees)) runs its servers there ([which folder](#which-folder-the-pane-serves)), so two of them can preview the same guide at once. Every entry has `"autoPort": true`: when its port is taken, the pane starts the server on the next free one, up to 20 above it, and says so in the result. The dev entries pass `--port` and the pane rewrites it. The preview entries run a shell string, where the pane can't rewrite a flag, so they read `$PORT`, which the pane sets to the port it chose; `${PORT:-<port>}` falls back to the entry's own port where nothing sets it. Each guide's port sits 100 from the next, so a busy port moves a guide up within its own band and never onto another guide's.
 
 That matters because the pane keeps each origin's service worker and caches between sessions. A port that once served another guide, or an older build, can answer in place of the build you just started: the page is the wrong guide, or last week's. Unregister it from the page and reload:
 
@@ -84,6 +84,32 @@ location.reload();
 ```
 
 To see what holds a port, `lsof -nP -iTCP:<port> -sTCP:LISTEN`.
+
+### Which folder the pane serves
+
+`preview_start` reads `.claude/launch.json` from the folder the session works in, starts the entry's process with that folder as its working directory, and expands `${workspaceFolder}` to it. For a session the app opened in a worktree, which is what `[session] worktrees = true` gives every child the desktop app opens, that is the worktree, so what it serves is its own code. Checked on 15 Nov 2026 from such a session:
+
+- an entry added only to the worktree's `launch.json` was found and ran, and saw the worktree as `${workspaceFolder}` and as its `pwd`;
+- `koholint` (dev) and `koholint-preview` (production build) listened with the worktree's `apps/koholint` as their cwd;
+- a file added only to the worktree's `apps/koholint/public` came back 200 from both, and 404 from a `vite` run in the main checkout.
+
+A session the app opened in the main checkout gets main instead (`get_session` shows `cwd: /Users/max/code/hundo` and no `worktreePath`). That holds even when it works in a worktree it made with `git worktree add`: the app's code picks the session's worktree or its own folder, and a hand-made worktree is neither (read in the app's code, not run). A session working in a worktree reported this on 15 Nov 2026: `lsof` put its servers in `/Users/max/code/hundo/apps/koholint`. The page looks fine either way, so it's easy not to notice. Not tried: a session that moves into a worktree with `EnterWorktree`.
+
+Check before trusting a page. `preview_list` prints each server's `cwd`, or ask the process: `lsof -a -p $(lsof -nP -iTCP:<port> -sTCP:LISTEN -t | head -1) -d cwd`. It has to be the worktree you edit in.
+
+When it isn't, serve the worktree yourself from the worktree. Build into a folder of your own, so the worktree's `dist` (and any server on it) stays as it is, then preview that folder on a free port:
+
+```bash
+cd <worktree> && pnpm -C apps/<name> exec vite build --outDir <scratchpad>/<name>-dist --emptyOutDir
+```
+
+```bash
+cd <worktree> && pnpm -C apps/<name> exec vite preview --outDir <scratchpad>/<name>-dist --port <free port> --strictPort
+```
+
+Open `http://localhost:<free port>` in the pane with `navigate`. A free port: `node -e 'const s=require("net").createServer().listen(0,()=>{console.log(s.address().port);s.close()})'`. `vite build` skips the `tsc` that `pnpm build` runs, so the typecheck stays with `pnpm check`. Both commands were run this way on 15 Nov 2026, and the marker file from the list above came back 200 on the port, with the worktree's `dist` untouched.
+
+`shoot.mjs` needs none of this: it builds and serves `--root` (the folder you run it from unless told otherwise), so from a worktree it shoots that worktree, and from any other folder `--root <worktree>` points it there.
 
 ### What to look at
 
