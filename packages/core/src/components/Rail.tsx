@@ -1,5 +1,5 @@
 import { cva } from "class-variance-authority";
-import type { RefObject } from "react";
+import type { ReactNode } from "react";
 import { Link } from "react-router";
 import { Icon } from "./Icon";
 import { brand, chapterRows, chapters } from "../guide";
@@ -7,11 +7,12 @@ import { pct, two } from "../format";
 import { isOpen, useProgress } from "../store/progress";
 import { useReveal } from "../useReveal";
 import { useUi } from "../store/ui";
+import { railHeading, railPanel } from "./rail-style";
 
 // A chapter in the rail: a link to it, or, while spoiler protection hides it, a button that reveals it (and says what it's hidden by).
 // A locked one keeps its muted colour when it's hovered; an open one darkens.
 const chapterLink = cva(
-  "group/chapter grid min-h-12 w-full grid-cols-[30px_minmax(0,1fr)_17px] items-center gap-2.5 rounded-small border border-transparent bg-transparent p-2 text-left font-bold hover:bg-rail-hover aria-[current=page]:border-soft-line aria-[current=page]:text-ink [&_.svg-icon]:size-3.5 [&_.svg-icon]:text-muted [&[aria-current=page]:not(:hover)]:bg-soft",
+  "group/chapter grid min-h-12 w-full cursor-pointer grid-cols-[30px_minmax(0,1fr)_17px] items-center gap-2.5 rounded-small border border-transparent bg-transparent p-2 text-left font-sans font-bold no-underline hover:bg-rail-hover aria-[current=page]:border-soft-line aria-[current=page]:text-ink [&_.svg-icon]:size-3.5 [&_.svg-icon]:text-muted [&[aria-current=page]:not(:hover)]:bg-soft",
   { variants: { locked: { true: "text-[13px] text-muted", false: "text-[14px] text-inherit hover:text-ink" } } },
 );
 
@@ -19,29 +20,28 @@ const number =
   "grid size-7 place-items-center rounded-small border border-soft-line text-[12px] text-muted tabular-nums group-aria-[current=page]/chapter:border-primary group-aria-[current=page]/chapter:bg-primary group-aria-[current=page]/chapter:text-on-primary";
 
 interface RailProps {
-  id: string;
-  /** Under 800px the rail is a drawer, and this is whether it's out. */
-  open: boolean;
   activeChapter: number;
   view: string;
-  railRef: RefObject<HTMLElement | null>;
 }
 
-/** The chapters, the spoiler protection's state and its settings, and the fine print. A column beside the page; a drawer on a phone. */
-export function Rail({ id, open, activeChapter, view, railRef }: RailProps) {
+/** The rail beside the page, at 801px and up (Layout); under that it is in the drawer (RailDrawer.tsx). */
+export function Rail(props: RailProps) {
+  return (
+    <aside aria-label="Chapters" className={railPanel({ frame: "column" })}>
+      <RailContent {...props} />
+    </aside>
+  );
+}
+
+/** The chapters, the spoiler protection's state and its settings, and the fine print: the rail's content wherever it is. */
+export function RailContent({ activeChapter, view, heading }: RailProps & { heading?: ReactNode }) {
   const data = useProgress((s) => s.data);
   const reveal = useReveal();
   const openDialog = useUi((s) => s.openDialog);
   return (
-    <aside
-      ref={railRef}
-      id={id}
-      aria-label="Chapters"
-      data-open={open ? "" : undefined}
-      className="sticky top-(--bar) flex h-[calc(100dvh-var(--bar))] scrollbar-thin [scrollbar-color:var(--edge)_var(--rail)] flex-col gap-[22px] self-start overflow-auto border-r border-line bg-rail pt-[25px] pr-[15px] pb-[calc(16px+var(--safe-bottom))] pl-[calc(15px+var(--safe-left))] text-ink standalone:select-none standalone:[-webkit-touch-callout:none] standalone:not-drawer:relative standalone:not-drawer:top-auto standalone:not-drawer:h-auto standalone:not-drawer:self-stretch drawer:invisible drawer:fixed drawer:bottom-0 drawer:left-0 drawer:z-8 drawer:h-auto drawer:w-[min(var(--rail-col),calc(100%-30px))] drawer:translate-x-[-102%] drawer:self-auto drawer:transition-[transform,visibility] drawer:duration-180 drawer:ease-[ease] drawer:data-open:visible drawer:data-open:translate-x-0"
-    >
+    <>
       <div>
-        <div className="mb-2.5 px-[9px] text-[12px] font-extrabold tracking-[0.16em] text-muted uppercase">Walkthrough</div>
+        {heading ?? <div className={railHeading}>Walkthrough</div>}
         <nav className="grid gap-[3px]" aria-label="Walkthrough chapters">
           {chapters.map((chapter) => {
             const n = two(chapter.id);
@@ -79,7 +79,7 @@ export function Rail({ id, open, activeChapter, view, railRef }: RailProps) {
             <strong className="text-[13px]">Spoiler protection {data.spoilers ? "on" : "off"}</strong>
             <p className="mt-0.5 mb-[5px] text-[12px] leading-[1.46] text-muted">{data.spoilers ? `Chapters past ${data.ceiling} are hidden.` : "All chapters are visible."}</p>
             <button
-              className="inline-flex min-h-8 items-center border-0 bg-transparent px-0 py-1 text-left text-[12px] font-bold text-primary underline underline-offset-[3px]"
+              className="inline-flex min-h-8 cursor-pointer items-center border-0 bg-transparent px-0 py-1 text-left font-sans text-[12px] font-bold text-primary underline underline-offset-[3px]"
               type="button"
               onClick={() => openDialog({ kind: "settings" })}
             >
@@ -92,6 +92,6 @@ export function Rail({ id, open, activeChapter, view, railRef }: RailProps) {
           <span>Unofficial fan guide, not affiliated with {brand.publisher}.</span>
         </small>
       </div>
-    </aside>
+    </>
   );
 }

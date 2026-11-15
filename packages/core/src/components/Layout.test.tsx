@@ -1,4 +1,4 @@
-import { act, render, screen, waitFor } from "@testing-library/react";
+import { act, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { panels } from "virtual:guide/panels";
 import { App } from "../App";
@@ -145,5 +145,117 @@ describe("moving to another page", () => {
     await screen.findByRole("heading", { name: "Completion checklist" });
     expect(scrolled).toHaveBeenCalledWith(0, 0);
     expect(scrolled.mock.contexts.some((element) => (element as HTMLElement).id === "main")).toBe(true);
+  });
+});
+
+describe("the chapter drawer under 800px", () => {
+  let narrow = true;
+  let changed: (() => void) | undefined;
+  beforeEach(() => {
+    narrow = true;
+    vi.spyOn(window, "matchMedia").mockImplementation(
+      (query: string) =>
+        ({
+          get matches() {
+            return query.includes("800px") ? narrow : false;
+          },
+          media: query,
+          addEventListener: (_: string, listener: () => void) => {
+            if (query.includes("800px")) changed = listener;
+          },
+          removeEventListener() {},
+        }) as unknown as MediaQueryList,
+    );
+  });
+
+  // While the drawer is open the page behind it, the menu button included, is hidden from screen readers: keep hold of the button.
+  let button: HTMLElement;
+  const toggle = () => (button ??= screen.getByRole("button", { name: "Open chapters" }));
+  afterEach(() => {
+    button = undefined as unknown as HTMLElement;
+  });
+
+  it("opens from the menu button as a modal with the chapters, and Escape gives the focus back to the button", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await screen.findByRole("heading", { level: 1 });
+    expect(screen.queryByRole("complementary", { name: "Chapters" })).toBeNull();
+    await user.click(toggle());
+    const drawer = await screen.findByRole("dialog", { name: "Chapters" });
+    expect(toggle()).toHaveAttribute("aria-expanded", "true");
+    expect(toggle()).toHaveAttribute("aria-controls", drawer.id);
+    await waitFor(() => expect(within(drawer).getByRole("link", { current: "page" })).toHaveFocus());
+    await user.keyboard("{Escape}");
+    await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
+    expect(toggle()).toHaveAttribute("aria-expanded", "false");
+    await waitFor(() => expect(toggle()).toHaveFocus());
+  });
+
+  it("closes when a chapter is followed, and the focus goes to the page, not back to the button", async () => {
+    useProgress.setState({ data: { ...defaultState(), spoilers: false, ceiling: 9 } });
+    const user = userEvent.setup();
+    render(<App />);
+    await screen.findByRole("heading", { level: 1 });
+    await user.click(toggle());
+    const drawer = await screen.findByRole("dialog", { name: "Chapters" });
+    await user.click(within(drawer).getAllByRole("link")[1]);
+    await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
+    expect(location.pathname).toBe("/guide/2");
+    await waitFor(() => expect(document.getElementById("main")).toHaveFocus());
+  });
+
+  it("doesn't come back when the reader goes back to the page it was opened on", async () => {
+    useProgress.setState({ data: { ...defaultState(), spoilers: false, ceiling: 9 } });
+    const user = userEvent.setup();
+    render(<App />);
+    await screen.findByRole("heading", { level: 1 });
+    await user.click(toggle());
+    await user.click(within(await screen.findByRole("dialog", { name: "Chapters" })).getAllByRole("link")[1]);
+    await waitFor(() => expect(location.pathname).toBe("/guide/2"));
+    act(() => history.back());
+    await waitFor(() => expect(location.pathname).toBe("/guide/1"));
+    await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
+    expect(toggle()).toHaveAttribute("aria-expanded", "false");
+  });
+
+  it("closes on the current chapter's link too, whose address doesn't change", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await screen.findByRole("heading", { level: 1 });
+    await user.click(toggle());
+    await user.click(within(await screen.findByRole("dialog", { name: "Chapters" })).getByRole("link", { current: "page" }));
+    await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
+    expect(location.pathname).toBe("/guide/1");
+    // A followed link puts the reader in the page, as any other chapter's does.
+    await waitFor(() => expect(document.getElementById("main")).toContainElement(document.activeElement as HTMLElement));
+  });
+
+  it("stays open under the settings dialog opened from it, and Escape closes only the dialog", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await screen.findByRole("heading", { level: 1 });
+    await user.click(toggle());
+    const drawer = await screen.findByRole("dialog", { name: "Chapters" });
+    await user.click(within(drawer).getByRole("button", { name: "Change settings" }));
+    const settings = await screen.findByRole("dialog", { name: "Guide settings" });
+    // The key goes to whatever has the focus: wait until the settings have it, as a reader's Escape would.
+    await waitFor(() => expect(settings).toContainElement(document.activeElement as HTMLElement));
+    await user.keyboard("{Escape}");
+    await waitFor(() => expect(screen.queryByRole("dialog", { name: "Guide settings" })).toBeNull());
+    expect(screen.getByRole("dialog", { name: "Chapters" })).toBeInTheDocument();
+  });
+
+  it("goes when the screen widens past 800px, and the rail is a column again", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await screen.findByRole("heading", { level: 1 });
+    await user.click(toggle());
+    await screen.findByRole("dialog", { name: "Chapters" });
+    narrow = false;
+    act(() => changed?.());
+    await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
+    expect(screen.getByRole("complementary", { name: "Chapters" })).toBeInTheDocument();
+    // The menu button the drawer would give the focus back to is hidden at this width: the focus goes into the page instead.
+    await waitFor(() => expect(document.getElementById("main")).toContainElement(document.activeElement as HTMLElement));
   });
 });

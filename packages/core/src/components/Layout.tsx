@@ -1,13 +1,16 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useLocation } from "react-router";
+import { chunks, loadFailed } from "./chunks";
 import { DialogHost } from "./DialogHost";
 import { Rail } from "./Rail";
 import { TopBar } from "./TopBar";
 import { ToastHost } from "./ToastHost";
 import { guideAnchor, readChapter } from "../guide";
 import { panels } from "virtual:guide/panels";
+import { useLoadable, whenIdle } from "../loadable";
 import { isOpen, useProgress } from "../store/progress";
 import { useUi } from "../store/ui";
+import { isNarrow, useNarrow } from "../useNarrow";
 import { useChromeColor } from "../useThemeEffects";
 
 function viewOf(pathname: string) {
@@ -26,13 +29,36 @@ export function Layout({ children }: { children: ReactNode }) {
   const announcement = useUi((s) => s.announcement);
   const dialogOpen = useUi((s) => s.dialog !== null);
   useChromeColor(dialogOpen);
-  // The menu is open only for the page it was opened on, so navigating closes it.
+  // Under 800px the chapter rail is a drawer (RailDrawer.tsx, a chunk of its own); wider, a column beside the page.
+  const narrow = useNarrow();
+  // The drawer is open only for the page it was opened on, so navigating closes it, and only while there is a drawer.
   const [menuPath, setMenuPath] = useState<string | null>(null);
+  if (menuPath !== null && (!narrow || menuPath !== pathname)) setMenuPath(null);
   const menuOpen = menuPath === pathname;
-  const setMenuOpen = (open: boolean) => setMenuPath(open ? pathname : null);
+  // Where the drawer was opened, for the focus when it closes: back to the menu button, unless a link was followed.
+  const openedOn = useRef<string | null>(null);
+  const followedLink = useRef(false);
+  const setMenuOpen = (open: boolean) => {
+    if (open) {
+      openedOn.current = pathname;
+      followedLink.current = false;
+    }
+    setMenuPath(open ? pathname : null);
+  };
+  const drawer = useLoadable(chunks.drawer, menuOpen, () => {
+    setMenuPath(null);
+    loadFailed();
+  });
+  // Fetched ahead only where it can be needed; a window that narrows later loads it when the menu opens.
+  useEffect(
+    () =>
+      whenIdle(() => {
+        if (isNarrow()) chunks.drawer.warm();
+      }),
+    [],
+  );
   const mainRef = useRef<HTMLElement>(null);
   const menuToggle = useRef<HTMLButtonElement>(null);
-  const railRef = useRef<HTMLElement>(null);
   const firstRender = useRef(true);
   const { view, param, entry } = viewOf(pathname);
   const activeChapter = readChapter(param, chapter);
@@ -54,20 +80,6 @@ export function Layout({ children }: { children: ReactNode }) {
     mainRef.current?.focus({ preventScroll: true });
   }, [pathname, targeted]);
 
-  useEffect(() => {
-    if (!menuOpen) return;
-    const rail = railRef.current;
-    (rail?.querySelector<HTMLElement>('[aria-current="page"]') ?? rail?.querySelector<HTMLElement>("nav a, nav button"))?.focus();
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape" && !dialogOpen) {
-        setMenuPath(null);
-        menuToggle.current?.focus();
-      }
-    };
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, [menuOpen, dialogOpen]);
-
   return (
     <>
       <a
@@ -83,16 +95,28 @@ export function Layout({ children }: { children: ReactNode }) {
       </a>
       <TopBar chapter={chapter} view={view} menuOpen={menuOpen} onToggleMenu={() => setMenuOpen(!menuOpen)} menuToggle={menuToggle} />
       <div className="grid min-h-[calc(100dvh-var(--bar))] grid-cols-[var(--rail-col)_minmax(0,1fr)] standalone:min-h-0 standalone:flex-1 standalone:grid-rows-[minmax(0,1fr)] drawer:block standalone:drawer:grid standalone:drawer:grid-cols-[minmax(0,1fr)]">
-        <Rail id="chapter-rail" open={menuOpen} activeChapter={activeChapter} view={view} railRef={railRef} />
-        <button
-          // Shown only under 800px and only while the drawer is out. `hidden` hides it the rest of the time through the global
-          // `[hidden]{display:none!important}` in styles.css, which this class's `drawer:block` would otherwise beat.
-          className="hidden border-0 standalone:select-none standalone:[-webkit-touch-callout:none] drawer:fixed drawer:inset-x-0 drawer:top-(--bar) drawer:bottom-0 drawer:z-7 drawer:block drawer:bg-backdrop"
-          type="button"
-          aria-label="Close chapters"
-          hidden={!menuOpen}
-          onClick={() => setMenuOpen(false)}
-        />
+        {/* The drawer stays mounted (closed, it renders nothing) so that widening past 800px closes it the ordinary way, focus and all. */}
+        {drawer && (
+          <drawer.RailDrawer
+            open={menuOpen}
+            onOpenChange={setMenuOpen}
+            activeChapter={activeChapter}
+            view={view}
+            onFollowLink={() => {
+              followedLink.current = true;
+            }}
+            returnFocus={() => {
+              // Widened past 800px while open: the menu button is hidden at that width, so the focus goes into the page.
+              if (!isNarrow()) return mainRef.current ?? false;
+              // A link to another page: Layout puts the focus in the page after the move (or on what the address points at).
+              if (window.location.pathname !== openedOn.current) return false;
+              // The current chapter's link moves nothing, so the focus goes into the page from here.
+              if (followedLink.current) return mainRef.current ?? false;
+              return menuToggle.current ?? false;
+            }}
+          />
+        )}
+        {!narrow && <Rail activeChapter={activeChapter} view={view} />}
         <main
           id="main"
           tabIndex={-1}

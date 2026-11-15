@@ -4,11 +4,11 @@ import { useProgress } from "@hundo/core/store/progress";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { MemoryRouter } from "react-router";
 
-// The chapter rail: a column beside the page, a drawer under 800px (which a story can't show: the media queries look at the window).
+// The chapter rail as a column beside the page. Under 800px it is a drawer: RailDrawer.stories.tsx.
 const meta = {
   title: "Core/Rail",
   component: Rail,
-  args: { id: "chapter-rail", open: false, activeChapter: 1, view: "guide", railRef: { current: null } },
+  args: { activeChapter: 1, view: "guide" },
   decorators: [
     (Story, { parameters }) => {
       // Each story sets the saved progress it needs: the store is shared by every story.
