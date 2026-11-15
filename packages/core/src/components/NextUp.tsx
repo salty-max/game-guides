@@ -1,6 +1,5 @@
-import { Link } from "react-router";
 import { Button, Empty } from "./ui";
-import { CheckBox } from "./CheckBox";
+import { TickItem } from "./TickItem";
 import { cats, nextUp, primaryTag, text } from "../guide";
 import { useHeldRows } from "../useHeldRows";
 import { isOpen, useProgress } from "../store/progress";
@@ -17,21 +16,17 @@ export function NextUp({ chapter }: { chapter: number }) {
     <section className="next-up" aria-labelledby="next-up-title">
       <h2 id="next-up-title">Next up</h2>
       {rows.length ? (
-        <ul onChangeCapture={hold}>
+        <ul>
           {rows.map((row) => (
-            <li key={row.id} className={data.checks[row.id] === true ? "ticked" : undefined}>
-              <CheckBox id={`next-${row.id}`} row={row} />
-              <label htmlFor={`next-${row.id}`}>
-                <strong>{row.title}</strong>
-                <small>
-                  {row.chapter !== chapter && `Chapter ${row.chapter} · `}
-                  {cats[primaryTag(row)][1]} · {row.group}
-                </small>
-              </label>
-              <Link className="origin" to={`/guide/${row.chapter}/${row.id}`} aria-label={`Jump to “${row.title}” in chapter ${row.chapter}`}>
-                Jump to
-              </Link>
-            </li>
+            <TickItem
+              key={row.id}
+              row={row}
+              prefix="next"
+              ticked={data.checks[row.id] === true}
+              detail={`${row.chapter !== chapter ? `Chapter ${row.chapter} · ` : ""}${cats[primaryTag(row)][1]} · ${row.group}`}
+              jumpLabel={`Jump to “${row.title}” in chapter ${row.chapter}`}
+              onToggle={hold}
+            />
           ))}
         </ul>
       ) : (

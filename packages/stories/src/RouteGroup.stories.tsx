@@ -64,3 +64,17 @@ export const Closed: Story = {
     await expect(row?.closest("[hidden]")).toHaveAttribute("hidden", "until-found");
   },
 };
+
+/** A click anywhere on a step's row (its label stretches over it) ticks the step's box and tints the row. */
+export const TickRow: Story = {
+  play: async ({ canvasElement }) => {
+    const row = group.rows[0];
+    const element = canvasElement.ownerDocument.getElementById(`entry-${row.id}`)!;
+    const box = within(element).getByRole("checkbox", { name: row.title });
+    await userEvent.click(within(element).getByText(row.title));
+    await expect(box).toBeChecked();
+    await expect(useProgress.getState().data.checks[row.id]).toBe(true);
+    await userEvent.click(box);
+    await expect(box).not.toBeChecked();
+  },
+};
