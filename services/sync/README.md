@@ -51,7 +51,7 @@ No email, no name. The server sees IP addresses, as any web server does, and use
 - Pairing: ten codes an hour and ten tries per fifteen minutes from one address (an IPv6 address counts by its /64), and 300 failed tries across everyone per ten minutes.
 - Sync: 120 a minute from one device. That holds a runaway client or a stolen cookie to a trickle. It doesn't guard the store (below).
 - A request is at most 256 KB and 1,500 entries. A guide's data holds at most 2,000 keys, of which at most 60 are extra-state leaves of at most 256 bytes. A group has at most twelve devices. One not seen for three months drops off the list by itself, and comes back on its next sync.
-- A sync costs five store commands to pull, seven to push a new key and eight to change one, so Upstash's free 500,000 commands a month covers somewhere between 60,000 and 100,000 syncs of ordinary use.
+- A sync costs five store commands to pull, seven to push a new key and eight to change one, and two more on any that comes more than a minute after the device was last marked seen. A guide left open polls every 20 seconds to 2 minutes ([core.md](../../docs/core.md#syncing-devices)): some 230 commands an hour untouched, some 1,000 an hour at the quick pace, so Upstash's free 500,000 commands a month goes to about a pair of devices in steady use, or several times that many left open and idle.
 
 ### Known limits, and what isn't checked yet
 
