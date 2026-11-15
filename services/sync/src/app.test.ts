@@ -1,0 +1,765 @@
+import { createHash } from "node:crypto";
+import { describe, expect, it, vi } from "vitest";
+import { GUIDES, handle, visitorOf } from "./app";
+import { GUIDE, KOHOLINT, LOCAL, PREVIEW, RDR, World, link, random, type Device } from "./harness";
+import { memberOf, merge, type Entries } from "./ledger";
+import { StoreError } from "./store";
+
+const KEEP = 400 * 86_400;
+const line = (cookies: string[], name: string) => cookies.find((cookie) => cookie.startsWith(`${name}=`)) ?? "";
+const groups = (world: World, ns = "prod") => world.store.keys().filter((name) => name.startsWith(`hs:${ns}:gd:`)).map((name) => name.split(":")[3]);
+const keysOf = (world: World, group: string) => world.store.keys().filter((name) => name.includes(`:${group}`));
+const NO_STORE = (headers: Headers) => {
+  expect(headers.get("cache-control")).toBe("no-store");
+  expect(headers.get("x-content-type-options")).toBe("nosniff");
+};
+
+describe("every request", () => {
+  it("answers 404 for an unknown path and 405 for anything but POST, never cached", async () => {
+    const world = new World();
+    const get = (path: string) => handle(new Request(`https://api.hundo.quest${path}`, { method: "GET" }), world.deps);
+    const nothing = await get("/api/nope");
+    expect(nothing.status).toBe(404);
+    NO_STORE(nothing.headers);
+    const wrong = await get("/api/sync");
+    expect(wrong.status).toBe(405);
+    expect(wrong.headers.get("allow")).toBe("POST");
+    NO_STORE(wrong.headers);
+    for (const path of ["/api", "/", "/api/sync/", "/api/pair"]) expect((await get(path)).status, path).toBe(404);
+  });
+
+  it("answers only a page of the guides: its Origin must be its own host, on hundo.quest, a preview or localhost", async () => {
+    const world = new World();
+    const d = world.device();
+    const refused: [string, Parameters<Device["post"]>[2]][] = [
+      ["no origin", { headers: { origin: "" } }],
+      ["a stranger", { origin: "https://evil.example" }],
+      ["a stranger lookalike", { origin: "https://koholint.hundo.quest.evil.example" }],
+      ["the API's own host", { origin: "https://api.hundo.quest" }],
+      ["the bare domain", { origin: "https://hundo.quest" }],
+      ["plain http on hundo.quest", { origin: "http://koholint.hundo.quest" }],
+      ["origin and forwarded host differ", { headers: { "x-forwarded-host": "evil.example" } }],
+      ["a plain host that differs", { direct: true, headers: { host: "evil.example" } }],
+      ["not a url", { headers: { origin: "null" } }],
+    ];
+    for (const [name, options] of refused) {
+      const reply = await d.status(options);
+      expect(reply.status, name).toBe(403);
+      NO_STORE(reply.headers);
+    }
+    for (const origin of [KOHOLINT, RDR, "https://reddead.hundo.quest", PREVIEW]) expect((await d.status({ origin })).status, origin).not.toBe(403);
+    expect((await d.status({ origin: LOCAL, direct: true })).status).not.toBe(403);
+    expect((await d.status({ origin: "http://127.0.0.1:5173", direct: true })).status).not.toBe(403);
+  });
+
+  it("wants a JSON object with protocol 1, of a sane size", async () => {
+    const world = new World();
+    const d = world.device();
+    expect((await d.post("/api/status", {}, { headers: { "content-type": "text/plain" } })).status).toBe(400);
+    expect((await d.post("/api/status", {}, { raw: "{not json" })).status).toBe(400);
+    expect((await d.post("/api/status", {}, { raw: "[1]" })).status).toBe(400);
+    expect((await d.post("/api/status", {}, { raw: "null" })).status).toBe(400);
+    expect((await d.post("/api/status", {}, { raw: "{}" })).body).toEqual({ error: "protocol" });
+    expect((await d.post("/api/status", {}, { raw: '{"p":2}' })).body).toEqual({ error: "protocol" });
+    const big = await d.post("/api/status", {}, { raw: JSON.stringify({ p: 1, pad: "x".repeat(300_000) }) });
+    expect(big.status).toBe(413);
+    expect((await d.post("/api/status", {}, { headers: { "content-length": "999999" } })).status).toBe(413);
+  });
+
+  it("says 503 when the store is not set up, down or out of quota, and 500 for the unexpected", async () => {
+    const d = new World().device();
+    expect(await d.status({ deps: null })).toMatchObject({ status: 503, body: { error: "unconfigured" } });
+    const down = new World({ store: { exec: async () => Promise.reject(new StoreError("max requests limit exceeded")) } }).device();
+    expect(await down.show()).toMatchObject({ reply: { status: 503, body: { error: "store" } } });
+    const log = vi.spyOn(console, "error").mockImplementation(() => {});
+    const broken = new World({ store: { exec: async () => Promise.reject(new Error("boom")) } }).device();
+    expect((await broken.show()).reply).toMatchObject({ status: 500, body: { error: "server" } });
+    expect(log).toHaveBeenCalled();
+    log.mockRestore();
+  });
+
+  it("checks the origin before it looks at the store", async () => {
+    const d = new World().device();
+    expect((await d.status({ origin: "https://evil.example", deps: null })).status).toBe(403);
+  });
+});
+
+describe("pairing", () => {
+  it("links two devices that have no progress anywhere yet", async () => {
+    const world = new World();
+    const a = world.device();
+    const b = world.device();
+    const shown = await a.show();
+    expect(shown.code).toMatch(/^\d{6}$/);
+    expect(shown.reply.body).toMatchObject({ linked: false, expiresAt: world.clock.now + 600_000 });
+    NO_STORE(shown.reply.headers);
+    // The one showing the code waits as a pending device: its cookie, but no hint yet, so its other tabs don't try to sync.
+    expect(shown.reply.cookies).toHaveLength(1);
+    expect(shown.reply.cookies[0]).toContain("hundo_sync=");
+    expect(shown.reply.cookies[0]).toContain("Max-Age=900");
+    expect((await a.status()).body).toEqual({ linked: false, pending: true });
+
+    const claimed = await b.claim(shown.code, "Chrome · Windows");
+    expect(claimed).toMatchObject({ status: 200, body: { linked: true } });
+    // The next poll of the first device carries its new cookies.
+    const poll = await a.status();
+    expect(poll.body).toMatchObject({ linked: true });
+    expect(line(poll.cookies, "hundo_link")).not.toBe("");
+    expect(a.jar.get("hundo_link")).toBe(b.jar.get("hundo_link"));
+    const devices = (poll.body.devices as { label: string; self: boolean }[]).map(({ label, self }) => [label, self]);
+    expect(devices.sort()).toEqual([["Chrome · Windows", false], ["Test device", true]]);
+    expect(groups(world)).toHaveLength(1);
+  });
+
+  it("sets a secret device cookie and a readable hint, on the whole domain for a guide on hundo.quest", async () => {
+    const { claimed } = await link(new World());
+    const device = line(claimed.cookies, "hundo_sync");
+    for (const part of ["HttpOnly", "Secure", "SameSite=Lax", "Path=/api", "Domain=hundo.quest", `Max-Age=${KEEP}`]) expect(device, part).toContain(part);
+    expect(device.split(";")[0]).toMatch(/^hundo_sync=[A-Za-z0-9_-]{16}\.[A-Za-z0-9_-]{22}$/);
+    const hint = line(claimed.cookies, "hundo_link");
+    expect(hint).not.toContain("HttpOnly");
+    expect(hint).toMatch(/Path=\/(;|$)/);
+    for (const part of ["Secure", "SameSite=Lax", "Domain=hundo.quest", `Max-Age=${KEEP}`]) expect(hint, part).toContain(part);
+    expect(hint.split(";")[0]).toMatch(/^hundo_link=[A-Za-z0-9_-]{10}$/);
+  });
+
+  it("keeps cookies to the host on a preview or localhost, and drops Secure only for plain http", async () => {
+    const preview = line((await link(new World(), { origin: PREVIEW })).claimed.cookies, "hundo_sync");
+    expect(preview).toContain("Secure");
+    expect(preview).not.toContain("Domain=");
+    expect(preview).toContain(`Max-Age=${7 * 86_400}`);
+    const local = (await link(new World(), { origin: LOCAL, direct: true })).claimed.cookies;
+    for (const name of ["hundo_sync", "hundo_link"]) {
+      expect(line(local, name), name).not.toContain("Secure");
+      expect(line(local, name), name).not.toContain("Domain=");
+    }
+  });
+
+  it("stores a hash of each device's secret and never the secret, and the hint is not the group's id", async () => {
+    const world = new World();
+    const { a, b } = await link(world);
+    const dump = world.store.snapshot();
+    for (const d of [a, b]) {
+      const secret = d.jar.get("hundo_sync")!.split(".")[1];
+      expect(dump).not.toContain(secret);
+      expect(dump).toContain(createHash("sha256").update(secret).digest("hex"));
+    }
+    // The hint is a fingerprint of the group, not the group itself, and the secret cookie carries no group id either.
+    const [group] = groups(world);
+    expect(a.jar.get("hundo_link")).toBe(createHash("sha256").update(group).digest("base64url").slice(0, 10));
+    for (const d of [a, b]) {
+      expect(d.jar.get("hundo_link")).not.toBe(group);
+      expect(d.jar.get("hundo_sync")).not.toContain(group);
+    }
+  });
+
+  it("joins an unlinked device to a linked one's group, whichever shows the code", async () => {
+    const world = new World();
+    const { a, b } = await link(world);
+    // A linked device shows, an unlinked one types.
+    const c = world.device();
+    const first = await a.show();
+    expect(first.reply.body.linked).toBe(true);
+    expect(first.reply.cookies).toEqual([]);
+    expect((await c.claim(first.code)).status).toBe(200);
+    // An unlinked device shows, a linked one types.
+    const d = world.device();
+    const second = await d.show();
+    expect((await b.claim(second.code)).status).toBe(200);
+    expect((await d.status()).body.linked).toBe(true);
+    expect(groups(world)).toHaveLength(1);
+    expect((await a.status()).body.devices).toHaveLength(4);
+  });
+
+  it("says so, and changes nothing, when both devices are already in one group", async () => {
+    const world = new World();
+    const { a, b } = await link(world);
+    const { code } = await a.show();
+    expect((await b.claim(code)).body).toEqual({ linked: true, already: true });
+    expect((await a.status()).body.devices).toHaveLength(2);
+  });
+
+  it("moves the typing device to the other's group when both are linked apart, and leaves the rest of its old group", async () => {
+    const world = new World();
+    const one = await link(world);
+    const two = await link(world);
+    await two.a.sync({ "c:mine": [5, 1] });
+    const { code } = await one.a.show();
+    const moved = await two.a.claim(code, "Moved");
+    expect(moved.body).toEqual({ linked: true, moved: true });
+    expect(two.a.jar.get("hundo_link")).toBe(one.a.jar.get("hundo_link"));
+    expect((await one.a.status()).body.devices).toHaveLength(3);
+    expect((await two.b.status()).body.devices).toHaveLength(1);
+    // The old group's data stays for the device still in it.
+    expect((await two.b.sync()).body.entries).toEqual({ "c:mine": [5, 1] });
+  });
+
+  it("deletes a group that its last device leaves by moving", async () => {
+    const world = new World();
+    const one = await link(world);
+    await one.b.post("/api/unlink");
+    await one.a.sync({ "c:x": [5, 1] });
+    const [lonely] = groups(world);
+    const two = await link(world);
+    const { code } = await two.a.show();
+    expect((await one.a.claim(code)).body).toMatchObject({ moved: true });
+    expect(keysOf(world, lonely)).toEqual([]);
+    expect((await two.b.status()).body.devices).toHaveLength(3);
+  });
+
+  it("keeps the waiting device's cookie alive as long as the waiting, through a second code", async () => {
+    const world = new World();
+    const a = world.device();
+    const b = world.device();
+    await a.show();
+    world.advance(700_000);
+    const second = await a.show();
+    expect(second.reply.cookies[0]).toContain("Max-Age=900");
+    // Past the first cookie's life, within the second's.
+    world.advance(250_000);
+    expect(a.jar.has("hundo_sync")).toBe(true);
+    expect((await b.claim(second.code)).status).toBe(200);
+    expect((await a.status()).body.linked).toBe(true);
+  });
+
+  it("puts at most twelve devices in a group", async () => {
+    const world = new World();
+    const { a, b } = await link(world);
+    for (let i = 0; i < 10; i++) expect((await world.device().claim((await (i % 2 ? a : b).show()).code)).status, String(i)).toBe(200);
+    expect((await a.status()).body.devices).toHaveLength(12);
+    const extra = world.device();
+    expect((await extra.claim((await a.show()).code)).body).toEqual({ error: "devices" });
+    expect(extra.jar.has("hundo_sync")).toBe(false);
+    // Nor can a waiting device join by a full group's member typing its code, nor a linked device move in.
+    const waiting = world.device();
+    expect((await a.claim((await waiting.show()).code)).body).toEqual({ error: "devices" });
+    const elsewhere = await link(world);
+    expect((await elsewhere.a.claim((await a.show()).code)).body).toEqual({ error: "devices" });
+    expect((await elsewhere.a.status()).body.devices).toHaveLength(2);
+    // A device already in the full group is still told it is in it.
+    expect((await b.claim((await a.show()).code)).body).toEqual({ linked: true, already: true });
+  });
+
+  it("lets a device that went quiet for three months drop off, so abandoned browsers can't fill a group", async () => {
+    const world = new World();
+    const { a, b } = await link(world);
+    const ghosts = [];
+    for (let i = 0; i < 10; i++) {
+      const ghost = world.device();
+      await ghost.claim((await (i % 2 ? a : b).show()).code);
+      ghosts.push(ghost);
+    }
+    const late = world.device();
+    expect((await late.claim((await a.show()).code)).status).toBe(409);
+    world.advance(91 * 86_400_000);
+    await a.sync();
+    expect((await late.claim((await a.show()).code)).status).toBe(200);
+    expect((await a.status()).body.devices).toHaveLength(2);
+    expect((await world.store.exec([["HLEN", world.store.keys().find((name) => name.startsWith("hs:prod:gd:"))!]]))[0]).toBe(2);
+    // A device that was only quiet comes back on its next sync.
+    expect((await ghosts[0].sync()).status).toBe(200);
+    expect((await a.status()).body.devices).toHaveLength(3);
+  });
+
+  it("refuses a device claiming its own code", async () => {
+    const a = new World().device();
+    const { code } = await a.show();
+    expect((await a.claim(code)).body).toEqual({ error: "code" });
+  });
+
+  it("gives a code once, for ten minutes", async () => {
+    const world = new World();
+    const { code } = await world.device().show();
+    expect((await world.device().claim(code)).status).toBe(200);
+    expect((await world.device().claim(code)).status).toBe(400);
+    const late = await world.device().show();
+    world.advance(599_000);
+    expect((await world.store.exec([["GET", `hs:prod:pc:${late.code}`]]))[0]).not.toBeNull();
+    world.advance(2000);
+    expect((await world.device().claim(late.code)).status).toBe(400);
+  });
+
+  it("answers a wrong, expired, used or malformed code the same way", async () => {
+    const world = new World();
+    const { code } = await world.device().show();
+    await world.device().claim(code);
+    const replies = [code, "000000", "12345", "1234567", "abcdef", ""].map(async (value) => (await world.device().claim(value)).body);
+    for (const body of await Promise.all(replies)) expect(body).toEqual({ error: "code" });
+    expect((await world.device().post("/api/pair/claim", { code: 123456 })).body).toEqual({ error: "code" });
+  });
+
+  it("reads a code typed with spaces or dashes", async () => {
+    const world = new World();
+    const { code } = await world.device().show();
+    expect((await world.device().claim(`${code.slice(0, 3)} ${code.slice(3)}`)).status).toBe(200);
+    const next = await world.device().show();
+    expect((await world.device().claim(`${next.code.slice(0, 3)}-${next.code.slice(3)}`)).status).toBe(200);
+  });
+
+  it("keeps a device's label short and free of control characters", async () => {
+    const world = new World();
+    const a = world.device();
+    const b = world.device();
+    const { code } = await a.show();
+    await b.post("/api/pair/claim", { code, label: `A\tB\n${"x".repeat(100)}` });
+    const labels = ((await a.status()).body.devices as { label: string }[]).map((device) => device.label);
+    expect(labels.find((label) => label.startsWith("AB"))).toHaveLength(40);
+    const c = world.device();
+    const next = await world.device().show();
+    await c.post("/api/pair/claim", { code: next.code, label: 7 });
+    expect(((await c.status()).body.devices as { label: string }[]).some((device) => device.label === "Unknown device")).toBe(true);
+  });
+});
+
+describe("limits on guessing", () => {
+  it("allows ten codes an hour from one visitor", async () => {
+    const world = new World();
+    const d = world.device();
+    for (let i = 0; i < 10; i++) expect((await d.show()).reply.status, String(i)).toBe(200);
+    expect((await d.show()).reply.status).toBe(429);
+    expect((await world.device().show()).reply.status).toBe(200);
+    world.advance(2 * 3600_000);
+    expect((await d.show()).reply.status).toBe(200);
+  });
+
+  it("allows ten tries in fifteen minutes from one visitor", async () => {
+    const world = new World();
+    const d = world.device();
+    for (let i = 0; i < 10; i++) expect((await d.claim("000000")).status, String(i)).toBe(400);
+    expect((await d.claim("000000")).status).toBe(429);
+    const { code } = await world.device().show();
+    expect((await d.claim(code)).status).toBe(429);
+    expect((await world.device().claim(code)).status).toBe(200);
+    world.advance(30 * 60_000);
+    expect((await d.claim("000000")).status).toBe(400);
+  });
+
+  it("stops everyone's claims once 300 guesses have failed in ten minutes, and starts again after", async () => {
+    const world = new World();
+    world.clock.now = Date.UTC(2026, 10, 15, 12, 5, 0);
+    const { code } = await world.device().show();
+    for (let visitor = 0; visitor < 30; visitor++) {
+      const d = world.device();
+      for (let i = 0; i < 10; i++) await d.claim("000000");
+    }
+    expect((await world.device().claim(code)).status).toBe(429);
+    world.advance(301_000);
+    expect((await world.device().claim(code)).status).toBe(200);
+  });
+
+  it("keeps no counter, so no trace of a visitor's address, for longer than its window, an hour at most", async () => {
+    const world = new World();
+    const d = world.device("198.51.100.77");
+    await d.show();
+    await d.claim("000000");
+    const counters = () => world.store.keys().filter((name) => name.includes(":rl:"));
+    expect(counters().length).toBeGreaterThan(0);
+    for (const name of counters()) expect(world.store.ttl(name), name).toBeLessThanOrEqual(3600);
+    expect(world.store.snapshot()).not.toContain("198.51.100.77");
+    world.advance(3601_000);
+    expect(counters()).toEqual([]);
+  });
+
+  it("names a visitor by its IPv4 address or its IPv6 /64, in whatever form the address comes", () => {
+    expect(visitorOf("203.0.113.9")).toBe("203.0.113.9");
+    expect(visitorOf("::ffff:203.0.113.9")).toBe("203.0.113.9");
+    expect(visitorOf("")).toBe("");
+    const subnet = "2001:0db8:0000:0000";
+    for (const address of ["2001:db8::1", "2001:db8::2:3", "2001:db8:0:0:ffff:ffff:ffff:ffff", "2001:DB8:0:0::9", "2001:db8::"]) expect(visitorOf(address), address).toBe(subnet);
+    expect(visitorOf("2001:db8:1:2:3:4:5:6")).toBe("2001:0db8:0001:0002");
+    expect(visitorOf("2001:db8:0:1::1")).not.toBe(subnet);
+    expect(visitorOf("::1")).toBe("0000:0000:0000:0000");
+    expect(visitorOf("1:2:3:4:5:6:7:8:9::")).toBeTypeOf("string");
+  });
+
+  it("counts the /64 of an IPv6 visitor as one", async () => {
+    const world = new World();
+    const d = (low: string) => world.device(`2001:db8:1:2:${low}`);
+    for (let i = 0; i < 10; i++) await d(`${i}:0:0:1`).show();
+    expect((await d("ffff:0:0:9").show()).reply.status).toBe(429);
+    expect((await world.device("2001:db8:1:3::1").show()).reply.status).toBe(200);
+  });
+});
+
+describe("sync", () => {
+  it("answers 401, and clears the cookies, for a device that is not linked", async () => {
+    const world = new World();
+    const stranger = world.device();
+    const reply = await stranger.sync();
+    expect(reply).toMatchObject({ status: 401, body: { error: "unlinked" } });
+    expect(line(reply.cookies, "hundo_sync")).toContain("Max-Age=0");
+    expect(line(reply.cookies, "hundo_link")).toContain("Max-Age=0");
+    // Nor can a device that is still waiting to be linked.
+    const waiting = world.device();
+    await waiting.show();
+    expect((await waiting.sync()).status).toBe(401);
+  });
+
+  it("refuses a cookie with the wrong secret or an id that is gone", async () => {
+    const world = new World();
+    const { a } = await link(world);
+    const [id] = a.jar.get("hundo_sync")!.split(".");
+    a.jar.set("hundo_sync", `${id}.${"A".repeat(22)}`);
+    expect((await a.sync()).status).toBe(401);
+    a.jar.set("hundo_sync", `${"B".repeat(16)}.${"A".repeat(22)}`);
+    expect((await a.sync()).status).toBe(401);
+    a.jar.set("hundo_sync", "garbage");
+    expect((await a.sync()).status).toBe(401);
+  });
+
+  it("keeps both devices' ticks, and the later of a tick and an untick", async () => {
+    const world = new World();
+    const { a, b } = await link(world);
+    await a.sync({ "c:one": [10, 1], ceiling: [10, 3] });
+    const seen = await b.sync({ "c:two": [11, 1] });
+    expect(seen.body.entries).toEqual({ "c:one": [10, 1], "c:two": [11, 1], ceiling: [10, 3] });
+    await b.sync({ "c:one": [12, 0] });
+    expect((await a.sync()).body.entries).toMatchObject({ "c:one": [12, 0], "c:two": [11, 1] });
+    await a.sync({ "c:one": [13, 1] });
+    expect((await b.sync()).body.entries).toMatchObject({ "c:one": [13, 1] });
+  });
+
+  it("settles a tie between devices the same way whichever pushes first", async () => {
+    const world = new World();
+    const { a, b } = await link(world);
+    await a.sync({ "c:t": [20, 0], spoilers: [20, false], ceiling: [20, 2] });
+    await b.sync({ "c:t": [20, 1], spoilers: [20, true], ceiling: [20, 5] });
+    expect((await a.sync()).body.entries).toEqual({ "c:t": [20, 1], spoilers: [20, true], ceiling: [20, 5] });
+    const other = await link(world);
+    await other.b.sync({ "c:t": [20, 1], spoilers: [20, true], ceiling: [20, 5] });
+    await other.a.sync({ "c:t": [20, 0], spoilers: [20, false], ceiling: [20, 2] });
+    expect((await other.a.sync()).body.entries).toEqual({ "c:t": [20, 1], spoilers: [20, true], ceiling: [20, 5] });
+  });
+
+  it("gives back the winner of each key, one entry a key", async () => {
+    const world = new World();
+    const { a } = await link(world);
+    await a.sync({ "x:mode": [1, "normal"] });
+    await a.sync({ "x:mode": [3, "hero"] });
+    await a.sync({ "x:mode": [2, "normal"] });
+    expect((await a.sync()).body.entries).toEqual({ "x:mode": [3, "hero"] });
+  });
+
+  it("ignores an old copy of a change, however late it turns up", async () => {
+    const world = new World();
+    const { a, b } = await link(world);
+    await a.sync({ "c:x": [10, 1] });
+    await b.sync({ "c:x": [5, 1] });
+    expect((await a.sync()).body.entries).toEqual({ "c:x": [10, 1] });
+    // So an untick stamped between the two stays beaten by the later tick, however late the old copy turns up.
+    await b.sync({ "c:x": [7, 0] });
+    await b.sync({ "c:x": [5, 1] });
+    expect((await a.sync()).body.entries).toEqual({ "c:x": [10, 1] });
+  });
+
+  it("keeps each guide's progress apart", async () => {
+    const world = new World();
+    const { a } = await link(world);
+    await a.sync({ "c:row": [5, 1] });
+    expect((await a.post("/api/sync", { guide: "red-dead-redemption" })).body.entries).toEqual({});
+    expect((await a.post("/api/sync", { guide: GUIDE })).body.entries).toEqual({ "c:row": [5, 1] });
+  });
+
+  it("links every guide in a browser at once: the cookie covers the domain", async () => {
+    const world = new World();
+    const { a } = await link(world);
+    await a.sync({ "c:row": [5, 1] });
+    const reply = await a.post("/api/sync", { guide: "red-dead-redemption", entries: { "c:other": [6, 1] } }, { origin: RDR });
+    expect(reply.status).toBe(200);
+    expect((await a.post("/api/sync", { guide: "red-dead-redemption" }, { origin: RDR })).body.entries).toEqual({ "c:other": [6, 1] });
+  });
+
+  it("refuses a guide it does not know, and bad entries", async () => {
+    const { a } = await link(new World());
+    expect((await a.post("/api/sync", { guide: "nope", entries: {} })).body).toEqual({ error: "guide" });
+    expect((await a.post("/api/sync", { entries: {} })).body).toEqual({ error: "guide" });
+    expect((await a.post("/api/sync", { guide: GUIDE, entries: { "c:x": [1, 7] } })).body).toEqual({ error: "entries" });
+    expect((await a.post("/api/sync", { guide: GUIDE, entries: [] })).body).toEqual({ error: "entries" });
+    expect((await a.post("/api/sync", { guide: GUIDE, entries: { theme: [1, "dark"] } })).body).toEqual({ error: "entries" });
+  });
+
+  it("refuses a stamp more than a day ahead, tells the device the time, and stores nothing from the request", async () => {
+    const world = new World();
+    const { a } = await link(world);
+    const now = world.clock.now;
+    const refused = await a.sync({ "c:ok": [1, 1], "c:future": [now + 86_400_001, 1] });
+    expect(refused).toMatchObject({ status: 400, body: { error: "clock", now } });
+    expect((await a.sync()).body.entries).toEqual({});
+    expect((await a.sync({ "c:future": [now + 86_400_000, 1] })).status).toBe(200);
+  });
+
+  it("holds a guide to 2,000 keys, and still serves a pull, and takes a change to a key it has", async () => {
+    const world = new World();
+    const { a } = await link(world);
+    const rows = (from: number, to: number) => Object.fromEntries(Array.from({ length: to - from }, (_, i) => [`c:r${from + i}`, [1, 1]]));
+    expect((await a.sync(rows(0, 1500))).status).toBe(200);
+    expect((await a.sync(rows(1500, 2000))).status).toBe(200);
+    expect((await a.sync({ "c:one-more": [1, 1] })).body).toEqual({ error: "full" });
+    expect((await a.sync({ "c:r7": [2, 0] })).status).toBe(200);
+    expect(Object.keys((await a.sync()).body.entries!)).toHaveLength(2000);
+  });
+
+  it("holds a guide's extra state to 60 leaves", async () => {
+    const { a } = await link(new World());
+    const leaves = (n: number) => Object.fromEntries(Array.from({ length: n }, (_, i) => [`x:leaf${i}`, [1, i]]));
+    expect((await a.sync(leaves(60))).status).toBe(200);
+    expect((await a.sync({ "x:leaf60": [1, 60] })).body).toEqual({ error: "full" });
+    expect((await a.sync({ "x:leaf3": [2, 99] })).status).toBe(200);
+  });
+
+  it("takes a full state again and again, and counts only keys that are new", async () => {
+    const { a } = await link(new World());
+    const rows = Object.fromEntries(Array.from({ length: 1400 }, (_, i) => [`c:r${i}`, [1, 1]]));
+    for (let i = 0; i < 3; i++) expect((await a.sync(rows)).status, String(i)).toBe(200);
+  });
+
+  it("stays as big as its keys, however often they change", async () => {
+    const world = new World();
+    const { a, b } = await link(world);
+    for (let deaths = 1; deaths <= 150; deaths++) await (deaths % 2 ? a : b).sync({ "x:runs.normal.deaths": [deaths, deaths], "c:row": [deaths, deaths % 2] });
+    const set = world.store.keys().find((name) => name.startsWith("hs:prod:p:"))!;
+    expect((await world.store.exec([["ZCARD", set]]))[0]).toBe(2);
+    expect((await a.sync()).body.entries).toEqual({ "x:runs.normal.deaths": [150, 150], "c:row": [150, 0] });
+  });
+
+  it("pays no heed to a stamp lower than the one it holds, which a later change must beat", async () => {
+    const { a } = await link(new World());
+    await a.sync({ "c:x": [10, 1] });
+    await a.sync({ "c:x": [20, 0] });
+    await a.sync({ "c:x": [15, 1] });
+    expect((await a.sync()).body.entries).toEqual({ "c:x": [20, 0] });
+  });
+
+  it("allows 120 syncs a minute from a device", async () => {
+    const world = new World();
+    const { a } = await link(world);
+    for (let i = 0; i < 120; i++) expect((await a.sync()).status, String(i)).toBe(200);
+    expect((await a.sync()).status).toBe(429);
+    world.advance(60_000);
+    expect((await a.sync()).status).toBe(200);
+  });
+
+  it("counts the devices in the group", async () => {
+    const world = new World();
+    const { a } = await link(world);
+    expect((await a.sync()).body.devices).toBe(2);
+    const c = world.device();
+    await c.claim((await a.show()).code);
+    expect((await a.sync()).body.devices).toBe(3);
+    expect((await c.sync()).body.devices).toBe(3);
+  });
+
+  it("keeps a group for 400 days from its last sync, and a daily touch pushes that out", async () => {
+    const world = new World();
+    const { a } = await link(world);
+    await a.sync({ "c:x": [5, 1] });
+    const ttl = (prefix: string) => world.store.ttl(world.store.keys().find((name) => name.startsWith(prefix))!);
+    expect(ttl("hs:prod:p:")).toBe(KEEP);
+    expect(ttl("hs:prod:gd:")).toBe(KEEP);
+    expect(ttl("hs:prod:dv:")).toBe(KEEP);
+    world.advance(100 * 86_400_000);
+    expect(ttl("hs:prod:p:")).toBe(KEEP - 100 * 86_400);
+    const touched = await a.sync({}, { touch: true });
+    expect(touched.cookies.map((cookie) => cookie.split("=")[0]).sort()).toEqual(["hundo_link", "hundo_sync"]);
+    for (const prefix of ["hs:prod:p:", "hs:prod:gd:", "hs:prod:dv:"]) expect(ttl(prefix), prefix).toBe(KEEP);
+    expect((await a.sync()).cookies).toEqual([]);
+  });
+
+  it("forgets a preview's or a local build's data after a week", async () => {
+    const world = new World();
+    const { a } = await link(world, { origin: PREVIEW });
+    await a.sync({ "c:x": [5, 1] }, {}, { origin: PREVIEW });
+    for (const name of world.store.keys().filter((key) => /^hs:test:(p|gd|dv):/.test(key))) expect(world.store.ttl(name), name).toBeLessThanOrEqual(7 * 86_400);
+    expect(world.store.keys().some((name) => name.startsWith("hs:prod:"))).toBe(false);
+  });
+
+  it("keeps preview and production apart", async () => {
+    const world = new World();
+    const prod = await link(world);
+    const test = await link(world, { origin: PREVIEW });
+    await prod.a.sync({ "c:prod": [5, 1] });
+    await test.a.sync({ "c:test": [5, 1] }, {}, { origin: PREVIEW });
+    expect((await prod.b.sync()).body.entries).toEqual({ "c:prod": [5, 1] });
+    expect((await test.b.sync({}, {}, { origin: PREVIEW })).body.entries).toEqual({ "c:test": [5, 1] });
+    // A preview cookie is host-only and never reaches a hundo.quest guide, and a production code is no good on a preview.
+    const { code } = await prod.a.show();
+    expect((await world.device().claim(code, "x", { origin: PREVIEW })).status).toBe(400);
+  });
+
+  it("gives the same state as merging everything the devices pushed", async () => {
+    const world = new World();
+    const { a, b } = await link(world);
+    const next = random(21);
+    const pick = <T>(items: T[]) => items[Math.floor(next() * items.length)];
+    const make = (): Entries => {
+      const out: Entries = {};
+      for (let i = 0; i < 1 + Math.floor(next() * 8); i++) {
+        const key = pick(["c:r0", "c:r1", "c:r2", "c:r3", "ceiling", "spoilers", "chapter", "x:mode", "x:n"]);
+        const value = key.startsWith("c:") ? pick([0, 1]) : key === "spoilers" ? pick([true, false]) : key === "x:mode" ? pick(["normal", "hero", null]) : pick([1, 2, 3]);
+        out[key] = [Math.floor(next() * 6), value];
+      }
+      return out;
+    };
+    const pushed: Entries[] = [];
+    for (let round = 0; round < 40; round++) {
+      const entries = make();
+      pushed.push(entries);
+      await (next() < 0.5 ? a : b).sync(entries);
+    }
+    expect((await a.sync()).body.entries).toEqual(merge(...pushed));
+    expect((await b.sync()).body.entries).toEqual(merge(...pushed));
+  });
+
+  it("loses nothing when devices push at the same time", async () => {
+    const next = random(33);
+    const world = new World({ between: async () => void (await new Promise((resolve) => setImmediate(resolve))) });
+    const { a, b, c } = await (async () => {
+      const { a, b } = await link(world);
+      const c = world.device();
+      await c.claim((await a.show()).code);
+      return { a, b, c };
+    })();
+    const pick = <T>(items: T[]) => items[Math.floor(next() * items.length)];
+    const pushed: Entries[] = [];
+    for (let round = 0; round < 25; round++) {
+      const batch = [a, b, c].map(() => ({ [pick(["c:r0", "c:r1", "c:r2"])]: [Math.floor(next() * 4), pick([0, 1])] as [number, number], [pick(["ceiling", "chapter"])]: [Math.floor(next() * 4), 1 + Math.floor(next() * 3)] as [number, number] }));
+      pushed.push(...batch);
+      const replies = await Promise.all([a, b, c].map((device, i) => device.sync(batch[i])));
+      for (const reply of replies) expect(reply.status).toBe(200);
+    }
+    const expected = merge(...pushed);
+    for (const device of [a, b, c]) expect((await device.sync()).body.entries).toEqual(expected);
+  });
+
+  it("gives each device its own 120 syncs a minute, whatever address it comes from", async () => {
+    const world = new World();
+    const a = world.device("198.51.100.1");
+    const b = world.device("198.51.100.1");
+    await b.claim((await a.show()).code);
+    await a.status();
+    for (let i = 0; i < 120; i++) expect((await a.sync()).status, String(i)).toBe(200);
+    expect((await a.sync()).status).toBe(429);
+    expect((await b.sync()).status).toBe(200);
+  });
+
+  it("clears what lost and still serves a pull when two devices together passed a cap, and refuses only new keys", async () => {
+    const world = new World();
+    const { a } = await link(world);
+    await a.sync({ "c:seed": [5, 1] });
+    const set = world.store.keys().find((name) => name.startsWith("hs:prod:p:"))!;
+    // 62 leaves, over the 60 allowed: what two concurrent pushes that each stayed under could leave.
+    await world.store.exec([["ZADD", set, ...Array.from({ length: 62 }, (_, i) => [1, memberOf(`x:leaf${i}`, 1, i)]).flat(), 1, memberOf("c:seed", 1, 0)]]);
+    expect(Object.keys((await a.sync()).body.entries!)).toHaveLength(63);
+    expect((await world.store.exec([["ZRANGE", set, 0, -1]]))[0]).not.toContain(memberOf("c:seed", 1, 0));
+    await world.store.exec([["ZADD", set, 1, memberOf("c:seed", 2, 0)]]);
+    expect((await a.sync({ "x:fresh": [3, 1] })).body).toEqual({ error: "full" });
+    expect((await world.store.exec([["ZRANGE", set, 0, -1]]))[0]).not.toContain(memberOf("c:seed", 2, 0));
+    expect((await a.sync({ "x:leaf3": [4, 99], "c:seed": [6, 1] })).status).toBe(200);
+    expect((await a.sync()).body.entries).toMatchObject({ "x:leaf3": [4, 99], "c:seed": [6, 1] });
+  });
+
+  it("gives the device list an expiry even when a forget raced the sync that wrote it", async () => {
+    const world = new World();
+    const { a } = await link(world);
+    const devices = world.store.keys().find((name) => name.startsWith("hs:prod:gd:"))!;
+    await world.store.exec([["DEL", devices]]);
+    expect((await a.sync()).status).toBe(200);
+    expect(world.store.ttl(devices)).toBe(KEEP);
+  });
+
+  it("costs five store commands to pull, seven to push a new key and eight to change one", async () => {
+    const world = new World();
+    const { a } = await link(world);
+    await a.sync({ "c:x": [5, 1] });
+    const cost = async (entries: Record<string, [number, unknown]>) => {
+      world.store.commands = 0;
+      await a.sync(entries);
+      return world.store.commands;
+    };
+    expect(await cost({})).toBe(5);
+    expect(await cost({ "c:y": [6, 1] })).toBe(7);
+    expect(await cost({ "c:y": [7, 0] })).toBe(8);
+    expect(await cost({ "c:y": [1, 1] })).toBe(5);
+  });
+});
+
+describe("unlinking", () => {
+  it("takes a device out, clears its cookies, and keeps the group's data for the others", async () => {
+    const world = new World();
+    const { a, b } = await link(world);
+    await a.sync({ "c:x": [5, 1] });
+    const reply = await b.post("/api/unlink");
+    expect(reply).toMatchObject({ status: 200, body: { ok: true } });
+    expect(line(reply.cookies, "hundo_sync")).toContain("Max-Age=0");
+    expect(line(reply.cookies, "hundo_link")).toContain("Max-Age=0");
+    expect(b.jar.size).toBe(0);
+    expect((await a.sync()).body).toMatchObject({ entries: { "c:x": [5, 1] }, devices: 1 });
+    expect((await a.status()).body.devices).toHaveLength(1);
+  });
+
+  it("deletes the data when the last device unlinks", async () => {
+    const world = new World();
+    const { a, b } = await link(world);
+    await a.sync({ "c:x": [5, 1] });
+    await a.post("/api/unlink");
+    await b.post("/api/unlink");
+    expect(world.store.keys().filter((name) => /:(p|gd|dv):/.test(name))).toEqual([]);
+  });
+
+  it("revokes the token: an unlinked device's old cookie does nothing", async () => {
+    const world = new World();
+    const { a, b } = await link(world);
+    const cookie = b.jar.get("hundo_sync")!;
+    await b.post("/api/unlink");
+    b.jar.set("hundo_sync", cookie);
+    expect((await b.sync({ "c:sneaky": [9, 1] })).status).toBe(401);
+    expect((await a.sync()).body.entries).toEqual({});
+  });
+
+  it("clears the cookies even for a stale one, and for none", async () => {
+    const world = new World();
+    const stale = world.device();
+    stale.jar.set("hundo_sync", `${"A".repeat(16)}.${"B".repeat(22)}`);
+    expect(await stale.post("/api/unlink")).toMatchObject({ status: 200 });
+    expect(stale.jar.size).toBe(0);
+    expect(await world.device().post("/api/unlink")).toMatchObject({ status: 200 });
+  });
+
+  it("drops a device still waiting to be linked", async () => {
+    const world = new World();
+    const a = world.device();
+    await a.show();
+    await a.post("/api/unlink");
+    expect(world.store.keys().filter((name) => name.includes(":dv:"))).toEqual([]);
+  });
+});
+
+describe("deleting the synced progress", () => {
+  it("erases the group's data and every device, and the others learn on their next sync", async () => {
+    const world = new World();
+    const { a, b } = await link(world);
+    const c = world.device();
+    await c.claim((await a.show()).code);
+    await a.sync({ "c:x": [5, 1] });
+    await a.post("/api/sync", { guide: "red-dead-redemption", entries: { "c:y": [5, 1] } });
+    const reply = await a.post("/api/forget");
+    expect(reply).toMatchObject({ status: 200, body: { ok: true } });
+    expect(line(reply.cookies, "hundo_sync")).toContain("Max-Age=0");
+    expect(world.store.keys().filter((name) => /:(p|gd|dv):/.test(name))).toEqual([]);
+    for (const device of [b, c]) {
+      const next = await device.sync();
+      expect(next.status).toBe(401);
+      expect(line(next.cookies, "hundo_link")).toContain("Max-Age=0");
+    }
+  });
+
+  it("is a 401 for a device that is not linked", async () => {
+    expect((await new World().device().post("/api/forget")).status).toBe(401);
+  });
+});
+
+describe("the guides", () => {
+  it("knows the three of them", () => {
+    expect([...GUIDES].sort()).toEqual(["echoes-of-wisdom", "links-awakening", "red-dead-redemption"]);
+  });
+});

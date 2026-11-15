@@ -1,0 +1,9 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["ES2023"],
+    "jsx": "preserve",
+    "types": ["node"]
+  },
+  "include": ["api", "src", "vitest.config.mts"]
+}

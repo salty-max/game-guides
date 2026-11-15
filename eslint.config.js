@@ -16,4 +16,6 @@ export default tseslint.config(
       "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
     },
   },
+  // The sync service runs on Node, not in a browser.
+  { files: ["services/**/*.ts"], languageOptions: { globals: globals.node } },
 );

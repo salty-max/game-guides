@@ -72,6 +72,22 @@ Nothing reaches production without being looked at on a preview deployment first
 
 Previews sit behind Vercel's deployment protection, so a plain `curl` doesn't get through. `vercel curl`, run from a folder linked to the project, does. Anywhere else it gets a 302. The `guide-deploy` skill's `headers.sh` does this. A signed-in browser's network panel works too.
 
+## The sync API
+
+`services/sync` is its own Vercel project, `hundo-api`, on the same team, at `https://api.hundo.quest`. It is the server for sync codes ([its README](../services/sync/README.md)): one Web-standard function per route in `api/`, with Upstash Redis as the store. It is not a guide, so the rules above about every app's `vercel.json` don't reach it. It has its own `vercel.json` and its own ignore script, `services/sync/scripts/vercel-ignore.sh`, which watches the service and the root files that install its packages, but not core. `project.test.ts` holds both to what the deploy needs.
+
+Settings in the Vercel dashboard:
+
+- **Root Directory:** `services/sync`, with "Include files outside the Root Directory" left on, so the install runs from the workspace's lockfile.
+- **Framework:** Other (`vercel.json` says `"framework": null`), **Node.js** 26.x, **production branch** `main`.
+- **Domain:** `api.hundo.quest`.
+- **Environment variables**, for Production and Preview: `SYNC_IP_SALT`, a long random secret (`openssl rand -hex 32`) that salts the IP hashes behind the rate limits, and the Upstash Redis REST URL and token. The code reads `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN`, or Vercel KV's `KV_REST_API_URL` and `KV_REST_API_TOKEN`. With either missing, every real call answers `503 unconfigured`.
+- **The store:** an Upstash Redis database, in Frankfurt to sit next to the function (`"regions": ["fra1"]`). Production and previews share it, apart by key prefix: production keys start `hs:prod:`, everything from a preview or localhost `hs:test:` and goes after a week.
+
+Creating the project, attaching the domain and creating the store each need the user's go, like any new project. The service can't stop a flood of requests from using the store's commands (each request costs at least one), so a rate-limit rule in the project's firewall is the guard it lacks ([its README](../services/sync/README.md#known-limits-and-what-isnt-checked-yet)).
+
+Before a guide's preview can sync, `api.hundo.quest` has to be live, so the service ships first and the guides' side after it. Check the service's own preview with `curl`: a POST with an `Origin` and `Content-Type: application/json` and `{"p":1}` to `/api/status` answers `401 unlinked` with `Cache-Control: no-store`, and the same call with a foreign `Origin` answers `403`.
+
 ## A new project
 
 For a new guide, after its folder passes `pnpm check` ([adding-a-guide.md](adding-a-guide.md)), and with the user's go:
