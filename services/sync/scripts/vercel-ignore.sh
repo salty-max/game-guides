@@ -3,7 +3,12 @@
 # fails the deployment on any other exit code, so every doubt ends in a build: no earlier deployment, or an earlier commit
 # that the shallow clone lacks or that history no longer has. It watches the service and what installs its dependencies,
 # not core: the service shares no code with the guides at runtime.
-base=${VERCEL_GIT_PREVIOUS_SHA:-HEAD^}
+#
+# With no earlier deployment (VERCEL_GIT_PREVIOUS_SHA is empty on a branch's first deployment, and on every deployment of a
+# branch whose git deployments have all been skipped, as main's were until this) only the last commit is in sight, and a push
+# of several commits whose last one is a docs fix would skip the build for a change in the commits before it. That is a doubt.
+base=$VERCEL_GIT_PREVIOUS_SHA
+[ -n "$base" ] || exit 1
 git cat-file -e "$base^{commit}" 2>/dev/null || exit 1
 git diff --quiet "$base" HEAD -- . ../../package.json ../../pnpm-lock.yaml ../../pnpm-workspace.yaml ../../tsconfig.base.json && exit 0
 exit 1

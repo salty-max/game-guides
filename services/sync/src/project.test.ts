@@ -1,7 +1,8 @@
 import { execFileSync } from "node:child_process";
-import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
+import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { dirname, join, relative, resolve } from "node:path";
-import { describe, expect, it } from "vitest";
+import { afterAll, describe, expect, it } from "vitest";
 import { GUIDES } from "./app";
 
 // What the deploy of this project depends on, held to what Vercel's docs and past deployments taught.
@@ -122,3 +123,68 @@ describe("vercel.json", () => {
     expect(script.trim().split("\n").at(-1)?.trim()).toBe("exit 1");
   });
 });
+
+describe("the ignore step, run against real history", () => {
+  // What Vercel does: runs the script from services/sync in a clone of the repository, with the last deployed commit in
+  // VERCEL_GIT_PREVIOUS_SHA, or nothing there. The answers are the exit codes: 0 skips the build, 1 builds it.
+  const git = (cwd: string, ...args: string[]) => execFileSync("git", ["-c", "user.name=t", "-c", "user.email=t@example.com", "-c", "commit.gpgsign=false", ...args], { cwd, encoding: "utf8" }).trim();
+  const repo = mkdtempSync(join(tmpdir(), "hundo-ignore-"));
+  const sync = join(repo, "services/sync");
+  const commit = (file: string, text: string) => {
+    mkdirSync(dirname(join(repo, file)), { recursive: true });
+    writeFileSync(join(repo, file), text);
+    git(repo, "add", "-A");
+    git(repo, "commit", "-q", "-m", file);
+    return git(repo, "rev-parse", "HEAD");
+  };
+  const answer = (previous?: string) => {
+    const env = { ...process.env };
+    delete env.VERCEL_GIT_PREVIOUS_SHA;
+    if (previous !== undefined) env.VERCEL_GIT_PREVIOUS_SHA = previous;
+    try {
+      execFileSync("sh", ["scripts/vercel-ignore.sh"], { cwd: sync, env, stdio: "ignore" });
+      return 0;
+    } catch (error) {
+      return (error as { status: number }).status;
+    }
+  };
+
+  // c1 starts the service, c2 changes it, c3 is a docs commit on top of it, c4 changes the lockfile, c5 is a docs fix on top of that
+  git(repo, "init", "-q", "-b", "main");
+  mkdirSync(join(sync, "scripts"), { recursive: true });
+  copyFileSync(join(root, "scripts/vercel-ignore.sh"), join(sync, "scripts/vercel-ignore.sh"));
+  const c1 = commit("services/sync/api/sync.ts", "1");
+  const c2 = commit("services/sync/src/app.ts", "2");
+  const c3 = commit("docs/a.md", "3");
+  const c4 = commit("pnpm-lock.yaml", "4");
+  const c5 = commit("docs/b.md", "5");
+  const c6 = commit("apps/koholint/x.ts", "6");
+
+  afterAll(() => rmSync(repo, { recursive: true, force: true }));
+
+  it("builds when no earlier deployment names a commit to compare with, however the last commit looks", () => {
+    // (at c3, c5 and c6 the last commit alone touches nothing the service uses, though c2 and c4 before them did)
+    for (const head of [c2, c3, c4, c5, c6]) {
+      git(repo, "checkout", "-q", head);
+      expect(answer(), head).toBe(1);
+      expect(answer(""), head).toBe(1);
+    }
+  });
+
+  it("builds when the earlier commit is gone from the clone", () => {
+    git(repo, "checkout", "-q", c5);
+    expect(answer("0123456789abcdef0123456789abcdef01234567")).toBe(1);
+  });
+
+  it("skips a build for a range that changes nothing the service uses, and builds for one that does", () => {
+    git(repo, "checkout", "-q", c3);
+    expect(answer(c2)).toBe(0);
+    git(repo, "checkout", "-q", c6);
+    expect(answer(c4)).toBe(0);
+    expect(answer(c2)).toBe(1);
+    expect(answer(c1)).toBe(1);
+    git(repo, "checkout", "-q", c5);
+    expect(answer(c3)).toBe(1);
+  });
+});
+
