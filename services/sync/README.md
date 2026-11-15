@@ -34,7 +34,7 @@ All keys sit under `hs:<namespace>:`.
 
 | Key | Holds | Kept |
 | --- | --- | --- |
-| `dv:<deviceId>` | hash of the secret, the group, a label such as "Safari · iPhone" | 400 days from the last touch (15 minutes while pending) |
+| `dv:<deviceId>` | hash of the secret, the group, a label such as "Safari · iPhone · Koholint app" (the guide's short name, for an installed app) | 400 days from the last touch (15 minutes while pending) |
 | `gd:<group>` | each device's label and when it last synced | 400 days from the last touch |
 | `p:<group>:<guide>` | the guide's progress, as a sorted set with one member per entry, `key<TAB>stamp<TAB>value`, scored by the stamp | 400 days from the last touch |
 | `pc:<code>` | the device that showed the code | 10 minutes |
@@ -57,7 +57,7 @@ No email, no name. The server sees IP addresses, as any web server does, and use
 
 - The API takes the visitor's address from `x-real-ip` (or `x-forwarded-for`). The pairing limits rest on it, so if every request arrived with one address, or none, all readers would share them. Behind a guide's rewrite, `x-real-ip`, `x-forwarded-for` and `x-vercel-forwarded-for` held the same address, not a Vercel one (read from the runtime logs on 2026-11-15, on a call from a browser on a guide preview), so the limits count readers apart. The sync limit is per device and doesn't depend on it.
 - Anyone can use up the wrong-try cap and so pause pairing for everyone for ten minutes. Devices already linked go on syncing. The cap is also what bounds guessing a six-digit code: with N codes showing, an attacker who keeps the cap used up hits one with a chance of at most 300 × N in a million every ten minutes.
-- Nothing in this service can stop a flood of requests from using up the store's commands: each request, even a refused one, costs it at least one, so the limits protect groups and not the quota. A rate-limit rule in the Vercel project's firewall on `api.hundo.quest` is the guard for that. It isn't set up, and what the team's plan allows hasn't been checked. When the quota runs out, syncing answers 503 and every guide keeps working on its own.
+- Nothing in this service can stop a flood of requests from using up the store's commands: each request, even a refused one, costs it at least one, so the limits protect groups and not the quota. The guard for that is a pair of rate-limit rules in the Vercel project's firewall ([deploying.md](../../docs/deploying.md#the-sync-api) has them): a request they turn away never reaches the function, so it costs no store command. When the quota runs out, syncing answers 503 and every guide keeps working on its own.
 - A guide's extra state keeps every path it has ever used, since a path can't be removed, so over its whole life it may use at most 60 distinct ones.
 - A device can remove only itself. One that went quiet drops off by itself after three months, but nothing can remove another that is still being seen.
 - Two devices joining a full group in the same instant can take it past twelve.
