@@ -1,4 +1,6 @@
 import { Checkbox as BaseCheckbox } from "@base-ui/react/checkbox";
+import { Field as BaseField } from "@base-ui/react/field";
+import { OTPField as BaseOTPField } from "@base-ui/react/otp-field";
 import { Radio } from "@base-ui/react/radio";
 import { RadioGroup as BaseRadioGroup } from "@base-ui/react/radio-group";
 import { Select as BaseSelect } from "@base-ui/react/select";
@@ -154,5 +156,112 @@ export function FileField({ id, label, accept, onChange }: FileFieldProps) {
         <span className="text-sm font-semibold text-muted">{name || "No file chosen"}</span>
       </div>
     </div>
+  );
+}
+
+interface CodeFieldProps {
+  id: string;
+  label: string;
+  /** How many characters; each gets its own box. */
+  length?: number;
+  value: string;
+  onChange: (value: string) => void;
+  /** Called once when the last box is filled, also when a whole code is pasted. */
+  onComplete?: (value: string) => void;
+  /** Supporting text, read with the field. */
+  description?: string;
+  invalid?: boolean;
+  disabled?: boolean;
+  /** Letters and digits (a recovery code), where the default is digits only. */
+  alphanumeric?: boolean;
+  /** Takes the focus when the screen opens. */
+  autoFocus?: boolean;
+}
+
+/**
+ * A short code, one box per character: the sixth digit of a pairing code. Typing moves on by itself, Backspace goes back, a pasted code
+ * fills every box, and a phone's one-time-code suggestion fills them too. The first box carries the label's name; the others say which one they are.
+ */
+export function CodeField({ id, label, length = 6, value, onChange, onComplete, description, invalid = false, disabled = false, alphanumeric = false, autoFocus = false }: CodeFieldProps) {
+  const descriptionId = `${id}-description`;
+  return (
+    <div className="field">
+      <label htmlFor={id}>{label}</label>
+      <BaseOTPField.Root
+        id={id}
+        length={length}
+        value={value}
+        onValueChange={onChange}
+        onValueComplete={(code) => onComplete?.(code)}
+        validationType={alphanumeric ? "alphanumeric" : "numeric"}
+        disabled={disabled}
+        className="flex max-w-xs gap-2"
+      >
+        {Array.from({ length }, (_, index) => (
+          <BaseOTPField.Input
+            key={index}
+            aria-label={index === 0 ? undefined : `Character ${index + 1} of ${length}`}
+            aria-describedby={description ? descriptionId : undefined}
+            aria-invalid={(invalid && !disabled) || undefined}
+            data-autofocus={autoFocus && index === 0 ? "" : undefined}
+            className="h-11 min-w-0 flex-1 rounded-control border border-control-line bg-surface p-0 text-center text-lg font-bold text-ink disabled:cursor-not-allowed disabled:opacity-[.46] aria-invalid:border-2 aria-invalid:border-error"
+          />
+        ))}
+      </BaseOTPField.Root>
+      {description && (
+        <p id={descriptionId} className="text-[13px] font-semibold text-muted">
+          {description}
+        </p>
+      )}
+    </div>
+  );
+}
+
+interface TextFieldProps {
+  id: string;
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  /** Supporting text under the field, read with it. */
+  description?: string;
+  /** What is wrong with the value. It is read with the field, and marks it invalid. */
+  error?: string;
+  disabled?: boolean;
+  placeholder?: string;
+  name?: string;
+  inputMode?: "text" | "numeric" | "decimal" | "tel" | "email" | "url" | "search";
+  autoComplete?: string;
+  maxLength?: number;
+  pattern?: string;
+}
+
+/**
+ * A line of text with its label, an optional description and an optional error, wired to it for assistive technology. The error is read
+ * with the field but isn't announced when it appears: a screen that shows one while the reader is still in the field also says it, in a
+ * DialogStatus.
+ */
+export function TextField({ id, label, value, onChange, description, error, disabled = false, placeholder, name, inputMode, autoComplete, maxLength, pattern }: TextFieldProps) {
+  return (
+    <BaseField.Root className="field" invalid={Boolean(error)} disabled={disabled}>
+      <BaseField.Label htmlFor={id}>{label}</BaseField.Label>
+      <BaseField.Control
+        id={id}
+        name={name}
+        value={value}
+        onValueChange={onChange}
+        placeholder={placeholder}
+        inputMode={inputMode}
+        autoComplete={autoComplete}
+        maxLength={maxLength}
+        pattern={pattern}
+        className="min-h-11 w-full rounded-control border border-control-line bg-surface px-2.5 py-1.5 text-sm font-bold text-ink placeholder:font-normal placeholder:text-muted disabled:cursor-not-allowed disabled:opacity-[.46] data-invalid:border-2 data-invalid:border-error"
+      />
+      {description && <BaseField.Description className="text-[13px] font-semibold text-muted">{description}</BaseField.Description>}
+      {error && (
+        <BaseField.Error match className="text-[13px] font-bold text-error">
+          {error}
+        </BaseField.Error>
+      )}
+    </BaseField.Root>
   );
 }
