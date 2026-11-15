@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { allRows, byId, cats, chapterRows, chapters, CHAPTER_COUNT, completion, config, guideAnchor, hasMissables, isCategory, missablesLeft, nextUp, readChapter, tally, whatsLeft } from "./guide";
 
 const everything = Object.fromEntries(allRows.map((row) => [row.id, true as const]));
