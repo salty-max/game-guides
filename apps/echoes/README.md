@@ -1,4 +1,4 @@
-# Echoes of Wisdom Field Guide
+# Echoes of Wisdom Hundo
 
 A spoiler-aware, unofficial companion for *The Legend of Zelda: Echoes of Wisdom* (Nintendo Switch, 2024): a nine-chapter walkthrough with a checklist for the game's completion list.
 

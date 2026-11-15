@@ -1,6 +1,6 @@
 # Hundo
 
-Spoiler-aware, installable field guides for single-player games: one app per game, all built on one shared core.
+Spoiler-aware, installable completion guides for single-player games: one app per game, all built on one shared core.
 
 | App | Game | Site | Vercel project |
 | --- | --- | --- | --- |

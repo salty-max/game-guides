@@ -105,7 +105,10 @@ function Rail({ id, className, activeChapter, view, railRef }: { id: string; cla
             </button>
           </div>
         </div>
-        <div className="rail-credit">{brand.credit}</div>
+        <small className="rail-legal">
+          <span>© 2026 Hundo</span>
+          <span>Unofficial fan guide, not affiliated with {brand.publisher}.</span>
+        </small>
       </div>
     </aside>
   );
@@ -192,7 +195,7 @@ export function Layout({ children }: { children: ReactNode }) {
           </span>
           <span className="brand-type">
             <strong>{brand.mark}</strong>
-            <small>FIELD GUIDE</small>
+            <small>Hundo</small>
           </span>
         </Link>
         <nav id="top-nav" className="top-nav" aria-label="Main navigation">

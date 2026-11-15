@@ -1,6 +1,6 @@
 # hundo
 
-Spoiler-aware PWA field guides for single-player games: a pnpm workspace with one shared app in `packages/core` and one guide per folder in `apps/` (Koholint, Red Dead, Echoes). React 19, TypeScript, Vite, Vitest. GitHub `salty-max/hundo`, deployed as three Vercel projects and served at `<sub>.hundo.quest`. The README has the layout. This file is the rules.
+Spoiler-aware PWA completion guides for single-player games: a pnpm workspace with one shared app in `packages/core` and one guide per folder in `apps/` (Koholint, Red Dead, Echoes). React 19, TypeScript, Vite, Vitest. GitHub `salty-max/hundo`, deployed as three Vercel projects and served at `<sub>.hundo.quest`. The README has the layout. This file is the rules.
 
 ## Commands
 

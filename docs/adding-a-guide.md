@@ -39,12 +39,15 @@ Delete what's Echoes' own:
 ### `brand.ts`
 
 - `id`: written into every backup as `guide`, so a backup from another guide is refused. It's short, for example `echoes-of-wisdom`.
-- `name`, `shortName` (under the installed icon), `title` (the document and social title), `description`.
+- `name`: the mark and "Hundo", as in `RDR Hundo`. It's the installed app's name and the header's label.
+- `shortName`: the bare mark (`RDR`), without "Hundo", so the label under a home-screen icon isn't cut short.
+- `title`: the document and social title. The name, then enough to name the game, so a search for it finds the guide and a newcomer who doesn't know the word still knows what it is: `RDR Hundo · Red Dead Redemption 100% checklist`, or `Echoes of Wisdom Hundo · Zelda completion checklist`, where the name already holds the game's. Use the word its `description` uses for what it covers: "100%", or "completion" as in Echoes.
+- `description`.
 - `storagePrefix`: the localStorage prefix. Progress is saved under `<prefix>.v1` and the theme under `<prefix>.theme`. **Pick it once.** Changing it after launch starts every reader from nothing.
 - `backupFile`: the name of the exported JSON file.
-- `mark`: the word in the header, above "FIELD GUIDE".
+- `mark`: the word in the header, above "HUNDO".
 - `icon`: any name from `packages/core/src/components/Icon.tsx`.
-- `game` (the breadcrumb root) and `credit` (small print under the rail).
+- `game` (the breadcrumb root) and `publisher` (named in the rail's small print: "Unofficial fan guide, not affiliated with …").
 - `corners` and `fonts`: [house-style.md](house-style.md#fonts-and-corners).
 - `home`: the guide's address, `https://<sub>.hundo.quest`. The subdomain is chosen per guide, and the folder and package follow it (`apps/rdr`, `hundo-rdr`, `rdr.hundo.quest`). `movedFrom` stays out of a new guide; it's only for a guide that changes address ([deploying.md](deploying.md#pitfalls)).
 

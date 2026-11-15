@@ -59,7 +59,7 @@ h1,h2,h3{line-height:1.17}
 .brand-icon .svg-icon{width:24px;height:24px}
 .brand-type{display:grid;gap:3px;line-height:1.1}
 .brand-type strong{font:700 21px/1.05 var(--display);letter-spacing:-.01em}
-.brand-type small{font-size:11px;letter-spacing:.2em;font-weight:800;color:var(--primary)}
+.brand-type small{font-size:11px;letter-spacing:.2em;font-weight:800;text-transform:uppercase;color:var(--primary)}
 .top-nav{justify-self:center;display:flex;gap:8px;margin-left:-42px}
 .top-nav a{display:flex;align-items:center;gap:8px;line-height:1.2;font-weight:700;min-height:40px;padding:10px 14px;border-radius:var(--r-button);white-space:nowrap;font-size:14px;color:var(--muted)}
 .top-nav a[aria-current="page"]{background:var(--soft);color:var(--soft-ink)}
@@ -92,7 +92,7 @@ h1,h2,h3{line-height:1.17}
 .spoiler-card strong{font-size:13px}
 .spoiler-card p{font-size:12px;color:var(--muted);line-height:1.46;margin:2px 0 5px}
 .text-button{display:inline-flex;align-items:center;min-height:32px;padding:4px 0;background:none;border:0;color:var(--primary);text-align:left;text-decoration:underline;text-underline-offset:3px;font-weight:700;font-size:12px}
-.rail-credit{padding:0 4px;color:var(--muted);font-size:12px}
+.rail-legal{display:grid;gap:2px;padding:0 4px;color:var(--muted);font-size:12px;line-height:1.4;text-wrap:pretty}
 .mobile-menu,.scrim{display:none}
 .main{min-width:0;width:100%;max-width:1460px;margin:0 auto;padding:24px clamp(23px,3.25vw,53px) 50px;outline:none}
 .breadcrumb{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);font-weight:700;margin-bottom:15px}

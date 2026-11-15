@@ -1,4 +1,4 @@
-# Koholint Field Guide
+# Koholint Hundo
 
 A responsive companion for *The Legend of Zelda: Link’s Awakening* on Nintendo Switch (2019).
 

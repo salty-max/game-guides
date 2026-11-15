@@ -110,13 +110,13 @@ export interface Brand {
   /** Storage keys are `<prefix>.v1` (progress) and `<prefix>.theme`. */
   storagePrefix: string;
   backupFile: string;
-  /** The word in the header brand, above "FIELD GUIDE". */
+  /** The word in the header brand, above "HUNDO". */
   mark: string;
   icon: IconName;
   /** Breadcrumb root. */
   game: string;
-  /** Small print under the rail. */
-  credit: string;
+  /** The game's publisher, named in the rail's fan disclaimer ("not affiliated with …"). */
+  publisher: string;
   /** "narrow": soft square corners. "normal": round buttons, chips and tags. */
   corners: "narrow" | "normal";
   /** The guide's own address, such as "https://koholint.hundo.quest". */
