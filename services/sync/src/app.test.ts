@@ -273,7 +273,7 @@ describe("pairing", () => {
     expect((await b.claim((await a.show()).code)).body).toEqual({ linked: true, already: true });
   });
 
-  it("lets a device that went quiet for three months drop off, so abandoned browsers can't fill a group", async () => {
+  it("lets a device that went quiet for two months drop off, so abandoned browsers can't fill a group", async () => {
     const world = new World();
     const { a, b } = await link(world);
     const ghosts = [];
@@ -284,14 +284,37 @@ describe("pairing", () => {
     }
     const late = world.device();
     expect((await late.claim((await a.show()).code)).status).toBe(409);
-    world.advance(91 * 86_400_000);
+    // two months less a day: still listed, and still holding its place
+    world.advance(59 * 86_400_000);
     await a.sync();
+    expect((await a.status()).body.devices).toHaveLength(12);
+    world.advance(2 * 86_400_000);
+    await a.sync();
+    // (only the one that synced is left in the list: the other linked device and the ghosts were quiet as long)
+    expect((await a.status()).body.devices).toHaveLength(1);
     expect((await late.claim((await a.show()).code)).status).toBe(200);
     expect((await a.status()).body.devices).toHaveLength(2);
     expect((await world.store.exec([["HLEN", world.store.keys().find((name) => name.startsWith("hs:prod:gd:"))!]]))[0]).toBe(2);
-    // A device that was only quiet comes back on its next sync.
-    expect((await ghosts[0].sync()).status).toBe(200);
-    expect((await a.status()).body.devices).toHaveLength(3);
+    // They are gone for good, records and all: a lost phone that wakes up has to be linked again, and is cleared like one that unlinked.
+    expect(world.store.keys().filter((name) => name.includes(":dv:")).length).toBe(2);
+    const back = await ghosts[0].sync();
+    expect(back.status).toBe(401);
+    expect(back.body).toEqual({ error: "unlinked" });
+    expect(line(back.cookies, "hundo_sync")).toContain("Max-Age=0");
+    expect((await a.status()).body.devices).toHaveLength(2);
+  });
+
+  it("hears a quiet device that comes back before anyone has looked, and keeps it", async () => {
+    const world = new World();
+    const { a, b } = await link(world);
+    await a.sync();
+    world.advance(61 * 86_400_000);
+    // b is the first to call: it is heard before it is judged, and so is not dropped
+    expect((await b.sync()).status).toBe(200);
+    expect(((await b.status()).body.devices as { self: boolean }[]).filter((device) => device.self)).toHaveLength(1);
+    // a, quiet as long, was the one that was dropped
+    expect((await a.sync()).status).toBe(401);
+    expect((await b.status()).body.devices).toHaveLength(1);
   });
 
   it("refuses a device claiming its own code", async () => {
@@ -927,6 +950,108 @@ describe("a poll with a revision", () => {
     const { a } = await link(world, { origin: PREVIEW });
     await a.sync({ "c:x": [5, 1] }, {}, { origin: PREVIEW });
     expect(world.store.ttl(world.store.keys().find((name) => name.includes(":rv:"))!)).toBe(7 * 86_400);
+  });
+});
+
+describe("removing another device", () => {
+  const idOf = async (asker: Device, label: string) => ((await asker.status()).body.devices as { id: string; label: string; self: boolean }[]).find((device) => device.label === label)!.id;
+
+  const three = async () => {
+    const world = new World();
+    const { a, b } = await link(world);
+    const c = world.device();
+    await c.claim((await a.show()).code, "Third");
+    await b.post("/api/pair/start", { label: "Second" });
+    return { world, a, b, c };
+  };
+
+  it("lists each device with the id that names it, and the one asking marked", async () => {
+    const { a } = await three();
+    const devices = (await a.status()).body.devices as { id: string; label: string; seen: number; self: boolean }[];
+    expect(devices).toHaveLength(3);
+    for (const device of devices) expect(device.id).toMatch(/^[A-Za-z0-9_-]{16}$/);
+    expect(devices.filter((device) => device.self)).toHaveLength(1);
+    expect(new Set(devices.map((device) => device.id)).size).toBe(3);
+  });
+
+  it("takes the device out: its next call is unlinked with its cookies cleared, and the group and its data carry on", async () => {
+    const { a, b, c } = await three();
+    await a.sync({ "c:x": [5, 1] });
+    await c.sync({ "c:y": [6, 1] });
+    const gone = await idOf(a, "Third");
+    const reply = await a.post("/api/remove", { id: gone });
+    expect(reply).toMatchObject({ status: 200, body: { ok: true } });
+    NO_STORE(reply.headers);
+    // the removed device finds out on its next call, and is cleared like one that unlinked
+    const next = await c.sync();
+    expect(next.status).toBe(401);
+    expect(next.body).toEqual({ error: "unlinked" });
+    expect(line(next.cookies, "hundo_sync")).toContain("Max-Age=0");
+    expect(line(next.cookies, "hundo_link")).toContain("Max-Age=0");
+    expect((await c.status()).status).toBe(401);
+    // the others still see all of the data, including what the removed device pushed, and no longer see it
+    expect((await a.sync()).body).toMatchObject({ entries: { "c:x": [5, 1], "c:y": [6, 1] } });
+    expect(((await a.status()).body.devices as { label: string }[]).map((device) => device.label)).not.toContain("Third");
+    expect((await b.sync()).status).toBe(200);
+  });
+
+  it("tidies a row whose record is gone, as when a device was removed in the middle of its own sync and wrote itself back", async () => {
+    const { world, a } = await three();
+    const id = await idOf(a, "Third");
+    await world.store.exec([["DEL", world.store.keys().find((name) => name.includes(`:dv:${id}`))!]]);
+    expect((await a.post("/api/remove", { id })).body).toEqual({ ok: true });
+    expect(((await a.status()).body.devices as { id: string }[]).map((device) => device.id)).not.toContain(id);
+  });
+
+  it("removes a device by its own record, listed or not, and refuses one whose record says another group", async () => {
+    const { world, a } = await three();
+    const gd = world.store.keys().find((name) => name.includes(":gd:"))!;
+    const id = await idOf(a, "Third");
+    // not in the list, but its record still says it is in this group
+    await world.store.exec([["HDEL", gd, id]]);
+    expect((await a.post("/api/remove", { id })).body).toEqual({ ok: true });
+    // still in the list, but its record says another group: it moved, and isn't this group's to remove
+    const second = await idOf(a, "Second device");
+    const dv = world.store.keys().find((name) => name.includes(`:dv:${second}`))!;
+    await world.store.exec([["HSET", dv, "g", "some-other-group"]]);
+    expect((await a.post("/api/remove", { id: second })).body).toEqual({ error: "device" });
+    expect(world.store.keys()).toContain(dv);
+  });
+
+  it("frees the place the device held, and its record", async () => {
+    const { world, a } = await three();
+    const before = world.store.keys().filter((name) => name.includes(":dv:")).length;
+    await a.post("/api/remove", { id: await idOf(a, "Third") });
+    expect(world.store.keys().filter((name) => name.includes(":dv:")).length).toBe(before - 1);
+    expect((await world.store.exec([["HLEN", world.store.keys().find((name) => name.includes(":gd:"))!]]))[0]).toBe(2);
+  });
+
+  it("refuses a device taking itself out (that is unlinking), an id that names nothing, one in another group, and one that isn't an id", async () => {
+    const { world, a } = await three();
+    const own = await idOf(a, "Test device");
+    expect((await a.post("/api/remove", { id: own })).body).toEqual({ error: "self" });
+    expect((await a.sync()).status).toBe(200);
+    const other = await link(world);
+    const foreign = await idOf(other.a, "Test device");
+    for (const id of ["A".repeat(16), foreign, "short", "x".repeat(17), "has spaces here!!", 12, null, ["A".repeat(16)], undefined]) {
+      const reply = await a.post("/api/remove", { id });
+      expect(reply.status, JSON.stringify(id)).toBe(400);
+      expect(reply.body, JSON.stringify(id)).toEqual({ error: "device" });
+    }
+    // the other group's device is still there
+    expect((await other.a.status()).body.devices).toHaveLength(2);
+  });
+
+  it("is for a linked device only, and keeps every other check: origin, JSON and protocol", async () => {
+    const { world, a } = await three();
+    const id = await idOf(a, "Third");
+    expect((await world.device().post("/api/remove", { id })).status).toBe(401);
+    expect((await a.post("/api/remove", { id }, { origin: "https://evil.example" })).status).toBe(403);
+    expect((await a.post("/api/remove", { id }, { headers: { "content-type": "text/plain" } })).status).toBe(400);
+    expect((await a.post("/api/remove", { id }, { raw: JSON.stringify({ id }) })).status).toBe(400);
+    expect((await handle(new Request("https://api.hundo.quest/api/remove", { method: "GET" }), world.deps)).status).toBe(405);
+    // none of that removed it
+    expect(((await a.status()).body.devices as unknown[]).length).toBe(3);
   });
 });
 

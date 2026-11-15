@@ -2,13 +2,15 @@ import { brand } from "../guide";
 import { call } from "./api";
 import { deviceLabel, isApple } from "./label";
 import { dropRecord } from "./local";
-import { syncSoon } from "./engine";
+import { syncAfterLinking } from "./engine";
 import { installed } from "../persistence";
 import { setSyncStatus } from "../store/sync";
 
 /** The calls behind the Sync screen: showing a code, typing one, listing the devices, and leaving. */
 
 export interface Device {
+  /** What names it to `removeDevice`. Absent from an older server's list, which can't remove one. */
+  id?: string;
   label: string;
   seen: number;
   self: boolean;
@@ -35,7 +37,9 @@ export async function checkStatus(): Promise<StatusResult> {
   if (status === 0) return { ok: false, why: "offline" };
   if (status === 401) return { ok: false, why: "unlinked" };
   if (status !== 200 || !body) return { ok: false, why: "error" };
-  const devices = Array.isArray(body.devices) ? body.devices.filter((d) => typeof d?.label === "string" && typeof d.seen === "number") : [];
+  const devices = Array.isArray(body.devices)
+    ? body.devices.filter((d) => typeof d?.label === "string" && typeof d.seen === "number").map((d) => ({ ...d, id: typeof d.id === "string" ? d.id : undefined }))
+    : [];
   return { ok: true, linked: body.linked === true, devices, now: typeof body.now === "number" ? body.now : Date.now() };
 }
 
@@ -48,10 +52,21 @@ export async function claimCode(code: string): Promise<ClaimResult> {
   return { ok: false, why: status === 0 ? "offline" : status === 429 ? "limit" : "error" };
 }
 
+export type RemoveResult = "removed" | "gone" | "offline" | "error";
+
+/** Take another device of the group out. It finds out on its next call, and its own progress stays on it. */
+export async function removeDevice(id: string): Promise<RemoveResult> {
+  const { status } = await call("/remove", { id });
+  if (status === 200) return "removed";
+  // 400: the server doesn't have it in this group, because it was removed already, or has moved to another.
+  if (status === 400) return "gone";
+  return status === 0 ? "offline" : "error";
+}
+
 /** This device has just been linked (by either side of a code): join the group and sync. */
 export function afterLinked() {
   setSyncStatus({ phase: "joining" });
-  syncSoon();
+  syncAfterLinking();
 }
 
 /** Take this device out of its group. Progress stays on it. False when the service couldn't be reached, and nothing changed. */

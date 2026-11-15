@@ -37,15 +37,28 @@ export const BACKOFF_MAX = 5 * 60_000;
 export const backoff = (failures: number, random = Math.random()) =>
   Math.min(BACKOFF_MAX, BACKOFF_FIRST * 2 ** Math.max(0, failures - 1)) * (0.75 + random * 0.5);
 
+/**
+ * Rounds after a device links, beyond the one it runs at once. The two devices of a pair don't link in the same moment: the one that
+ * typed the code joins first, to a group that is still empty, and the one that showed it learns of the link from its next look, up to
+ * 3 seconds later, and only then pushes what it has. So the first has to look again, and the second has to hear what the first sent.
+ */
+export const LINK_FOLLOW_UPS = [3_000, 8_000, 15_000];
+
 interface Engine {
   kick: () => void;
+  linking: () => void;
 }
 
 let active: Engine | null = null;
 
-/** Run a round soon, for when something just changed what sync should do (a device was linked). */
+/** Run a round soon, for when something just changed what sync should do. */
 export function syncSoon() {
   active?.kick();
+}
+
+/** A device has just been linked, or another has joined this one's group: a round now, and a few more shortly after. */
+export function syncAfterLinking() {
+  active?.linking();
 }
 
 /** Starts sync for this page and returns the function that stops it. */
@@ -56,6 +69,7 @@ export function startEngine(): () => void {
   let changedHere = false;
   /** The round now running or just ended was started by the poll timer. */
   let polled = false;
+  let followUps: ReturnType<typeof setTimeout>[] = [];
   let running = false;
   let again = false;
   let failures = 0;
@@ -184,7 +198,20 @@ export function startEngine(): () => void {
   window.addEventListener("offline", onOffline);
   window.addEventListener("storage", onStorage);
 
-  active = { kick: () => schedule(0) };
+  active = {
+    kick: () => schedule(0),
+    linking: () => {
+      wait = POLL_FAST;
+      schedule(0);
+      followUps.forEach(clearTimeout);
+      followUps = LINK_FOLLOW_UPS.map((delay) =>
+        setTimeout(() => {
+          // Not in the middle of a round, nor over a retry waiting out a failure, nor on a page that is hidden: the same rules as everywhere.
+          if (!stopped && !running && failures === 0 && visible() && linked()) void run();
+        }, delay),
+      );
+    },
+  };
   setSyncStatus({ phase: startingPhase() });
   if (linked()) schedule(0);
 
@@ -192,6 +219,7 @@ export function startEngine(): () => void {
     stopped = true;
     clearTimeout(timer);
     clearTimeout(pollTimer);
+    followUps.forEach(clearTimeout);
     document.removeEventListener("visibilitychange", onVisibility);
     window.removeEventListener("focus", onReturn);
     window.removeEventListener("pageshow", onPageShow);
