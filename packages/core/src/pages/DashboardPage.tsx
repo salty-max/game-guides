@@ -5,6 +5,7 @@ import { Breadcrumb, Button, PageHeading, ProgressBar } from "../components/ui";
 import { CHAPTER_COUNT, cats, chapterRows, chapters, completion, overallLine, text, whatsLeft } from "../guide";
 import { two } from "../format";
 import { exportProgress } from "../backup";
+import { installed, usePersistence } from "../persistence";
 import { panels } from "virtual:guide/panels";
 import { isOpen, useProgress } from "../store/progress";
 import { useUi } from "../store/ui";
@@ -13,6 +14,7 @@ export function DashboardPage() {
   const { section } = useParams();
   const data = useProgress((s) => s.data);
   const openDialog = useUi((s) => s.openDialog);
+  const persisted = usePersistence((s) => s.persisted);
   const visible = chapters.filter((chapter) => isOpen(data, chapter.id));
 
   useEffect(() => {
@@ -50,6 +52,15 @@ export function DashboardPage() {
           <section className="panel">
             <h2>Progress backup</h2>
             <p>Progress lives in this browser. Export a backup to move it to another device or keep a copy.</p>
+            {persisted === false && (
+              <p>
+                This browser hasn’t agreed to keep your progress, so it may clear it when space runs low, or in Safari after
+                you stay away a while.{" "}
+                {installed()
+                  ? "Export a backup now and then."
+                  : "Export a backup now and then, or add the guide to your home screen and import the backup there."}
+              </p>
+            )}
             <div className="controls">
               <Button onClick={exportProgress}>Export progress</Button>
               <Button onClick={() => openDialog({ kind: "settings" })}>Import progress</Button>
