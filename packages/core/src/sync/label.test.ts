@@ -1,4 +1,4 @@
-import { deviceLabel, isApple } from "./label";
+import { browserOf, deviceLabel, isApple } from "./label";
 
 const agents = {
   iphoneSafari: "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.7 Mobile/15E148 Safari/604.1",
@@ -29,6 +29,24 @@ describe("deviceLabel", () => {
   });
 });
 
+describe("deviceLabel for an installed app", () => {
+  it("says which guide's app it is, since each installed guide is a device of its own", () => {
+    expect(deviceLabel(agents.iphoneSafari, true, 5, "Koholint")).toBe("Safari · iPhone · Koholint app");
+    expect(deviceLabel(agents.winEdge, true, 0, "RDR")).toBe("Edge · Windows · RDR app");
+    expect(deviceLabel(agents.macSafari, false, 0, "Koholint")).toBe("Safari · Mac");
+  });
+
+  it("keeps to what the server keeps, 40 characters, for every browser and system and every guide's name", () => {
+    const longest = [
+      "Mozilla/5.0 (Linux; Android 15; SM-S921B) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/27.0 Chrome/125.0.0.0 Mobile Safari/537.36",
+      "Mozilla/5.0 (X11; CrOS x86_64 14541.0.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36",
+      "Mozilla/5.0 (Linux; Android 15) AppleWebKit/537.36 (KHTML, like Gecko) OPR/80.0.0.0 Mobile Safari/537.36",
+      ...Object.values(agents),
+    ];
+    for (const ua of longest) for (const app of ["Koholint", "RDR", "Echoes"]) expect(deviceLabel(ua, true, 5, app).length, `${ua} ${app}`).toBeLessThanOrEqual(40);
+  });
+});
+
 describe("isApple", () => {
   it("knows an iPhone, an iPad, and an iPad that says it is a Mac, but not a Mac", () => {
     expect(isApple(agents.iphoneSafari, 5)).toBe(true);
@@ -40,6 +58,16 @@ describe("isApple", () => {
 
   it("labels an iPad that says it is a Mac as an iPad", () => {
     expect(deviceLabel(agents.macSafari, false, 5)).toBe("Safari · iPad");
+  });
+
+  it("knows the iPhone browsers by what they are, and not as Safari", () => {
+    for (const [ua, name] of [
+      [agents.iphoneChrome, "Chrome"],
+      [agents.iphoneSafari, "Safari"],
+      ["Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) EdgiOS/140.0.0.0 Mobile/15E148 Safari/605.1.15", "Edge"],
+      ["Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) FxiOS/140.0 Mobile/15E148 Safari/605.1.15", "Firefox"],
+      ["Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) OPiOS/16.0.15 Mobile/15E148 Safari/9537.53", "Opera"],
+    ] as const) expect(browserOf(ua), ua).toBe(name);
     expect(deviceLabel(agents.macSafari, false, 0)).toBe("Safari · Mac");
   });
 });

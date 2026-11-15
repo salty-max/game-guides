@@ -8,7 +8,7 @@ import { installed } from "../persistence";
 import { useSyncStatus, type SyncPhase } from "../store/sync";
 import { useUi } from "../store/ui";
 import { syncSoon } from "../sync/engine";
-import { isApple } from "../sync/label";
+import { browserOf, isApple } from "../sync/label";
 import { afterLinked, checkStatus, claimCode, forgetGroup, startCode, unlinkDevice, type ClaimResult, type CodeResult, type Device } from "../sync/pairing";
 
 /** How long a code works, which the server holds to as well. Counted from when it arrives, so a clock that's off can't shorten it. */
@@ -67,7 +67,7 @@ function View({ children }: { children: ReactNode }) {
 function PrivacyNote() {
   return (
     <DialogText small>
-      No email or name. The server keeps a random id for each device, a label like “Safari · iPhone”, and your checks with the time you made them. It sees your IP
+      No email or name. The server keeps a random id for each device, a label like “Safari · iPhone · Koholint app”, and your checks with the time you made them. It sees your IP
       address, as every website does, and keeps only a scrambled copy of it, for at most an hour, to limit tries at a code. Spoiler settings sync too. Delete synced
       progress erases it all, and anything not synced for 400 days goes by itself.
     </DialogText>
@@ -90,8 +90,10 @@ function Off({ onShow, onEnter, busy, said }: { onShow: () => void; onEnter: () 
       {isApple() && (
         <DialogText small>
           {installed()
-            ? "This guide is installed, so it keeps its own storage: type a code here once."
-            : "On an iPhone or iPad, link here in Safari first, then add the guides to your Home Screen, and they should start linked. A guide already on your Home Screen takes a code once."}
+            ? "This guide is an app on your Home Screen, and it keeps its own link: type a code here. Each other guide on your Home Screen needs a code of its own."
+            : browserOf() === "Safari"
+              ? "On an iPhone or iPad, each guide on your Home Screen keeps its own link. One you add after linking here in Safari should come up linked; one that is already there needs a code of its own."
+              : "On an iPhone or iPad, each guide on your Home Screen keeps its own link, and needs a code of its own."}
         </DialogText>
       )}
       <DialogFooter>
@@ -248,6 +250,15 @@ function Linked({ onShow, busy, said, onUnlink, onForget }: { onShow: () => void
           <ItemRow key={index} title={device.self ? `${device.label} (this device)` : device.label} detail={`Last synced ${ago(device.seen, shown.now)}`} />
         ))}
       </ItemList>
+      {isApple() && (
+        <DialogText small>
+          {installed()
+            ? "This guide is an app on your Home Screen, and each guide you add there keeps its own link: open its Sync screen and type a code there."
+            : browserOf() === "Safari"
+              ? "On an iPhone or iPad, a guide you add to the Home Screen from now on should come up linked; one that is already there needs a code of its own: open its Sync screen and type one."
+              : "On an iPhone or iPad, each guide on your Home Screen keeps its own link: open its Sync screen and type a code there."}
+        </DialogText>
+      )}
       <DialogFooter>
         <Button look="" data-autofocus="" aria-disabled={busy || undefined} onClick={onShow}>
           Link another device
