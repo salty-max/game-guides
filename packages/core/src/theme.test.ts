@@ -1,3 +1,4 @@
+// @vitest-environment node
 import coreCss from "./styles.css?raw";
 import themeCss from "virtual:guide/theme.css?raw";
 

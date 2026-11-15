@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { execFileSync } from "node:child_process";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import page from "../index.html?raw";

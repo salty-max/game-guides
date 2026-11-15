@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { allRows, brand, CHAPTER_COUNT } from "./guide";
 import { defaultState, validateState } from "./progress-state";
 

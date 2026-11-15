@@ -5,6 +5,9 @@ import { chapters } from "../guide";
 import { defaultState } from "../progress-state";
 import { useProgress } from "../store/progress";
 import { MissablesStrip } from "./MissablesStrip";
+import { allowSlowMounts } from "../test/slow";
+
+allowSlowMounts();
 
 // Flag the guide's first row, whatever the guide, so every guide exercises the list.
 vi.mock("virtual:guide/config", async (importOriginal) => {

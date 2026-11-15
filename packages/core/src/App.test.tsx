@@ -6,6 +6,9 @@ import { brand, chapters, config } from "./guide";
 import { panels } from "virtual:guide/panels";
 import { useProgress } from "./store/progress";
 import { useUi } from "./store/ui";
+import { allowSlowMounts } from "./test/slow";
+
+allowSlowMounts();
 
 const first = chapters[0];
 const firstRow = first.groups[0].rows[0];

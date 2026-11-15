@@ -2,6 +2,9 @@ import { render, screen, within } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import { chapters } from "../guide";
 import { MissablesStrip } from "./MissablesStrip";
+import { allowSlowMounts } from "../test/slow";
+
+allowSlowMounts();
 
 // Nothing flagged, with a sourced reassurance, so every guide exercises that branch too.
 vi.mock("virtual:guide/config", async (importOriginal) => {
