@@ -35,7 +35,7 @@ export function ArticleRoute({ chapter, target, footer }: { chapter: Chapter; ta
         ))}
         {footer}
       </article>
-      <nav className="chapter-contents chapter-contents-desktop" aria-label="In this chapter">
+      <nav className="chapter-contents chapter-contents-desktop standalone:top-6" aria-label="In this chapter">
         <h2>In this chapter</h2>
         {links}
       </nav>

@@ -86,9 +86,9 @@ describe("guide theme", () => {
     }
   });
 
-  it("keeps core's tokens in a layer below the legacy rules that override --bar and --rail-w on small screens", () => {
-    // An unlayered rule beats every layer, and a rule in a higher layer beats a lower one: either would make tokens.css win over
-    // the legacy media queries and the phone layout would quietly lose its overrides.
+  it("keeps core's tokens, and the media queries that resize them, in a layer below the legacy rules", () => {
+    // An unlayered rule beats every layer, so a token (or --bar-h and --rail-w on a phone) left outside @layer theme would beat the
+    // palette and everything a guide sets after it.
     const app = appCss.replace(/\/\*[\s\S]*?\*\//g, "");
     const order = (/@layer\s+([\w\s,-]+);/.exec(app)?.[1] ?? "").split(",").map((name) => name.trim());
     expect(order.indexOf("theme"), "the layer order in app.css").toBeGreaterThanOrEqual(0);

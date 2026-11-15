@@ -38,7 +38,7 @@ describe("App", () => {
     render(<App />);
     expect(brand.name).toBe(`${brand.mark} Hundo`);
     expect(brand.title.startsWith(`${brand.name} · `)).toBe(true);
-    expect(await screen.findByRole("link", { name: `${brand.name} home` })).toHaveTextContent(`${brand.mark}Hundo`);
+    expect(await screen.findByRole("link", { name: `${brand.name} home` })).toHaveTextContent(`${brand.mark} Hundo`);
     const rail = screen.getByRole("complementary", { name: "Chapters" });
     expect(within(rail).getByText("© 2026 Hundo")).toBeInTheDocument();
     expect(within(rail).getByText(`Unofficial fan guide, not affiliated with ${brand.publisher}.`)).toBeInTheDocument();

@@ -12,9 +12,13 @@ const text = cva("my-2.5", {
 
 const status = cva("my-2.5 min-h-5 text-sm", { variants: { tone: { quiet: "text-muted", error: "text-error" } } });
 
-/** The middle of a dialog: a tall screen scrolls here, so the title and the close button stay in view on a phone. */
+/**
+ * The middle of a dialog: a tall screen scrolls here, so the title and the close button stay in view on a phone. A scrolling box clips
+ * what sticks out of it, and a focus ring does (3px of outline and 3px of offset), so the box takes in 8px of the dialog's padding
+ * on each side and gives it back as its own: the content sits where it did, and the ring of a field at its edge isn't cut off.
+ */
 export function DialogBody({ children }: { children: ReactNode }) {
-  return <div className="min-h-0 flex-1 overflow-y-auto">{children}</div>;
+  return <div className="-mx-2 -mb-2 min-h-0 flex-1 overflow-y-auto overscroll-contain px-2 pb-2">{children}</div>;
 }
 
 /** A row of actions at the end of a section. */

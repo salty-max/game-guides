@@ -1,11 +1,16 @@
 /* Core's design tokens. A guide's theme.css sets the eleven palette colours; everything below is derived from them or fixed here,
    and the @theme blocks at the end hand all of it to Tailwind as variables (never as copied values), so a guide's palette and
-   corners reach every utility. The :root blocks sit in the `theme` layer, below the legacy rules, so a media query in styles.css can
-   still override a token (--bar and --rail-w on a phone); unlayered, they would win over every layer. theme.test.ts reads this
-   file as text. */
+   corners reach every utility. The :root blocks, and the media queries that resize the layout tokens, sit in the `theme` layer:
+   unlayered, they would win over every other layer. theme.test.ts reads this file as text. */
 @layer theme {
 :root{
-  color-scheme:light;--bar:69px;--rail-w:249px;
+  color-scheme:light;--bar-h:69px;--rail-w:249px;
+  /* The parts of the screen a notch, the status bar or the home indicator covers (0 where there are none; viewport-fit=cover in
+     index.html is what lets the page reach them). The top bar is --bar-h tall below them, so --bar, which is what everything under
+     it is offset by, includes them; the rail column does the same on its left. --bar-h and --rail-w change with the width of the
+     screen (the media queries below). */
+  --safe-top:env(safe-area-inset-top,0px);--safe-right:env(safe-area-inset-right,0px);--safe-bottom:env(safe-area-inset-bottom,0px);--safe-left:env(safe-area-inset-left,0px);
+  --bar:calc(var(--bar-h) + var(--safe-top));--rail-col:calc(var(--rail-w) + var(--safe-left));
   --line-soft:color-mix(in srgb,var(--line) 55%,var(--surface));
   --control-line:color-mix(in srgb,var(--ink) 20%,var(--surface));
   /* checkbox edges and other boundaries that must stand out at 3:1 */
@@ -39,6 +44,9 @@
   --error:#f1bcaf;--danger:#f1bcaf;--on-danger:#2a1410;--ok:#9bcf9f;--warn:#ed9e75;
   --shadow:#0009;--backdrop:color-mix(in srgb,var(--paper) 86%,transparent);
 }
+/* The rail narrows from 1040px. From 800px it is a drawer rather than a column, and the top bar is shorter. */
+@media (max-width:1040px){:root{--rail-w:224px}}
+@media (max-width:800px){:root{--bar-h:60px;--rail-w:250px}}
 }
 
 /* Tailwind keeps its spacing, type scale, weights, breakpoints and motion. Its colours, radii, shadows and fonts are cleared, so

@@ -1,4 +1,4 @@
-import type { ButtonHTMLAttributes, ReactNode } from "react";
+import type { ButtonHTMLAttributes, ComponentPropsWithRef, ReactNode } from "react";
 import { Link } from "react-router";
 import { buttonClass, type ButtonSize, type ButtonStyle } from "./buttonStyle";
 import { Icon, type IconName } from "./Icon";
@@ -30,9 +30,14 @@ export function LinkButton({ to, look = "outline", size = "default", icon, child
   );
 }
 
-export function IconButton({ label, icon, className = "icon-button", ...rest }: { label: string; icon: IconName } & ButtonHTMLAttributes<HTMLButtonElement>) {
+// The top bar sets --icon-w where its buttons have to be narrower (the narrowest phones), so no class is needed on one.
+const iconButton =
+  "grid h-10 w-(--icon-w,2.5rem) place-items-center rounded-control border border-control-line bg-transparent p-0 text-inherit hover:bg-raised [&_.svg-icon]:size-4.5";
+
+/** A square button with an icon and no words: `label` is what a screen reader says. */
+export function IconButton({ label, icon, ...rest }: { label: string; icon: IconName } & Omit<ComponentPropsWithRef<"button">, "className" | "style">) {
   return (
-    <button type="button" className={className} aria-label={label} {...rest}>
+    <button type="button" className={iconButton} aria-label={label} {...rest}>
       <Icon name={icon} />
     </button>
   );

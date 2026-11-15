@@ -5,18 +5,54 @@ import { useRef, useState } from "react";
 import { DialogBody } from "./dialog";
 import { screens, type DialogScreen } from "./screen-list";
 import { IconButton } from "./ui";
+import { lastInput } from "../lastInput";
 import { useUi } from "../store/ui";
 
+// Base UI's own dialog layers (the "inside scroll" pattern in https://base-ui.com/react/components/dialog): a backdrop, a viewport that
+// positions the popup, and a popup whose body scrolls inside it. `supports-[-webkit-touch-callout:none]:absolute` is the rule that page
+// gives the backdrop for iOS 26 and later, where a fixed backdrop doesn't cover everything the reader can see.
 const backdrop =
-  "fixed inset-0 z-50 bg-backdrop transition-opacity duration-100 data-ending-style:opacity-0 data-starting-style:opacity-0 motion-reduce:transition-none";
+  "fixed inset-0 z-50 min-h-dvh bg-backdrop transition-opacity duration-100 supports-[-webkit-touch-callout:none]:absolute data-ending-style:opacity-0 data-starting-style:opacity-0 motion-reduce:transition-none";
+
+// The viewport is the part of the screen the reader can see: --vv-top and --vv-height are the visual viewport's (followVisualViewport),
+// which an on-screen keyboard shrinks, and fall back to the layout viewport where there is no visual viewport to ask. The notch and the
+// home indicator are its padding. `touch-none` keeps a finger on the dimmed page, or on the dialog's frame, from dragging anything: the
+// body scrolls on its own (touch-action stops at a scroll container), and the page behind is inert.
+const viewport =
+  "fixed top-[var(--vv-top,0px)] left-0 z-50 flex h-[var(--vv-height,100dvh)] w-full touch-none items-center justify-center overflow-hidden pt-[calc(15px+var(--safe-top))] pr-[calc(13px+var(--safe-right))] pb-[calc(15px+var(--safe-bottom))] pl-[calc(13px+var(--safe-left))]";
 
 const popup = cva(
-  "fixed top-1/2 left-1/2 z-50 flex max-h-[calc(100dvh-30px)] -translate-1/2 flex-col rounded-card border border-control-line bg-surface p-5 text-ink shadow-[0_18px_85px_var(--shadow)] outline-hidden transition-[opacity,scale] duration-100 data-ending-style:scale-95 data-ending-style:opacity-0 data-starting-style:scale-95 data-starting-style:opacity-0 motion-reduce:transition-none",
+  "relative flex max-h-full min-h-0 w-full flex-col rounded-card border border-control-line bg-surface p-5 text-ink shadow-[0_18px_85px_var(--shadow)] outline-hidden transition-[opacity,scale] duration-100 data-ending-style:scale-95 data-ending-style:opacity-0 data-starting-style:scale-95 data-starting-style:opacity-0 motion-reduce:transition-none",
   {
-    variants: { size: { default: "w-[min(530px,calc(100%-26px))]", wide: "w-[min(720px,calc(100%-26px))]" } },
+    variants: { size: { default: "max-w-[530px]", wide: "max-w-[720px]" } },
     defaultVariants: { size: "default" },
   },
 );
+
+/** A field you type in: the one place where focus on a touch screen is wanted, because it brings the keyboard up. */
+const takesText = (el: HTMLElement) => el.matches("input:not([type=checkbox], [type=radio], [type=file], [type=button], [type=submit]), textarea");
+
+/**
+ * What the visual viewport is, kept in --vv-top and --vv-height on the dialog's viewport layer (a ref callback: the layer is in a portal and
+ * mounts a moment after the dialog is asked for). The layout viewport doesn't change when the on-screen
+ * keyboard opens (on iOS it stays the size of the screen), so a dialog centred in it would be half behind the keyboard; the visual
+ * viewport is the part the reader can actually see, and it shrinks.
+ */
+function followVisualViewport(layer: HTMLElement | null) {
+  const visual = window.visualViewport;
+  if (!layer || !visual) return;
+  const sync = () => {
+    layer.style.setProperty("--vv-top", `${visual.offsetTop}px`);
+    layer.style.setProperty("--vv-height", `${visual.height}px`);
+  };
+  sync();
+  visual.addEventListener("resize", sync);
+  visual.addEventListener("scroll", sync);
+  return () => {
+    visual.removeEventListener("resize", sync);
+    visual.removeEventListener("scroll", sync);
+  };
+}
 
 /**
  * Where the focus goes when a screen opens: the element the screen marks with data-autofocus, else the first field. A radio's hidden
@@ -66,15 +102,26 @@ function Frame({ alert }: { alert: boolean }) {
       {shown && screen && (
         <Dialog.Portal>
           <Dialog.Backdrop className={backdrop} />
-          <Dialog.Popup ref={popupRef} className={popup({ size: screen.size })} initialFocus={() => firstField(popupRef.current) ?? true}>
-            <Dialog.Title className="pr-11 font-display text-[25px] leading-[1.2] font-bold tracking-[-0.015em]">{screen.title(shown)}</Dialog.Title>
-            <div className="absolute top-3 right-3.25">
-              <IconButton label="Close dialog" icon="x" onClick={closeDialog} />
-            </div>
-            <DialogBody>
-              <screen.Body key={last?.key} dialog={shown} />
-            </DialogBody>
-          </Dialog.Popup>
+          <Dialog.Viewport ref={followVisualViewport} className={viewport}>
+            <Dialog.Popup
+              ref={popupRef}
+              className={popup({ size: screen.size })}
+              initialFocus={() => {
+                const field = firstField(popupRef.current);
+                // Opened by a touch: a button or a radio taking the focus would show the ring a keyboard user needs, round something nobody
+                // pressed. The dialog takes it instead (it is named, and a screen reader says so), except for a field you type in.
+                return field && lastInput() === "touch" && !takesText(field) ? (popupRef.current ?? true) : (field ?? true);
+              }}
+            >
+              <Dialog.Title className="pr-11 font-display text-[25px] leading-[1.2] font-bold tracking-[-0.015em]">{screen.title(shown)}</Dialog.Title>
+              <div className="absolute top-3 right-3.25">
+                <IconButton label="Close dialog" icon="x" onClick={closeDialog} />
+              </div>
+              <DialogBody>
+                <screen.Body key={last?.key} dialog={shown} />
+              </DialogBody>
+            </Dialog.Popup>
+          </Dialog.Viewport>
         </Dialog.Portal>
       )}
     </Root>
