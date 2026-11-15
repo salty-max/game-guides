@@ -28,7 +28,7 @@ describe("every request", () => {
     for (const path of ["/api", "/", "/api/sync/", "/api/pair"]) expect((await get(path)).status, path).toBe(404);
   });
 
-  it("answers only a page of the guides: its Origin must be its own host, on hundo.quest, a preview or localhost", async () => {
+  it("answers only a page of the guides, by its Origin alone: on hundo.quest, one of the team's previews, or localhost", async () => {
     const world = new World();
     const d = world.device();
     const refused: [string, Parameters<Device["post"]>[2]][] = [
@@ -38,8 +38,12 @@ describe("every request", () => {
       ["the API's own host", { origin: "https://api.hundo.quest" }],
       ["the bare domain", { origin: "https://hundo.quest" }],
       ["plain http on hundo.quest", { origin: "http://koholint.hundo.quest" }],
-      ["origin and forwarded host differ", { headers: { "x-forwarded-host": "evil.example" } }],
-      ["a plain host that differs", { direct: true, headers: { host: "evil.example" } }],
+      ["a port on hundo.quest", { origin: "https://koholint.hundo.quest:8443" }],
+      ["any other vercel.app", { origin: "https://evil.vercel.app" }],
+      ["a vercel.app that isn't the team's", { origin: "https://hundo-koholint.vercel.app" }],
+      ["a lookalike of a preview", { origin: "https://hundo-koholint-jellycat.vercel.app.evil.example" }],
+      ["a preview on plain http", { origin: "http://hundo-koholint-2b16reepd-jellycat.vercel.app" }],
+      ["a preview on a port", { origin: "https://hundo-koholint-2b16reepd-jellycat.vercel.app:8443" }],
       ["not a url", { headers: { origin: "null" } }],
     ];
     for (const [name, options] of refused) {
@@ -47,9 +51,38 @@ describe("every request", () => {
       expect(reply.status, name).toBe(403);
       NO_STORE(reply.headers);
     }
-    for (const origin of [KOHOLINT, RDR, "https://reddead.hundo.quest", PREVIEW]) expect((await d.status({ origin })).status, origin).not.toBe(403);
+    // nothing refused for its Origin touched the store
+    expect(world.store.commands).toBe(0);
+    for (const origin of [KOHOLINT, RDR, "https://reddead.hundo.quest", PREVIEW, "https://hundo-koholint-2b16reepd-jellycat.vercel.app", "https://hundo-rdr-git-feat-sync-client-jellycat.vercel.app"]) {
+      expect((await d.status({ origin })).status, origin).not.toBe(403);
+    }
     expect((await d.status({ origin: LOCAL, direct: true })).status).not.toBe(403);
     expect((await d.status({ origin: "http://127.0.0.1:5173", direct: true })).status).not.toBe(403);
+  });
+
+  it("doesn't need the host to say who is calling: behind a guide's rewrite it never names the guide", async () => {
+    const d = new World().device();
+    const behind = { headers: { host: "api.hundo.quest", "x-forwarded-host": "api.hundo.quest" } };
+    expect((await d.status({ origin: KOHOLINT, ...behind })).status).toBe(401);
+    expect((await d.status({ origin: PREVIEW, ...behind })).status).toBe(401);
+    expect((await d.status({ origin: KOHOLINT, headers: { host: "somewhere.else", "x-forwarded-host": "evil.example" } })).status).toBe(401);
+  });
+
+  it("refuses a post a page of another site could make without a preflight, before it touches the store", async () => {
+    const world = new World();
+    const d = world.device();
+    const simple = ["application/x-www-form-urlencoded", "multipart/form-data; boundary=x", "text/plain", "text/plain;charset=UTF-8", ""];
+    for (const type of simple) {
+      for (const path of ["/api/pair/start", "/api/pair/claim", "/api/sync", "/api/status", "/api/unlink", "/api/forget"]) {
+        const reply = await d.post(path, {}, { origin: KOHOLINT, headers: { "content-type": type }, raw: '{"p":1}' });
+        expect(reply.status, `${path} as "${type}"`).toBe(400);
+      }
+    }
+    expect(world.store.commands).toBe(0);
+    // and what a JSON body needs is a preflight, which nothing here answers
+    const preflight = await handle(new Request("https://api.hundo.quest/api/sync", { method: "OPTIONS", headers: { origin: KOHOLINT, "access-control-request-method": "POST", "access-control-request-headers": "content-type" } }), world.deps);
+    expect(preflight.status).toBe(405);
+    expect(preflight.headers.get("access-control-allow-origin")).toBeNull();
   });
 
   it("wants a JSON object with protocol 1, of a sane size", async () => {

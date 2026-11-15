@@ -65,6 +65,16 @@ interface Ctx {
 const ttl = (ns: Ns) => (ns === "test" ? KEEP_TEST_SECONDS : KEEP_SECONDS);
 const key = (ns: Ns, ...parts: string[]) => ["hs", ns, ...parts].join(":");
 
+/** The team's preview hosts: a deployment (`hundo-koholint-2b16reepd-jellycat.vercel.app`) or a branch (`hundo-koholint-git-<branch>-jellycat.vercel.app`). */
+const PREVIEW_HOST = /^hundo-[a-z0-9-]+-jellycat\.vercel\.app$/;
+
+/**
+ * Which page is calling, and so which part of the store it may touch, from the `Origin` alone: only a guide's own hosts, the team's
+ * previews and localhost are served. The page's host can't be checked against Origin: behind a guide's /api rewrite Vercel hands this
+ * API its own host in Host, and no x-forwarded-host that names the guide's (seen on the first preview, against what Vercel's docs say).
+ * Origin is set by the browser and no page script can change it. A script on another site can't read an answer (it needs a CORS
+ * preflight, which this API never answers), and a form or text/plain post, which needs none, is refused for its content type.
+ */
 function whereFrom(request: Request): Where | null {
   const origin = request.headers.get("origin");
   if (!origin) return null;
@@ -74,11 +84,9 @@ function whereFrom(request: Request): Where | null {
   } catch {
     return null;
   }
-  // The caller must be the page's own host: behind the rewrite that is x-forwarded-host, called direct it is Host.
-  const forwarded = (request.headers.get("x-forwarded-host") ?? request.headers.get("host") ?? "").split(",")[0].trim();
-  if (forwarded !== url.host) return null;
-  if (url.protocol === "https:" && /^(?!api\.)[a-z0-9-]+\.hundo\.quest$/.test(url.hostname)) return { ns: "prod", domain: "hundo.quest", secure: true };
-  if (url.protocol === "https:" && url.hostname.endsWith(".vercel.app")) return { ns: "test", secure: true };
+  const secure = url.protocol === "https:" && url.port === "";
+  if (secure && /^(?!api\.)[a-z0-9-]+\.hundo\.quest$/.test(url.hostname)) return { ns: "prod", domain: "hundo.quest", secure: true };
+  if (secure && PREVIEW_HOST.test(url.hostname)) return { ns: "test", secure: true };
   if (["localhost", "127.0.0.1", "[::1]"].includes(url.hostname)) return { ns: "test", secure: url.protocol === "https:" };
   return null;
 }
@@ -405,6 +413,11 @@ export async function handle(request: Request, deps: Deps | null): Promise<Respo
     if (request.method !== "POST") return reply(405, { error: "method" }, [], { Allow: "POST" });
     const where = whereFrom(request);
     if (!where) return reply(403, { error: "origin" });
+    // TEMPORARY, to be removed before the merge: what the address and host headers hold behind a guide's rewrite. Test namespace only.
+    if (where.ns === "test") {
+      const h = request.headers;
+      console.log("ip-probe", JSON.stringify(Object.fromEntries(["x-real-ip", "x-forwarded-for", "x-vercel-forwarded-for", "host", "x-forwarded-host", "origin", "x-vercel-id"].map((name) => [name, h.get(name)]))));
+    }
     if (!deps) return reply(503, { error: "unconfigured" });
     if (!/^application\/json\b/i.test(request.headers.get("content-type") ?? "")) return reply(400, { error: "body" });
     if (Number(request.headers.get("content-length") ?? 0) > MAX_BODY) return reply(413, { error: "size" });

@@ -5,7 +5,7 @@ import { MemoryStore, type Store } from "./store";
 
 export const KOHOLINT = "https://koholint.hundo.quest";
 export const RDR = "https://rdr.hundo.quest";
-export const PREVIEW = "https://hundo-koholint-git-sync-team.vercel.app";
+export const PREVIEW = "https://hundo-koholint-git-sync-jellycat.vercel.app";
 export const LOCAL = "http://localhost:5173";
 export const GUIDE = "links-awakening";
 
@@ -75,9 +75,9 @@ export class Device {
     const headers: Record<string, string> = {
       "content-type": "application/json",
       origin,
-      // Behind the guide's rewrite the API sees its own host and the page's host in x-forwarded-host; called direct it sees the page's.
+      // Behind a guide's rewrite the API sees its own host and no x-forwarded-host for the guide's (seen on the first preview); called
+      // direct, as through a dev server's proxy, it sees the page's. Nothing depends on either.
       host: options.direct ? host : "api.hundo.quest",
-      ...(options.direct ? {} : { "x-forwarded-host": host }),
       "x-real-ip": this.ip,
       ...(cookie ? { cookie } : {}),
       ...options.headers,
