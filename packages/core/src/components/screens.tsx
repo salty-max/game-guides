@@ -7,6 +7,7 @@ import { brand, chapters, readChapter, text } from "../guide";
 import { exportProgress } from "../backup";
 import { validateState } from "../progress-state";
 import { isOpen, useProgress } from "../store/progress";
+import { useSyncStatus } from "../store/sync";
 import { normalizeTheme, themeOptions, useTheme } from "../store/theme";
 import { useUi, type DialogState } from "../store/ui";
 import type { ProgressState } from "../types";
@@ -39,7 +40,9 @@ export function SettingsScreen() {
   const storageError = useProgress((s) => s.storageError);
   const preference = useTheme((s) => s.preference);
   const closeDialogThen = useUi((s) => s.closeDialogThen);
+  const openDialog = useUi((s) => s.openDialog);
   const announce = useUi((s) => s.announce);
+  const synced = useSyncStatus((s) => s.phase !== "off");
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const [theme, setTheme] = useState(preference);
@@ -101,7 +104,9 @@ export function SettingsScreen() {
         </DialogFooter>
       </form>
       <DialogSeparator />
-      <DialogText>{text.backupBlurb} Importing replaces the current progress.</DialogText>
+      <DialogText>
+        {text.backupBlurb} Importing replaces the current progress{synced ? ", here and on every device you sync with" : ""}.
+      </DialogText>
       <DialogText small>
         Installed on a phone or tablet? The installed app can keep its own separate storage. Export here first, then import in the installed app.
       </DialogText>
@@ -113,6 +118,7 @@ export function SettingsScreen() {
         <Button id="import-button" disabled={!imported} onClick={replace}>
           Replace with backup
         </Button>
+        <Button onClick={() => openDialog({ kind: "sync" })}>Sync devices</Button>
       </DialogFooter>
     </>
   );

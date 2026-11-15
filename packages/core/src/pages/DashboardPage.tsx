@@ -64,6 +64,7 @@ export function DashboardPage() {
             <div className="controls">
               <Button onClick={exportProgress}>Export progress</Button>
               <Button onClick={() => openDialog({ kind: "settings" })}>Import progress</Button>
+              <Button onClick={() => openDialog({ kind: "sync" })}>Sync devices</Button>
             </div>
           </section>
           {panels.map(({ id, Component }) => (
