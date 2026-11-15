@@ -8,7 +8,7 @@ Spoiler-aware PWA field guides for single-player games: a pnpm workspace with on
 - `pnpm check`: lint (warnings fail), typecheck, tests and build in every package. Through the harness: `bun harness/q.ts check -- bun run check`, which stamps the tree for the push gate.
 - `bun harness/hooks.ts install .`, once per clone, from the main checkout's root: it points `core.hooksPath` at `harness/githooks`. `bun harness/hooks.ts status` shows whether they're on. Never run it from a worktree, which would point the whole repository at that worktree's copy.
 - In an app folder: `pnpm dev`, `pnpm test`, `pnpm build`, `pnpm preview`, `pnpm icons`. A `cd` lasts one command in a session here (`.claude/settings.json`), so reach the folder in the same command, `cd apps/<name> && pnpm test`, or use `pnpm -C apps/<name> test`.
-- Browser pane: `preview_start` with `koholint`, `rdr` or `echoes` for dev, or `<name>-preview` for a production build (`.claude/launch.json`). These load only in a session started in this repository.
+- Browser pane: `preview_start` with `koholint`, `rdr` or `echoes` for dev, or `<name>-preview` for a production build (`.claude/launch.json`). These load only in a session started in this repository. A port that's taken moves to the next free one, so read the port from the result (`docs/testing.md`).
 - Screenshots: `node .claude/skills/guide-check/scripts/shoot.mjs --out <dir>` (the `guide-check` skill).
 
 ## Which skill and doc for which task
@@ -47,6 +47,17 @@ Each one is a mistake already made, or one that would cost readers their progres
 - **Preview first.** Nothing reaches production without a look at its Vercel preview: headers, deep links, the service worker (`docs/deploying.md`).
 - **No push, deploy, merge to `main` or new Vercel project without the user's go**, asked in the session that wants it. A merge to `main` deploys every guide whose ignore command sees a change.
 - **No unverifiable claims** in the guides, the READMEs or these docs. Comments only where they explain a why.
+
+## Sessions and worktrees
+
+hundo sets `[hooks] lock = false` in `harness.toml`. Each child session works in its own git worktree on its own branch, cut from `main`. Nothing commits to `main` here and the work meets in pull requests, so there is nothing to queue for. The board is the list of who does what, not a lock. Anything in the Harness section below, or printed by a harness tool, that makes the board an automatic lock (a `held:` line, "write nothing until it's free", "the child will block on it", a commit refused for want of a card) doesn't apply. A card can still be `blocked --on` another, as a choice (the last item). The rest of that section does, except that `session.ts check` before archiving a child is replaced by the git checks below. Drop this paragraph once the template checks the lock setting itself.
+
+- **A card is still the rule.** Nothing enforces it now, so add yours as the session's first write and move it at each stop. `bun harness/board.ts held` shows who else is on hundo: read it for overlap and talk to that session by its id, don't wait for it.
+- **Open a child from the desktop app with `use_worktree: true`** (the `child` skill's `false` is for the family's shared checkouts), cut from `main`: pass `source_branch: "main"` when the opener isn't on it. A child opened from a CLI session starts in the main checkout (`session.ts` runs `claude --bg` from the project root), so open them from the desktop app.
+- **`pnpm install` first in a new worktree.** It has no `node_modules`.
+- **Where the harness reads the main checkout.** The git hooks (`core.hooksPath` is absolute) and `harness.toml` come from the main checkout, so a change to either only takes effect once the main checkout has it merged and pulled. The board and the check stamps are shared by every worktree. Never run `hooks.ts install` in a worktree.
+- **A tool given the name `hundo` reads the main checkout, not your worktree.** In a worktree, review with `bun harness/packet.ts .` and `bun harness/review.ts . "<verdict>"` (a fresh branch's packet also lists `main`'s last commit: the change is the uncommitted files). `q.ts check` and the push gate are right from a worktree. `session.ts check` isn't: it reads the main checkout. Before archiving a child, run `git -C <worktree> status --porcelain` and `git -C <worktree> log HEAD --not --remotes` instead, and push or drop its branch first.
+- **Rewrites of core are sequenced on purpose.** The component rewrite, and anything else that rewrites core under every guide, goes one at a time, whatever the lock says: a worktree spares the queue, not the rebase. The card that comes second is set `blocked --on` the first (`board.ts set <id> --status blocked --on <card>`), which is a choice and the board then reads as it always did, or it starts once the first has landed.
 
 <!-- harness:start -->
 

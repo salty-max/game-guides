@@ -38,8 +38,10 @@ The tests don't see layout, fonts, colour or how a page reads. Look at every vis
 
 | Name | What | URL |
 | --- | --- | --- |
-| `koholint`, `rdr`, `echoes` | dev server | http://localhost:5173, 5174, 5175 |
-| `koholint-preview`, `rdr-preview`, `echoes-preview` | production build, then `vite preview` | http://localhost:4173, 4174, 4175 |
+| `koholint`, `rdr`, `echoes` | dev server | http://localhost:5200, 5300, 5400 |
+| `koholint-preview`, `rdr-preview`, `echoes-preview` | production build, then `vite preview` | http://localhost:4200, 4300, 4400 |
+
+Those are the ports when nothing holds them. Read the port from `preview_start`'s result.
 
 By hand:
 
@@ -53,7 +55,17 @@ pnpm --filter hundo-echoes build && pnpm --filter hundo-echoes preview
 
 Check a release-bound change on the production build. Dev mode skips the service worker and serves unbundled modules.
 
-Every entry uses `--strictPort`, so it fails rather than drifting to another port when its own is taken. If one won't start, `lsof -nP -iTCP:<port> -sTCP:LISTEN` shows what's holding the port. That could be a server another session left running.
+Sessions work in their own worktrees ([CLAUDE.md](../CLAUDE.md#sessions-and-worktrees)), so two of them can preview the same guide at once. Every entry has `"autoPort": true`: when its port is taken, the pane starts the server on the next free one, up to 20 above it, and says so in the result. The dev entries pass `--port` and the pane rewrites it. The preview entries run a shell string, where the pane can't rewrite a flag, so they read `$PORT`, which the pane sets to the port it chose; `${PORT:-<port>}` falls back to the entry's own port where nothing sets it. Each guide's port sits 100 from the next, so a busy port moves a guide up within its own band and never onto another guide's.
+
+That matters because the pane keeps each origin's service worker and caches between sessions. A port that once served another guide, or an older build, can answer in place of the build you just started: the page is the wrong guide, or last week's. Unregister it from the page and reload:
+
+```js
+for (const r of await navigator.serviceWorker.getRegistrations()) await r.unregister();
+for (const k of await caches.keys()) await caches.delete(k);
+location.reload();
+```
+
+To see what holds a port, `lsof -nP -iTCP:<port> -sTCP:LISTEN`.
 
 ### What to look at
 
@@ -74,5 +86,5 @@ Testing writes to the guide's localStorage on `localhost`. When you're done, rem
 
 ### What a local check can't cover
 
-- **The service worker.** Claude's browser pane refuses to fetch `sw.js` (the request fails with "unknown error", for the old single-repo builds too). Check offline mode and the update prompt in a regular browser, or on a Vercel preview.
+- **The service worker's offline mode and update prompt.** The pane registers the service worker (it once refused to fetch `sw.js`, and an old one answering for a new build is how that shows now), but neither was checked in it. Check them in a regular browser, or on a Vercel preview.
 - **Headers.** The CSP, the security headers and the cache rules come from `vercel.json` and exist only on Vercel. Check them on a preview deployment ([deploying.md](deploying.md#preview-first)).
