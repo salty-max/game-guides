@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { useLocation, useParams } from "react-router";
 import { Icon } from "../components/Icon";
 import { RouteGroup } from "../components/RouteGroup";
-import { Select } from "../components/controls";
+import { Select } from "../components/Select";
 import { Breadcrumb, Button, Chip, Empty, PageHeading } from "../components/ui";
 import { allRows, CHAPTER_COUNT, cats, chapters, config, hasMissables, isCategory, readChapter, statusOptions, tagName, text } from "../guide";
 import { two } from "../format";

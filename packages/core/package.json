@@ -10,6 +10,7 @@
     "./progress-state": "./src/progress-state.ts",
     "./store/*": "./src/store/*.ts",
     "./sync/*": "./src/sync/*.ts",
+    "./components/chunks": "./src/components/chunks.ts",
     "./components/*": "./src/components/*.tsx",
     "./vite": "./vite.ts",
     "./icons": "./icons.mjs",

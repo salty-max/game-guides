@@ -1,7 +1,7 @@
 import { useState, type ReactNode } from "react";
 import { Icon } from "./Icon";
 import { RouteGroup } from "./RouteGroup";
-import { Select } from "./controls";
+import { Select } from "./Select";
 import { Chip, Empty } from "./ui";
 import { chapterRows, config, hasMissables, statusOptions } from "../guide";
 import { useProgress } from "../store/progress";

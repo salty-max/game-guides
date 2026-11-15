@@ -1,4 +1,5 @@
 import "@hundo/core/app.css";
+import { chunks } from "@hundo/core/components/chunks";
 import type { Decorator, Preview } from "@storybook/react-vite";
 import { guideCss, guides } from "./guides";
 import { GUIDES, THEMES, type GuideId, type ThemeId } from "./ids";
@@ -23,6 +24,9 @@ const withGuide: Decorator = (Story, { globals }) => {
 };
 
 const preview: Preview = {
+  // The dialog and the select load on use. Load them before a story renders, so that axe and the interaction tests see the real
+  // components, not the stand-ins shown while they load.
+  loaders: [async () => void (await Promise.all(Object.values(chunks).map((chunk) => chunk.load())))],
   decorators: [withGuide],
   initialGlobals: { guide: "koholint", theme: "light" },
   globalTypes: {
