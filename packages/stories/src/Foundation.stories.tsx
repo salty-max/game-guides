@@ -6,7 +6,17 @@ import type { GuideId, ThemeId } from "../.storybook/ids";
 
 // Not a component: a guard on the setup. The axe checks only mean something if each Vitest project really renders the guide and theme
 // it says it does, with core's CSS processed. A page with no CSS, or the wrong palette, would otherwise pass on a blank look.
-const meta = { title: "Foundation/Palette", component: Button, args: { look: "", children: "Primary" } } satisfies Meta<typeof Button>;
+const meta = {
+  title: "Foundation/Palette",
+  component: Button,
+  args: { look: "", children: "Primary" },
+  render: (args) => (
+    <div style={{ display: "flex", gap: 12 }}>
+      <Button {...args} />
+      <Button look="outline">Outline</Button>
+    </div>
+  ),
+} satisfies Meta<typeof Button>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -31,13 +41,17 @@ export const GuideLook: Story = {
     const palette = paletteOf(guide, globals.theme as ThemeId);
     const { brand } = guides[guide];
     const root = getComputedStyle(document.documentElement);
-    const button = getComputedStyle(canvas.getByRole("button"));
+    const button = getComputedStyle(canvas.getByRole("button", { name: "Primary" }));
+    const outline = getComputedStyle(canvas.getByRole("button", { name: "Outline" }));
 
     // The guide's palette is the one on the page, for this theme…
     await expect(root.getPropertyValue("--primary").trim().toLowerCase()).toBe(palette["--primary"].toLowerCase());
     // …core's CSS turned it into the button's fill and text…
     await expect(button.backgroundColor).toBe(colourOf(palette["--primary"]));
     await expect(button.color).toBe(colourOf(palette["--on-primary"]));
+    // …a look's own border colour wins over any other (the outline button's edge is a visible line, not transparent)…
+    await expect(outline.borderTopColor).toBe(colourOf("var(--control-line)"));
+    await expect(outline.borderTopWidth).toBe("1px");
     // …the guide's corner preset reached the button…
     await expect(button.borderTopLeftRadius).toBe(brand.corners === "normal" ? "999px" : "8px");
     // …and its two font files are served and load (fonts.load() resolves with the faces it loaded, and rejects if a file 404s).

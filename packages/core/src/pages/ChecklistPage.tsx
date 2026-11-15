@@ -2,7 +2,8 @@ import { useMemo, useState } from "react";
 import { useLocation, useParams } from "react-router";
 import { Icon } from "../components/Icon";
 import { RouteGroup } from "../components/RouteGroup";
-import { Breadcrumb, Button, Chip, Empty, PageHeading, SelectField } from "../components/ui";
+import { Select } from "../components/controls";
+import { Breadcrumb, Button, Chip, Empty, PageHeading } from "../components/ui";
 import { allRows, CHAPTER_COUNT, cats, chapters, config, hasMissables, isCategory, readChapter, statusOptions, tagName, text } from "../guide";
 import { two } from "../format";
 import { isOpen, useProgress } from "../store/progress";
@@ -78,15 +79,15 @@ function ChecklistView() {
           <span className="sr-only">Search entries</span>
           <input type="search" id="search" placeholder={text.searchPlaceholder} value={query} onChange={(event) => setQuery(event.target.value)} />
         </label>
-        <SelectField id="collection-category" label="Category" choices={categoryChoices} value={filter} onChange={setFilter} />
-        <SelectField
+        <Select id="collection-category" label="Category" choices={categoryChoices} value={filter} onChange={setFilter} />
+        <Select
           id="collection-chapter"
           label="Chapter"
           choices={[["all", "All revealed"], ...openChapters.map((chapter): [number, string] => [chapter.id, `Chapter ${chapter.id}`])]}
           value={effectiveChapter}
           onChange={setChapterFilter}
         />
-        <SelectField id="collection-status" label="Status" choices={statusOptions} value={status} onChange={setStatus} />
+        <Select id="collection-status" label="Status" choices={statusOptions} value={status} onChange={setStatus} />
         <Button onClick={clear}>Clear</Button>
       </div>
       <div className="subhead">

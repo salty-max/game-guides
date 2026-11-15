@@ -1,3 +1,4 @@
+import { cva } from "class-variance-authority";
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 import { Link } from "react-router";
 import { Icon, type IconName } from "./Icon";
@@ -5,27 +6,47 @@ import { brand, cats, config, tagName } from "../guide";
 import type { Row } from "../types";
 import { pct } from "../format";
 
+/** `""` is the primary look. */
 export type ButtonStyle = "" | "outline" | "accent" | "danger";
-// The outline look's class is "outlined": a bare "outline" is also a Tailwind utility, which would add a 1px outline to every such button.
-const buttonClass = (style: ButtonStyle) => ["button", style === "outline" ? "outlined" : style].filter(Boolean).join(" ");
+export type ButtonSize = "default" | "compact";
+
+// A button's padding reads --button-px, so a container can narrow it (the hero's actions on a phone) without a class on the button.
+// Each look names its own border colour: one set in the base would fight the looks' for the same property.
+const button = cva("inline-flex items-center justify-center gap-2 rounded-button border leading-[1.22] font-extrabold [&_.svg-icon]:size-4", {
+  variants: {
+    look: {
+      primary: "border-transparent bg-primary text-on-primary not-disabled:hover:bg-primary-hover",
+      outline: "border-control-line bg-surface text-primary not-disabled:hover:bg-raised",
+      accent: "border-accent bg-accent text-on-accent not-disabled:hover:border-accent-hover not-disabled:hover:bg-accent-hover",
+      danger: "border-transparent bg-danger text-on-danger",
+    },
+    size: {
+      default: "min-h-11 px-(--button-px,18px) py-2.25 text-sm",
+      compact: "min-h-10 px-(--button-px,14px) py-1.5 text-[13px]",
+    },
+  },
+});
+
+const buttonClass = (look: ButtonStyle, size: ButtonSize) => button({ look: look || "primary", size });
 
 interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "style" | "className"> {
   look?: ButtonStyle;
+  size?: ButtonSize;
   icon?: IconName;
 }
 
-export function Button({ look = "outline", icon, children, type = "button", ...rest }: ButtonProps) {
+export function Button({ look = "outline", size = "default", icon, children, type = "button", ...rest }: ButtonProps) {
   return (
-    <button type={type} className={buttonClass(look)} {...rest}>
+    <button type={type} className={buttonClass(look, size)} {...rest}>
       {icon && <Icon name={icon} />}
       {children}
     </button>
   );
 }
 
-export function LinkButton({ to, look = "outline", icon, children }: { to: string; look?: ButtonStyle; icon?: IconName; children: ReactNode }) {
+export function LinkButton({ to, look = "outline", size = "default", icon, children }: { to: string; look?: ButtonStyle; size?: ButtonSize; icon?: IconName; children: ReactNode }) {
   return (
-    <Link className={buttonClass(look)} to={to}>
+    <Link className={buttonClass(look, size)} to={to}>
       {icon && <Icon name={icon} />}
       {children}
     </Link>
@@ -45,30 +66,6 @@ export function Chip({ label, value, current, onSelect }: { label: string; value
     <button className="chip" type="button" aria-pressed={value === current} onClick={() => onSelect(value)}>
       {label}
     </button>
-  );
-}
-
-interface SelectProps {
-  id: string;
-  label: string;
-  choices: [key: string | number, label: string][];
-  value: string | number;
-  onChange: (value: string) => void;
-  bare?: boolean;
-}
-
-export function SelectField({ id, label, choices, value, onChange, bare = false }: SelectProps) {
-  return (
-    <label className="field" htmlFor={id}>
-      <span className={bare ? "sr-only" : undefined}>{label}</span>
-      <select id={id} className="select" value={String(value)} onChange={(event) => onChange(event.target.value)}>
-        {choices.map(([key, text]) => (
-          <option key={key} value={String(key)}>
-            {text}
-          </option>
-        ))}
-      </select>
-    </label>
   );
 }
 

@@ -1,7 +1,8 @@
 import { useState, type ReactNode } from "react";
 import { Icon } from "./Icon";
 import { RouteGroup } from "./RouteGroup";
-import { Chip, Empty, SelectField } from "./ui";
+import { Select } from "./controls";
+import { Chip, Empty } from "./ui";
 import { chapterRows, config, hasMissables, statusOptions } from "../guide";
 import { useProgress } from "../store/progress";
 import { useUi } from "../store/ui";
@@ -63,7 +64,7 @@ export function ChecklistRoute({ chapter, target, footer }: { chapter: Chapter; 
             />
           ))}
         </div>
-        <SelectField
+        <Select
           id="route-status"
           label="Route completion status"
           choices={statusOptions}
