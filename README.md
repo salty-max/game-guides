@@ -31,6 +31,17 @@ Core reaches the guide through `virtual:guide/config`, `virtual:guide/panels` an
 
 Routes are real paths (`/guide/3`, `/checklist/heart`, `/dashboard/<panel>`, `/sources`), and old `#guide/3` hash links redirect. Each app is a PWA. It precaches the shell, fonts and banners, works offline, and asks before swapping in a new version.
 
+## Sync codes and privacy
+
+Progress lives in the reader's browser, and that stays true. To keep the same progress on another device (a Mac's browser and an installed phone app, say), a reader opens Sync devices in the guide, shows a six-digit code on one device and types it on the other, with no account. From then on each device sends its changes shortly after making them and picks up the others' when the guide opens or comes back to the front. Export and import still work; an import on a synced device replaces progress on every linked device, and the settings say so.
+
+What the server keeps ([services/sync](services/sync/README.md#what-it-keeps) has the detail):
+
+- No email, no name and no analytics. Per device: a random id, a label like "Safari · iPhone", and the time it last synced. Per guide: the reader's checks and settings, each with the time it was last changed. The theme isn't synced.
+- Two cookies, both set by the guide's own host through its `/api` rewrite: `hundo_sync` (a random device id and secret, unreadable by script, sent only to `/api`) and `hundo_link` (a short fingerprint of the group that opens nothing, which lets a guide know it is linked without a request). On hundo.quest they cover every guide in the browser, and last 400 days.
+- The API is its own Vercel project, and the data is in an Upstash Redis database in Frankfurt. The server sees IP addresses, as any web server does, and uses them only through counters keyed by a salted hash, kept an hour at most, to limit tries at a code.
+- Unlinking a device stops it syncing and leaves its progress. "Delete synced progress" erases the server's copy and every device record. Anything not synced for 400 days expires by itself.
+
 ## Scripts
 
 You need pnpm and Node. The root `package.json` pins pnpm 11. CI and Vercel use Node 26, and Vite needs at least 20.19.
