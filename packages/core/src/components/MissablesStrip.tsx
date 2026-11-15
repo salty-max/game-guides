@@ -19,7 +19,7 @@ export function MissablesStrip({ chapter }: { chapter: Chapter }) {
 
 // The strip's frame and its header, which opens and closes it.
 const frame = cva("mt-4 rounded-card border bg-surface", { variants: { tone: { clear: "border-line", flagged: "border-missable-line" } } });
-const caret = cva("svg-icon size-4 flex-none text-muted group-data-panel-open/trigger:rotate-180", { variants: { at: { top: "mt-1", middle: "" } } });
+const caret = cva("size-4 flex-none text-muted group-data-panel-open/trigger:rotate-180", { variants: { at: { top: "mt-1", middle: "" } } });
 
 function Reassurance({ text, sources }: NonNullable<typeof config.reassurance>) {
   return (

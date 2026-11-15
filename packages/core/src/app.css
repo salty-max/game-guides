@@ -13,6 +13,8 @@
 /* Tailwind reads class names from core's components only: a guide can't reach for a utility. */
 @source "./**/*.{ts,tsx}";
 @source not "./**/*.test.{ts,tsx}";
+/* And from the page itself, for the line a browser without JavaScript shows. */
+@source "../index.html";
 
 @import "./tokens.css";
 @import "./styles.css" layer(legacy);
@@ -25,8 +27,12 @@
 
 /* The widths the layout changes at, named for what changes there. They are inclusive (`max-width: 800px` matches an 800px screen),
    which Tailwind's own `max-*` variants are not, and they are declared widest first so that the narrower one wins. The matching
-   tokens (--bar-h, --rail-w) change at the same widths, in tokens.css. */
+   tokens (--bar-h, --rail-w) change at the same widths, in tokens.css. A media query written in brackets in a class sorts after all of
+   these whatever its width, so a width gets a name here as soon as a class needs one. `stack`: a chapter's hero puts its art above its
+   words. `fold`: an article's list of sections folds away above it instead of standing beside it. */
+@custom-variant stack (@media (max-width: 1050px));
 @custom-variant mid (@media (max-width: 1040px));
+@custom-variant fold (@media (max-width: 1000px));
 @custom-variant drawer (@media (max-width: 800px));
 @custom-variant phone (@media (max-width: 550px));
 @custom-variant slim (@media (max-width: 405px));
@@ -64,6 +70,16 @@
   }
   [data-standalone] button {
     @apply select-none [-webkit-touch-callout:none];
+  }
+
+  /* Every page: a reader who asks for less motion gets none, no smooth scrolling and no transitions. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      scroll-behavior: auto !important;
+      transition: none !important;
+    }
   }
 }
 

@@ -33,7 +33,7 @@ export function SelectImpl({
         <BaseSelect.Trigger id={id} autoFocus={autoFocus} className={selectTrigger}>
           <BaseSelect.Value />
           <BaseSelect.Icon className="text-muted">
-            <Icon name="down" className="svg-icon size-4" />
+            <Icon name="down" className="size-4" />
           </BaseSelect.Icon>
         </BaseSelect.Trigger>
         <BaseSelect.Portal>
@@ -47,7 +47,7 @@ export function SelectImpl({
                     className="grid min-h-11 cursor-pointer grid-cols-[1rem_1fr] items-center gap-2 rounded-small px-2.5 text-sm font-semibold outline-hidden select-none data-highlighted:bg-soft data-highlighted:text-soft-ink data-selected:font-extrabold"
                   >
                     <BaseSelect.ItemIndicator className="col-start-1">
-                      <Icon name="check" className="svg-icon size-4" />
+                      <Icon name="check" className="size-4" />
                     </BaseSelect.ItemIndicator>
                     <BaseSelect.ItemText className="col-start-2">{item.label}</BaseSelect.ItemText>
                   </BaseSelect.Item>

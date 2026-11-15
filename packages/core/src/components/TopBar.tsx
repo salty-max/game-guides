@@ -155,7 +155,7 @@ export function TopBar({ chapter, view, menuOpen, onToggleMenu, menuToggle }: To
           aria-label={`${brand.name} home`}
         >
           <span className="grid size-10 place-items-center rounded-control bg-primary text-on-primary drawer:size-[34px]">
-            <Icon name={brand.icon} className="svg-icon size-6 drawer:size-5" />
+            <Icon name={brand.icon} className="size-6 drawer:size-5" />
           </span>
           <span className="grid gap-[3px] leading-[1.1] slim:hidden">
             <strong className="font-display text-[21px] leading-[1.05] font-bold tracking-[-0.01em] drawer:text-[17px]">{brand.mark}</strong>
@@ -173,7 +173,7 @@ export function TopBar({ chapter, view, menuOpen, onToggleMenu, menuToggle }: To
             aria-current={view === id ? "page" : undefined}
             className="flex min-h-10 items-center gap-2 rounded-button px-3.5 py-2.5 text-[14px] leading-[1.2] font-bold whitespace-nowrap text-muted hover:bg-raised hover:text-ink drawer:gap-1 drawer:p-2 phone:grid phone:justify-items-center phone:gap-[3px] phone:px-1.5 phone:py-[5px] phone:text-[11px] tiny:px-[3px] [&[aria-current=page]:not(:hover)]:bg-soft [&[aria-current=page]:not(:hover)]:text-soft-ink"
           >
-            <Icon name={icon} className="svg-icon size-4 drawer:size-3.5" />
+            <Icon name={icon} className="size-4 drawer:size-3.5" />
             {label}
           </Link>
         ))}

@@ -23,7 +23,7 @@ export function SearchField({ id, label, placeholder, value, onChange }: SearchF
         htmlFor={id}
         className="flex min-h-11 items-center gap-[7px] rounded-control border border-control-line bg-surface px-2.5 py-1.5 text-sm focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-focus"
       >
-        <Icon name="search" className="svg-icon size-4 text-muted" />
+        <Icon name="search" className="size-4 text-muted" />
         <span className="sr-only">{label}</span>
         <Input
           type="search"

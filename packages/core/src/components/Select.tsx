@@ -52,7 +52,7 @@ export function Select(props: SelectProps) {
       >
         <span>{current}</span>
         <span className="text-muted">
-          <Icon name="down" className="svg-icon size-4" />
+          <Icon name="down" className="size-4" />
         </span>
       </button>
     </div>

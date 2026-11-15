@@ -53,13 +53,13 @@ export const RouteRow = memo(function RouteRow({ row, prefix, highlighted, origi
         {row.text && <p className="mt-[3px] text-[15px] leading-[1.6] text-muted">{row.text}</p>}
       </div>
       {/* On a phone a long tag wraps under the next instead of pushing the row wider. */}
-      <div className="flex flex-col items-end gap-1 leading-[1.1] phone:[&>.tag]:max-w-[84px] phone:[&>.tag]:text-right phone:[&>.tag]:whitespace-normal">
-        <Tag tag={tag} />
+      <div className="flex flex-col items-end gap-1 leading-[1.1]">
+        <Tag tag={tag} at="column" />
         {badges.map((entry) => (
-          <Tag key={entry} tag={entry} />
+          <Tag key={entry} tag={entry} at="column" />
         ))}
-        {row.quantity > 0 && <Quantity row={row} />}
-        {row.tags.includes("missable") && <Tag tag="missable" />}
+        {row.quantity > 0 && <Quantity row={row} at="column" />}
+        {row.tags.includes("missable") && <Tag tag="missable" at="column" />}
         {origin ? (
           <Link className={rowLink} to={`/guide/${row.chapter}/${row.id}`} aria-label={`Open “${row.title}” in chapter ${row.chapter}`}>
             Chapter {row.chapter}
@@ -121,7 +121,7 @@ export function RouteGroup({ groupKey, title, location, icon, note, sources = []
     >
       <h3 className="m-0">
         <Collapsible.Trigger className={trigger}>
-          <span className="grid size-[34px] place-items-center rounded-small bg-soft text-soft-ink phone:size-7 [&_.svg-icon]:size-[17px]">
+          <span className="grid size-[34px] place-items-center rounded-small bg-soft text-soft-ink phone:size-7 [&_svg]:size-[17px]">
             <Icon name={graphic} />
           </span>
           <span className="grid">
@@ -131,7 +131,7 @@ export function RouteGroup({ groupKey, title, location, icon, note, sources = []
           <span className="text-[12px] whitespace-nowrap text-muted tabular-nums">
             {done} / {rows.length}
           </span>
-          <Icon name="down" className="svg-icon size-4 text-muted group-data-panel-open/trigger:rotate-180" />
+          <Icon name="down" className="size-4 text-muted group-data-panel-open/trigger:rotate-180" />
         </Collapsible.Trigger>
       </h3>
       {/* Closed, the steps stay in the page, hidden until found: the browser's find-in-page reaches them and opens the group. */}

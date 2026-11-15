@@ -74,14 +74,17 @@ describe("the installed app in app.css", () => {
   });
 
   it("changes nothing in a browser tab: every rule that makes the page a frame is behind the variant or the mark", () => {
-    // The base layer's global rules are the only hand-written ones; each either sets something every page has (the scroll padding
-    // under the top bar) or is keyed on the mark.
+    // The base layer's global rules are the only hand-written ones; each either is one of the page's own defaults, which every page has
+    // (the scroll padding under the top bar, the reduced motion), and none of what makes a frame, or is keyed on the mark.
     const base = /@layer base \{([\s\S]*?)\n\}\n/.exec(app)?.[1] ?? "";
     const rules = base.replace(/\/\*[\s\S]*?\*\//g, "").split("}").map((rule) => rule.trim()).filter(Boolean);
     expect(rules.length).toBeGreaterThan(4);
+    const pageWide = ["html", "@media (prefers-reduced-motion: reduce)"];
+    const frame = /fixed|overflow|overscroll|inset|h-full|touch-|position|height/;
     for (const rule of rules) {
-      const [selector, body] = rule.split("{").map((part) => part.trim());
-      const everyPage = selector === "html" && /^@apply scroll-pt-\[calc\(var\(--bar\)\+24px\)\];$/.test(body);
+      const [selector, ...rest] = rule.split("{").map((part) => part.trim());
+      const body = rest.join("{");
+      const everyPage = pageWide.includes(selector) && !frame.test(body);
       const onlyApp = /standalone:/.test(body.replace(/@apply /, "")) && !body.split(/\s+/).some((cls) => cls !== "@apply" && !cls.startsWith("standalone:"));
       const marked = selector.startsWith("[data-standalone]");
       expect(everyPage || onlyApp || marked, `"${selector}" would apply in a browser tab`).toBe(true);

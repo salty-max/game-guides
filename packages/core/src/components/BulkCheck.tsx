@@ -8,7 +8,7 @@ import type { Row } from "../types";
 export const BULK_CONFIRM_THRESHOLD = 10;
 
 /** Check what is left in a section, or uncheck all of it once it is done. Either way the toast can undo it. */
-export function BulkCheck({ rows, label }: { rows: Row[]; label: string }) {
+export function BulkCheck({ rows, label, space = "none" }: { rows: Row[]; label: string; space?: "none" | "above" }) {
   const checks = useProgress((s) => s.data.checks);
   const openDialog = useUi((s) => s.openDialog);
   if (rows.length < 2) return null;
@@ -30,10 +30,12 @@ export function BulkCheck({ rows, label }: { rows: Row[]; label: string }) {
     });
   };
 
-  return (
+  const button = (
     <Button icon="check" size="compact" onClick={run}>
       {allDone ? `Uncheck all (${ids.length})` : `${unchecked < ids.length ? "Check remaining" : "Check all"} (${unchecked})`}
       <span className="sr-only"> in {label}</span>
     </Button>
   );
+  // Under an article section's title and lines, with room above it.
+  return space === "above" ? <div className="mt-[.6rem]">{button}</div> : button;
 }
