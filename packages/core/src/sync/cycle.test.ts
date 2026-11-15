@@ -331,6 +331,28 @@ describe("a first sync", () => {
   });
 });
 
+describe("whether a round pulled anything", () => {
+  it("says so when the group had something this device didn't, and not for a push or a quiet round", async () => {
+    await tick(a, [r1]);
+    await pair(a, b);
+    // joining is a pull of everything the group has (here, for the first device, nothing)
+    expect(await sync(a)).toMatchObject({ kind: "ok", pulled: true });
+    later();
+    expect(await sync(a)).toMatchObject({ kind: "ok", pulled: false });
+    later();
+    expect(await sync(b)).toMatchObject({ kind: "ok", pulled: true });
+    later();
+    expect(await sync(b)).toMatchObject({ kind: "ok", pulled: false });
+    await tick(a, [r2]);
+    later();
+    expect(await sync(a)).toMatchObject({ kind: "ok", pulled: false });
+    later();
+    expect(await sync(b)).toMatchObject({ kind: "ok", pulled: true });
+    later();
+    expect(await sync(b)).toMatchObject({ kind: "ok", pulled: false });
+  });
+});
+
 describe("what a pull must not do", () => {
   it("keeps progress this tab couldn't save, as storage that refused the save is behind it", async () => {
     await pair(a, b);
