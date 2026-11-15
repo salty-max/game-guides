@@ -1,5 +1,6 @@
+import { brand } from "../guide";
 import { call } from "./api";
-import { deviceLabel } from "./label";
+import { deviceLabel, isApple } from "./label";
 import { dropRecord } from "./local";
 import { syncSoon } from "./engine";
 import { installed } from "../persistence";
@@ -17,7 +18,9 @@ export type CodeResult = { ok: true; code: string; linked: boolean } | { ok: fal
 export type ClaimResult = { ok: true; already: boolean; moved: boolean } | { ok: false; why: "code" | "limit" | "full" | "offline" | "error" };
 export type StatusResult = { ok: true; linked: boolean; devices: Device[]; now: number } | { ok: false; why: "offline" | "unlinked" | "error" };
 
-const label = () => deviceLabel(navigator.userAgent, installed());
+// The guide's name goes in only where an installed guide is a device of its own: on Apple devices, where each has its own cookies.
+// An installed Chrome or Edge app normally shares its browser's, so it is one device with the tab, whichever guide linked it.
+const label = () => deviceLabel(navigator.userAgent, installed(), navigator.maxTouchPoints, isApple() ? brand.shortName : "");
 
 /** Ask for a code to show on this device. */
 export async function startCode(): Promise<CodeResult> {

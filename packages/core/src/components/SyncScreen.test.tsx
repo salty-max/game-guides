@@ -1,4 +1,4 @@
-import { act, render, screen, waitFor, within } from "@testing-library/react";
+import { act, cleanup, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { App } from "../App";
 import { defaultState } from "../progress-state";
@@ -266,6 +266,59 @@ describe("a linked device", () => {
     pairing.checkStatus.mockResolvedValue({ ...group(Date.now()), devices: [...group().devices, { label: "Edge · Windows", seen: Date.now(), self: false }] });
     await waitFor(() => expect(within(dialog).getByRole("status")).toHaveTextContent("A device joined."), { timeout: 6000 });
     expect(pairing.afterLinked).not.toHaveBeenCalled();
+  });
+});
+
+describe("on an iPhone, where each guide on the Home Screen keeps its own link", () => {
+  const IPHONE = "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.7 Mobile/15E148 Safari/604.1";
+  const IPHONE_CHROME = "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/140.0.0.0 Mobile/15E148 Safari/604.1";
+  const apple = (installed: boolean, ua = IPHONE) => {
+    vi.spyOn(navigator, "userAgent", "get").mockReturnValue(ua);
+    vi.spyOn(window, "matchMedia").mockImplementation(((query: string) => ({ matches: installed && query.includes("standalone"), media: query, addEventListener() {}, removeEventListener() {} })) as unknown as typeof window.matchMedia);
+  };
+  afterEach(() => vi.restoreAllMocks());
+
+  it("tells an installed app on the linked screen that every other guide on the Home Screen needs a code of its own", async () => {
+    apple(true);
+    pairing.checkStatus.mockResolvedValue(group(Date.now()));
+    const dialog = await open({ phase: "synced", devices: 2, lastSync: Date.now() });
+    expect(await within(dialog).findByText(/This guide is an app on your Home Screen, and each guide you add there keeps its own link/)).toBeInTheDocument();
+  });
+
+  it("tells a reader in Safari, already linked, that a guide added from now on should come up linked and one already there needs a code", async () => {
+    apple(false);
+    pairing.checkStatus.mockResolvedValue(group(Date.now()));
+    const dialog = await open({ phase: "synced", devices: 2, lastSync: Date.now() });
+    expect(await within(dialog).findByText(/a guide you add to the Home Screen from now on should come up linked; one that is already there needs a code of its own/)).toBeInTheDocument();
+  });
+
+  it("promises nothing about the Home Screen to a reader in another iPhone browser, whose apps' cookies aren't known", async () => {
+    apple(false, IPHONE_CHROME);
+    pairing.checkStatus.mockResolvedValue(group(Date.now()));
+    const linked = await open({ phase: "synced", devices: 2, lastSync: Date.now() });
+    expect(await within(linked).findByText(/each guide on your Home Screen keeps its own link: open its Sync screen and type a code there/)).toBeInTheDocument();
+    expect(within(linked).queryByText(/should come up linked/)).not.toBeInTheDocument();
+    cleanup();
+    act(() => useSyncStatus.setState({ phase: "off", devices: 0, lastSync: null }));
+    const off = await open();
+    expect(within(off).getByText("On an iPhone or iPad, each guide on your Home Screen keeps its own link, and needs a code of its own.")).toBeInTheDocument();
+    expect(within(off).queryByText(/after linking here in Safari/)).not.toBeInTheDocument();
+  });
+
+  it("says it before linking too, in the words that fit where the reader is", async () => {
+    apple(true);
+    const installedDialog = await open();
+    expect(within(installedDialog).getByText(/each other guide on your Home Screen needs a code of its own/i)).toBeInTheDocument();
+    cleanup();
+    apple(false);
+    const dialog = await open();
+    expect(within(dialog).getByText(/each guide on your Home Screen keeps its own link. One you add after linking here in Safari should come up linked; one that is already there needs a code of its own/)).toBeInTheDocument();
+  });
+
+  it("says nothing of it elsewhere", async () => {
+    pairing.checkStatus.mockResolvedValue(group(Date.now()));
+    const dialog = await open({ phase: "synced", devices: 2, lastSync: Date.now() });
+    expect(within(dialog).queryByText(/Home Screen/)).not.toBeInTheDocument();
   });
 });
 
