@@ -13,3 +13,5 @@ coverage
 # the harness's local state
 .harness/
 .cache/
+storybook-static
+debug-storybook.log

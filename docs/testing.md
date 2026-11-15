@@ -30,6 +30,19 @@ Core's suites run against each guide:
 
 Each guide's own `guide.test.ts` adds its totals, its legacy saves, its extra state and its two storage keys.
 
+## Stories
+
+`packages/stories` holds Storybook for core's components. A story is a component in one state; every component gets stories for every state (default, hover or focus where it matters, disabled, invalid, empty, long text). A new component or a new look isn't done without them.
+
+- **See them:** `pnpm --filter hundo-stories storybook` (port 6006), or `preview_start` with `storybook` (port 6600). The toolbar's Guide and Theme switch the palette, fonts and corners, the same things a guide sets. The stories read Koholint's chapter data whichever guide is chosen: only the look changes.
+- **Test them:** `pnpm test` in `packages/stories` (and so `pnpm check`) renders every story in Chrome and runs axe on it, once for each of Koholint, Red Dead and Echoes in light and dark: six Vitest projects named `<guide>-<theme>`. A violation fails the run, colour contrast included, because the CSS is really processed. To run one: `pnpm -C packages/stories exec vitest run --project echoes-dark Button`.
+- **The guard:** `Foundation/Palette` fails if a project isn't really showing the guide and theme it claims (its `--primary`, the button's fill and text, the corner preset and the font). Without it the axe checks would pass on a page with no CSS.
+- **Chrome:** the tests use the system Google Chrome (`channel: "chrome"`, as `shoot.mjs` does) and don't download a browser. CI relies on the runner having one.
+- **Exempting a story** from axe takes `parameters: { a11y: { test: "todo" } }` on that story, with a comment saying why. Don't turn the check off for a whole file.
+- **No Tailwind classes in a story.** Tailwind only reads core's `.tsx` files, so a `className="flex gap-3"` in a story renders unstyled and raises no error. Lay a story out with inline `style`, as `Button.stories.tsx` does, or use core's own components.
+- Nothing in `packages/stories` reaches a guide's bundle, and a change to the stories alone doesn't rebuild a guide on Vercel. A change to the package's dependencies does, because it rewrites `pnpm-lock.yaml`, which each guide's ignore command watches. Every guide's Vercel install (`pnpm install --frozen-lockfile`) also installs the whole workspace, Storybook included; no browser is downloaded.
+- The pnpm workspace's `allowBuilds` records that esbuild's install script isn't run: an unanswered one makes `pnpm install --frozen-lockfile` exit 1.
+
 ## In a browser
 
 The tests don't see layout, fonts, colour or how a page reads. Look at every visible change in a browser before calling it done. The `guide-check` skill (`.claude/skills/guide-check`) scripts what follows. It builds, serves and screenshots each guide at 1280×860 and 390×844 in both themes, and makes a before/after page.

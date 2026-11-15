@@ -13,6 +13,7 @@ Each app's history from its old repository is kept under its folder, so `git log
 ## Layout
 
 - **`packages/core`** (`@hundo/core`, used through the workspace, not published) is the app itself. It holds the React 19 pages, components, stores and styles. It also holds the page shell (`index.html`, `theme-init.js`), the shared test suites and `vite.ts`, which builds an app's whole Vite and Vitest config from its brand.
+- **`packages/stories`** (`hundo-stories`, private, dev tools only) is Storybook for core's components. Each component has stories for every state, shown under any guide's palette, fonts and corners in light and dark (a toolbar switches them). Its tests render every story in Chrome under all six guide and theme combinations and check each with axe. It is no part of a guide's bundle, precache or deploy.
 - **`apps/<name>`** is one guide:
   - `src/guide`: brand, config, chapter data, palette, panels (often none) and banners;
   - `public/fonts` and `public/icons`;
@@ -47,6 +48,12 @@ pnpm --filter hundo-koholint dev
 ```
 
 `pnpm check` runs `pnpm lint`, `pnpm typecheck`, `pnpm test` and `pnpm build`, each across every package (`pnpm -r`). Lint fails on warnings. Inside an app folder, `pnpm dev`, `pnpm build`, `pnpm preview`, `pnpm test` and `pnpm icons` work on that guide alone.
+
+```bash
+pnpm --filter hundo-stories storybook
+```
+
+That opens the component stories on port 6006. Their tests are part of `pnpm test`, and drive the system Google Chrome.
 
 Typecheck and tests run per app. Each app's typecheck includes core's source, and core's suites run beside the guide's own tests. That way core is always checked against a real guide config, and a guide that breaks one of core's assumptions fails in its own app.
 

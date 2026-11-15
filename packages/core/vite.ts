@@ -5,7 +5,8 @@ import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 import { defineConfig, type Plugin } from "vite";
 import { VitePWA } from "vite-plugin-pwa";
-import type { Brand, FontFace } from "./src/types.ts";
+import { fontCss } from "./src/fonts.ts";
+import type { Brand } from "./src/types.ts";
 
 const here = (path: string) => fileURLToPath(new URL(path, import.meta.url));
 // index.html loads the app through this id, which resolves to core's main.tsx.
@@ -17,9 +18,6 @@ const lightPalette = (root: string) => {
   const block = css.split(":root{")[1]?.split("}")[0] ?? "";
   return Object.fromEntries([...block.matchAll(/(--[a-z-]+):([^;]+)/g)].map(([, key, value]) => [key, value.trim()]));
 };
-
-const font = (face: FontFace) =>
-  `@font-face{font-family:"${face.family}";src:url("/fonts/${face.file}") format("woff2");font-weight:${face.weight};font-display:swap}`;
 
 /**
  * Serves the page every guide shares: core's index.html with the brand filled in, and theme-init.js beside it.
@@ -36,11 +34,7 @@ const guideShell = (root: string, brand: Brand, palette: Record<string, string>)
     THEME_COLOR: palette["--surface"],
     CORNERS: brand.corners,
     STORAGE: brand.storagePrefix,
-    FONTS: [
-      font(brand.fonts.display),
-      font(brand.fonts.sans),
-      `:root{--display:"${brand.fonts.display.family}",${brand.fonts.display.fallback};--sans:"${brand.fonts.sans.family}",${brand.fonts.sans.fallback}}`,
-    ].join(""),
+    FONTS: fontCss(brand),
   };
 
   return {
