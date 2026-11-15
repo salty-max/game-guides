@@ -5,6 +5,7 @@ import { Radio } from "@base-ui/react/radio";
 import { RadioGroup as BaseRadioGroup } from "@base-ui/react/radio-group";
 import { useId, useState } from "react";
 import { buttonClass } from "./buttonStyle";
+import { checkBox, checkIcon, checkMark } from "./check-style";
 import { Icon } from "./Icon";
 
 // Core's form controls: Base UI's headless parts, styled from the guide's palette through the tokens in tokens.css. Like Button, none of
@@ -25,10 +26,10 @@ export function Checkbox({ label, checked, onChange, disabled = false }: Checkbo
         checked={checked}
         disabled={disabled}
         onCheckedChange={onChange}
-        className="flex size-6.5 shrink-0 cursor-pointer items-center justify-center rounded-check border-2 border-edge bg-surface text-on-primary data-checked:border-primary data-checked:bg-primary"
+        className={checkBox()}
       >
-        <BaseCheckbox.Indicator className="flex data-unchecked:hidden">
-          <Icon name="check" className="svg-icon size-4" />
+        <BaseCheckbox.Indicator className={checkMark}>
+          <Icon name="check" className={checkIcon} />
         </BaseCheckbox.Indicator>
       </BaseCheckbox.Root>
       {label}

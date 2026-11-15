@@ -61,7 +61,7 @@ function GuideView({ chapter, target }: { chapter: Chapter; target?: string }) {
   useEffect(() => {
     if (!target) return;
     const element = document.getElementById(target);
-    const focusable = element?.hasAttribute("tabindex") ? element : (element?.querySelector<HTMLElement>("input, button") ?? element);
+    const focusable = element?.hasAttribute("tabindex") ? element : (element?.querySelector<HTMLElement>('[role="checkbox"], button') ?? element);
     focusable?.focus({ preventScroll: true });
     element?.scrollIntoView({ block: "start" });
   }, [target, locationKey]);

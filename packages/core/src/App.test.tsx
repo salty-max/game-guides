@@ -61,9 +61,11 @@ describe("App", () => {
     render(<App />);
     const list = () => within(screen.getByRole("region", { name: "Next up" }));
     expect(list().getAllByRole("link", { name: /^Jump to/ })).toHaveLength(3);
-    const idsBefore = list().getAllByRole("checkbox").map((box) => box.id);
+    // Which rows the list shows, by their links: a Base UI box's own id is generated.
+    const rowIds = () => list().getAllByRole("link", { name: /^Jump to/ }).map((link) => link.getAttribute("href"));
+    const idsBefore = rowIds();
     await user.click(list().getAllByRole("checkbox")[0]);
-    expect(list().getAllByRole("checkbox").map((box) => box.id)).toEqual(idsBefore);
+    expect(rowIds()).toEqual(idsBefore);
     expect(list().getAllByRole("checkbox")[0]).toBeChecked();
 
     await user.click(screen.getByRole("button", { name: "Undo" }));
@@ -72,7 +74,7 @@ describe("App", () => {
 
     await user.click(list().getAllByRole("checkbox")[0]);
     await user.click(list().getByRole("button", { name: "Show next steps" }));
-    expect(list().getAllByRole("checkbox").map((box) => box.id)).not.toContain(idsBefore[0]);
+    expect(rowIds()).not.toContain(idsBefore[0]);
     expect(list().queryByRole("button", { name: "Show next steps" })).toBeNull();
   });
 

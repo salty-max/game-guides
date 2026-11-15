@@ -1,4 +1,5 @@
 import { Collapsible } from "@base-ui/react/collapsible";
+import { cva } from "class-variance-authority";
 import type { ReactNode } from "react";
 import { Link } from "react-router";
 import { Icon } from "./Icon";
@@ -56,6 +57,10 @@ export function ArticleRoute({ chapter, target, footer }: { chapter: Chapter; ta
   );
 }
 
+// A step's opening words, which hold its box: clicking them ticks it. In prose they run on into the step's text; in a compact list they
+// sit on one line with the badges after them.
+const check = cva("cursor-pointer font-extrabold hover:text-primary", { variants: { in: { prose: "py-1.5", list: "flex items-center" } } });
+
 function Section({ group, target }: { group: Group; target?: string }) {
   return (
     <section className="walkthrough-section" aria-labelledby={group.key}>
@@ -71,8 +76,8 @@ function Section({ group, target }: { group: Group; target?: string }) {
         <ul className="walkthrough-list">
           {group.rows.map((row) => (
             <li key={row.id} id={`entry-${row.id}`} tabIndex={-1} className={target === `entry-${row.id}` ? "linked" : undefined}>
-              <label className="walkthrough-check">
-                <CheckBox id={`walkthrough-${row.id}`} row={row} />
+              <label id={`walkthrough-${row.id}-label`} className={check({ in: "list" })}>
+                <CheckBox id={`walkthrough-${row.id}`} labelId={`walkthrough-${row.id}-label`} row={row} prose />
                 {row.title}
               </label>
               <Badges row={row} />
@@ -83,8 +88,8 @@ function Section({ group, target }: { group: Group; target?: string }) {
       ) : (
         group.rows.map((row) => (
           <p key={row.id} id={`entry-${row.id}`} tabIndex={-1} className={target === `entry-${row.id}` ? "walkthrough-paragraph linked" : "walkthrough-paragraph"}>
-            <label className="walkthrough-check">
-              <CheckBox id={`walkthrough-${row.id}`} row={row} />
+            <label id={`walkthrough-${row.id}-label`} className={check({ in: "prose" })}>
+              <CheckBox id={`walkthrough-${row.id}`} labelId={`walkthrough-${row.id}-label`} row={row} prose />
               {row.title}
               {/[.!?]$/.test(row.title) ? "" : "."}
             </label>{" "}

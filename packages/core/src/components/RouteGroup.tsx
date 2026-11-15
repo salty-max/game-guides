@@ -1,9 +1,11 @@
 import { Collapsible } from "@base-ui/react/collapsible";
-import { useState } from "react";
+import { cva } from "class-variance-authority";
+import { memo, useState } from "react";
 import { Link } from "react-router";
 import { Icon } from "./Icon";
 import { BulkCheck } from "./BulkCheck";
 import { CheckBox } from "./CheckBox";
+import { rowLink } from "./TickItem";
 import { Quantity, SourceLine, Tag } from "./ui";
 import { cats, config, primaryTag } from "../guide";
 import { useProgress } from "../store/progress";
@@ -20,21 +22,38 @@ interface RowProps {
   fallbackFocusId: string;
 }
 
-export function RouteRow({ row, prefix, highlighted, origin = false, fallbackFocusId }: RowProps) {
+// A step: its box, its title over its text, and its tags and link at the end. Ticked, it takes the done tint; linked to (a deep link or the
+// checklist's highlight), the highlight.
+const routeRow = cva(
+  "relative grid scroll-mt-4 grid-cols-[28px_minmax(0,1fr)_auto] items-start gap-3 border-t border-line-soft p-3.5 first:border-t-0 target:bg-highlight phone:gap-2.5 phone:px-2.5 phone:py-3",
+  { variants: { tone: { plain: "", done: "bg-done", highlight: "bg-highlight" } } },
+);
+
+// Memoised: the checklist re-renders the whole list on every tick, and only the ticked row has anything new to draw (it reads its own
+// check from the store).
+export const RouteRow = memo(function RouteRow({ row, prefix, highlighted, origin = false, fallbackFocusId }: RowProps) {
   const checked = useProgress((s) => s.data.checks[row.id] === true);
-  const inputId = `${prefix}-${row.id}`;
+  const boxId = `${prefix}-${row.id}`;
+  const labelId = `${boxId}-label`;
   const tag = primaryTag(row);
   const badges = row.tags.filter((entry) => entry !== tag && config.badges?.includes(entry));
 
   return (
-    <div className={["route-row", checked && "completed", highlighted && "highlight"].filter(Boolean).join(" ")} id={`entry-${row.id}`}>
-      <CheckBox id={inputId} row={row} fallbackFocusId={fallbackFocusId} />
+    <div className={routeRow({ tone: highlighted ? "highlight" : checked ? "done" : "plain" })} id={`entry-${row.id}`}>
+      <CheckBox id={boxId} labelId={labelId} row={row} fallbackFocusId={fallbackFocusId} />
       <div>
-        {/* The label stretches over the whole row (see .route-row label::after), so the row is the tap target. */}
-        <label htmlFor={inputId}>{row.title}</label>
-        {row.text && <p>{row.text}</p>}
+        {/* The label stretches over the whole row, so the row is the tap target; the box and the link sit above it. */}
+        <label
+          id={labelId}
+          htmlFor={boxId}
+          className="inline-block cursor-pointer text-[15px] leading-[1.3] font-extrabold after:absolute after:inset-0 after:cursor-pointer"
+        >
+          {row.title}
+        </label>
+        {row.text && <p className="mt-[3px] text-[15px] leading-[1.6] text-muted">{row.text}</p>}
       </div>
-      <div className="row-meta">
+      {/* On a phone a long tag wraps under the next instead of pushing the row wider. */}
+      <div className="flex flex-col items-end gap-1 leading-[1.1] phone:[&>.tag]:max-w-[84px] phone:[&>.tag]:text-right phone:[&>.tag]:whitespace-normal">
         <Tag tag={tag} />
         {badges.map((entry) => (
           <Tag key={entry} tag={entry} />
@@ -42,12 +61,12 @@ export function RouteRow({ row, prefix, highlighted, origin = false, fallbackFoc
         {row.quantity > 0 && <Quantity row={row} />}
         {row.tags.includes("missable") && <Tag tag="missable" />}
         {origin ? (
-          <Link className="origin" to={`/guide/${row.chapter}/${row.id}`} aria-label={`Open “${row.title}” in chapter ${row.chapter}`}>
+          <Link className={rowLink} to={`/guide/${row.chapter}/${row.id}`} aria-label={`Open “${row.title}” in chapter ${row.chapter}`}>
             Chapter {row.chapter}
           </Link>
         ) : (
           row.reference && (
-            <a className="origin" href={row.reference} target="_blank" rel="noopener noreferrer" aria-label={`Source for ${row.title} (opens in a new tab)`}>
+            <a className={rowLink} href={row.reference} target="_blank" rel="noopener noreferrer" aria-label={`Source for ${row.title} (opens in a new tab)`}>
               Source
             </a>
           )
@@ -55,7 +74,7 @@ export function RouteRow({ row, prefix, highlighted, origin = false, fallbackFoc
       </div>
     </div>
   );
-}
+});
 
 interface GroupProps {
   groupKey: string;

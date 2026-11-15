@@ -1,8 +1,7 @@
 import { Collapsible } from "@base-ui/react/collapsible";
 import { cva } from "class-variance-authority";
-import { Link } from "react-router";
 import { Icon } from "./Icon";
-import { CheckBox } from "./CheckBox";
+import { TickItem } from "./TickItem";
 import { config, hasMissables, missablesLeft, missableWhy } from "../guide";
 import { useHeldRows } from "../useHeldRows";
 import { useProgress } from "../store/progress";
@@ -61,30 +60,18 @@ function MissablesList({ chapter }: { chapter: Chapter }) {
         </span>
       </Collapsible.Trigger>
       <Collapsible.Panel hiddenUntilFound>
-        <ul className="m-0 list-none px-4 pb-2" onChangeCapture={hold}>
-          {rows.map((row) => {
-            const ticked = checks[row.id] === true;
-            return (
-              <li
-                key={row.id}
-                className="relative grid grid-cols-[28px_minmax(0,1fr)_auto] items-center gap-3 border-t border-line-soft py-2.5 first:border-t-0 phone:gap-2.5"
-              >
-                <CheckBox id={`missable-${row.id}`} row={row} />
-                {/* The label stretches over the whole item, so the item is the tap target; the link sits above it. */}
-                <label className="grid cursor-pointer gap-0.5 leading-[1.3] after:absolute after:inset-0" htmlFor={`missable-${row.id}`}>
-                  <strong className={ticked ? "text-[15px] text-muted line-through decoration-1" : "text-[15px]"}>{row.title}</strong>
-                  <small className="text-[12px] text-muted">{missableWhy(row.id) ?? row.group}</small>
-                </label>
-                <Link
-                  className="relative z-1 -mx-0.5 -my-2 px-0.5 py-2 text-[13px] whitespace-nowrap text-primary underline underline-offset-[3px]"
-                  to={`/guide/${row.chapter}/${row.id}`}
-                  aria-label={`Jump to “${row.title}”`}
-                >
-                  Jump to
-                </Link>
-              </li>
-            );
-          })}
+        <ul className="m-0 list-none px-4 pb-2">
+          {rows.map((row) => (
+            <TickItem
+              key={row.id}
+              row={row}
+              prefix="missable"
+              ticked={checks[row.id] === true}
+              detail={missableWhy(row.id) ?? row.group}
+              jumpLabel={`Jump to “${row.title}”`}
+              onToggle={hold}
+            />
+          ))}
         </ul>
       </Collapsible.Panel>
     </Collapsible.Root>
