@@ -1,5 +1,5 @@
 import { DialogHost } from "@hundo/core/components/DialogHost";
-import { Button } from "@hundo/core/components/ui";
+import { Button, PageHeading } from "@hundo/core/components/ui";
 import { useUi, type DialogState } from "@hundo/core/store/ui";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { MemoryRouter } from "react-router";
@@ -12,7 +12,7 @@ function Page({ dialog }: { dialog: Opened }) {
   const openDialog = useUi((s) => s.openDialog);
   return (
     <>
-      <h1>The page behind</h1>
+      <PageHeading title="The page behind" />
       <Button look="" onClick={() => openDialog(dialog)}>
         Open
       </Button>

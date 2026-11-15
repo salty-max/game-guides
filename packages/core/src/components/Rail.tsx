@@ -1,3 +1,4 @@
+import { Button as BaseButton } from "@base-ui/react/button";
 import { cva } from "class-variance-authority";
 import type { ReactNode } from "react";
 import { Link } from "react-router";
@@ -47,12 +48,12 @@ export function RailContent({ activeChapter, view, heading }: RailProps & { head
             const n = two(chapter.id);
             if (!isOpen(data, chapter.id)) {
               return (
-                <button key={chapter.id} className={chapterLink({ locked: true })} type="button" onClick={() => reveal(chapter.id)}>
+                <BaseButton key={chapter.id} className={chapterLink({ locked: true })} onClick={() => reveal(chapter.id)}>
                   <span className={number}>{n}</span>
                   <span>{chapter.teaser ?? `Chapter ${n}`}</span>
                   <Icon name="lock" />
                   <span className="sr-only"> · hidden by spoiler protection. Reveal chapter {chapter.id}</span>
-                </button>
+                </BaseButton>
               );
             }
             const current = view === "guide" && activeChapter === chapter.id;
@@ -78,13 +79,12 @@ export function RailContent({ activeChapter, view, heading }: RailProps & { head
           <div>
             <strong className="text-[13px]">Spoiler protection {data.spoilers ? "on" : "off"}</strong>
             <p className="mt-0.5 mb-[5px] text-[12px] leading-[1.46] text-muted">{data.spoilers ? `Chapters past ${data.ceiling} are hidden.` : "All chapters are visible."}</p>
-            <button
+            <BaseButton
               className="inline-flex min-h-8 cursor-pointer items-center border-0 bg-transparent px-0 py-1 text-left font-sans text-[12px] font-bold text-primary underline underline-offset-[3px]"
-              type="button"
               onClick={() => openDialog({ kind: "settings" })}
             >
               Change settings
-            </button>
+            </BaseButton>
           </div>
         </div>
         <small className="grid gap-0.5 px-1 text-[12px] leading-[1.4] text-pretty text-muted">

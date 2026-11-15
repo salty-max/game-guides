@@ -216,11 +216,11 @@ export function PageHeading({ title, intro, stat }: { title: string; intro?: Rea
 // A category's label. In prose it sits a little above the baseline, level with the words' middle; in a row's column of tags, on a phone, a
 // long one wraps under itself instead of pushing the row wider.
 const tag = cva("rounded-tag px-2 py-1 text-[11px] font-extrabold tracking-[0.02em] whitespace-nowrap", {
-  variants: { tone: tones, at: { inline: "", prose: "align-[2px]", column: "phone:max-w-[84px] phone:text-right phone:whitespace-normal" } },
-  defaultVariants: { tone: "none", at: "inline" },
+  variants: { tone: tones, at: { line: "", prose: "align-[2px]", column: "phone:max-w-[84px] phone:text-right phone:whitespace-normal" } },
+  defaultVariants: { tone: "none", at: "line" },
 });
 
-type TagAt = "inline" | "prose" | "column";
+type TagAt = "line" | "prose" | "column";
 
 /** A category label, coloured by the category's tone. */
 export function Tag({ tag: name, at, children }: { tag: string; at?: TagAt; children?: ReactNode }) {

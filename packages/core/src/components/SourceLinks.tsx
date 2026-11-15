@@ -22,7 +22,7 @@ export function SourceLinks({ items }: { items: Item[] }) {
         Sources and maps
       </Collapsible.Trigger>
       <Collapsible.Panel hiddenUntilFound>
-        <ul className="my-[1em] pl-[18px]">
+        <ul className="my-[1em] list-disc pl-[18px]">
           {items.map(([label, url]) => (
             <li key={url} className="[&_a]:text-inherit [&_a]:underline [&_a]:underline-offset-2">
               <ExternalLink label={label} url={url} />

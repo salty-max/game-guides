@@ -98,7 +98,7 @@ function Frame({ alert }: { alert: boolean }) {
         const { afterClose } = useUi.getState();
         if (open || !afterClose || afterClose.key !== last?.key) return;
         useUi.setState({ afterClose: null });
-        // With no animation to wait for (jsdom, and reduced motion, where the transition is off) Base UI reports the close just before it unmounts
+        // With no animation to wait for (jsdom, and reduced motion, where nothing animates) Base UI reports the close just before it unmounts
         // the dialog and lets screen readers back into the page; one task later they are. DialogHost.test.tsx holds this.
         setTimeout(afterClose.run, 0);
       }}
