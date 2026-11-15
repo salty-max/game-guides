@@ -12,7 +12,8 @@
   "dependencies": {
     "@hundo/core": "workspace:*",
     "react": "catalog:",
-    "react-dom": "catalog:"
+    "react-dom": "catalog:",
+    "react-router": "^8.5.1"
   },
   "devDependencies": {
     "@storybook/addon-a11y": "^10.6.7",

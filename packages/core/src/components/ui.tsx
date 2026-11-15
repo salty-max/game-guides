@@ -1,33 +1,10 @@
-import { cva } from "class-variance-authority";
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 import { Link } from "react-router";
+import { buttonClass, type ButtonSize, type ButtonStyle } from "./buttonStyle";
 import { Icon, type IconName } from "./Icon";
 import { brand, cats, config, tagName } from "../guide";
 import type { Row } from "../types";
 import { pct } from "../format";
-
-/** `""` is the primary look. */
-export type ButtonStyle = "" | "outline" | "accent" | "danger";
-export type ButtonSize = "default" | "compact";
-
-// A button's padding reads --button-px, so a container can narrow it (the hero's actions on a phone) without a class on the button.
-// Each look names its own border colour: one set in the base would fight the looks' for the same property.
-const button = cva("inline-flex items-center justify-center gap-2 rounded-button border leading-[1.22] font-extrabold [&_.svg-icon]:size-4", {
-  variants: {
-    look: {
-      primary: "border-transparent bg-primary text-on-primary not-disabled:hover:bg-primary-hover",
-      outline: "border-control-line bg-surface text-primary not-disabled:hover:bg-raised",
-      accent: "border-accent bg-accent text-on-accent not-disabled:hover:border-accent-hover not-disabled:hover:bg-accent-hover",
-      danger: "border-transparent bg-danger text-on-danger",
-    },
-    size: {
-      default: "min-h-11 px-(--button-px,18px) py-2.25 text-sm",
-      compact: "min-h-10 px-(--button-px,14px) py-1.5 text-[13px]",
-    },
-  },
-});
-
-const buttonClass = (look: ButtonStyle, size: ButtonSize) => button({ look: look || "primary", size });
 
 interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "style" | "className"> {
   look?: ButtonStyle;

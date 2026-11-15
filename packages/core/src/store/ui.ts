@@ -22,6 +22,15 @@ interface UiStore {
   dialog: DialogState;
   openDialog: (dialog: NonNullable<DialogState>) => void;
   closeDialog: () => void;
+  /** Counts the openings, so a screen opened again while the last one is still fading out starts afresh, not with the old one's state. */
+  dialogKey: number;
+  /** Runs once, after the dialog it was set for (`key`) has finished closing. */
+  afterClose: { key: number; run: () => void } | null;
+  /**
+   * Close the dialog, then run `after` when it has gone. A modal dialog hides the page behind it from screen readers until it's gone,
+   * so a message announced before that is never heard.
+   */
+  closeDialogThen: (after: () => void) => void;
   /** Which route groups the reader opened or closed by hand. */
   openGroups: Record<string, boolean>;
   setGroupOpen: (key: string, open: boolean) => void;
@@ -30,15 +39,23 @@ interface UiStore {
 
 let toastId = 0;
 
-export const useUi = create<UiStore>((set) => ({
+export const useUi = create<UiStore>((set, get) => ({
   toast: null,
   showToast: (message, undo) => set({ toast: { id: ++toastId, message, undo } }),
   dismissToast: (id) => set((s) => (s.toast?.id === id ? { toast: null } : s)),
   announcement: "",
   announce: (announcement) => set({ announcement }),
   dialog: null,
-  openDialog: (dialog) => set({ dialog }),
+  dialogKey: 0,
+  openDialog: (dialog) => {
+    // An action still waiting for the last dialog to finish closing is never dropped, and never left to run at some later dialog's close.
+    const { afterClose, dialogKey } = get();
+    set({ dialog, dialogKey: dialogKey + 1, afterClose: null });
+    afterClose?.run();
+  },
   closeDialog: () => set({ dialog: null }),
+  afterClose: null,
+  closeDialogThen: (after) => set((s) => ({ dialog: null, afterClose: { key: s.dialogKey, run: after } })),
   openGroups: {},
   setGroupOpen: (key, open) => set((s) => (s.openGroups[key] === open ? s : { openGroups: { ...s.openGroups, [key]: open } })),
   setGroupsOpen: (keys, open) =>

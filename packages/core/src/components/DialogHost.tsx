@@ -1,178 +1,95 @@
-import { useEffect, useRef, useState, type FormEvent } from "react";
-import { useLocation, useNavigate } from "react-router";
-import { Button, IconButton } from "./ui";
-import { brand, chapters, readChapter, text } from "../guide";
-import { exportProgress } from "../backup";
-import { validateState } from "../progress-state";
-import { isOpen, useProgress } from "../store/progress";
-import { themeOptions, useTheme, type ThemePreference } from "../store/theme";
-import { useUi, type DialogState } from "../store/ui";
-import type { ProgressState } from "../types";
+import { AlertDialog } from "@base-ui/react/alert-dialog";
+import { Dialog } from "@base-ui/react/dialog";
+import { cva } from "class-variance-authority";
+import { useRef, useState } from "react";
+import { DialogBody } from "./dialog";
+import { screens, type DialogScreen } from "./screen-list";
+import { IconButton } from "./ui";
+import { useUi } from "../store/ui";
 
-/** One native <dialog> for the whole app; its content switches on the store. */
-export function DialogHost() {
+const backdrop =
+  "fixed inset-0 z-50 bg-backdrop transition-opacity duration-100 data-ending-style:opacity-0 data-starting-style:opacity-0 motion-reduce:transition-none";
+
+const popup = cva(
+  "fixed top-1/2 left-1/2 z-50 flex max-h-[calc(100dvh-30px)] -translate-1/2 flex-col rounded-card border border-control-line bg-surface p-5 text-ink shadow-[0_18px_85px_var(--shadow)] outline-hidden transition-[opacity,scale] duration-100 data-ending-style:scale-95 data-ending-style:opacity-0 data-starting-style:scale-95 data-starting-style:opacity-0 motion-reduce:transition-none",
+  {
+    variants: { size: { default: "w-[min(530px,calc(100%-26px))]", wide: "w-[min(720px,calc(100%-26px))]" } },
+    defaultVariants: { size: "default" },
+  },
+);
+
+/**
+ * Where the focus goes when a screen opens: the element the screen marks with data-autofocus, else the first field. A radio's hidden
+ * input is aria-hidden and the radio itself is the field, so only the chosen radio counts; the unchosen ones aren't a place to land.
+ */
+const firstField = (root: HTMLElement | null): HTMLElement | null =>
+  root?.querySelector<HTMLElement>("[data-autofocus]") ??
+  root?.querySelector<HTMLElement>(
+    "[role=radio][aria-checked=true], select:not(:disabled), input:not([type=hidden]):not([aria-hidden=true]):not(:disabled), [role=combobox]:not([aria-disabled=true])",
+  ) ??
+  null;
+
+/**
+ * One frame, for one kind of dialog. An alert dialog (a question that needs an answer, not dismissed by a click outside) and a plain
+ * one are different Base UI roots, so each has its own frame, and both stay mounted: a root that mounts already open doesn't animate.
+ */
+function Frame({ alert }: { alert: boolean }) {
   const dialog = useUi((s) => s.dialog);
   const closeDialog = useUi((s) => s.closeDialog);
-  const ref = useRef<HTMLDialogElement>(null);
-  const trigger = useRef<Element | null>(null);
+  const key = useUi((s) => s.dialogKey);
+  const popupRef = useRef<HTMLDivElement>(null);
+  const mine = dialog && Boolean(screens[dialog.kind].alert) === alert ? dialog : null;
+  // The store clears the screen the moment the dialog closes; keep showing it while the dialog fades out. Each opening has its own key,
+  // so a screen opened again during the fade starts afresh instead of inheriting the last one's state.
+  const [last, setLast] = useState(mine && { dialog: mine, key });
+  if (mine && key !== last?.key) setLast({ dialog: mine, key });
 
-  useEffect(() => {
-    const element = ref.current;
-    if (!element) return;
-    if (dialog && !element.open) {
-      trigger.current = document.activeElement;
-      element.showModal();
-    } else if (!dialog && element.open) {
-      element.close();
-    }
-    if (dialog) element.querySelector<HTMLElement>("[autofocus], input, select, .controls button")?.focus();
-  }, [dialog]);
-
-  const title = dialog?.kind === "settings" ? "Guide settings" : dialog?.title;
-
+  const shown = last?.dialog;
+  const screen = shown ? (screens[shown.kind] as DialogScreen<typeof shown>) : null;
+  const Root = alert ? AlertDialog.Root : Dialog.Root;
   return (
-    <dialog
-      id="dialog"
-      ref={ref}
-      aria-labelledby="dialog-title"
-      onClose={() => {
-        closeDialog();
-        if (trigger.current instanceof HTMLElement && trigger.current.isConnected) trigger.current.focus({ preventScroll: true });
-        trigger.current = null;
+    <Root
+      open={mine !== null}
+      onOpenChange={(open) => {
+        if (!open) closeDialog();
+      }}
+      onOpenChangeComplete={(open) => {
+        // Only the close of the dialog the action was set for runs it: the other frame may be closing from an earlier dialog.
+        const { afterClose } = useUi.getState();
+        if (open || !afterClose || afterClose.key !== last?.key) return;
+        useUi.setState({ afterClose: null });
+        // With no animation to wait for (jsdom, and reduced motion, where the transition is off) Base UI reports the close just before it unmounts
+        // the dialog and lets screen readers back into the page; one task later they are. DialogHost.test.tsx holds this.
+        setTimeout(afterClose.run, 0);
       }}
     >
-      {dialog && (
-        <>
-          <h2 id="dialog-title">{title}</h2>
-          <span className="close">
-            <IconButton label="Close dialog" icon="x" onClick={closeDialog} />
-          </span>
-          {dialog.kind === "settings" ? <SettingsForm /> : <ConfirmBody dialog={dialog} />}
-        </>
+      {shown && screen && (
+        <Dialog.Portal>
+          <Dialog.Backdrop className={backdrop} />
+          <Dialog.Popup ref={popupRef} className={popup({ size: screen.size })} initialFocus={() => firstField(popupRef.current) ?? true}>
+            <Dialog.Title className="pr-11 font-display text-[25px] leading-[1.2] font-bold tracking-[-0.015em]">{screen.title(shown)}</Dialog.Title>
+            <div className="absolute top-3 right-3.25">
+              <IconButton label="Close dialog" icon="x" onClick={closeDialog} />
+            </div>
+            <DialogBody>
+              <screen.Body key={last?.key} dialog={shown} />
+            </DialogBody>
+          </Dialog.Popup>
+        </Dialog.Portal>
       )}
-    </dialog>
+    </Root>
   );
 }
 
-function ConfirmBody({ dialog }: { dialog: Extract<NonNullable<DialogState>, { kind: "confirm" }> }) {
-  const closeDialog = useUi((s) => s.closeDialog);
+/**
+ * The one dialog for the whole app. Its content is a screen from screen-list.ts, chosen by the UI store. A modal dialog: focus stays
+ * inside, Escape closes it and focus goes back to what opened it.
+ */
+export function DialogHost() {
   return (
     <>
-      <p>{dialog.explanation}</p>
-      <div className="controls">
-        <Button
-          look={dialog.danger ? "danger" : ""}
-          onClick={() => {
-            closeDialog();
-            dialog.onConfirm();
-          }}
-        >
-          {dialog.label}
-        </Button>
-        <Button onClick={closeDialog}>Cancel</Button>
-      </div>
+      <Frame alert={false} />
+      <Frame alert />
     </>
   );
 }
-
-function SettingsForm() {
-  const data = useProgress((s) => s.data);
-  const storageError = useProgress((s) => s.storageError);
-  const preference = useTheme((s) => s.preference);
-  const closeDialog = useUi((s) => s.closeDialog);
-  const announce = useUi((s) => s.announce);
-  const navigate = useNavigate();
-  const { pathname } = useLocation();
-  const [imported, setImported] = useState<ProgressState>();
-  const [feedback, setFeedback] = useState<{ text: string; error: boolean }>({ text: "", error: false });
-
-  const submit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const fields = new FormData(event.currentTarget);
-    useTheme.getState().setPreference(fields.get("theme") as ThemePreference);
-    useProgress.getState().saveSettings({ spoilers: fields.has("spoilers"), ceiling: readChapter(fields.get("ceiling")) });
-    closeDialog();
-    const next = useProgress.getState().data;
-    const [view, param] = pathname.split("/").filter(Boolean);
-    if (view === "guide" && !isOpen(next, readChapter(param, next.chapter))) navigate(`/guide/${next.chapter}`);
-    announce("Guide settings saved.");
-  };
-
-  const pickFile = async (file: File | undefined) => {
-    setImported(undefined);
-    if (!file) return setFeedback({ text: "", error: false });
-    try {
-      if (file.size > 1_000_000) throw new Error("The backup is too large.");
-      const parsed = validateState(JSON.parse(await file.text()));
-      setImported(parsed);
-      const count = Object.keys(parsed.checks).length;
-      setFeedback({ text: `${count} checked ${count === 1 ? "entry" : "entries"} found. Select Replace with backup to load them.`, error: false });
-    } catch {
-      setFeedback({ text: `Couldn’t read this ${brand.name} progress backup.`, error: true });
-    }
-  };
-
-  const replace = () => {
-    if (!imported) return;
-    useProgress.getState().replaceAll(imported);
-    closeDialog();
-    const [view, param] = pathname.split("/").filter(Boolean);
-    if (view === "guide") navigate(`/guide/${isOpen(imported, imported.chapter) ? imported.chapter : imported.ceiling}`);
-    else if (!param) navigate(pathname);
-    announce("Progress backup loaded.");
-  };
-
-  return (
-    <>
-      <p>Choose your theme and how far the guide can reveal.</p>
-      <form id="guide-settings" onSubmit={submit}>
-        <label className="field">
-          Appearance
-          <select className="select" name="theme" defaultValue={preference}>
-            {themeOptions.map(([key, label]) => (
-              <option key={key} value={key}>
-                {label}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="check-label">
-          <input type="checkbox" className="check" name="spoilers" defaultChecked={data.spoilers} /> Hide later chapters
-        </label>
-        <label className="field">
-          Reveal through
-          <select className="select" name="ceiling" defaultValue={data.ceiling}>
-            {chapters.map((chapter) => (
-              <option key={chapter.id} value={chapter.id}>
-                Chapter {chapter.id}
-              </option>
-            ))}
-          </select>
-        </label>
-        <div className="controls">
-          <Button type="submit" look="">
-            Save settings
-          </Button>
-        </div>
-      </form>
-      <hr />
-      <p>{text.backupBlurb} Importing replaces the current progress.</p>
-      <p className="hint">Installed on a phone or tablet? The installed app can keep its own separate storage. Export here first, then import in the installed app.</p>
-      {storageError && <p className="inline-error">Browser storage is unavailable. Export a backup before closing this tab.</p>}
-      <label className="field" htmlFor="import-file">
-        Import progress backup
-        <input id="import-file" type="file" accept=".json,application/json" onChange={(event) => void pickFile(event.target.files?.[0])} />
-      </label>
-      <p id="import-status" role="status" className={feedback.error ? "inline-error" : undefined}>
-        {feedback.text}
-      </p>
-      <div className="controls">
-        <Button onClick={exportProgress}>Export progress</Button>
-        <Button id="import-button" disabled={!imported} onClick={replace}>
-          Replace with backup
-        </Button>
-      </div>
-    </>
-  );
-}
-
