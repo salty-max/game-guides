@@ -1,8 +1,9 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "lib": ["ES2023"],
+    "lib": ["ES2023", "DOM"],
     "jsx": "preserve",
+    "verbatimModuleSyntax": false,
     "types": ["node"]
   },
   "include": ["api", "src", "vitest.config.mts"]

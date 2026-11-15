@@ -14,7 +14,7 @@ Work out which projects will build before asking for the push. The ignore step, 
 ## 2. Previews
 
 - **Push the branch**, with the user's go. A new branch with real commits builds a preview on every project whose ignore command sees a change. PR [salty-max/hundo#1](https://github.com/salty-max/hundo/pull/1) built all three this way on 2026-11-14. The pull request's checks link to each deployment.
-- **No preview built?** That happens when the branch's last commit touches none of the watched paths. The monorepo session also saw no build for a branch pushed at a commit that already existed (2026-11-14). Create the deployment through the API instead. The body goes in a file:
+- **No preview built?** That happens when the branch's last commit touches none of the watched paths. The monorepo session also saw no build for a branch pushed at a commit that already existed (2026-11-14). Create the deployment through the API instead, unless the ignore step is what skipped it: an API deployment runs the same script, so with an empty watched diff it is canceled too. In that case use `vercel deploy` from a linked repository root. The body goes in a file:
 
   ```json
   { "name": "<project>", "project": "<project>", "gitSource": { "type": "github", "repoId": 1458075216, "ref": "<branch>", "sha": "<full sha>" } }
@@ -24,7 +24,7 @@ Work out which projects will build before asking for the push. The ignore step, 
   vercel api /v13/deployments --scope jellycat -X POST --input <body.json> --raw | jq -r '.url, .id, .readyState'
   ```
 
-  `1458075216` is `salty-max/hundo`'s GitHub id (`gh api repos/salty-max/hundo --jq .id`), unchanged by the rename from game-guides. Leave out `target` so the deployment is a preview. **Never print the whole response**, or a project's: it holds a protection-bypass secret. Always pick fields with `jq`. Right after the POST, the state is queued or initializing. `vercel inspect --wait` shows how it ends. If it ends canceled, the likely reason is that the ignore step skipped it too. That's an inference, not seen yet, so check the build log.
+  `1458075216` is `salty-max/hundo`'s GitHub id (`gh api repos/salty-max/hundo --jq .id`), unchanged by the rename from game-guides. Leave out `target` so the deployment is a preview. **Never print the whole response**, or a project's: it holds a protection-bypass secret. Always pick fields with `jq`. Right after the POST, the state is queued or initializing. `vercel inspect --wait` shows how it ends. If it ends canceled, check the build log. "The Ignored Build Step command returned exit code 0" means the ignore step skipped it, which it does whenever the watched diff is empty. On `hundo-api` (2026-11-15) an API deployment, a redeploy and an API deployment with the ignore command overridden in `projectSettings` were all canceled this way for a commit the branch had already deployed (the script must have been handed that earlier deployment's commit as `VERCEL_GIT_PREVIOUS_SHA`, an inference), and `vercel.json`'s `ignoreCommand` won over the override. `vercel deploy` from a linked repository root built it.
 - **Find and wait.** `vercel ls <project> --scope jellycat` lists the deployments. Match yours by branch and commit, because other sessions deploy too. Then wait on each one:
 
   ```bash

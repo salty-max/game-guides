@@ -32,7 +32,7 @@ Every app's `vercel.json` is the same, and `deploy.test.ts` fails if one drifts:
 
   So a change to one guide deploys only that guide, and a change to core, the lockfile or the root `package.json` deploys all three. The root `docs/`, `README.md` and `CLAUDE.md`, the harness, the ESLint config and `.github/` aren't in the list, and a commit touching only those deploys nothing. An app's own `README.md` and `docs/facts-to-verify.md` sit inside its folder, though, so editing them redeploys that guide. If the build starts to read another root file, add it to the list in every app. `deploy.test.ts` checks that core and the root workspace files stay in it.
 
-  Vercel leaves `VERCEL_GIT_PREVIOUS_SHA` empty on a branch's first deployment ([its docs](https://vercel.com/docs/environment-variables/system-environment-variables)). So on a new branch only the last commit decides: when that commit touches only docs, no preview gets built, even if earlier commits on the branch changed a guide. Push a commit that touches the app, or redeploy from the dashboard.
+  Vercel leaves `VERCEL_GIT_PREVIOUS_SHA` empty on a branch's first deployment ([its docs](https://vercel.com/docs/environment-variables/system-environment-variables)). So on a new branch only the last commit decides: when that commit touches only docs, no preview gets built, even if earlier commits on the branch changed a guide. Push a commit that touches the app, or build it with `vercel deploy` (a redeploy runs the same ignore command and is skipped the same way, see Pitfalls).
 - **Rewrites:** one catch-all sends every path except `/assets/`, `/fonts/` and `/icons/` to `/index.html`, so deep links like `/guide/3` load the app.
 - **Headers:**
   - a strict Content-Security-Policy, with `script-src 'self'` and no inline scripts;
@@ -54,6 +54,8 @@ Each of these broke something or nearly did. `packages/core/src/deploy.test.ts` 
   - keep the old address attached and serving.
 
   On every visit there, `packages/core/src/boot.ts` redirects to the same page on `home`, with the saved progress and theme in the URL fragment. The new address imports them only when the visit came from an old address and it has no checks yet. `boot.test.ts` covers it.
+- **Connect a repository to a project only once its Root Directory exists on `main`.** Until then every branch without that folder fails its deployment at clone with "The specified Root Directory … does not exist", and each of those pull requests shows a failing check. On `hundo-api`, neither an ignore command (none gets to run) nor `gitProviderOptions.createDeployments` (it only concerns GitHub's deployment notifications) stopped it. Disconnecting the repository did (`vercel git disconnect`). So create such a project without the repository link, or disconnect it, and connect it (`vercel git connect`) once the folder is on `main`.
+- **The ignore command can cancel a deployment you want.** It answers 0 whenever the watched diff is empty. On `hundo-api` an API deployment, a redeploy, and an API deployment with the ignore command overridden in its `projectSettings` were all canceled with "The Ignored Build Step command returned exit code 0", for a commit the branch had already deployed. The script must have been handed that earlier deployment's commit as `VERCEL_GIT_PREVIOUS_SHA` (an inference: against `HEAD^` it would have found the new folder changed), and the `ignoreCommand` in `vercel.json` won over the override. `vercel deploy` from a linked repository root built it.
 - **Check headers on a real preview.** `vite preview` doesn't send them.
 
 ## Preview first
@@ -82,20 +84,22 @@ Settings in the Vercel dashboard:
 - **Framework:** Other (`vercel.json` says `"framework": null`), **Node.js** 26.x, **production branch** `main`.
 - **Domain:** `api.hundo.quest`.
 - **Environment variables**, for Production and Preview: `SYNC_IP_SALT`, a long random secret (`openssl rand -hex 32`) that salts the IP hashes behind the rate limits, and the Upstash Redis REST URL and token. The code reads `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN`, or Vercel KV's `KV_REST_API_URL` and `KV_REST_API_TOKEN`. With either missing, every real call answers `503 unconfigured`.
-- **The store:** an Upstash Redis database, in Frankfurt to sit next to the function (`"regions": ["fra1"]`). Production and previews share it, apart by key prefix: production keys start `hs:prod:`, everything from a preview or localhost `hs:test:` and goes after a week.
+- **The store:** an Upstash Redis database on the free plan, in Frankfurt. `vercel integration add upstash/upstash-kv --name hundo-sync -m primaryRegion=fra1` creates it (without `-m` it came up in `iad1`, and the Upstash terms have to be accepted once in a browser first). It sets `KV_REST_API_URL`, `KV_REST_API_TOKEN` and three more, for production and preview. Production and previews share it, apart by key prefix: production keys start `hs:prod:`, everything from a preview or localhost `hs:test:` and goes after a week.
+- **Function Region:** Frankfurt (`fra1`), to sit next to the store, in the project's settings. The default is `iad1`. `regions` in `vercel.json` did not move the functions off `iad1` on the first preview, so the file doesn't carry one.
+- **The repository link:** connect it only once `services/sync` is on `main` (see Pitfalls).
 
 Creating the project, attaching the domain and creating the store each need the user's go, like any new project. The service can't stop a flood of requests from using the store's commands (each request costs at least one), so a rate-limit rule in the project's firewall is the guard it lacks ([its README](../services/sync/README.md#known-limits-and-what-isnt-checked-yet)).
 
-Before a guide's preview can sync, `api.hundo.quest` has to be live, so the service ships first and the guides' side after it. Check the service's own preview with `curl`: a POST with an `Origin` and `Content-Type: application/json` and `{"p":1}` to `/api/status` answers `401 unlinked` with `Cache-Control: no-store`, and the same call with a foreign `Origin` answers `403`.
+Before a guide's preview can sync, `api.hundo.quest` has to be live, so the service ships first and the guides' side after it. A preview of the service sits behind deployment protection, so check it with `vercel curl <path> --deployment <url> --scope jellycat -- <curl options>` from a folder linked to the project, calling it with its own address as the `Origin` (that lands in the `test` namespace and the real store). What it should do: a pairing (`pair/start`, then `pair/claim` from a second cookie jar, then `sync` from both) answers as [the README](../services/sync/README.md) says, `GET /api/sync` is `405`, an unknown path is the platform's `404` and not HTML, a POST without cookies is `401 unlinked` with its cookies cleared, and a foreign `Origin` is `403`. (A forged `x-forwarded-host` that matched the `Origin` was still refused with `403` on the first preview, so on a direct call Vercel replaces it with the real host.) The build log has no TypeScript errors.
 
 ## A new project
 
 For a new guide, after its folder passes `pnpm check` ([adding-a-guide.md](adding-a-guide.md)), and with the user's go:
 
-1. In Vercel, on the team jellycat: add a project and import `salty-max/hundo`.
+1. In Vercel, on the team jellycat: add a project and import `salty-max/hundo`. If the app's folder isn't on `main` yet, which is the case for a new guide until its pull request merges, disconnect the repository again at once (`vercel git disconnect`, see Pitfalls) and connect it once the folder is on `main`.
 2. Name it after the app's package, `hundo-<sub>`.
 3. Set the Root Directory to `apps/<name>`. Leave "Include files outside the Root Directory" on. Vercel picks up the framework, install, build and output from the app's `vercel.json`.
 4. Set the Node.js version to 26.x and the production branch to `main`.
 5. Add the guide's `<sub>.hundo.quest` to the project's domains. Its `brand.home` is already set in `brand.ts`.
-6. Deploy a preview first, and check it as above, before the first production deploy.
+6. Deploy a preview first, and check it as above, before the first production deploy. While the repository isn't connected, link the repository root to the project (`vercel link`) and run `vercel deploy`, which is how `hundo-api`'s first preview was built.
 7. Add the guide to the root README's apps table.
