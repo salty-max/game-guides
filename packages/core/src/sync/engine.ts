@@ -16,10 +16,11 @@ import { SYNC_KEY, onLocalChange, readHint, readRecord } from "./local";
  * After a failure it waits 5 seconds, doubling to 5 minutes, with some jitter, and doesn't poll on top. Changes wait on the device
  * through all of it.
  *
- * What a poll costs: one request and 5 store commands, 7 when the device's last-seen is refreshed (the API does that at most once a
- * minute). An open guide that nobody touches asks about 33 times an hour, about 230 commands; one kept at the quick pace by changes on
- * either side, 180 times, about 1,000. The firewall's limit is 120 a minute for an address, so three devices polling at 20 seconds
- * (9 a minute) are far under it. The commands are what the store's free plan counts: docs/core.md has the monthly figures.
+ * What a poll costs: one request, and for the store two commands when the group's data hasn't changed (cycle.ts asks with the revision
+ * it has, and the answer is "unchanged"), six when it has or when the poll is a full sync (every ten minutes), eight with the device's
+ * last-seen refreshed (which only full syncs do). An open guide that nobody touches asks about 33 times an hour, about 100 commands.
+ * The firewall's limit is 120 a minute for an address, so three devices polling at 20 seconds (9 a minute) are far under it. The
+ * commands are what the store's free plan counts: docs/core.md has the monthly figures.
  */
 
 export const DEBOUNCE = 2_000;

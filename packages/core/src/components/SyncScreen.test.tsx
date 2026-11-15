@@ -180,6 +180,8 @@ describe("a linked device", () => {
     expect(await within(dialog).findByText("Safari · iPhone (this device)")).toBeInTheDocument();
     expect(within(dialog).getByText("Chrome · Windows")).toBeInTheDocument();
     expect(within(dialog).getByText("Last synced 3 hours ago")).toBeInTheDocument();
+    // (a device seen half a minute ago is only said to have been seen lately: last-seen is refreshed by full syncs, every ten minutes or so)
+    expect(within(dialog).getByText("Seen in the last 15 minutes")).toBeInTheDocument();
     expect(within(dialog).getByRole("status")).toHaveTextContent("Synced · 2 devices · just now");
     for (const name of ["Link another device", "Unlink this device", "Delete synced progress…"]) expect(within(dialog).getByRole("button", { name })).toBeInTheDocument();
     expect(within(dialog).getByRole("list", { name: "Linked devices" })).toBeInTheDocument();

@@ -145,6 +145,8 @@ const exec = (ctx: Ctx, commands: Command[]) => ctx.deps.store.exec(commands);
 const dvKey = (ctx: Ctx, id: string) => key(ctx.where.ns, "dv", id);
 const gdKey = (ctx: Ctx, group: string) => key(ctx.where.ns, "gd", group);
 const pKey = (ctx: Ctx, group: string, guide: string) => key(ctx.where.ns, "p", group, guide);
+/** A guide's revision in a group: a counter that goes up whenever its data is written, so a poll can ask "has anything changed" in one read. */
+const rvKey = (ctx: Ctx, group: string, guide: string) => key(ctx.where.ns, "rv", group, guide);
 
 /** The device behind this request's cookie, or null when there is none or it was unlinked. */
 async function identify(ctx: Ctx): Promise<Me | null> {
@@ -235,7 +237,7 @@ async function hasRoom(ctx: Ctx, group: string): Promise<boolean> {
 
 async function dropIfEmpty(ctx: Ctx, group: string) {
   const [count] = await exec(ctx, [["HLEN", gdKey(ctx, group)]]);
-  if (count === 0) await exec(ctx, [["DEL", gdKey(ctx, group), ...GUIDES.map((guide) => pKey(ctx, group, guide))]]);
+  if (count === 0) await exec(ctx, [["DEL", gdKey(ctx, group), ...GUIDES.flatMap((guide) => [pKey(ctx, group, guide), rvKey(ctx, group, guide)])]]);
 }
 
 async function pairStart(ctx: Ctx) {
@@ -342,9 +344,31 @@ async function sync(ctx: Ctx) {
   if (!me?.group) return unlinked(ctx);
   const set = pKey(ctx, me.group, guide);
   const devicesKey = gdKey(ctx, me.group);
+  const rv = rvKey(ctx, me.group, guide);
   const visits = key(ctx.where.ns, "rl", "sync", me.id, String(Math.floor(ctx.now / 60_000)));
 
-  const [count, , stored, flat] = await exec(ctx, [["INCR", visits], ["EXPIRE", visits, 60, "NX"], ["ZRANGE", set, 0, -1], ["HGETALL", devicesKey]]);
+  // A poll: a device with nothing to send that says which revision of this guide's data it has. If that is still the revision, nothing
+  // else is read, written or refreshed, and the answer costs two store commands (the device's record, and the revision). It isn't counted
+  // against the per-device limit: that counter is only checked after the data is read, so it never saved the store a command (a refused call
+  // costs six), and the firewall's rate limit is what holds a flood. A device asking for a touch (its daily expiry refresh) always takes the
+  // full path below.
+  const known = typeof ctx.body.rev === "number" && Number.isSafeInteger(ctx.body.rev) && ctx.body.rev >= 0 ? ctx.body.rev : null;
+  let before: number | null = null;
+  if (known !== null && Object.keys(entries).length === 0 && ctx.body.touch !== true) {
+    const [stamp] = await exec(ctx, [["GET", rv]]);
+    before = Number(stamp ?? 0);
+    if (before === known) return reply(200, { p: PROTOCOL, unchanged: true, rev: before, now: ctx.now });
+  }
+
+  // The revision is read before the data, never after: a write that lands in between leaves this answer's data newer than its revision,
+  // and the device then asks once more for nothing, where the other way round it would never hear of what it missed.
+  const first: Command[] = [["INCR", visits], ["EXPIRE", visits, 60, "NX"]];
+  if (before === null) first.push(["GET", rv]);
+  first.push(["ZRANGE", set, 0, -1], ["HGETALL", devicesKey]);
+  const read = await exec(ctx, first);
+  const [count] = read;
+  const [stored, flat] = read.slice(before === null ? 3 : 2);
+  if (before === null) before = Number(read[2] ?? 0);
   if (Number(count) > SYNCS_PER_MINUTE) return reply(429, { error: "limit" });
 
   // Settle what the device sent against what is stored: the winners go back, only winning changes are added, and the
@@ -373,11 +397,20 @@ async function sync(ctx: Ctx) {
   if (add.length > 0) commands.push(["ZADD", set, ...add.flatMap(([at, member]) => [at, member])], ["EXPIRE", set, keep]);
   if (drop.length > 0) commands.push(["ZREM", set, ...drop]);
   if (!mine || ctx.now - mine.seen > SEEN_EVERY) commands.push(["HSET", devicesKey, me.id, `${me.label}\t${ctx.now}`], ["EXPIRE", devicesKey, keep]);
-  if (touch) commands.push(["EXPIRE", dvKey(ctx, me.id), keep], ["EXPIRE", devicesKey, keep], ["EXPIRE", set, keep]);
-  if (commands.length > 0) await exec(ctx, commands);
+  if (touch) commands.push(["EXPIRE", dvKey(ctx, me.id), keep], ["EXPIRE", devicesKey, keep], ["EXPIRE", set, keep], ["EXPIRE", rv, keep]);
+  // The revision goes up last: nobody who sees the new number can find the data not yet written.
+  const bumpAt = add.length > 0 || drop.length > 0 ? commands.length : -1;
+  if (bumpAt >= 0) commands.push(["INCR", rv], ["EXPIRE", rv, keep]);
+  const written = commands.length > 0 ? await exec(ctx, commands) : [];
+
+  // What this answer is a revision of: the one read before the data, or, when this call's own write is the only one that has landed
+  // since (the counter is exactly one higher), the number it made. Anything else, and another device wrote in between: say the old
+  // one, so the next poll finds the change.
+  const after = bumpAt >= 0 ? Number(written[bumpAt]) : before;
+  const rev = after === before + 1 ? after : before;
 
   const total = live.some((device) => device.id === me.id) ? live.length : live.length + 1;
-  return reply(200, { p: PROTOCOL, entries: state, devices: total, now: ctx.now }, touch ? sessionCookies(ctx, tokenOf(me), me.group) : []);
+  return reply(200, { p: PROTOCOL, entries: state, devices: total, now: ctx.now, rev }, touch ? sessionCookies(ctx, tokenOf(me), me.group) : []);
 }
 
 async function unlink(ctx: Ctx) {
@@ -397,7 +430,7 @@ async function forget(ctx: Ctx) {
   if (!me?.group) return unlinked(ctx);
   const [flat] = await exec(ctx, [["HGETALL", gdKey(ctx, me.group)]]);
   const ids = new Set([me.id, ...toPairs(flat).map(([id]) => id)]);
-  await exec(ctx, [["DEL", ...[...ids].map((id) => dvKey(ctx, id)), gdKey(ctx, me.group), ...GUIDES.map((guide) => pKey(ctx, me.group, guide))]]);
+  await exec(ctx, [["DEL", ...[...ids].map((id) => dvKey(ctx, id)), gdKey(ctx, me.group), ...GUIDES.flatMap((guide) => [pKey(ctx, me.group, guide), rvKey(ctx, me.group, guide)])]]);
   return reply(200, { ok: true }, clearCookies(ctx));
 }
 

@@ -19,6 +19,8 @@ const BATCH = 1000;
 /** Rounds in one cycle, so a device with a huge backlog doesn't hold the lock for long. */
 const ROUNDS = 5;
 const TOUCH_AFTER = 20 * 60 * 60 * 1000;
+/** A poll that is only a check becomes a full sync this often: it refreshes the device's last-seen and the count of devices. */
+const FULL_EVERY = 10 * 60_000;
 
 export type Outcome =
   | { kind: "off" }
@@ -31,6 +33,8 @@ interface SyncBody {
   entries?: unknown;
   devices?: unknown;
   now?: unknown;
+  rev?: unknown;
+  unchanged?: unknown;
   error?: unknown;
 }
 
@@ -66,9 +70,10 @@ function apply(entries: Entries, first: boolean): boolean {
 }
 
 /** The server's entries in a reply, or null when the reply isn't what the protocol says. */
-function serverState(body: SyncBody | null): { entries: Entries; devices: number; now: number } | null {
+function serverState(body: SyncBody | null): { entries: Entries; devices: number; now: number; rev: number | null } | null {
   if (!body || typeof body.now !== "number" || typeof body.devices !== "number") return null;
-  return { entries: cleanEntries(body.entries), devices: body.devices, now: body.now };
+  const rev = typeof body.rev === "number" && Number.isSafeInteger(body.rev) && body.rev >= 0 ? body.rev : null;
+  return { entries: cleanEntries(body.entries), devices: body.devices, now: body.now, rev };
 }
 
 /** Take what another tab of this guide has saved, if this tab hasn't heard of it yet, so a first sync starts from the progress that is stored. */
@@ -103,7 +108,17 @@ async function join(hint: string): Promise<{ joined: true } | { outcome: Outcome
   const state = useProgress.getState().data;
   const mine = seed(state, server.entries, clock, Date.now());
   const entries = merge(server.entries, mine);
-  const record: SyncRecord = { v: 1, group: hint, entries, dirty: Object.keys(mine).filter((key) => entries[key] === mine[key]), clock, touched: Date.now() };
+  const record: SyncRecord = {
+    v: 1,
+    group: hint,
+    entries,
+    dirty: Object.keys(mine).filter((key) => entries[key] === mine[key]),
+    clock,
+    touched: Date.now(),
+    rev: server.rev,
+    fullAt: Date.now(),
+    devices: server.devices,
+  };
   // The ledger first: if it can't be saved, nothing was applied and the next round joins afresh. The other way round, rows pulled from the
   // group would count as ticked here on that next round, and beat an untick another device made in between.
   if (!writeRecord(record)) return { outcome: retry("error") };
@@ -121,9 +136,16 @@ async function exchange(): Promise<Outcome> {
     const keys = record.dirty.slice(0, BATCH);
     const sent = pick(record.entries, keys);
     const touch = Date.now() - record.touched > TOUCH_AFTER;
+    // Nothing to send, no touch due, a revision to go by and a full answer not long ago: only ask whether anything has changed.
+    const quiet = record.rev !== null && keys.length === 0 && !touch && Date.now() - record.fullAt < FULL_EVERY;
     const sentAt = Date.now();
-    const reply = await call<SyncBody>("/sync", { guide: brand.id, entries: sent, touch });
+    const reply = await call<SyncBody>("/sync", quiet ? { guide: brand.id, entries: {}, rev: record.rev } : { guide: brand.id, entries: sent, touch });
     const receivedAt = Date.now();
+
+    if (quiet && reply.status === 200 && reply.body?.unchanged === true && reply.body.rev === record.rev) {
+      // Nothing changed in the group: nothing to merge, apply or save, so nothing is written. What this tab has waiting is its own business.
+      return { kind: "ok", devices: record.devices, dirty: (readRecord()?.dirty.length ?? 0) > 0, pulled };
+    }
 
     if (reply.status === 400 && reply.body?.error === "clock" && typeof reply.body.now === "number" && !rebased) {
       // This device's clock is more than a day off the server's, and the offset it had was wrong: take the server's time, once.
@@ -149,6 +171,9 @@ async function exchange(): Promise<Outcome> {
     latest.dirty = latest.dirty.filter((key) => !delivered(key));
     latest.entries = merge(latest.entries, server.entries);
     if (touch) latest.touched = Date.now();
+    latest.rev = server.rev;
+    latest.fullAt = Date.now();
+    latest.devices = server.devices;
     pulled = apply(latest.entries, false) || pulled;
     if (!writeRecord(latest)) return retry("error");
     devices = server.devices;

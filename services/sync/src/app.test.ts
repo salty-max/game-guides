@@ -700,7 +700,7 @@ describe("sync", () => {
     expect(world.store.ttl(devices)).toBe(KEEP);
   });
 
-  it("costs five store commands to pull, seven to push a new key and eight to change one", async () => {
+  it("costs six store commands to pull, ten to push a new key and eleven to change one, with no revision to go by", async () => {
     const world = new World();
     const { a } = await link(world);
     await a.sync({ "c:x": [5, 1] });
@@ -709,10 +709,224 @@ describe("sync", () => {
       await a.sync(entries);
       return world.store.commands;
     };
-    expect(await cost({})).toBe(5);
-    expect(await cost({ "c:y": [6, 1] })).toBe(7);
-    expect(await cost({ "c:y": [7, 0] })).toBe(8);
-    expect(await cost({ "c:y": [1, 1] })).toBe(5);
+    expect(await cost({})).toBe(6);
+    expect(await cost({ "c:y": [6, 1] })).toBe(10);
+    expect(await cost({ "c:y": [7, 0] })).toBe(11);
+    expect(await cost({ "c:y": [1, 1] })).toBe(6);
+  });
+});
+
+describe("a poll with a revision", () => {
+  const poll = (device: Device, rev: unknown, extra: Record<string, unknown> = {}) => device.sync({}, { rev, ...extra });
+  const commandsFor = async (world: World, run: () => Promise<unknown>) => {
+    world.store.commands = 0;
+    await run();
+    return world.store.commands;
+  };
+
+  it("is answered from two store commands when nothing has changed, and says so", async () => {
+    const world = new World();
+    const { a } = await link(world);
+    const first = await a.sync({ "c:x": [5, 1] });
+    expect(first.body).toMatchObject({ entries: { "c:x": [5, 1] }, devices: 2, rev: 1 });
+    for (let at = 0; at < 3; at++) {
+      world.advance(90_000);
+      let reply!: Awaited<ReturnType<typeof poll>>;
+      expect(await commandsFor(world, async () => (reply = await poll(a, 1)))).toBe(2);
+      expect(reply.status).toBe(200);
+      expect(reply.body).toEqual({ p: 1, unchanged: true, rev: 1, now: world.clock.now });
+      NO_STORE(reply.headers);
+    }
+  });
+
+  it("changes nothing on the quiet path: no counter, no last-seen refresh, no expiry, no cookies", async () => {
+    const world = new World();
+    const { a } = await link(world);
+    await a.sync({ "c:x": [5, 1] });
+    const keys = () => world.store.keys().sort();
+    const data = () => keys().filter((name) => !name.includes(":rl:"));
+    const seen = await world.store.exec([["HGETALL", keys().find((name) => name.includes(":gd:"))!]]);
+    const before = data();
+    const expiries = before.map((name) => world.store.ttl(name));
+    world.advance(300_000);
+    const reply = await poll(a, 1);
+    expect(reply.cookies).toEqual([]);
+    expect(data()).toEqual(before);
+    expect(keys().filter((name) => name.includes(":rl:sync:"))).toEqual([]);
+    expect(await world.store.exec([["HGETALL", keys().find((name) => name.includes(":gd:"))!]])).toEqual(seen);
+    // (no expiry was pushed out: each is the same as it was, less the five minutes that passed)
+    expect(data().map((name) => world.store.ttl(name))).toEqual(expiries.map((left) => (left === null ? null : left - 300)));
+  });
+
+  it("answers in full, with the new revision, once another device has changed the data", async () => {
+    const world = new World();
+    const { a, b } = await link(world);
+    const mine = await a.sync({ "c:x": [5, 1] });
+    expect(mine.body.rev).toBe(1);
+    await b.sync({ "c:y": [6, 1] });
+    world.advance(30_000);
+    let reply!: Awaited<ReturnType<typeof poll>>;
+    // two to find out it changed, and four more to read it: the identify, the revision, the counter, the data, the devices
+    expect(await commandsFor(world, async () => (reply = await poll(a, 1)))).toBe(6);
+    expect(reply.body).toMatchObject({ entries: { "c:x": [5, 1], "c:y": [6, 1] }, devices: 2, rev: 2 });
+    expect(reply.body.unchanged).toBeUndefined();
+    expect((await poll(a, 2)).body).toMatchObject({ unchanged: true, rev: 2 });
+  });
+
+  it("takes its own push as the revision when nothing else has landed, and asks again once if something has", async () => {
+    const world = new World();
+    const { a, b } = await link(world);
+    expect((await a.sync({ "c:x": [5, 1] })).body.rev).toBe(1);
+    expect((await a.sync({ "c:x": [6, 0] }, { rev: 1 })).body.rev).toBe(2);
+    expect((await poll(a, 2)).body).toMatchObject({ unchanged: true });
+    // a push that wins nothing writes nothing, and the revision stays
+    expect((await a.sync({ "c:x": [1, 1] }, { rev: 2 })).body.rev).toBe(2);
+    // b's write and a's own are both counted: a can't tell which is which from the number, so it takes the older and finds b's change next time
+    expect((await b.sync({ "c:y": [7, 1] }, { rev: 2 })).body.rev).toBe(3);
+    expect((await poll(a, 2)).body).toMatchObject({ entries: { "c:y": [7, 1] }, rev: 3 });
+  });
+
+  it("never misses a change another device makes in the middle of a push", async () => {
+    let at = 0;
+    let aim = Infinity;
+    let during: () => Promise<unknown> = async () => {};
+    const world = new World({
+      between: async () => {
+        if (++at === aim) {
+          aim = Infinity;
+          await during();
+        }
+      },
+    });
+    const { a, b } = await link(world);
+    expect((await a.sync({ "c:x": [5, 1] })).body.rev).toBe(1);
+    // a's next push: the identify, the counter, the revision, the data and the devices are read before its first write, so b writes then
+    during = () => b.sync({ "c:b": [9, 1] });
+    aim = at + 7;
+    const pushed = await a.sync({ "c:a": [8, 1] }, { rev: 1 });
+    expect(pushed.status).toBe(200);
+    // b's write and a's both landed, so the counter is two up. a is told the revision it read, and the next poll brings b's change.
+    expect(pushed.body.rev).toBe(1);
+    const next = await poll(a, pushed.body.rev);
+    expect(next.body).toMatchObject({ entries: { "c:x": [5, 1], "c:a": [8, 1], "c:b": [9, 1] }, rev: 3 });
+  });
+
+  it("reads the revision before the data: a change landing between the two is found by the next poll, not taken for seen", async () => {
+    let at = 0;
+    let aim = Infinity;
+    let during: () => Promise<unknown> = async () => {};
+    const world = new World({
+      between: async () => {
+        if (++at === aim) {
+          aim = Infinity;
+          await during();
+        }
+      },
+    });
+    const { a, b } = await link(world);
+    expect((await a.sync({ "c:x": [5, 1] })).body.rev).toBe(1);
+    // a's push reads the device (1), counts the sync (2, 3), reads the revision (4) and then the data (5): b writes between the last two,
+    // so a reads b's data under the older revision, and its own write then makes the counter two higher, which it doesn't take for its own
+    during = () => b.sync({ "c:b": [9, 1] });
+    aim = at + 5;
+    const pushed = await a.sync({ "c:a": [8, 1] }, { rev: 1 });
+    expect(pushed.body).toMatchObject({ rev: 1, entries: { "c:x": [5, 1], "c:b": [9, 1], "c:a": [8, 1] } });
+    // had the revision been read after the data, it would be b's, a would take its own write for the next, and this poll would say "unchanged"
+    expect((await poll(a, pushed.body.rev)).body).toMatchObject({ rev: 3, entries: { "c:b": [9, 1], "c:a": [8, 1] } });
+  });
+
+  it("finds a change that lands between a poll's check and the full read that follows it, on the next poll", async () => {
+    let at = 0;
+    let aim = Infinity;
+    let during: () => Promise<unknown> = async () => {};
+    const world = new World({
+      between: async () => {
+        if (++at === aim) {
+          aim = Infinity;
+          await during();
+        }
+      },
+    });
+    const { a, b } = await link(world);
+    await a.sync({ "c:x": [5, 1] });
+    await b.sync({ "c:y": [6, 1] });
+    // a asks with a revision that is behind (2 commands), and the full read follows: b writes again between them
+    during = () => b.sync({ "c:z": [7, 1] });
+    aim = at + 5;
+    const answer = await poll(a, 1);
+    expect(answer.body).toMatchObject({ rev: 2, entries: { "c:x": [5, 1], "c:y": [6, 1], "c:z": [7, 1] } });
+    // a holds the revision it read first, so the change it already has is sent once more, and nothing is missed
+    expect((await poll(a, 2)).body).toMatchObject({ rev: 3 });
+    expect((await poll(a, 3)).body).toMatchObject({ unchanged: true, rev: 3 });
+  });
+
+  it("takes the full path for a device with something to send, one asking for its daily touch, and one with no revision", async () => {
+    const world = new World();
+    const { a } = await link(world);
+    await a.sync({ "c:x": [5, 1] });
+    world.advance(90_000);
+    expect((await a.sync({ "c:z": [6, 1] }, { rev: 1 })).body.unchanged).toBeUndefined();
+    const touched = await poll(a, 2, { touch: true });
+    expect(touched.body.unchanged).toBeUndefined();
+    expect(touched.body).toMatchObject({ entries: { "c:x": [5, 1], "c:z": [6, 1] } });
+    expect(touched.cookies.length).toBe(2);
+    expect((await a.sync()).body).toMatchObject({ entries: { "c:x": [5, 1], "c:z": [6, 1] }, rev: 2 });
+  });
+
+  it("treats a revision it can't read as none, and an old client's call as it always did", async () => {
+    const world = new World();
+    const { a } = await link(world);
+    await a.sync({ "c:x": [5, 1] });
+    for (const rev of ["1", -1, 1.5, null, Number.MAX_SAFE_INTEGER + 2, [1], { rev: 1 }, true]) {
+      const reply = await poll(a, rev);
+      expect(reply.status, JSON.stringify(rev)).toBe(200);
+      expect(reply.body, JSON.stringify(rev)).toMatchObject({ entries: { "c:x": [5, 1] }, devices: 2, rev: 1 });
+    }
+    // an old client sends no revision and ignores the one it gets
+    expect((await a.sync()).body).toMatchObject({ p: 1, entries: { "c:x": [5, 1] }, devices: 2, now: world.clock.now });
+  });
+
+  it("answers a revision ahead of the server's as a change, and an empty guide's as the same as no data at all", async () => {
+    const world = new World();
+    const { a } = await link(world);
+    expect((await poll(a, 5)).body).toMatchObject({ entries: {}, rev: 0 });
+    expect((await poll(a, 0)).body).toEqual({ p: 1, unchanged: true, rev: 0, now: world.clock.now });
+  });
+
+  it("counts each guide's data apart, so a poll for one isn't answered by a change to another", async () => {
+    const world = new World();
+    const { a } = await link(world);
+    await a.sync({ "c:x": [5, 1] });
+    await a.post("/api/sync", { guide: "red-dead-redemption", entries: { "c:y": [6, 1] } });
+    expect((await poll(a, 1)).body).toMatchObject({ unchanged: true, rev: 1 });
+    expect((await a.post("/api/sync", { guide: "red-dead-redemption", entries: {}, rev: 0 })).body).toMatchObject({ rev: 1, entries: { "c:y": [6, 1] } });
+  });
+
+  it("keeps the revision as long as the data, and deletes it with it", async () => {
+    const world = new World();
+    const { a, b } = await link(world);
+    await a.sync({ "c:x": [5, 1] });
+    const rv = world.store.keys().find((name) => name.includes(":rv:"))!;
+    expect(world.store.ttl(rv)).toBe(KEEP);
+    world.advance(10 * 86_400_000);
+    await poll(a, 1, { touch: true });
+    expect(world.store.ttl(rv)).toBe(KEEP);
+    await a.post("/api/forget");
+    expect(world.store.keys().filter((name) => /:(p|rv|gd|dv):/.test(name))).toEqual([]);
+    const other = new World();
+    const pair = await link(other);
+    await pair.a.sync({ "c:x": [5, 1] });
+    await pair.a.post("/api/unlink");
+    await pair.b.post("/api/unlink");
+    expect(other.store.keys().filter((name) => /:(p|rv|gd|dv):/.test(name))).toEqual([]);
+    void b;
+  });
+
+  it("keeps the revision for a preview or localhost a week, like the data", async () => {
+    const world = new World();
+    const { a } = await link(world, { origin: PREVIEW });
+    await a.sync({ "c:x": [5, 1] }, {}, { origin: PREVIEW });
+    expect(world.store.ttl(world.store.keys().find((name) => name.includes(":rv:"))!)).toBe(7 * 86_400);
   });
 });
 
@@ -736,7 +950,7 @@ describe("unlinking", () => {
     await a.sync({ "c:x": [5, 1] });
     await a.post("/api/unlink");
     await b.post("/api/unlink");
-    expect(world.store.keys().filter((name) => /:(p|gd|dv):/.test(name))).toEqual([]);
+    expect(world.store.keys().filter((name) => /:(p|rv|gd|dv):/.test(name))).toEqual([]);
   });
 
   it("revokes the token: an unlinked device's old cookie does nothing", async () => {

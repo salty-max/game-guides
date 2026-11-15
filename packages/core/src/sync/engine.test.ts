@@ -18,7 +18,7 @@ const start = () => (stop = startEngine());
 const link = (on = true) => {
   document.cookie = on ? "hundo_link=abc; path=/" : "hundo_link=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
 };
-const record = () => writeRecord({ v: 1, group: "abc", entries: {}, dirty: [], clock: { last: 0, offset: 0 }, touched: 0 });
+const record = () => writeRecord({ v: 1, group: "abc", entries: {}, dirty: [], clock: { last: 0, offset: 0 }, touched: 0, rev: null, fullAt: 0, devices: 1 });
 const visibility = (state: "visible" | "hidden") => {
   Object.defineProperty(document, "visibilityState", { value: state, configurable: true });
   document.dispatchEvent(new Event("visibilitychange"));
@@ -123,10 +123,12 @@ describe("when sync runs", () => {
     expect(flush).toHaveBeenCalled();
   });
 
-  /** Moves the clock in 100 ms steps until another round has been asked for, and says how long that took. */
-  const untilNextRound = async (limit = 400_000) => {
+  /** Moves the clock in 100 ms steps until another round has been asked for, and says how long that took. `skip` jumps most of the way first. */
+  const untilNextRound = async (skip = 0, limit = 400_000) => {
     const before = run.mock.calls.length;
-    let waited = 0;
+    if (skip > 0) await vi.advanceTimersByTimeAsync(skip);
+    expect(run.mock.calls.length, "a round came before the wait was over").toBe(before);
+    let waited = skip;
     while (run.mock.calls.length === before && waited < limit) {
       await vi.advanceTimersByTimeAsync(100);
       waited += 100;
@@ -143,8 +145,8 @@ describe("when sync runs", () => {
     await vi.advanceTimersByTimeAsync(0);
     run.mockClear();
     const waits: number[] = [];
-    for (let poll = 0; poll < 9; poll++) waits.push(await untilNextRound());
     const expected = [20_000, 30_000, 45_000, 67_500, 101_250, 120_000, 120_000, 120_000, 120_000];
+    for (const wait of expected) waits.push(await untilNextRound(wait - 1000));
     waits.forEach((got, index) => expect(Math.abs(got - expected[index]), `poll ${index + 1}: ${got}`).toBeLessThanOrEqual(200));
     expect(POLL_GROWTH).toBe(1.5);
   });
@@ -156,16 +158,16 @@ describe("when sync runs", () => {
     start();
     await vi.advanceTimersByTimeAsync(0);
     run.mockClear();
-    for (let poll = 0; poll < 4; poll++) await untilNextRound();
+    for (const wait of [20_000, 30_000, 45_000, 67_500]) await untilNextRound(wait - 1000);
     // the poll after these finds something on the other device
     run.mockResolvedValueOnce(ok(false, true)).mockResolvedValue(ok());
-    expect(Math.abs((await untilNextRound()) - 101_250)).toBeLessThanOrEqual(200);
+    expect(Math.abs((await untilNextRound(100_000)) - 101_250)).toBeLessThanOrEqual(200);
     // the wait is quick again, and grows again from there
-    for (const expected of [20_000, 30_000, 45_000]) expect(Math.abs((await untilNextRound()) - expected)).toBeLessThanOrEqual(200);
+    for (const expected of [20_000, 30_000, 45_000]) expect(Math.abs((await untilNextRound(expected - 1000)) - expected)).toBeLessThanOrEqual(200);
     // a change made here: its push, then quick again
     useProgress.getState().setCheck(a, true);
     expect(await untilNextRound()).toBeLessThan(3000);
-    expect(Math.abs((await untilNextRound()) - 20_000)).toBeLessThanOrEqual(200);
+    expect(Math.abs((await untilNextRound(19_000)) - 20_000)).toBeLessThanOrEqual(200);
   });
 
   it("stays well inside what it costs: about 33 requests an hour for a guide left open and untouched, never more than 180 an hour", async () => {
@@ -299,10 +301,10 @@ describe("when sync runs", () => {
     run.mockClear();
     // the first poll fails, and its retry finds nothing
     run.mockResolvedValueOnce({ kind: "retry", why: "offline" }).mockResolvedValue(ok());
-    expect(Math.abs((await untilNextRound()) - 20_000)).toBeLessThanOrEqual(200);
-    expect(Math.abs((await untilNextRound()) - 5_000)).toBeLessThanOrEqual(200);
+    expect(Math.abs((await untilNextRound(19_000)) - 20_000)).toBeLessThanOrEqual(200);
+    expect(Math.abs((await untilNextRound(4_000)) - 5_000)).toBeLessThanOrEqual(200);
     // the round that recovered wasn't a poll, so the next wait is the quick one, not 30 s
-    expect(Math.abs((await untilNextRound()) - 20_000)).toBeLessThanOrEqual(200);
+    expect(Math.abs((await untilNextRound(19_000)) - 20_000)).toBeLessThanOrEqual(200);
   });
 
   it("doesn't run twice when visibilitychange, focus and pageshow all come at once", async () => {
