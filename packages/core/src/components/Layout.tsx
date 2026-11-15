@@ -26,7 +26,6 @@ function ThemeToggle() {
   const label = dark ? "Switch to light mode" : "Switch to dark mode";
   return (
     <IconButton
-      className="icon-button theme-toggle"
       icon={dark ? "sun" : "moon"}
       label={label}
       title={label}

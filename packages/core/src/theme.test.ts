@@ -1,6 +1,10 @@
 // @vitest-environment node
-import coreCss from "./styles.css?raw";
+import appCss from "./app.css?raw";
+import tokensCss from "./tokens.css?raw";
 import themeCss from "virtual:guide/theme.css?raw";
+
+// Every stylesheet in core, as text, for the "only defined tokens" check: styles move between files as components move to Tailwind.
+const coreCss = Object.values(import.meta.glob<string>("./*.css", { query: "?raw", import: "default", eager: true })).join("\n");
 
 const PALETTE = ["--paper", "--surface", "--raised", "--ink", "--muted", "--line", "--primary", "--on-primary", "--accent", "--on-accent", "--focus"];
 const LIGHT = ":root";
@@ -20,7 +24,7 @@ const blocks = (css: string): Block[] =>
   }));
 
 const theme = blocks(themeCss);
-const core = blocks(coreCss);
+const core = blocks(tokensCss);
 const valuesFor = (list: Block[], selector: string) => list.find((block) => block.selector === selector)?.values ?? {};
 
 /** Every token as the browser resolves it in one theme: the guide's palette plus core's derived and fixed colours. */
@@ -82,6 +86,31 @@ describe("guide theme", () => {
     }
   });
 
+  it("keeps core's tokens in a layer below the legacy rules that override --bar and --rail-w on small screens", () => {
+    // An unlayered rule beats every layer, and a rule in a higher layer beats a lower one: either would make tokens.css win over
+    // the legacy media queries and the phone layout would quietly lose its overrides.
+    const app = appCss.replace(/\/\*[\s\S]*?\*\//g, "");
+    const order = (/@layer\s+([\w\s,-]+);/.exec(app)?.[1] ?? "").split(",").map((name) => name.trim());
+    expect(order.indexOf("theme"), "the layer order in app.css").toBeGreaterThanOrEqual(0);
+    expect(order.indexOf("theme")).toBeLessThan(order.indexOf("legacy"));
+    // tokens.css is imported as it is (its own @layer theme applies), and the legacy rules are imported into their layer.
+    expect(app).toContain('@import "./tokens.css";');
+    expect(app).toContain('@import "./styles.css" layer(legacy);');
+    // Every :root in tokens.css sits inside the `@layer theme { … }` block.
+    const css = tokensCss.replace(/\/\*[\s\S]*?\*\//g, "");
+    const start = css.indexOf("@layer theme");
+    let depth = 0;
+    let end = -1;
+    for (let i = css.indexOf("{", start); i < css.length && end < 0; i++) {
+      depth += css[i] === "{" ? 1 : css[i] === "}" ? -1 : 0;
+      if (depth === 0) end = i;
+    }
+    const roots = [...css.matchAll(/:root/g)].map((match) => match.index);
+    expect(start).toBeGreaterThanOrEqual(0);
+    expect(roots.length).toBeGreaterThan(0);
+    for (const index of roots) expect(index > start && index < end, `:root at ${index} is outside @layer theme (${start}–${end})`).toBe(true);
+  });
+
   it("keeps text and controls legible in both themes", () => {
     for (const dark of [false, true]) {
       const all = tokens(dark);
@@ -95,6 +124,8 @@ describe("guide theme", () => {
   it("only uses tokens that the palette or core defines", () => {
     const defined = new Set([...PALETTE, ...core.flatMap((block) => Object.keys(block.values)), "--display", "--sans"]);
     const used = new Set([...coreCss.matchAll(/var\((--[a-z0-9-]+)/g)].map(([, name]) => name));
+    // Raw CSS loads empty unless it's let through (vite.ts's test.css.include): a glob that matched nothing must not pass.
+    expect(used.size, "core's stylesheets loaded as text").toBeGreaterThan(30);
     expect([...used].filter((name) => !defined.has(name))).toEqual([]);
   });
 });

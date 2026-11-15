@@ -1,4 +1,4 @@
-/* Red Dead's palette. Everything else, from borders to the banner tint, derives from it in packages/core/src/styles.css. */
+/* Red Dead's palette. Everything else, from borders to the banner tint, derives from it in packages/core/src/tokens.css. */
 :root{
   --paper:#f3ecdf;--surface:#fffbf2;--raised:#f7ecdc;--ink:#32271f;--muted:#67584a;--line:#e1d2bf;
   --primary:#873d29;--on-primary:#fff;--accent:#edda9e;--on-accent:#3a2418;--focus:#a8691d;

@@ -1,4 +1,4 @@
-/* Koholint's palette. Everything else, from borders to the banner tint, derives from it in packages/core/src/styles.css. */
+/* Koholint's palette. Everything else, from borders to the banner tint, derives from it in packages/core/src/tokens.css. */
 :root{
   --paper:#f6f5ee;--surface:#fffef9;--raised:#f1f4eb;--ink:#25342b;--muted:#5e6b61;--line:#e1e3d8;
   --primary:#325d48;--on-primary:#fff;--accent:#edda9e;--on-accent:#26392c;--focus:#a8691d;

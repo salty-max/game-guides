@@ -1,0 +1,18 @@
+/* The one stylesheet core ships, imported by main.tsx. Layer order, lowest first: Tailwind's theme (and core's tokens), then the
+   legacy rules (styles.css, which moves out a component at a time until it's empty), then components, then utilities. A guide's
+   theme.css loads after this and only sets the palette variables.
+
+   Tailwind's preflight is left out for now. It strips list bullets, heading weights, table borders and the like, and the legacy
+   pages rely on the browser's defaults for those. It joins when styles.css is gone, after a look at every page. Until then a new
+   component sets its own resets (list-none, m-0, p-0, appearance-none) instead of leaning on preflight. */
+@layer theme, base, legacy, components, utilities;
+
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities) source(none);
+
+/* Tailwind reads class names from core's components only: a guide can't reach for a utility. */
+@source "./**/*.tsx";
+@source not "./**/*.test.tsx";
+
+@import "./tokens.css";
+@import "./styles.css" layer(legacy);

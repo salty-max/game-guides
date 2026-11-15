@@ -1,0 +1,115 @@
+/* Core's design tokens. A guide's theme.css sets the eleven palette colours; everything below is derived from them or fixed here,
+   and the @theme blocks at the end hand all of it to Tailwind as variables (never as copied values), so a guide's palette and
+   corners reach every utility. The :root blocks sit in the `theme` layer, below the legacy rules, so a media query in styles.css can
+   still override a token (--bar and --rail-w on a phone); unlayered, they would win over every layer. theme.test.ts reads this
+   file as text. */
+@layer theme {
+:root{
+  color-scheme:light;--bar:69px;--rail-w:249px;
+  --line-soft:color-mix(in srgb,var(--line) 55%,var(--surface));
+  --control-line:color-mix(in srgb,var(--ink) 20%,var(--surface));
+  /* checkbox edges and other boundaries that must stand out at 3:1 */
+  --edge:color-mix(in srgb,var(--ink) 56%,var(--surface));
+  --primary-hover:color-mix(in srgb,var(--primary) 84%,var(--ink));
+  --accent-hover:color-mix(in srgb,var(--accent) 88%,var(--ink));
+  --soft:color-mix(in srgb,var(--primary) 11%,var(--surface));
+  --soft-line:color-mix(in srgb,var(--primary) 32%,var(--surface));
+  --soft-ink:color-mix(in srgb,var(--primary) 80%,var(--ink));
+  --done:color-mix(in srgb,var(--primary) 4%,var(--surface));
+  --highlight:color-mix(in srgb,var(--accent) 30%,var(--surface));
+  --bar-track:color-mix(in srgb,var(--primary) 13%,var(--surface));
+  --rail:color-mix(in srgb,var(--primary) 5%,var(--paper));
+  --rail-hover:color-mix(in srgb,var(--primary) 10%,var(--paper));
+  --hero-from:color-mix(in srgb,var(--primary) 10%,var(--surface));
+  --hero-to:color-mix(in srgb,var(--accent) 22%,var(--surface));
+  --missable-line:color-mix(in srgb,var(--rose-ink) 50%,var(--surface));
+  --rose-bg:#f5e8e3;--rose-ink:#8f4a43;--violet-bg:#efeaf4;--violet-ink:#6c5683;--amber-bg:#f3eddb;--amber-ink:#755626;
+  --clay-bg:#f4ebe2;--clay-ink:#764a39;--sky-bg:#e8edf3;--sky-ink:#3f5b77;--mint-bg:#e3efe3;--mint-ink:#2f5d43;
+  --error:#8e3f33;--danger:#8e3f33;--on-danger:#fff;--ok:#4f9a62;--warn:#c8643c;
+  --shadow:color-mix(in srgb,var(--ink) 30%,transparent);--backdrop:color-mix(in srgb,var(--ink) 78%,transparent);
+  /* corners: brand.corners "narrow" (soft squares); "normal" below (pills) */
+  --r-button:8px;--r-tag:6px;--r-control:8px;--r-small:6px;--r-card:12px;--r-hero:16px;--r-check:6px;
+}
+:root[data-corners="normal"]{--r-button:999px;--r-tag:999px;--r-control:12px;--r-small:10px;--r-card:16px;--r-hero:22px;--r-check:8px}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --hero-to:color-mix(in srgb,var(--primary) 22%,var(--surface));
+  --rose-bg:#452e30;--rose-ink:#f1bcaf;--violet-bg:#392d46;--violet-ink:#e1c8ee;--amber-bg:#433820;--amber-ink:#efd493;
+  --clay-bg:#463324;--clay-ink:#edc7aa;--sky-bg:#273949;--sky-ink:#c3daef;--mint-bg:#23402f;--mint-ink:#bfe3c6;
+  --error:#f1bcaf;--danger:#f1bcaf;--on-danger:#2a1410;--ok:#9bcf9f;--warn:#ed9e75;
+  --shadow:#0009;--backdrop:color-mix(in srgb,var(--paper) 86%,transparent);
+}
+}
+
+/* Tailwind keeps its spacing, type scale, weights, breakpoints and motion. Its colours, radii, shadows and fonts are cleared, so
+   `bg-red-500` or `rounded-lg` don't exist: only the house tokens below do. */
+@theme {
+  --color-*: initial;
+  --radius-*: initial;
+  --shadow-*: initial;
+  --font-*: initial;
+}
+
+/* `inline` writes `var(--paper)` itself into each utility instead of a copy, so the guide's own value (and the dark theme) applies. */
+@theme inline {
+  --color-paper: var(--paper);
+  --color-surface: var(--surface);
+  --color-raised: var(--raised);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-primary: var(--primary);
+  --color-on-primary: var(--on-primary);
+  --color-accent: var(--accent);
+  --color-on-accent: var(--on-accent);
+  --color-focus: var(--focus);
+
+  --color-line-soft: var(--line-soft);
+  --color-control-line: var(--control-line);
+  --color-edge: var(--edge);
+  --color-primary-hover: var(--primary-hover);
+  --color-accent-hover: var(--accent-hover);
+  --color-soft: var(--soft);
+  --color-soft-line: var(--soft-line);
+  --color-soft-ink: var(--soft-ink);
+  --color-done: var(--done);
+  --color-highlight: var(--highlight);
+  --color-bar-track: var(--bar-track);
+  --color-rail: var(--rail);
+  --color-rail-hover: var(--rail-hover);
+  --color-hero-from: var(--hero-from);
+  --color-hero-to: var(--hero-to);
+  --color-missable-line: var(--missable-line);
+
+  --color-rose-bg: var(--rose-bg);
+  --color-rose-ink: var(--rose-ink);
+  --color-violet-bg: var(--violet-bg);
+  --color-violet-ink: var(--violet-ink);
+  --color-amber-bg: var(--amber-bg);
+  --color-amber-ink: var(--amber-ink);
+  --color-clay-bg: var(--clay-bg);
+  --color-clay-ink: var(--clay-ink);
+  --color-sky-bg: var(--sky-bg);
+  --color-sky-ink: var(--sky-ink);
+  --color-mint-bg: var(--mint-bg);
+  --color-mint-ink: var(--mint-ink);
+
+  --color-error: var(--error);
+  --color-danger: var(--danger);
+  --color-on-danger: var(--on-danger);
+  --color-ok: var(--ok);
+  --color-warn: var(--warn);
+  --color-shadow: var(--shadow);
+  --color-backdrop: var(--backdrop);
+
+  --radius-button: var(--r-button);
+  --radius-tag: var(--r-tag);
+  --radius-control: var(--r-control);
+  --radius-small: var(--r-small);
+  --radius-card: var(--r-card);
+  --radius-hero: var(--r-hero);
+  --radius-check: var(--r-check);
+
+  --font-display: var(--display);
+  --font-sans: var(--sans);
+}

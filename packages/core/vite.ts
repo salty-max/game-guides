@@ -1,6 +1,7 @@
 /// <reference types="vitest/config" />
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
+import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 import { defineConfig, type Plugin } from "vite";
 import { VitePWA } from "vite-plugin-pwa";
@@ -80,6 +81,8 @@ export const guideConfig = (root: string, brand: Brand) => {
     plugins: [
       guideShell(root, brand, palette),
       react(),
+      // The jsdom tests never process CSS (only ?raw text gets through), so Tailwind sits them out.
+      ...(process.env.VITEST ? [] : [tailwindcss()]),
       VitePWA({
         // "prompt": a new version waits until the reader accepts, so a reload never lands mid-checklist.
         registerType: "prompt",
