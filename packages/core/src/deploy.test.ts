@@ -48,13 +48,24 @@ describe("deploy settings", () => {
   });
 
   it("serves the app for every route but lets a missing asset, font or icon 404", () => {
-    expect(vercel.rewrites).toHaveLength(1);
-    const [{ source, destination }] = vercel.rewrites;
+    expect(vercel.rewrites).toHaveLength(2);
+    const [{ source, destination }] = vercel.rewrites.slice(1);
     expect(destination).toBe("/index.html");
     // (the source read as a regular expression, which this pattern is)
     const rewritten = (path: string) => new RegExp(`^${source}$`).test(path);
     for (const route of ["/", "/guide/3", "/checklist/heart", "/dashboard/calibration", "/sources"]) expect(rewritten(route), route).toBe(true);
     for (const file of ["/assets/index-abc123.js", "/fonts/body.woff2", "/icons/icon-192.png"]) expect(rewritten(file), file).toBe(false);
+  });
+
+  it("hands /api to the sync API ahead of the catch-all, so a call is same-origin and a miss there isn't the app's page", () => {
+    const [api, catchAll] = vercel.rewrites;
+    expect(api).toEqual({ source: "/api/:path*", destination: "https://api.hundo.quest/api/:path*" });
+    // (the page is never served for /api: a missing call is the API's own 404, not HTML that looks like an answer)
+    for (const path of ["/api/sync", "/api/pair/start", "/api/nope"]) expect(new RegExp(`^${catchAll.source}$`).test(path), path).toBe(false);
+    // (the CSP needs no new origin for it, and the camera stays off)
+    const headers: { key: string; value: string }[] = vercel.headers.flatMap((rule: { headers: { key: string; value: string }[] }) => rule.headers);
+    expect(headers.find((header) => header.key === "Content-Security-Policy")?.value).toMatch(/(^|;\s*)connect-src 'self'(;|$)/);
+    expect(headers.find((header) => header.key === "Permissions-Policy")?.value).toMatch(/camera=\(\)/);
   });
 
   it("forbids inline scripts, and the page has none", () => {
