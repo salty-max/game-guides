@@ -1,5 +1,6 @@
-/* Shared styles. A guide's src/guide/theme.css sets only its palette (paper, surface, raised, ink, muted, line, primary,
-   on-primary, accent, on-accent, focus) for light and dark; everything else is derived or fixed here. */
+/* The old shared styles, loaded into the `legacy` layer by app.css and moving into Tailwind components a few at a time.
+   A guide's src/guide/theme.css sets only its palette (paper, surface, raised, ink, muted, line, primary, on-primary, accent,
+   on-accent, focus) for light and dark; the colours, corners and sizes derived from it live in tokens.css. */
 *{box-sizing:border-box}
 html{scroll-padding-top:calc(var(--bar) + 24px);scrollbar-color:var(--edge) var(--paper);accent-color:var(--primary)}
 body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.58 var(--sans)}
@@ -13,45 +14,9 @@ button[disabled]{cursor:not-allowed;opacity:.46}
 h1,h2,h3,p{margin:0}
 h1,h2,h3{line-height:1.17}
 .svg-icon{display:block;flex:none;width:20px;height:20px}
-.sr-only,.skip:not(:focus){clip:rect(0,0,0,0);clip-path:inset(50%);width:1px;height:1px;overflow:hidden;position:absolute;white-space:nowrap}
+.skip:not(:focus){clip:rect(0,0,0,0);clip-path:inset(50%);width:1px;height:1px;overflow:hidden;position:absolute;white-space:nowrap}
 .skip:focus{position:fixed;left:12px;top:12px;z-index:30;padding:8px 12px;background:var(--surface);border-radius:var(--r-small)}
 .no-js{padding:15px}
-:root{
-  color-scheme:light;--bar:69px;--rail-w:249px;
-  --line-soft:color-mix(in srgb,var(--line) 55%,var(--surface));
-  --control-line:color-mix(in srgb,var(--ink) 20%,var(--surface));
-  /* checkbox edges and other boundaries that must stand out at 3:1 */
-  --edge:color-mix(in srgb,var(--ink) 56%,var(--surface));
-  --primary-hover:color-mix(in srgb,var(--primary) 84%,var(--ink));
-  --accent-hover:color-mix(in srgb,var(--accent) 88%,var(--ink));
-  --soft:color-mix(in srgb,var(--primary) 11%,var(--surface));
-  --soft-line:color-mix(in srgb,var(--primary) 32%,var(--surface));
-  --soft-ink:color-mix(in srgb,var(--primary) 80%,var(--ink));
-  --done:color-mix(in srgb,var(--primary) 4%,var(--surface));
-  --highlight:color-mix(in srgb,var(--accent) 30%,var(--surface));
-  --bar-track:color-mix(in srgb,var(--primary) 13%,var(--surface));
-  --rail:color-mix(in srgb,var(--primary) 5%,var(--paper));
-  --rail-hover:color-mix(in srgb,var(--primary) 10%,var(--paper));
-  --hero-from:color-mix(in srgb,var(--primary) 10%,var(--surface));
-  --hero-to:color-mix(in srgb,var(--accent) 22%,var(--surface));
-  --missable-line:color-mix(in srgb,var(--rose-ink) 50%,var(--surface));
-  --rose-bg:#f5e8e3;--rose-ink:#8f4a43;--violet-bg:#efeaf4;--violet-ink:#6c5683;--amber-bg:#f3eddb;--amber-ink:#755626;
-  --clay-bg:#f4ebe2;--clay-ink:#764a39;--sky-bg:#e8edf3;--sky-ink:#3f5b77;--mint-bg:#e3efe3;--mint-ink:#2f5d43;
-  --error:#8e3f33;--danger:#8e3f33;--on-danger:#fff;--ok:#4f9a62;--warn:#c8643c;
-  --shadow:color-mix(in srgb,var(--ink) 30%,transparent);--backdrop:color-mix(in srgb,var(--ink) 78%,transparent);
-  /* corners: brand.corners "narrow" (soft squares); "normal" below (pills) */
-  --r-button:8px;--r-tag:6px;--r-control:8px;--r-small:6px;--r-card:12px;--r-hero:16px;--r-check:6px;
-}
-:root[data-corners="normal"]{--r-button:999px;--r-tag:999px;--r-control:12px;--r-small:10px;--r-card:16px;--r-hero:22px;--r-check:8px}
-:root[data-theme="dark"]{
-  color-scheme:dark;
-  --hero-to:color-mix(in srgb,var(--primary) 22%,var(--surface));
-  --rose-bg:#452e30;--rose-ink:#f1bcaf;--violet-bg:#392d46;--violet-ink:#e1c8ee;--amber-bg:#433820;--amber-ink:#efd493;
-  --clay-bg:#463324;--clay-ink:#edc7aa;--sky-bg:#273949;--sky-ink:#c3daef;--mint-bg:#23402f;--mint-ink:#bfe3c6;
-  --error:#f1bcaf;--danger:#f1bcaf;--on-danger:#2a1410;--ok:#9bcf9f;--warn:#ed9e75;
-  --shadow:#0009;--backdrop:color-mix(in srgb,var(--paper) 86%,transparent);
-}
-
 /* chrome */
 .topbar{height:var(--bar);position:sticky;top:0;z-index:10;display:grid;grid-template-columns:var(--rail-w) 1fr auto;align-items:center;background:var(--surface);color:var(--ink);border-bottom:1px solid var(--line)}
 .brand{display:flex;align-items:center;gap:11px;padding:0 24px;width:max-content}
@@ -116,8 +81,8 @@ h1,h2,h3{line-height:1.17}
 .button:hover{background:var(--primary-hover)}
 .button.accent{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
 .button.accent:hover{background:var(--accent-hover);border-color:var(--accent-hover)}
-.button.outline{background:var(--surface);border-color:var(--control-line);color:var(--primary)}
-.button.outline:hover{background:var(--raised)}
+.button.outlined{background:var(--surface);border-color:var(--control-line);color:var(--primary)}
+.button.outlined:hover{background:var(--raised)}
 .button.danger{background:var(--danger);color:var(--on-danger)}
 .text-link{border:0;background:none;display:inline-flex;align-items:center;gap:6px;color:var(--primary);font-weight:800;font-size:13px;min-height:32px;padding:6px 0;white-space:nowrap}
 .text-link:hover{text-decoration:underline;text-underline-offset:3px}

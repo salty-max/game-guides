@@ -10,7 +10,7 @@ Every guide looks like the same product. A guide chooses five things and nothing
 | its icon art | `scripts/icons.mjs`, written to `public/icons` |
 | its banners | `src/guide/banners/chapter-N.webp` |
 
-Everything else belongs to core (`packages/core/src/styles.css` and the components):
+Everything else belongs to core (`packages/core/src/tokens.css`, `styles.css` and the components):
 
 - the topbar and rail, which follow the light or dark theme;
 - one banner treatment;
@@ -88,5 +88,5 @@ One WebP per chapter, `src/guide/banners/chapter-N.webp`, picked up by `byChapte
 
 ## Components
 
-- **`Button` takes no `className` or `style`.** Its props type leaves both out, so passing one fails the typecheck. Pick a `look` (`""` for primary, `"outline"`, `"accent"` or `"danger"`). A `className` would replace the button's own classes and its look with them. A new look is a core change: add it to `ButtonStyle` in `packages/core/src/components/ui.tsx` and give it a rule in `styles.css`.
+- **`Button` takes no `className` or `style`.** Its props type leaves both out, so passing one fails the typecheck. Pick a `look` (`""` for primary, `"outline"`, `"accent"` or `"danger"`). A `className` would replace the button's own classes and its look with them. A new look is a core change: add it to `ButtonStyle` in `packages/core/src/components/ui.tsx` and give it a rule in `styles.css`, with a class name that isn't a Tailwind utility (the outline look's class is `outlined` because a bare `outline` would add a 1px outline).
 - A guide's own panel, such as `DeathlessRun.tsx` or `Calibration.tsx`, uses core's components and classes. Its few extra styles live in core's `styles.css` (`.run-mode`, `.calibration`), so `theme.css` stays a palette.

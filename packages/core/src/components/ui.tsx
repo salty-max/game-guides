@@ -6,7 +6,8 @@ import type { Row } from "../types";
 import { pct } from "../format";
 
 export type ButtonStyle = "" | "outline" | "accent" | "danger";
-const buttonClass = (style: ButtonStyle) => ["button", style].filter(Boolean).join(" ");
+// The outline look's class is "outlined": a bare "outline" is also a Tailwind utility, which would add a 1px outline to every such button.
+const buttonClass = (style: ButtonStyle) => ["button", style === "outline" ? "outlined" : style].filter(Boolean).join(" ");
 
 interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "style" | "className"> {
   look?: ButtonStyle;

@@ -2,7 +2,7 @@ import { leaving } from "./boot";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { App } from "./App";
-import "./styles.css";
+import "./app.css";
 import "virtual:guide/theme.css";
 
 if (!leaving) {

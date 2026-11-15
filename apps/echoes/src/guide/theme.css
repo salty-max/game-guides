@@ -1,4 +1,4 @@
-/* Echoes of Wisdom's palette. Everything else, from borders to the banner tint, derives from it in packages/core/src/styles.css. */
+/* Echoes of Wisdom's palette. Everything else, from borders to the banner tint, derives from it in packages/core/src/tokens.css. */
 :root{
   --paper:#f8f4fc;--surface:#fffefb;--raised:#f3ecfb;--ink:#2a2444;--muted:#5b5576;--line:#e1d8ef;
   --primary:#6648b0;--on-primary:#fff;--accent:#f0bd4a;--on-accent:#3b2a05;--focus:#7a4fd0;
