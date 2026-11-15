@@ -18,6 +18,7 @@ lock     = false    # hundo: every child works in its own worktree on its own br
 
 [session]
 worktrees = true    # a child gets its own worktree: the child skill passes use_worktree for a desktop child (CLAUDE.md, "Sessions and worktrees")
+decisions = "opener"  # a child asks the user nothing: every question and every go (push, merge, any choice) goes to its opener, which asks in its own session
 
 [checks]
 queue = true        # one `check` at a time on the machine: parallel worktrees' checks overloaded it (harness/queue.ts)

@@ -72,7 +72,7 @@ node .claude/skills/guide-check/scripts/page.mjs file://<scratchpad>/compare/ind
 
 Remove the base checkout afterwards with `git worktree remove <scratchpad>/base`.
 
-When the user has to choose between looks, build one page that draws every option in all three guides' palettes, fonts and art, and ask through the question tool. That's how the house style was picked.
+When the user has to choose between looks, build one page that draws every option in all three guides' palettes, fonts and art, and ask through the question tool (a child sends the options to its opener, which asks). That's how the house style was picked.
 
 ## 6. What this can't check
 

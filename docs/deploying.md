@@ -1,6 +1,6 @@
 # Deploying
 
-Every push, deploy and release needs the user's go, asked in the session that wants it. That includes creating a Vercel project.
+Every push, deploy and release needs the user's go, asked of the user in the session that opened the work (a child sends the question there and asks nothing itself), or in the session itself when it has no opener. That includes creating a Vercel project.
 
 ## The projects
 

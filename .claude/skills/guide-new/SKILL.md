@@ -10,7 +10,7 @@ description: "Start a new hundo guide, the fourth and after, from apps/echoes: t
 ## 0. Before any file
 
 - Open the card: `bun harness/board.ts add hundo "<Game> guide" --repos hundo …`. Work on a branch.
-- Settle with the user, through the question tool:
+- Settle with the user, through the question tool (a child sends each of these to its opener with its recommendation, and the opener asks):
   - **The subdomain**, `<sub>`: the address is `https://<sub>.hundo.quest` and goes in `brand.home` (Koholint is `koholint`, Red Dead `rdr`, Echoes `echoes`).
   - **The folder**, `apps/<name>`. The package, the Vercel project and the storage prefix are all `hundo-<sub>`, and the prefix can never change once the guide is live.
   - **The layout:** `article` (Koholint, Echoes) or `checklist` (Red Dead).
@@ -36,7 +36,7 @@ Then follow [step 1 of the doc](../../../docs/adding-a-guide.md#1-copy-the-folde
 
 - **`config.ts`**: as [the doc](../../../docs/adding-a-guide.md#configts) says, with `state: {}`.
 - **Chapter data, missables, `facts-to-verify.md`**: use the `guide-content` skill.
-- **`panels.ts`**: `export const panels: Panel[] = [];`. A panel only for a real per-game tracker, and only with the user's say.
+- **`panels.ts`**: `export const panels: Panel[] = [];`. A panel only for a real per-game tracker, and only with the user's say (a child asks it through its opener).
 - **`guide.test.ts`**: pin the game's own totals and the two storage keys. The snippet is in the doc.
 
 ## 4. Art
@@ -57,5 +57,5 @@ Do [step 4 of the doc](../../../docs/adding-a-guide.md#4-wire-it-into-the-reposi
 ## 7. Vercel, up to the first preview
 
 - **The project:** create it only with the user's go, following [docs/deploying.md](../../../docs/deploying.md#a-new-project). That covers the name, Root Directory, outside files, Node, production branch and the hundo.quest subdomain.
-- **The first preview:** ask the push go, saying exactly what will be pushed, then check the preview as the `guide-deploy` skill says.
+- **The first preview:** get the push go (a child sends the question to its opener), saying exactly what will be pushed, then check the preview as the `guide-deploy` skill says.
 - **Stop there.** The first production deploy, the merge to `main`, is its own go.
