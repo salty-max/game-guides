@@ -31,7 +31,7 @@ export function BulkCheck({ rows, label }: { rows: Row[]; label: string }) {
   };
 
   return (
-    <Button icon="check" onClick={run}>
+    <Button icon="check" size="compact" onClick={run}>
       {allDone ? `Uncheck all (${ids.length})` : `${unchecked < ids.length ? "Check remaining" : "Check all"} (${unchecked})`}
       <span className="sr-only"> in {label}</span>
     </Button>

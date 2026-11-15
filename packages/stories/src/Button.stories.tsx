@@ -17,6 +17,9 @@ export const Accent: Story = { args: { look: "accent" } };
 export const Danger: Story = { args: { look: "danger", children: "Replace with backup" } };
 export const WithIcon: Story = { args: { look: "outline", icon: "gear", children: "Guide settings" } };
 
+/** The smaller button used beside a group of steps. */
+export const Compact: Story = { args: { look: "outline", size: "compact", icon: "check", children: "Check all (7)" } };
+
 /** Every look disabled: the same dimmed button, but its text still has to read. */
 export const Disabled: Story = {
   render: () => (

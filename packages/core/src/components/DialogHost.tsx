@@ -150,9 +150,9 @@ function SettingsForm() {
           </select>
         </label>
         <div className="controls">
-          <button type="submit" className="button">
+          <Button type="submit" look="">
             Save settings
-          </button>
+          </Button>
         </div>
       </form>
       <hr />

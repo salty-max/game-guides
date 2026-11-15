@@ -99,6 +99,16 @@ describe("App", () => {
     expect(within(document.getElementById(`entry-${firstRow.id}`)!).getByRole("checkbox")).not.toBeChecked();
   });
 
+  it("returns focus to the status filter when ticking an entry filters it out of the checklist", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(await screen.findByRole("link", { name: "Chapter checklist" }));
+    await user.click(await screen.findByRole("combobox", { name: "Status" }));
+    await user.click(await screen.findByRole("option", { name: "Unfinished" }));
+    await user.click(screen.getAllByRole("checkbox")[0]);
+    await waitFor(() => expect(screen.getByRole("combobox", { name: "Status" })).toHaveFocus());
+  });
+
   it("shows progress, what's left and the guide's own panels", async () => {
     history.replaceState(null, "", "/dashboard");
     render(<App />);
@@ -184,9 +194,20 @@ describe.runIf(config.layout === "checklist")("checklist layout", () => {
     render(<App />);
     await screen.findByRole("heading", { level: 1, name: first.title });
     expect(screen.getByRole("button", { name: /Expand all|Collapse all/ })).toBeInTheDocument();
-    await user.selectOptions(screen.getByLabelText("Route completion status"), "done");
+    await user.click(screen.getByRole("combobox", { name: "Route completion status" }));
+    await user.click(await screen.findByRole("option", { name: "Completed" }));
     expect(screen.getByText("No steps match these filters.")).toBeInTheDocument();
     await user.click(screen.getByRole("link", { name: "Start walkthrough" }));
     expect(contains(`entry-${firstRow.id}`)).toBe(true);
+  });
+
+  it("returns focus to the status filter when ticking a step filters it out of the route", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await screen.findByRole("heading", { level: 1, name: first.title });
+    await user.click(screen.getByRole("combobox", { name: "Route completion status" }));
+    await user.click(await screen.findByRole("option", { name: "Unfinished" }));
+    await user.click(within(document.getElementById(`entry-${firstRow.id}`)!).getByRole("checkbox"));
+    await waitFor(() => expect(screen.getByRole("combobox", { name: "Route completion status" })).toHaveFocus());
   });
 });

@@ -14,6 +14,9 @@ export default defineConfig({
         plugins: [storybookTest({ configDir: ".storybook", initialGlobals: { guide, theme } })],
         test: {
           name: `${guide}-${theme}`,
+          // These limits only catch a hang. A story is ~0.1 s alone, and many times that when several checks share the machine.
+          testTimeout: 60_000,
+          hookTimeout: 60_000,
           browser: {
             enabled: true,
             headless: true,
