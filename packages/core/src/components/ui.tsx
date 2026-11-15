@@ -8,6 +8,7 @@ import type { ComponentPropsWithRef, ReactNode } from "react";
 import { Link } from "react-router";
 import { buttonClass, type ButtonSize, type ButtonStyle } from "./buttonStyle";
 import { Icon, type IconName } from "./Icon";
+import { tones } from "./tone";
 import { tooltip as tooltipHandle } from "./tooltip-handle";
 import { brand, cats, config, tagName } from "../guide";
 import type { Row } from "../types";
@@ -46,7 +47,7 @@ export function LinkButton({ to, look = "outline", size = "default", icon, child
 
 // The top bar sets --icon-w where its buttons have to be narrower (the narrowest phones), so no class is needed on one.
 const iconButton =
-  "grid h-10 w-(--icon-w,2.5rem) place-items-center rounded-control border border-control-line bg-transparent p-0 text-inherit not-disabled:hover:bg-raised disabled:cursor-not-allowed disabled:opacity-[.46] [&_.svg-icon]:size-4.5";
+  "grid h-10 w-(--icon-w,2.5rem) place-items-center rounded-control border border-control-line bg-transparent p-0 text-inherit not-disabled:hover:bg-raised disabled:cursor-not-allowed disabled:opacity-[.46] [&_svg]:size-4.5";
 
 type IconButtonProps = { label: string; icon: IconName; tooltip?: boolean } & Omit<ComponentPropsWithRef<"button">, "className" | "style">;
 
@@ -120,26 +121,32 @@ export function ProgressBar({ done, total, label }: { done: number; total: numbe
 
 export function Breadcrumb({ current }: { current: string }) {
   return (
-    <div className="breadcrumb">
+    <div className="mb-[15px] flex items-center gap-2 text-[13px] font-bold text-muted phone:mb-2.5 [&_svg]:size-3.5">
       <Icon name={brand.icon} />
       <span>{brand.game}</span>
       <Icon name="right" />
-      <strong>{current}</strong>
+      <strong className="text-ink">{current}</strong>
     </div>
   );
 }
 
-// A card on the dashboard and the sources page, and a guide's own panels (Koholint's deathless run, Red Dead's calibration).
-const panel = cva("rounded-card border border-line bg-surface px-[18px] py-[17px]", {
-  variants: { space: { none: "", above: "mt-[13px]", below: "mb-3.5" } },
-  defaultVariants: { space: "none" },
+// A card on the dashboard and the sources page, Next up, and a guide's own panels (Koholint's deathless run, Red Dead's calibration).
+const panel = cva("rounded-card border border-line bg-surface", {
+  variants: {
+    space: { none: "", above: "mt-[13px]", "above-wide": "mt-4", below: "mb-3.5" },
+    pad: { roomy: "px-[18px] py-[17px]", snug: "px-4 py-3.5 phone:px-3" },
+  },
+  defaultVariants: { space: "none", pad: "roomy" },
 });
 
 type SectionProps = Omit<ComponentPropsWithRef<"section">, "className" | "style">;
 
-/** A panel: its title, its words and its actions are the Panel parts below; `space` is the room it keeps from what's next to it. */
-export function Panel({ space, ...rest }: SectionProps & { space?: "none" | "above" | "below" }) {
-  return <section className={panel({ space })} {...rest} />;
+/**
+ * A panel: its title, its words and its actions are the Panel parts below; `space` is the room it keeps from what's next to it, and `pad`
+ * the room inside it (snug for a short list that sits between other parts of a page).
+ */
+export function Panel({ space, pad, ...rest }: SectionProps & { space?: "none" | "above" | "above-wide" | "below"; pad?: "roomy" | "snug" }) {
+  return <section className={panel({ space, pad })} {...rest} />;
 }
 
 export function PanelTitle({ id, children }: { id?: string; children: ReactNode }) {
@@ -180,46 +187,73 @@ export function PanelActions(props: Omit<ComponentPropsWithRef<"div">, "classNam
   return <div className="mt-[13px] flex flex-wrap items-center gap-2" {...props} />;
 }
 
-export const Empty = ({ children }: { children: ReactNode }) => <div className="empty">{children}</div>;
+/** What a list says in place of its rows when it has none. */
+export const Empty = ({ children }: { children: ReactNode }) => (
+  <div className="rounded-card border border-dashed border-control-line bg-raised px-[15px] py-[21px] text-[14px] text-muted">{children}</div>
+);
 
-export function PageHeading({ title, children }: { title: string; children?: ReactNode }) {
+/** A note above a page's content, with an icon: what the page leaves out, and why. */
+export function Callout({ icon, children }: { icon: IconName; children: ReactNode }) {
   return (
-    <header className="page-heading">
-      <h1>{title}</h1>
-      {children}
+    <div className="mb-[13px] flex items-start gap-[9px] rounded-small border border-line bg-soft px-3 py-2.5 text-[13px] text-soft-ink [&_svg]:mt-px [&_svg]:size-4">
+      <Icon name={icon} />
+      <span>{children}</span>
+    </div>
+  );
+}
+
+/** A page's title, the line under it, and a figure in a pill under that (the dashboard's overall count). */
+export function PageHeading({ title, intro, stat }: { title: string; intro?: ReactNode; stat?: ReactNode }) {
+  return (
+    <header className="mt-[7px] mb-5">
+      <h1 className="font-display text-[clamp(38px,5vw,58px)] leading-[1.17] font-bold tracking-[-0.015em]">{title}</h1>
+      {intro && <p className="mt-[5px] text-[14px] text-muted">{intro}</p>}
+      {stat && <span className="mt-[9px] inline-block rounded-tag bg-soft px-3 py-[3px] text-[12px] font-extrabold text-soft-ink">{stat}</span>}
     </header>
   );
 }
 
+// A category's label. In prose it sits a little above the baseline, level with the words' middle; in a row's column of tags, on a phone, a
+// long one wraps under itself instead of pushing the row wider.
+const tag = cva("rounded-tag px-2 py-1 text-[11px] font-extrabold tracking-[0.02em] whitespace-nowrap", {
+  variants: { tone: tones, at: { inline: "", prose: "align-[2px]", column: "phone:max-w-[84px] phone:text-right phone:whitespace-normal" } },
+  defaultVariants: { tone: "none", at: "inline" },
+});
+
+type TagAt = "inline" | "prose" | "column";
+
 /** A category label, coloured by the category's tone. */
-export function Tag({ tag, children }: { tag: string; children?: ReactNode }) {
+export function Tag({ tag: name, at, children }: { tag: string; at?: TagAt; children?: ReactNode }) {
   return (
-    <span className="tag" data-tone={tag === "missable" ? "missable" : cats[tag]?.[3]}>
-      {children ?? cats[tag]?.[1] ?? (tag === "missable" ? "Missable" : tag)}
+    <span className={tag({ tone: name === "missable" ? "rose" : (cats[name]?.[3] ?? "none"), at })}>
+      {children ?? cats[name]?.[1] ?? (name === "missable" ? "Missable" : name)}
     </span>
   );
 }
 
 /** "+3" for a row whose amount counts toward the guide's quantity category. */
-export function Quantity({ row }: { row: Row }) {
+export function Quantity({ row, at }: { row: Row; at?: TagAt }) {
   const tag = config.quantity ?? "";
   return (
-    <Tag tag={tag}>
+    <Tag tag={tag} at={at}>
       +{row.quantity}
       <span className="sr-only"> {tagName(tag)}</span>
     </Tag>
   );
 }
 
-export function SourceLine({ sources }: { sources: [label: string, url: string][] }) {
+const sourceLine = cva("text-[12px] leading-[1.7] text-muted", { variants: { space: { group: "mt-2", section: "mt-4" } }, defaultVariants: { space: "group" } });
+
+/** A group's or an article section's sources, on one line under it. */
+export function SourceLine({ sources, space }: { sources: [label: string, url: string][]; space?: "group" | "section" }) {
   if (!sources.length) return null;
   return (
-    <p className="group-sources">
+    <p className={sourceLine({ space })}>
       Sources:{" "}
       {sources.map(([label, url], index) => (
         <span key={url}>
           {index > 0 && " · "}
-          <a href={url} target="_blank" rel="noopener noreferrer" aria-label={`${label} (opens in a new tab)`}>
+          <a className="text-primary underline underline-offset-2" href={url} target="_blank" rel="noopener noreferrer" aria-label={`${label} (opens in a new tab)`}>
             {label}
           </a>
         </span>

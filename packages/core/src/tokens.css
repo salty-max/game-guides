@@ -58,6 +58,14 @@
   --font-*: initial;
 }
 
+/* The tick box (check-style.ts): its width, the room after it in prose, and the two added up, which is where the text under a compact
+   row's words starts, so that it lines up with them. */
+@theme {
+  --spacing-check: 1.625rem;
+  --spacing-check-gap: 0.5rem;
+  --spacing-check-indent: calc(var(--spacing-check) + var(--spacing-check-gap));
+}
+
 /* `inline` writes `var(--paper)` itself into each utility instead of a copy, so the guide's own value (and the dark theme) applies. */
 @theme inline {
   --color-paper: var(--paper);

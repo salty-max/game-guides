@@ -1,10 +1,9 @@
 import { useMemo, useState } from "react";
 import { useLocation, useParams } from "react-router";
-import { Icon } from "../components/Icon";
 import { RouteGroup } from "../components/RouteGroup";
 import { Select } from "../components/Select";
 import { SearchField } from "../components/SearchField";
-import { Breadcrumb, Button, ChipGroup, Empty, PageHeading } from "../components/ui";
+import { Breadcrumb, Button, Callout, ChipGroup, Empty, PageHeading } from "../components/ui";
 import { allRows, CHAPTER_COUNT, cats, chapters, config, hasMissables, isCategory, readChapter, statusOptions, tagName, text } from "../guide";
 import { two } from "../format";
 import { isOpen, useProgress } from "../store/progress";
@@ -60,14 +59,9 @@ function ChecklistView() {
   return (
     <>
       <Breadcrumb current="Checklist" />
-      <PageHeading title="Completion checklist">
-        <p>{text.checklistIntro}</p>
-      </PageHeading>
+      <PageHeading title="Completion checklist" intro={text.checklistIntro} />
       {data.spoilers && data.ceiling < CHAPTER_COUNT && (
-        <div className="callout">
-          <Icon name="lock" />
-          <span>Showing chapters 1–{data.ceiling} only. Later entries unlock as you reveal chapters.</span>
-        </div>
+        <Callout icon="lock">Showing chapters 1–{data.ceiling} only. Later entries unlock as you reveal chapters.</Callout>
       )}
       <ChipGroup label="Checklist categories" choices={topFilters} value={filter} onChange={setFilter} />
       <div className="my-3 flex flex-wrap items-end gap-[9px] phone:*:max-w-full">

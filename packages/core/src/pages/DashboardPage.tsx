@@ -1,8 +1,9 @@
 import { useEffect } from "react";
 import { Link, useParams } from "react-router";
 import { Stat } from "../components/Stats";
+import { WhatsLeft } from "../components/WhatsLeft";
 import { Breadcrumb, Button, PageHeading, Panel, PanelActions, PanelText, PanelTitle, ProgressBar } from "../components/ui";
-import { CHAPTER_COUNT, cats, chapterRows, chapters, completion, overallLine, text, whatsLeft } from "../guide";
+import { CHAPTER_COUNT, chapterRows, chapters, completion, overallLine, text } from "../guide";
 import { two } from "../format";
 import { exportProgress } from "../backup";
 import { installed, usePersistence } from "../persistence";
@@ -24,11 +25,8 @@ export function DashboardPage() {
   return (
     <>
       <Breadcrumb current="Progress" />
-      <PageHeading title="Your progress">
-        <p>{text.dashboardIntro}</p>
-        <span className="inline-stat">{overallLine(data.checks)}</span>
-      </PageHeading>
-      <div className="dashboard-grid">
+      <PageHeading title="Your progress" intro={text.dashboardIntro} stat={overallLine(data.checks)} />
+      <div className="mb-3.5 grid grid-cols-[1.1fr_1fr] items-start gap-[13px] phone:grid-cols-1">
         <Panel>
           <PanelTitle>Chapter progress</PanelTitle>
           <PanelText>Open a revealed chapter.</PanelText>
@@ -50,7 +48,7 @@ export function DashboardPage() {
           })}
           {data.spoilers && data.ceiling < CHAPTER_COUNT && <PanelText>{CHAPTER_COUNT - data.ceiling} chapters hidden by spoiler protection.</PanelText>}
         </Panel>
-        <div className="dashboard-side">
+        <div className="grid gap-[13px]">
           <Panel>
             <PanelTitle>Progress backup</PanelTitle>
             <PanelText>Progress lives in this browser. Export a backup to move it to another device or keep a copy.</PanelText>
@@ -78,55 +76,12 @@ export function DashboardPage() {
       <Panel>
         <PanelTitle>{text.boardTitle}</PanelTitle>
         <PanelText>{text.boardNote}</PanelText>
-        <div className="category-board mt-[13px]">
+        <div className="mt-[13px] grid grid-cols-3 gap-2.5 mid:grid-cols-2">
           {completion.board.map(({ tag, goal }) => (
             <Stat key={tag} tag={tag} goal={goal} />
           ))}
         </div>
       </Panel>
     </>
-  );
-}
-
-const points = (value: number) => (Math.round(value * 10) / 10).toFixed(1);
-
-function WhatsLeft() {
-  const checks = useProgress((s) => s.data.checks);
-  const items = whatsLeft(checks);
-  const max = Math.max(...items.map((item) => item.total), 1);
-  const inPoints = completion.unit === "points";
-  const figure = inPoints ? points : String;
-  return (
-    <Panel space="below" aria-labelledby="whats-left-title">
-      <PanelTitle id="whats-left-title">What’s left</PanelTitle>
-      {items.length ? (
-        <div className="whats-left">
-          <PanelText>
-            {inPoints
-              ? `About ${points(items.reduce((sum, item) => sum + item.left, 0))} points to go. Biggest remaining first, using the estimate’s weights.`
-              : "Biggest gaps first."}
-          </PanelText>
-          <ul>
-            {items.map((item) => (
-              <li key={item.tag}>
-                <Link className="wl-name" to={`/checklist/${item.tag}`}>
-                  {cats[item.tag][0]}
-                </Link>
-                <span className="wl-bar" aria-hidden="true">
-                  <span className="wl-total" style={{ width: `${(item.total / max) * 100}%` }}>
-                    <span style={{ width: `${((item.total - item.left) / item.total) * 100}%` }} />
-                  </span>
-                </span>
-                <span className="wl-pts">
-                  {figure(item.left)} <small>of {figure(item.total)} {inPoints ? "pts " : ""}left</small>
-                </span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      ) : (
-        <PanelText>Nothing left. That’s a 100%.</PanelText>
-      )}
-    </Panel>
   );
 }

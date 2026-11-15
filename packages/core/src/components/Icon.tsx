@@ -48,14 +48,15 @@ export type IconName = keyof typeof paths;
 
 interface IconProps {
   name: IconName;
+  /** Core's own classes for it: its size (20px when none is given) and colour. What holds an icon can size it too, by its svg. */
   className?: string;
 }
 
 /** Static, trusted SVG path data; nothing user-controlled reaches innerHTML. */
-export function Icon({ name, className = "svg-icon" }: IconProps) {
+export function Icon({ name, className = "size-5" }: IconProps) {
   return (
     <svg
-      className={className}
+      className={`block flex-none ${className}`}
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"

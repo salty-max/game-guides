@@ -1,4 +1,4 @@
-import { Button, Empty } from "./ui";
+import { Button, Empty, Panel, PanelTitle } from "./ui";
 import { TickItem } from "./TickItem";
 import { cats, nextUp, primaryTag, text } from "../guide";
 import { useHeldRows } from "../useHeldRows";
@@ -13,10 +13,10 @@ export function NextUp({ chapter }: { chapter: number }) {
   );
 
   return (
-    <section className="next-up" aria-labelledby="next-up-title">
-      <h2 id="next-up-title">Next up</h2>
+    <Panel space="above-wide" pad="snug" aria-labelledby="next-up-title">
+      <PanelTitle id="next-up-title">Next up</PanelTitle>
       {rows.length ? (
-        <ul>
+        <ul className="mt-2 mb-0 list-none p-0">
           {rows.map((row) => (
             <TickItem
               key={row.id}
@@ -33,10 +33,10 @@ export function NextUp({ chapter }: { chapter: number }) {
         <Empty>{text.nextUpDone}</Empty>
       )}
       {holding && (
-        <div className="next-up-advance">
+        <div className="mt-2">
           <Button onClick={release}>Show next steps</Button>
         </div>
       )}
-    </section>
+    </Panel>
   );
 }

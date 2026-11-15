@@ -8,7 +8,7 @@ export type ButtonSize = "default" | "compact";
 // Each look names its own border colour: one set in the base would fight the looks' for the same property. A disabled button is
 // dimmed and says so to the pointer, whether it is disabled outright or kept focusable (aria-disabled).
 const button = cva(
-  "inline-flex items-center justify-center gap-2 rounded-button border leading-[1.22] font-extrabold disabled:cursor-not-allowed disabled:opacity-[.46] aria-disabled:cursor-not-allowed aria-disabled:opacity-[.46] [&_.svg-icon]:size-4",
+  "inline-flex items-center justify-center gap-2 rounded-button border leading-[1.22] font-extrabold disabled:cursor-not-allowed disabled:opacity-[.46] aria-disabled:cursor-not-allowed aria-disabled:opacity-[.46] [&_svg]:size-4",
   {
     variants: {
       look: {
@@ -27,7 +27,7 @@ const button = cva(
 
 // Its own classes, not a look of the box above: it shares none of the box's padding, height, corners or edge.
 const link =
-  "inline-flex min-h-8 items-center gap-1.5 border-0 bg-transparent px-0 py-1.5 text-[13px] font-extrabold whitespace-nowrap text-primary underline-offset-3 hover:underline disabled:cursor-not-allowed disabled:opacity-[.46] [&_.svg-icon]:size-4";
+  "inline-flex min-h-8 items-center gap-1.5 border-0 bg-transparent px-0 py-1.5 text-[13px] font-extrabold whitespace-nowrap text-primary underline-offset-3 hover:underline disabled:cursor-not-allowed disabled:opacity-[.46] [&_svg]:size-4";
 
 /** The classes of a button of this look and size: for Button and LinkButton, and for a control that has to look like one. */
 export const buttonClass = (look: ButtonStyle, size: ButtonSize) => (look === "link" ? link : button({ look: look || "primary", size }));
