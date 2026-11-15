@@ -45,14 +45,14 @@ export default tseslint.config(
     },
   },
   {
-    // A guide's own panels can't reach for Tailwind: it only reads core's files, so a utility class there would lint as valid and
-    // build to nothing. They may use only the classes core's old stylesheet still defines, until their panels move onto core's components.
-    files: ["apps/**/*.{ts,tsx}"],
+    // A guide builds its panels from core's components and nothing else: Tailwind only reads core's files, so a utility class in a guide
+    // would build to nothing, and a look a guide made for itself would drift from the house style. So no class and no style at all.
+    files: ["apps/*/src/**/*.{ts,tsx}"],
     rules: {
       "better-tailwindcss/no-unknown-classes": "off",
-      "better-tailwindcss/no-restricted-classes": [
+      "no-restricted-syntax": [
         "error",
-        { restrict: [{ pattern: `^(?!(?:${legacy.join("|")})$).+`, message: 'A guide uses core\'s components and its legacy classes only: "$0" isn\'t one.' }] },
+        { selector: "JSXAttribute[name.name=/^(className|style)$/]", message: "A guide uses core's components only: no className or style. A new look is a core part or variant." },
       ],
     },
   },

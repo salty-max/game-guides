@@ -1,4 +1,5 @@
-import { TextField } from "@hundo/core/components/controls";
+import { TextField } from "@hundo/core/components/TextField";
+import { Button } from "@hundo/core/components/ui";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState, type ComponentProps } from "react";
 import { expect, userEvent } from "storybook/test";
@@ -54,5 +55,27 @@ export const Focused: Story = {
     const field = canvas.getByRole("textbox");
     await expect(field).toHaveFocus();
     await expect(getComputedStyle(field).outlineWidth).toBe("3px");
+  },
+};
+
+/** A short field with its form's buttons on the same line, and the error under both, announced when it appears: Red Dead's calibration. */
+export const WithActions: Story = {
+  args: {
+    inputMode: "decimal",
+    width: "short",
+    value: "142",
+    error: "Enter a number from 0 to 100.",
+    alertError: true,
+    actions: (
+      <>
+        <Button look="">Save</Button>
+        <Button>Clear</Button>
+      </>
+    ),
+  },
+  decorators: [(Story) => <div style={{ maxWidth: 560 }}><Story /></div>],
+  play: async ({ canvas }) => {
+    await expect(canvas.getByRole("alert")).toHaveTextContent("Enter a number from 0 to 100.");
+    await expect(canvas.getByRole("textbox", { name: "In-game completion (%)" })).toHaveAccessibleDescription(/Enter a number from 0 to 100\./);
   },
 };

@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from "react";
-import { Button, Panel, PanelText, PanelTitle } from "@hundo/core/components/ui";
+import { TextField } from "@hundo/core/components/TextField";
+import { Button, Panel, PanelForm, PanelText, PanelTitle } from "@hundo/core/components/ui";
 import { coreRows } from "@hundo/core/guide";
 import { useProgress } from "@hundo/core/store/progress";
 import { useUi } from "@hundo/core/store/ui";
@@ -39,39 +40,36 @@ export function Calibration() {
     <Panel id="calibration" aria-labelledby="calibration-title">
       <PanelTitle id="calibration-title">Check against the game</PanelTitle>
       <PanelText>Enter the completion percentage from Stats → General to see how far this guide’s estimate is off.</PanelText>
-      <form className="calibration" onSubmit={submit} noValidate>
-        <label className="field" htmlFor="reported">
-          <span>In-game completion (%)</span>
-          <input
-            id="reported"
-            className="select"
-            inputMode="decimal"
-            value={draft}
-            aria-invalid={error ? true : undefined}
-            aria-describedby={error ? "reported-error" : undefined}
-            onChange={(event) => setDraft(event.target.value)}
-          />
-        </label>
-        <Button type="submit" look="">
-          Save
-        </Button>
-        {reported !== null && (
-          <Button
-            onClick={() => {
-              setReported(null);
-              setDraft("");
-              setError("");
-            }}
-          >
-            Clear
-          </Button>
-        )}
-      </form>
-      {error && (
-        <PanelText id="reported-error" tone="error" role="alert">
-          {error}
-        </PanelText>
-      )}
+      <PanelForm onSubmit={submit}>
+        <TextField
+          id="reported"
+          label="In-game completion (%)"
+          inputMode="decimal"
+          width="short"
+          value={draft}
+          onChange={setDraft}
+          error={error}
+          alertError
+          actions={
+            <>
+              <Button type="submit" look="">
+                Save
+              </Button>
+              {reported !== null && (
+                <Button
+                  onClick={() => {
+                    setReported(null);
+                    setDraft("");
+                    setError("");
+                  }}
+                >
+                  Clear
+                </Button>
+              )}
+            </>
+          }
+        />
+      </PanelForm>
       {delta !== null && (
         <PanelText tone="ink" role="status">
           Guide {estimated}% · game {reported}% ·{" "}

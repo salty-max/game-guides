@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { Link, useLocation, useParams } from "react-router";
+import { buttonClass } from "../components/buttonStyle";
 import { Icon } from "../components/Icon";
 import { ArticleRoute } from "../components/ArticleRoute";
 import { ChecklistRoute } from "../components/ChecklistRoute";
@@ -130,7 +131,7 @@ function GuideView({ chapter, target }: { chapter: Chapter; target?: string }) {
       <MissablesStrip chapter={chapter} />
       <Link className="summary-strip" to="/dashboard">
         <SummaryFigure />
-        <span className="text-link">
+        <span className={buttonClass("link", "default")}>
           Progress <Icon name="right" />
         </span>
       </Link>

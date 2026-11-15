@@ -1,8 +1,7 @@
 import { useState, type ReactNode } from "react";
-import { Icon } from "./Icon";
 import { RouteGroup } from "./RouteGroup";
 import { Select } from "./Select";
-import { Chip, Empty } from "./ui";
+import { Button, ChipGroup, Empty } from "./ui";
 import { chapterRows, config, hasMissables, statusOptions } from "../guide";
 import { useProgress } from "../store/progress";
 import { useUi } from "../store/ui";
@@ -37,33 +36,29 @@ export function ChecklistRoute({ chapter, target, footer }: { chapter: Chapter; 
 
   return (
     <section id="route" aria-labelledby="route-title">
-      <div className="subhead">
+      <div className="mb-[13px] flex items-end justify-between gap-[13px] phone:flex-wrap phone:items-start phone:gap-1">
         <div>
-          <h2 id="route-title">Chapter route</h2>
-          <p>
+          <h2 id="route-title" className="m-0 font-display text-[32px] leading-[1.17] font-bold tracking-[-0.015em] phone:text-[27px]">
+            Chapter route
+          </h2>
+          <p className="mt-[5px] mb-0 text-[14px] text-muted">
             {done} of {rows.length} steps complete
           </p>
         </div>
-        <button className="text-link" type="button" onClick={() => setGroupsOpen(groups.map((group) => group.key), !allOpen)}>
-          <Icon name="down" />
-          <span>{allOpen ? "Collapse all" : "Expand all"}</span>
-        </button>
+        <Button look="link" icon="down" onClick={() => setGroupsOpen(groups.map((group) => group.key), !allOpen)}>
+          {allOpen ? "Collapse all" : "Expand all"}
+        </Button>
       </div>
-      <div className="toolbar">
-        <div className="chips" aria-label="Route categories">
-          {labels.map(([id, label]) => (
-            <Chip
-              key={id}
-              label={label}
-              value={id}
-              current={filter}
-              onSelect={(value) => {
-                setFilter(value);
-                setHighlighted("");
-              }}
-            />
-          ))}
-        </div>
+      <div className="mb-[15px] flex flex-wrap items-center justify-between gap-[11px]">
+        <ChipGroup
+          label="Route categories"
+          choices={labels}
+          value={filter}
+          onChange={(value) => {
+            setFilter(value);
+            setHighlighted("");
+          }}
+        />
         <Select
           id="route-status"
           label="Route completion status"

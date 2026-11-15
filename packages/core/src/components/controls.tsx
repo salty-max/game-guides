@@ -1,5 +1,4 @@
 import { Checkbox as BaseCheckbox } from "@base-ui/react/checkbox";
-import { Field as BaseField } from "@base-ui/react/field";
 import { OTPField as BaseOTPField } from "@base-ui/react/otp-field";
 import { Radio } from "@base-ui/react/radio";
 import { RadioGroup as BaseRadioGroup } from "@base-ui/react/radio-group";
@@ -7,6 +6,7 @@ import { useId, useState } from "react";
 import { buttonClass } from "./buttonStyle";
 import { checkBox, checkIcon, checkMark } from "./check-style";
 import { Icon } from "./Icon";
+import { field } from "./select-style";
 
 // Core's form controls: Base UI's headless parts, styled from the guide's palette through the tokens in tokens.css. Like Button, none of
 // them takes a className or a style: a guide gets the look it's given. The parts follow shadcn's Base UI components, adapted to the house tokens.
@@ -48,7 +48,7 @@ interface RadioGroupProps {
 export function RadioGroup({ label, choices, value, onChange }: RadioGroupProps) {
   const labelId = useId();
   return (
-    <div className="field">
+    <div className={field}>
       <span id={labelId}>{label}</span>
       <BaseRadioGroup aria-labelledby={labelId} value={value} onValueChange={(next) => onChange(String(next))} className="grid auto-cols-fr grid-flow-col gap-2">
         {choices.map(([key, text]) => (
@@ -80,7 +80,7 @@ interface FileFieldProps {
 export function FileField({ id, label, accept, onChange }: FileFieldProps) {
   const [name, setName] = useState("");
   return (
-    <div className="field">
+    <div className={field}>
       <span id={`${id}-label`}>{label}</span>
       <div className="flex flex-wrap items-center gap-2.5">
         <label className={`cursor-pointer has-focus-visible:outline-3 has-focus-visible:outline-offset-3 has-focus-visible:outline-focus ${buttonClass("outline", "default")}`}>
@@ -130,7 +130,7 @@ interface CodeFieldProps {
 export function CodeField({ id, label, length = 6, value, onChange, onComplete, description, invalid = false, disabled = false, alphanumeric = false, autoFocus = false }: CodeFieldProps) {
   const descriptionId = `${id}-description`;
   return (
-    <div className="field">
+    <div className={field}>
       <label htmlFor={id}>{label}</label>
       <BaseOTPField.Root
         id={id}
@@ -159,54 +159,5 @@ export function CodeField({ id, label, length = 6, value, onChange, onComplete, 
         </p>
       )}
     </div>
-  );
-}
-
-interface TextFieldProps {
-  id: string;
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-  /** Supporting text under the field, read with it. */
-  description?: string;
-  /** What is wrong with the value. It is read with the field, and marks it invalid. */
-  error?: string;
-  disabled?: boolean;
-  placeholder?: string;
-  name?: string;
-  inputMode?: "text" | "numeric" | "decimal" | "tel" | "email" | "url" | "search";
-  autoComplete?: string;
-  maxLength?: number;
-  pattern?: string;
-}
-
-/**
- * A line of text with its label, an optional description and an optional error, wired to it for assistive technology. The error is read
- * with the field but isn't announced when it appears: a screen that shows one while the reader is still in the field also says it, in a
- * DialogStatus.
- */
-export function TextField({ id, label, value, onChange, description, error, disabled = false, placeholder, name, inputMode, autoComplete, maxLength, pattern }: TextFieldProps) {
-  return (
-    <BaseField.Root className="field" invalid={Boolean(error)} disabled={disabled}>
-      <BaseField.Label htmlFor={id}>{label}</BaseField.Label>
-      <BaseField.Control
-        id={id}
-        name={name}
-        value={value}
-        onValueChange={onChange}
-        placeholder={placeholder}
-        inputMode={inputMode}
-        autoComplete={autoComplete}
-        maxLength={maxLength}
-        pattern={pattern}
-        className="min-h-11 w-full rounded-control border border-control-line bg-surface px-2.5 py-1.5 text-sm font-bold text-ink placeholder:font-normal placeholder:text-muted disabled:cursor-not-allowed disabled:opacity-[.46] data-invalid:border-2 data-invalid:border-error"
-      />
-      {description && <BaseField.Description className="text-[13px] font-semibold text-muted">{description}</BaseField.Description>}
-      {error && (
-        <BaseField.Error match className="text-[13px] font-bold text-error">
-          {error}
-        </BaseField.Error>
-      )}
-    </BaseField.Root>
   );
 }

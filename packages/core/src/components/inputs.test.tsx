@@ -1,7 +1,8 @@
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { useState } from "react";
-import { CodeField, TextField } from "./controls";
+import { CodeField } from "./controls";
+import { TextField } from "./TextField";
 import { ItemList, ItemRow } from "./list";
 import { Button } from "./ui";
 import { allowSlowMounts } from "../test/slow";
