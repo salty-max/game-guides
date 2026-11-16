@@ -29,7 +29,7 @@ Core's suites run against each guide:
 - **`deploy.test.ts`**: the app's `vercel.json`, the same in every app, and core's page template, held to the pitfalls in [deploying.md](deploying.md#pitfalls), the `/api` route and its place before the catch-all, and a long cache only after the file was found, among them.
 - **`sync/*.test.ts`, `SyncScreen.test.tsx`**: sync, from the ledger's merge to the screen ([core.md](core.md#syncing-devices)). `cycle.test.ts` runs two simulated browsers against the real API handler on an in-memory store, so the guide and the API are tested against each other. `ledger.test.ts` holds core's ledger equal to the API's.
 
-Each guide's own `guide.test.ts` adds its totals, its legacy saves, its extra state (and how that syncs) and its three storage keys.
+Each guide's own `guide.test.ts` adds its totals, its legacy saves, its extra state (and how that syncs) and its four storage keys.
 
 ## Stories
 
