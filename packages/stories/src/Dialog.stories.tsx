@@ -1,6 +1,8 @@
 import { DialogHost } from "@hundo/core/components/DialogHost";
 import { Button, PageHeading } from "@hundo/core/components/ui";
 import { useInstall, type InstallOffer } from "@hundo/core/store/install";
+import { useProgress } from "@hundo/core/store/progress";
+import { useSyncStatus } from "@hundo/core/store/sync";
 import { useUi, type DialogState } from "@hundo/core/store/ui";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { MemoryRouter } from "react-router";
@@ -38,6 +40,9 @@ const meta = {
       useUi.setState({ dialog: null, afterClose: null });
       // Nor any install line: Chromium hasn't offered, and the story isn't Safari on an iPhone.
       useInstall.setState({ offer: null, safari: false });
+      // Storage that works and a device that isn't linked: a story that needs otherwise says so.
+      useProgress.setState({ storageError: false });
+      useSyncStatus.setState({ phase: "off", devices: 0, lastSync: null });
       return (
         <MemoryRouter initialEntries={["/guide/1"]}>
           <Story />
@@ -67,6 +72,51 @@ export const Settings: Story = {
     // The first field has the focus, not the close button.
     await waitFor(() => expect(within(dialog).getByRole("radio", { checked: true })).toHaveFocus(), patient);
     await expect(within(dialog).getByRole("switch", { name: "Keep screen on" })).not.toBeChecked();
+  },
+};
+
+/** The browser won't keep the progress: the settings say so just above the backup, in the words the Sync screen uses at its top. */
+export const SettingsStorageUnavailable: Story = {
+  args: { dialog: { kind: "settings" } },
+  play: async ({ canvas, canvasElement }) => {
+    useProgress.setState({ storageError: true });
+    await userEvent.click(canvas.getByRole("button", { name: "Open" }));
+    const dialog = await page(canvasElement).findByRole("dialog", { name: "Guide settings" }, patient);
+    // (visible once the dialog has faded in)
+    await waitFor(() => expect(within(dialog).getByText("Browser storage is unavailable. Export a backup before closing this tab.")).toBeVisible(), patient);
+  },
+};
+
+/** The Sync screen of a device that isn't linked, which is where the status button in the title bar leads: what syncing is, and how to link. */
+export const Sync: Story = {
+  args: { dialog: { kind: "sync" } },
+  play: async ({ canvas, canvasElement }) => {
+    await userEvent.click(canvas.getByRole("button", { name: "Open" }));
+    const dialog = await page(canvasElement).findByRole("dialog", { name: "Sync devices" }, patient);
+    await waitFor(() => expect(within(dialog).getByRole("button", { name: "Show a code" })).toHaveFocus(), patient);
+    // (visible once the dialog has faded in)
+    await waitFor(() => expect(within(dialog).getByRole("button", { name: "Enter a code" })).toBeVisible(), patient);
+    await expect(dialog).toHaveAccessibleDescription(/same on your other devices/);
+    await expect(within(dialog).getByText(/Your progress is already saved on this device. To share it, show a code here/)).toBeVisible();
+    await expect(within(dialog).queryByText(/Browser storage is unavailable/)).toBeNull();
+  },
+};
+
+/** The Sync screen when the browser won't keep the progress: the warning is the first thing in it, above what the screen is for, with an Export progress button under it. */
+export const SyncStorageUnavailable: Story = {
+  args: { dialog: { kind: "sync" } },
+  play: async ({ canvas, canvasElement }) => {
+    useProgress.setState({ storageError: true });
+    await userEvent.click(canvas.getByRole("button", { name: "Open" }));
+    const dialog = await page(canvasElement).findByRole("dialog", { name: "Sync devices" }, patient);
+    const warning = within(dialog).getByText("Browser storage is unavailable. Export a backup before closing this tab.");
+    // (visible once the dialog has faded in)
+    await waitFor(() => expect(warning).toBeVisible(), patient);
+    const description = within(dialog).getByText(/same on your other devices/);
+    await expect(warning.compareDocumentPosition(description) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    // the backup it asks for is right under it, and the screen doesn't say the progress is saved
+    await expect(within(dialog).getByRole("button", { name: "Export progress" })).toBeVisible();
+    await expect(within(dialog).queryByText(/already saved on this device/)).toBeNull();
   },
 };
 

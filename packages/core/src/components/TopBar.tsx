@@ -48,24 +48,19 @@ function SaveStatus() {
   const error = useProgress((s) => s.storageError);
   const phase = useSyncStatus((s) => s.phase);
   const openDialog = useUi((s) => s.openDialog);
-  const linked = phase !== "off";
-  const word = linked && !error ? syncWords[phase] : "";
-  // A linked device opens the Sync screen from here, where the settings are one button away; one that isn't opens the settings as before.
+  // The words are drawn joined by a dot and named joined by a full stop, so the name always carries what is shown.
+  const words = error ? ["Storage unavailable"] : phase === "off" ? ["Progress saved"] : ["Progress saved", syncWords[phase]];
+  // One destination in every state: the Sync screen, linked or not, which also carries the storage warning. The guide's settings are the
+  // chapters menu's "Change settings" (the rail beside the page on a wide screen) and the Progress page's Import progress.
   return (
     <BaseButton
       className={`${press} flex min-h-10 items-center gap-2 rounded-control border border-control-line bg-transparent px-3 py-1.5 text-[12px] font-bold whitespace-nowrap text-muted hover:bg-raised drawer:h-(--icon-h,2.5rem) drawer:w-(--icon-w,2.5rem) drawer:justify-center drawer:gap-0 drawer:p-0 drawer:text-[0px]`}
       data-error={error || ["offline", "paused", "error"].includes(phase) ? "" : undefined}
-      aria-label={
-        error
-          ? "Storage unavailable. Open progress settings"
-          : linked
-            ? `Progress saved. ${word}. Open sync`
-            : "Progress saved. Open progress settings"
-      }
-      onClick={() => openDialog({ kind: linked && !error ? "sync" : "settings" })}
+      aria-label={`${words.join(". ")}. Open sync devices`}
+      onClick={() => openDialog({ kind: "sync" })}
     >
       <span className="block size-2 rounded-full bg-ok shadow-[0_0_0_3px_color-mix(in_srgb,var(--ok)_15%,transparent)] in-data-error:bg-warn" />
-      {error ? "Storage unavailable" : word ? `Progress saved · ${word}` : "Progress saved"}
+      {words.join(" · ")}
     </BaseButton>
   );
 }
