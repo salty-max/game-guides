@@ -15,6 +15,7 @@
     "./pages/*": "./src/pages/*.tsx",
     "./vite": "./vite.ts",
     "./icon-versions": "./icon-versions.ts",
+    "./banners": "./banners.ts",
     "./icons": "./icons.mjs",
     "./app.css": "./src/app.css"
   },
@@ -28,5 +29,8 @@
     "react-dom": "catalog:",
     "react-router": "^8.5.1",
     "zustand": "^5.1.0"
+  },
+  "devDependencies": {
+    "sharp": "^0.35.5"
   }
 }

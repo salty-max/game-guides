@@ -1,20 +1,27 @@
 import type { ReactNode } from "react";
 import { CHAPTER_COUNT } from "../guide";
 import { two } from "../format";
-import type { Chapter } from "../types";
+import type { Banner, Chapter } from "../types";
 
 /**
  * The top of a chapter: a tint from the guide's palette with the chapter's banner fading in on the right, its number, region, title and
  * intro, and `children`, the buttons under them. Up to 1050px wide the banner stacks above the words and fades into the card at its
  * foot, as it fades at its left beside them; on a phone the intro goes. The banner is 3:1, as its stacked frame is, so nothing is cut.
  */
-export function ChapterHero({ chapter, banner, children }: { chapter: Chapter; banner?: string; children: ReactNode }) {
+// How wide the banner is drawn, for the browser's pick from its srcset (core's banners.ts): on a phone the card less its 12px sides, up to
+// 1050px the card's whole width, where it stacks, and wider than that 68% of the hero, which is at most the page's 1460px less its 53px
+// sides (about 920px). Rounded up where unsure: too wide only costs bytes.
+const BANNER_SIZES = "(max-width: 550px) calc(100vw - 24px), (max-width: 1050px) 100vw, min(68vw, 920px)";
+
+export function ChapterHero({ chapter, banner, children }: { chapter: Chapter; banner?: Banner; children: ReactNode }) {
   return (
     <section className="relative isolate flex min-h-[245px] items-center overflow-hidden rounded-hero border border-line bg-[linear-gradient(120deg,var(--hero-from),var(--hero-to))] px-[clamp(23px,4vw,49px)] py-[22px] stack:block stack:min-h-0 stack:p-0 phone:rounded-card">
       {banner && (
         <img
           className="absolute top-0 right-0 -z-1 h-full w-[68%] mask-[linear-gradient(to_right,transparent_9%,#000_66%)] object-cover object-[76%_center] stack:static stack:block stack:aspect-3/1 stack:h-auto stack:w-full stack:mask-[linear-gradient(to_top,transparent_4%,#000_62%)]"
-          src={banner}
+          src={banner.src}
+          srcSet={banner.srcSet}
+          sizes={banner.srcSet ? BANNER_SIZES : undefined}
           alt=""
           width={1800}
           height={600}

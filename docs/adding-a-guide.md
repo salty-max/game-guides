@@ -60,7 +60,7 @@ The full type is `GuideConfig` in `packages/core/src/types.ts`, and every field 
 - **`badges`** (optional): secondary tags shown as a badge beside the label in route rows.
 - **`quantity`** (optional): the category a row's `quantity` counts toward, like Echoes' Might Crystals.
 - **`missables`** and **`reassurance`**: from `data/missables.ts`.
-- **`banners`**: `byChapter(import.meta.glob<string>("./banners/chapter-*.webp", { eager: true, query: "?url", import: "default" }))`, as Echoes has it.
+- **`banners`**: `byChapter(import.meta.glob<Banner>("./banners/chapter-*.webp", { eager: true, query: "?banner", import: "default" }))`, as Echoes has it (`?banner` adds the phone-sized copies, [house-style.md](house-style.md#banners)).
 - **`defer`** (optional): rows Next up holds back until nothing else is left, such as optional amiibo outfits.
 - **`completion`**:
   - `board`: the counts on the Progress page. Give a `goal` where the game has a fixed total.

@@ -5,7 +5,8 @@ import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 import { defineConfig, type Plugin } from "vite";
 import { VitePWA, type VitePWAOptions } from "vite-plugin-pwa";
-import { fontCss } from "./src/fonts.ts";
+import { fontCss, fontPreloads } from "./src/fonts.ts";
+import { bannerSizes } from "./banners.ts";
 import { iconUrl, iconUrls } from "./icon-versions.ts";
 import { guideManifest } from "./manifest.ts";
 import { darkPalette, lightPalette } from "./palette.ts";
@@ -32,6 +33,7 @@ const guideShell = (root: string, brand: Brand, palette: Record<string, string>,
     CORNERS: brand.corners,
     STORAGE: brand.storagePrefix,
     FONTS: fontCss(brand),
+    FONT_PRELOADS: fontPreloads(brand),
   };
 
   return {
@@ -103,6 +105,7 @@ export const guideConfig = (root: string, brand: Brand) => {
     plugins: [
       guideShell(root, brand, palette, dark),
       iconUrls(`${root}/public`),
+      bannerSizes(),
       react(),
       // The jsdom tests never process CSS (only ?raw text gets through), so Tailwind sits them out.
       ...(process.env.VITEST ? [] : [tailwindcss()]),

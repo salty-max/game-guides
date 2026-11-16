@@ -55,8 +55,8 @@ Convert with `sharp`, which is in the workspace, to exactly 1800×600 WebP. The 
 node -e 'require("sharp")(process.argv[1]).resize(1800, 600, { fit: "cover" }).webp({ quality: 80 }).toFile(process.argv[2]).then((i) => console.log(i.size))' <in> apps/<name>/src/guide/banners/chapter-<N>.webp
 ```
 
-- **Keep each file small.** The service worker precaches every banner on a reader's first visit, and the existing sets weigh 0.6 to 1.5 MB for five to nine banners. Above about 200 KB, lower the quality and convert again.
-- `config.ts` picks the banners up through `byChapter(import.meta.glob("./banners/chapter-*.webp", …))`. There's nothing else to wire.
+- **Keep each file small.** The service worker precaches every banner on a reader's first visit, with the 800 and 1320px copies the build makes of it, and the existing originals weigh 0.6 to 1.5 MB for five to nine banners (1.0 to 2.4 MB with the copies). Above about 200 KB, lower the quality and convert again.
+- `config.ts` picks the banners up through `byChapter(import.meta.glob<Banner>("./banners/chapter-*.webp", { eager: true, query: "?banner", import: "default" }))`, and the build makes the copies (`packages/core/banners.ts`). There's nothing else to wire.
 
 ## 6. Check how it reads
 
