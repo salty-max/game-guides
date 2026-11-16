@@ -79,13 +79,23 @@
     @apply accent-primary [scrollbar-color:var(--edge)_var(--paper)];
   }
   body {
-    @apply bg-paper font-sans text-[16px]/[1.58] text-ink;
+    @apply bg-paper font-sans text-[16px]/[1.58] text-ink standalone:bg-surface;
   }
   button {
     @apply cursor-pointer;
   }
   :focus-visible {
     @apply outline-3 outline-offset-3 outline-focus;
+  }
+
+  /* In the installed app iOS draws the strip behind the clock in the page's own background colour (seen on 18.7, docs/core.md), so the
+     page behind the frame is the top bar's colour (here and in the body's rule above, where it has to come after the paper) and the frame
+     itself carries the paper: the strip and the bar read as one. */
+  html {
+    @apply standalone:bg-surface;
+  }
+  #root {
+    @apply standalone:bg-paper;
   }
 
   /* A reader who asks for less motion gets none: no smooth scrolling, no transitions. */
