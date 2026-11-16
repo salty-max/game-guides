@@ -91,7 +91,7 @@ The full type is `GuideConfig` in `packages/core/src/types.ts`, and every field 
 ## 3. Fonts, icons, README
 
 - **Fonts**: put the two `.woff2` files and their licence texts in `public/fonts`, and name them in `brand.fonts`.
-- **Icons**: put the painting in `scripts/icon-master.webp` and the tab drawing in `scripts/favicon.svg`, copy a guide's `scripts/icons.mjs` and run `pnpm icons` from the app folder. [house-style.md](house-style.md#icon) has what each must be and what core writes from them.
+- **Icons**: put the painting in `scripts/icon-master.webp` and the tab drawing in `scripts/favicon.svg`, copy a guide's `scripts/icons.mjs` and run `pnpm icons` from the app folder. [house-style.md](house-style.md#icon) has what each must be and what core writes from them. Then run `pnpm screenshots <name>` from the root for the install dialog's pictures, and commit them (`icons.test.ts` fails without them).
 - **`README.md`**: what the guide covers, how to use it, its sources and credits. Copy the shape of Echoes' README.
 - **`docs/facts-to-verify.md`**: what isn't confirmed yet ([chapter-data.md](chapter-data.md#facts-to-verify)).
 

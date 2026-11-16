@@ -41,7 +41,7 @@ Then follow [step 1 of the doc](../../../docs/adding-a-guide.md#1-copy-the-folde
 
 ## 4. Art
 
-- **Icon:** the painting in `scripts/icon-master.webp` (prompts in `docs/icon-art.md`) and the tab drawing in `scripts/favicon.svg`, then copy a guide's `scripts/icons.mjs` and run `pnpm icons` in the app folder ([house-style.md](../../../docs/house-style.md#icon)). Look at what it wrote: the maskable icon through an 80% circle, and the tab icon at 16 and 32px in light and dark browser chrome.
+- **Icon:** the painting in `scripts/icon-master.webp` (prompts in `docs/icon-art.md`) and the tab drawing in `scripts/favicon.svg`, then copy a guide's `scripts/icons.mjs` and run `pnpm icons` in the app folder ([house-style.md](../../../docs/house-style.md#icon)), then `pnpm screenshots <name>` at the root once the first chapter renders. Look at what it wrote: the maskable icon through an 80% circle, and the tab icon at 16 and 32px in light and dark browser chrome.
 - **Banners:** use the `guide-banners` skill. It starts with whatever the research folder already has.
 
 ## 5. Wire it in

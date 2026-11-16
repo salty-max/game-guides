@@ -72,7 +72,7 @@ A guide's icon is two pieces of art, both in `scripts/`:
 - **`icon-master.webp`**, the painting: a 1024px opaque, full-bleed square, its subject inside a centred disk about 81% of the side, the square around it in the guide's dark `--surface`. It's what the home screen, the installed app and the top bar's brand tile show. The [artwork notes](icon-art.md) keep the prompts.
 - **`favicon.svg`**, the tab drawing: a 32-unit square SVG, a rounded tile in the guide's light `--primary` with a flat version of the same subject. A painting shrunk to 16px is a smudge, the Red Dead hat worst of all, so the tab gets a drawing made for that size. Its tile carries its own background, so it reads in light and dark browser chrome alike.
 
-`scripts/icons.mjs` hands both to core's `writeIcons`. Run `pnpm icons` from the app folder after changing either, and commit what it writes. Nothing regenerates them in the build.
+`scripts/icons.mjs` hands both to core's `writeIcons`, which also draws the installed app's shortcut icons from core's glyphs in the guide's `--primary` and `--on-primary`. Run `pnpm icons` from the app folder after changing either, or the palette, and commit what it writes. Nothing regenerates them in the build.
 
 - `icon-192.png` and `icon-512.png`: the painting with rounded corners (22% of the side), for the manifest.
 - `maskable-512.png`: the painting at 440px on a 512 canvas filled from its own edge, so the disk is 70% of the side and inside the 80% circle a launcher may crop to.

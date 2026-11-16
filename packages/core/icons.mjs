@@ -2,7 +2,10 @@
 import { copyFile, mkdir, writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import sharp from "sharp";
-import { tileSizes, tileSrc } from "./src/icons.ts";
+import { lightPalette } from "./palette.ts";
+import { paths } from "./src/icon-paths.ts";
+import { shortcutIcon, shortcutSizes, tileSizes, tileSrc } from "./src/icons.ts";
+import { pages } from "./src/nav.ts";
 
 /** An ICO file holding PNG frames, which every browser reads; sharp writes no ICO itself. */
 const ico = (frames) => {
@@ -43,7 +46,20 @@ export const writeIcons = async ({ master, favicon }) => {
   // (truecolour, as the ico's entries say: a strict reader takes a PNG frame for 32-bit RGBA)
   const tab = (size) => sharp(drawing, { density: (72 * size) / 32 }).resize(size, size).png().toBuffer();
 
+  // A shortcut's icon: the page's glyph from the navigation, in the guide's button colours. The rounded tile keeps it to the middle 60%,
+  // and the full-bleed one, which launchers crop to a circle as small as 80% of the side, to the middle half.
+  const { "--primary": fill, "--on-primary": ink } = lightPalette(process.cwd());
+  const shortcut = (glyph, size, maskable) => {
+    const scale = maskable ? 0.5 : 0.6;
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24"><rect width="24" height="24" rx="${maskable ? 0 : 24 * 0.22}" fill="${fill}"/><g transform="translate(12 12) scale(${scale}) translate(-12 -12)" fill="none" stroke="${ink}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${paths[glyph]}</g></svg>`;
+    return sharp(Buffer.from(svg)).png(png);
+  };
+
   await Promise.all([
+    ...pages.flatMap(([id, , glyph]) => [
+      ...shortcutSizes.map((size) => shortcut(glyph, size, false).toFile(`public/${shortcutIcon(id, size)}`)),
+      shortcut(glyph, 192, true).toFile(`public/${shortcutIcon(id, 192, true)}`),
+    ]),
     rounded(512).png(png).toFile(`${out}/icon-512.png`),
     rounded(192).png(png).toFile(`${out}/icon-192.png`),
     // iOS rounds the corners itself, so the square stays opaque.

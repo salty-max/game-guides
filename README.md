@@ -58,7 +58,7 @@ pnpm check
 pnpm --filter hundo-koholint dev
 ```
 
-`pnpm check` runs `pnpm lint`, `pnpm typecheck`, `pnpm test` and `pnpm build`, each across every package (`pnpm -r`). Lint fails on warnings. Inside an app folder, `pnpm dev`, `pnpm build`, `pnpm preview`, `pnpm test` and `pnpm icons` work on that guide alone.
+`pnpm check` runs `pnpm lint`, `pnpm typecheck`, `pnpm test` and `pnpm build`, each across every package (`pnpm -r`). Lint fails on warnings. Inside an app folder, `pnpm dev`, `pnpm build`, `pnpm preview`, `pnpm test` and `pnpm icons` work on that guide alone. `pnpm screenshots` at the root retakes every guide's install-dialog pictures from its production build ([docs/core.md](docs/core.md#the-installed-app)).
 
 ```bash
 pnpm --filter hundo-stories storybook
