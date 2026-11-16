@@ -59,6 +59,8 @@ check /workbox-nope.js 404 '' "$nolong" '' "$html"
 [ -n "$font" ] && check "$font" 200 'max-age=604800' '' font
 check /fonts/nope.woff2 404 '' "$nolong" '' "$html"
 check /icons/favicon.svg 200 'max-age=604800' '' image
+# the root favicon is a file, not the app's page, and keeps no long cache (no cache rule names it)
+check /favicon.ico 200 '' "$nolong" image "$html"
 check /icons/nope.svg 404 '' "$nolong" '' "$html"
 # the sync API behind /api: its own answers (JSON, or a 404), a CSP on them, and never the app's page
 check /api/sync 405 '' "$nolong" json "$html"

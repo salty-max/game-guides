@@ -17,7 +17,7 @@ Each app's history from its old repository is kept under its folder, so `git log
 - **`apps/<name>`** is one guide:
   - `src/guide`: brand, config, chapter data, palette, panels (often none) and banners;
   - `public/fonts` and `public/icons`;
-  - `scripts/icons.mjs`, which holds the guide's icon art;
+  - `scripts/icon-master.webp` and `scripts/favicon.svg`, the guide's icon art, and `scripts/icons.mjs`, which exports them;
   - `vercel.json`, a README and `docs/facts-to-verify.md`.
 
   Its `vite.config.ts` is a single call to `guideConfig`.

@@ -12,7 +12,7 @@ pnpm build      # typecheck + production build into dist/
 pnpm preview    # serve the production build
 pnpm test       # this guide's tests plus core's shared suites, run against this guide
 pnpm lint
-pnpm icons      # regenerate public/icons from the compass motif in scripts/icons.mjs
+pnpm icons      # regenerate public/icons and public/favicon.ico from scripts/icon-master.webp and scripts/favicon.svg
 ```
 
 `src/guide` is what makes this guide Red Dead: `brand.ts` (names, storage keys, fonts, corner style), `config.ts` (checklist layout, categories, completion rules), `estimate.ts` (the weighted in-game estimate), the chapter data in `src/guide/data`, the calibration panel (at `/dashboard/calibration`), the banners and `theme.css`, which sets only the palette.
@@ -32,5 +32,7 @@ The Vercel project `hundo-rdr` builds this folder as its Root Directory and serv
 The in-game percentage applies to the base campaign. *Undead Nightmare*, multiplayer, mission medals, platform trophies and optional encounters have separate completion goals. Sources and maps are linked inside the app. Directions and counts were compiled from the community guides linked in the app and have not been replayed or independently audited; see [docs/facts-to-verify.md](docs/facts-to-verify.md) for what is still unconfirmed.
 
 ## Artwork and fonts
+
+The gunslinger’s hat icon is an original generated illustration. The master is in [scripts/icon-master.webp](scripts/icon-master.webp).
 
 The chapter banners in `src/guide/banners` are decorative. Barlow Condensed and DM Sans are bundled with their licenses in `public/fonts`. *Red Dead Redemption* belongs to Rockstar Games. This is an unofficial guide.

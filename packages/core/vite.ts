@@ -6,6 +6,7 @@ import react from "@vitejs/plugin-react";
 import { defineConfig, type Plugin } from "vite";
 import { VitePWA } from "vite-plugin-pwa";
 import { fontCss } from "./src/fonts.ts";
+import { manifestIcons } from "./src/icons.ts";
 import type { Brand } from "./src/types.ts";
 
 const here = (path: string) => fileURLToPath(new URL(path, import.meta.url));
@@ -98,7 +99,8 @@ export const guideConfig = (root: string, brand: Brand) => {
         // "prompt": a new version takes over by itself only while the guide is just starting, untouched, and otherwise waits until the reader
         // accepts, so a reload never lands mid-checklist (sw-updates.ts).
         registerType: "prompt",
-        includeAssets: ["icons/favicon.svg", "icons/apple-touch-icon.png", "fonts/*.woff2"],
+        // (favicon.ico is no png or svg, so the glob below would miss it)
+        includeAssets: ["favicon.ico", "icons/favicon.svg", "icons/apple-touch-icon.png", "fonts/*.woff2"],
         manifest: {
           id: "/",
           name: brand.name,
@@ -111,12 +113,7 @@ export const guideConfig = (root: string, brand: Brand) => {
           theme_color: palette["--surface"],
           background_color: palette["--paper"],
           categories: ["games", "utilities"],
-          icons: [
-            { src: "icons/icon-192.png", sizes: "192x192", type: "image/png" },
-            { src: "icons/icon-512.png", sizes: "512x512", type: "image/png" },
-            { src: "icons/maskable-512.png", sizes: "512x512", type: "image/png", purpose: "maskable" },
-            { src: "icons/favicon.svg", sizes: "any", type: "image/svg+xml" },
-          ],
+          icons: manifestIcons,
         },
         workbox: {
           // Precache the whole shell, fonts and banners so the guide works offline.
@@ -135,7 +132,7 @@ export const guideConfig = (root: string, brand: Brand) => {
       environment: "jsdom",
       globals: true,
       setupFiles: [here("./src/test/setup.ts")],
-      // The deploy test reads this app's vercel.json.
+      // The deploy and icons tests read this app's vercel.json and icons.
       env: { GUIDE_ROOT: root },
       // Stylesheets load empty in tests, except the ?raw text the theme test reads.
       css: { include: [/\.css\?raw$/] },

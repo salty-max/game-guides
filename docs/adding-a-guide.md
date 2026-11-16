@@ -92,7 +92,7 @@ The full type is `GuideConfig` in `packages/core/src/types.ts`, and every field 
 ## 3. Fonts, icons, README
 
 - **Fonts**: put the two `.woff2` files and their licence texts in `public/fonts`, and name them in `brand.fonts`.
-- **Icons**: draw the motif in `scripts/icons.mjs`, then run `pnpm icons` from the app folder. Koholint's script is a 24-unit stroke glyph and Echoes' a filled 512px motif; copy whichever is closer. Core's `writeIcons` writes every size, the maskable icon and the square Apple icon ([house-style.md](house-style.md#icon)).
+- **Icons**: put the painting in `scripts/icon-master.webp` and the tab drawing in `scripts/favicon.svg`, copy a guide's `scripts/icons.mjs` and run `pnpm icons` from the app folder. [house-style.md](house-style.md#icon) has what each must be and what core writes from them.
 - **`README.md`**: what the guide covers, how to use it, its sources and credits. Copy the shape of Echoes' README.
 - **`docs/facts-to-verify.md`**: what isn't confirmed yet ([chapter-data.md](chapter-data.md#facts-to-verify)).
 

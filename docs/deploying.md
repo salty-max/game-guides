@@ -39,7 +39,7 @@ Every app's `vercel.json` is the same, and `deploy.test.ts` fails if one drifts:
   - `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy`, `Strict-Transport-Security` and `Cross-Origin-Opener-Policy`;
   - `public, max-age=0, must-revalidate` on `index.html`, `sw.js`, `theme-init.js` and the manifest, so a new version is seen at once;
   - `Service-Worker-Allowed: /` on `sw.js`.
-- **After a miss**, two routes, in this order. `/api` and what follows it goes to `https://api.hundo.quest/api/…` (the sync API, so a call is same-origin and its cookies are the guide's own, and the CSP keeps `connect-src 'self'`). Then one catch-all sends every other path except `/api/`, `/assets/`, `/fonts/`, `/icons/` and `/workbox-` to `/index.html`, so deep links like `/guide/3` load the app.
+- **After a miss**, two routes, in this order. `/api` and what follows it goes to `https://api.hundo.quest/api/…` (the sync API, so a call is same-origin and its cookies are the guide's own, and the CSP keeps `connect-src 'self'`). Then one catch-all sends every other path except `/api/`, `/assets/`, `/fonts/`, `/icons/` and `/workbox-` to `/index.html`, so deep links like `/guide/3` load the app. A file that exists never gets this far, which is how the root `/favicon.ico` is served.
 - **After a hit**, a long cache, only for a file that exists:
   - one year `immutable` on hashed `/assets/*` and the Workbox runtime (`/workbox-<hash>.js`);
   - a week, with stale-while-revalidate, on fonts and icons.
