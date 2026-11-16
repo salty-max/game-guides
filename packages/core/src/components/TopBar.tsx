@@ -1,7 +1,7 @@
 import { Button as BaseButton } from "@base-ui/react/button";
 import { cva } from "class-variance-authority";
-import { useCallback, useEffect, useRef, type RefObject } from "react";
-import { Link, useLocation, useNavigate } from "react-router";
+import type { RefObject } from "react";
+import { Link } from "react-router";
 import iconUrl from "virtual:icon-urls";
 import { MainNav } from "./MainNav";
 import { IconButton } from "./ui";
@@ -14,18 +14,6 @@ import { useUi } from "../store/ui";
 import { usePhone } from "../useNarrow";
 import { useResolvedTheme } from "../useThemeEffects";
 import { press } from "./press-style";
-
-/**
- * Whether there is somewhere in the app to go back to, in the guide installed as an app, which has no browser back button. (iOS lets
- * a reader swipe in from the left edge, and Android has its back button, but neither says so on the screen.) A browser tab has its
- * own button, so there it is never true. The dialogs have no need of one: they close with their own button, as a sheet does.
- */
-function useCanGoBack() {
-  // The router keeps each entry's position in the history in its state: 0 is where the app opened. A move changes the location.
-  useLocation();
-  const position = (window.history.state as { idx?: number } | null)?.idx ?? 0;
-  return document.documentElement.dataset.standalone !== undefined && position > 0;
-}
 
 function ThemeToggle() {
   const dark = useResolvedTheme() === "dark";
@@ -82,12 +70,8 @@ function SaveStatus() {
   );
 }
 
-// Where there is a way back, the brand gives its place to it from 1040px down to 551px (an iPad in portrait, a phone on its side): there's
-// no room for both beside the menu and the pages. Checked with Echoes, whose name is the longest, at 820px, where its text ran into the
-// Guide link. On a phone the pages are at the bottom, so the brand comes back beside the way back: Echoes fits at 375px.
-const brandLink = cva(`${press} flex w-max shrink-0 items-center gap-[11px] px-6 mid:pl-[17px] drawer:gap-[7px] drawer:px-2.5 phone:w-auto phone:min-w-0 phone:shrink`, {
-  variants: { canGoBack: { true: "mid:hidden phone:flex", false: "" } },
-});
+// On a phone the brand gives way: its name ellipsizes before the buttons beside it move, and under 361px only the tile shows.
+const brandLink = cva(`${press} flex w-max shrink-0 items-center gap-[11px] px-6 mid:pl-[17px] drawer:gap-[7px] drawer:px-2.5 phone:w-auto phone:min-w-0 phone:shrink`);
 
 // The guide's painting, its square the dark surface: a hairline in the guide's line keeps the cornered tile on a dark bar.
 // (an outline inset over the edge, not a border, so the painting draws at the size it was written for)
@@ -104,29 +88,10 @@ interface TopBarProps {
 }
 
 /**
- * The bar across the top: the chapters menu (800px and under), the way back (installed app only), the brand, the three pages, and the theme
- * and save buttons. On a phone it is a title bar: the pages are in the tab bar at the bottom (Layout), and the theme is in the settings.
+ * The bar across the top: the chapters menu (800px and under), the brand, the three pages, and the theme and save buttons. On a phone it is a
+ * title bar: the pages are in the tab bar at the bottom (Layout), and the theme toggle stays, one press away as on a wider screen.
  */
 export function TopBar({ chapter, view, menuOpen, onToggleMenu, menuToggle }: TopBarProps) {
-  const canGoBack = useCanGoBack();
-  const navigate = useNavigate();
-  const brandLinkRef = useRef<HTMLAnchorElement>(null);
-  const backHadFocus = useRef(false);
-  // React runs a ref's cleanup before it removes the node, while the node still has the focus (a browser may report the focus leaving as it goes, so a
-  // focus-out handler can't tell). The callback is stable, so the cleanup runs only when the button really goes.
-  const backRef = useCallback((node: HTMLButtonElement | null) => {
-    return () => {
-      if (node && document.activeElement === node) backHadFocus.current = true;
-    };
-  }, []);
-  // The Back button goes when the reader gets back to where the app opened, and the focus would fall to the page. It goes to the brand
-  // (Layout then moves it to the page's main area, unless the address points at something to scroll to).
-  useEffect(() => {
-    if (!canGoBack && backHadFocus.current) {
-      backHadFocus.current = false;
-      brandLinkRef.current?.focus();
-    }
-  }, [canGoBack]);
   const phone = usePhone();
   return (
     <header className="sticky top-0 z-10 grid h-(--bar) grid-cols-[var(--rail-w)_1fr_auto] items-center border-b border-line bg-surface pt-(--safe-top) pr-(--safe-right) pl-(--safe-left) text-ink standalone:relative standalone:flex-none standalone:select-none standalone:[-webkit-touch-callout:none] drawer:grid-cols-[auto_auto_1fr_auto] phone:grid-cols-[auto_minmax(0,1fr)_auto] phone:[--icon-h:2.75rem] phone:[--icon-w:2.75rem]">
@@ -143,20 +108,8 @@ export function TopBar({ chapter, view, menuOpen, onToggleMenu, menuToggle }: To
         />
       </div>
       <div className="flex min-w-0 items-center">
-        {canGoBack && (
-          <div className="ml-4 drawer:ml-1.5">
-            <IconButton
-              icon="left"
-              label="Back"
-              tooltip
-              ref={backRef}
-              onClick={() => void navigate(-1)}
-            />
-          </div>
-        )}
         <Link
-          ref={brandLinkRef}
-          className={brandLink({ canGoBack })}
+          className={brandLink()}
           to={`/guide/${chapter}`}
           aria-label={`${brand.name} home`}
         >
@@ -172,7 +125,7 @@ export function TopBar({ chapter, view, menuOpen, onToggleMenu, menuToggle }: To
       </div>
       {!phone && <MainNav chapter={chapter} view={view} place="top" />}
       <div className="mr-[25px] flex items-center gap-[9px] drawer:mr-[11px] drawer:gap-1.5 tiny:mr-[7px] tiny:gap-1">
-        {!phone && <ThemeToggle />}
+        <ThemeToggle />
         <SaveStatus />
       </div>
     </header>
