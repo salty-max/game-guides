@@ -52,7 +52,7 @@ Each guide's own `guide.test.ts` adds its totals, its legacy saves, its extra st
 
 CI's `lighthouse` job audits each guide's production build with Lighthouse on every pull request and every push to `main`, beside the four checks. A regression fails the pull request, as an axe violation in the stories does.
 
-**What runs.** One job per guide, so the three don't share a CPU and one failing doesn't stop the others. Each one builds its guide (`pnpm --filter hundo-<name> build`), serves `dist` with `vite preview` inside the runner, and runs Lighthouse CI (`@lhci/cli`, pinned at 0.16.1 in the root `package.json`, which pins Lighthouse 13.6.0) on the runner's own Google Chrome. The job prints Chrome's version, and the summary names its major version: the runner image updates it, so a jump in every number at once can be a new Chrome. `lighthouse/run.mjs` does all of it, and `pnpm lighthouse` runs that same script on a laptop.
+**What runs.** One job per guide, about three minutes each on GitHub's runner with the install and the build, so the three don't share a CPU and one failing doesn't stop the others. Each one builds its guide (`pnpm --filter hundo-<name> build`), serves `dist` with `vite preview` inside the runner, and runs Lighthouse CI (`@lhci/cli`, pinned at 0.16.1 in the root `package.json`, which pins Lighthouse 13.6.0) on the runner's own Google Chrome. The job prints Chrome's version, and the summary names its major version: the runner image updates it, so a jump in every number at once can be a new Chrome. `lighthouse/run.mjs` does all of it, and `pnpm lighthouse` runs that same script on a laptop.
 
 - **Pages:** `/guide/1`, `/checklist` (the heaviest page: Red Dead's has 307 rows) and `/dashboard` (Progress) on a phone, which is Lighthouse's default (a 412×823 screen, a slow 4G network and a four-times-slower CPU, all simulated), and `/checklist` again on a desktop. The desktop run's URL ends in `#desktop`: the app ignores the hash, and Lighthouse CI keeps it in the URL it groups runs by, which is how the thresholds tell the two apart.
 - **Runs:** three of each, so twelve per guide. Every run starts from an empty save: a reader with half of Red Dead ticked is never measured.
@@ -65,9 +65,7 @@ CI's `lighthouse` job audits each guide's production build with Lighthouse on ev
 | Accessibility | all | 100 | the worst of three |
 | Best practices | all | 100 | the worst |
 | SEO | all | 92, until the guides serve a `robots.txt` | the worst |
-| Total blocking time | all | 300 ms at most | the median run |
-| Cumulative layout shift | all | 0.15 at most | the median run |
-| Performance, largest contentful paint | each page | its own floor and limit, from main's baseline less a margin for noise (provisional: measured on an M-series Mac, not yet on GitHub's runner) | the median run |
+| Performance, largest contentful paint, total blocking time, cumulative layout shift | each page | its own floor and limits, set from the guide that does worst on that page on GitHub's runner, with a margin for its noise (the comment at the top of `lighthouserc.mjs` gives each margin) | the median run |
 
 Every accessibility audit counts, axe's `target-size` (WCAG 2.2's 24px targets) included. It once failed on main for two reasons, both fixed in core on 16 Nov 2026: rows passing under the phone's tab bar at the fold, which axe counts as covered by the bar's links while the bar is `sticky` but not once it is `fixed` ([core.md](core.md#the-installed-app)), and What's left's 22px category links on Progress, now 24px.
 
@@ -81,15 +79,15 @@ pnpm lighthouse
 pnpm lighthouse rdr,echoes --no-build
 ```
 
-The first builds and audits every guide, about two minutes each on an M-series Mac; the second audits two guides' existing `dist`. It uses the system Google Chrome (`CHROME_PATH` names another) and leaves the reports in `.cache/lighthouse/<guide>/report`, one HTML and one JSON per run, named after the page and its hash (`checklist-desktop-…` for the desktop runs, `-unknown-` where a phone run has no hash), and `manifest.json` saying which is each page's median. It isn't part of `pnpm check`, which stays fast. A laptop is faster than the runner: the table's `cpu` column is Lighthouse's benchmark of the machine (about 3,200 on an M-series Mac), and speed numbers from a faster machine pass more easily.
+The first builds and audits every guide, about two minutes each on an M-series Mac; the second audits two guides' existing `dist`. It uses the system Google Chrome (`CHROME_PATH` names another) and leaves the reports in `.cache/lighthouse/<guide>/report`, one HTML and one JSON per run, named after the page and its hash (`checklist-desktop-…` for the desktop runs, `-unknown-` where a phone run has no hash), and `manifest.json` saying which is each page's median. It isn't part of `pnpm check`, which stays fast. A laptop is faster than the runner: the table's `cpu` column is Lighthouse's benchmark of the machine (about 3,200 on an M-series Mac, 2,200 to 2,500 on GitHub's runner), and speed numbers from a faster machine pass more easily. TBT shows it most: Red Dead's first chapter blocks for about 90 ms on the Mac and about 320 ms on the runner.
 
 **Read a failure.** The job log, and the run's summary page, end with a table of the median runs (performance, accessibility, best practices and SEO scores, LCP, TBT, CLS, `cpu`) and one line per failed assertion: `<guide> <page>: <audit>: <rule>, was <value>`. The run's artifacts hold `lighthouse-<guide>`, every run's report, for 14 days: open the HTML for the page that failed.
 
 - **Accessibility, best practices or SEO:** these don't depend on the machine. The report names the element and the audit. Fix the page.
-- **Performance, LCP or TBT:** look at `cpu` first. Far below the runner's usual figure means a slow machine: rerun the job. If it fails again at a normal `cpu`, the change made the page slower. The report's diagnostics say where the time went.
+- **Performance, LCP, TBT or CLS:** look at `cpu` first. Far below the runner's usual 2,200 to 2,500 means a slow machine (a run at about 1,650 was seen on 16 Nov 2026, its TBT more than twice the others'): rerun the job. If it fails again at a normal `cpu`, the change made the page slower. The report's diagnostics say where the time went.
 - **A threshold that needs to move** moves in `lighthouserc.mjs`, in the pull request that needs it, with its reason in the comment beside it and the user's go.
 
-Checked on an M-series Mac on 16 Nov 2026, with `pnpm lighthouse koholint` and uncommitted edits reverted afterwards: an image without `alt` added to the page template and a 400 ms busy loop at start-up, built into Koholint, failed accessibility, SEO, performance and TBT on all four of its pages (and LCP on three) and exited 1. The same run on main's code passed.
+Checked on an M-series Mac on 16 Nov 2026, against the first limits (before the runner's numbers moved them), with `pnpm lighthouse koholint` and uncommitted edits reverted afterwards: an image without `alt` added to the page template and a 400 ms busy loop at start-up, built into Koholint, failed accessibility, SEO, performance and TBT on all four of its pages (and LCP on three) and exited 1. The same run on main's code passed.
 
 ## In a browser
 

@@ -1,10 +1,15 @@
 // What every pull request's Lighthouse runs are held to (lighthouse/run.mjs runs them; docs/testing.md#lighthouse says how to read a
 // failure). Lighthouse CI checks each URL against every assertMatrix entry whose pattern matches it, so the first entry holds every
-// page and the others add each page's own speed floor. The desktop runs are the URLs ending in #desktop.
+// page and the others add each page's own speed limits. The desktop runs are the URLs ending in #desktop.
 //
 // Accessibility, best practices and SEO take the worst of the three runs; speed takes the median run, so one slow run on a shared
-// runner doesn't fail a pull request. The speed floors are main's baseline less a margin for noise. PROVISIONAL: measured on an
-// M-series Mac so far, not yet on GitHub's runner.
+// runner doesn't fail a pull request. The speed limits come from main on GitHub's runner (16 Nov 2026, Lighthouse's CPU benchmark
+// 2,200 to 2,500, about three quarters of an M-series Mac), one set per page from the guide that does worst on it, so a lighter guide
+// has more room before it trips:
+// - performance: that guide's median less about 10 points;
+// - TBT, the number a slower machine moves most: about 1.5 times its median;
+// - LCP: the limits first set on a Mac, which leave the runner's medians 450 to 1,000 ms of room (desktop, 445 ms);
+// - CLS: 0.15, Google's "poor" being 0.25, and 0.2 on a chapter (below).
 
 const worst = { aggregationMethod: "pessimistic" };
 const median = { aggregationMethod: "median-run" };
@@ -16,17 +21,16 @@ const everyPage = {
     "categories:best-practices": ["error", { minScore: 1, ...worst }],
     // 92 until the guides serve a robots.txt (the SEO wave): every page fails robots-txt today, here and in production.
     "categories:seo": ["error", { minScore: 0.92, ...worst }],
-    "total-blocking-time": ["error", { maxNumericValue: 300, ...median }],
-    // Koholint's first chapter shifts by 0.113 on main; 0.1 is Google's "good".
-    "cumulative-layout-shift": ["error", { maxNumericValue: 0.15, ...median }],
   },
 };
 
-const speed = (matchingUrlPattern, minScore, lcp) => ({
+const speed = (matchingUrlPattern, { performance, lcp, tbt, cls }) => ({
   matchingUrlPattern,
   assertions: {
-    "categories:performance": ["error", { minScore, ...median }],
+    "categories:performance": ["error", { minScore: performance, ...median }],
     "largest-contentful-paint": ["error", { maxNumericValue: lcp, ...median }],
+    "total-blocking-time": ["error", { maxNumericValue: tbt, ...median }],
+    "cumulative-layout-shift": ["error", { maxNumericValue: cls, ...median }],
   },
 });
 
@@ -36,10 +40,12 @@ export default {
     assert: {
       assertMatrix: [
         everyPage,
-        speed("/guide/1$", 0.7, 5500),
-        speed("/checklist$", 0.85, 3000),
-        speed("/dashboard$", 0.75, 4500),
-        speed("#desktop$", 0.9, 1000),
+        // A chapter shifts by 0.111 to 0.138 on the runner in all three guides (only Koholint's on a Mac; 0.1 is Google's "good"). Its own card
+        // fixes the shift and brings this limit down.
+        speed("/guide/1$", { performance: 0.65, lcp: 5500, tbt: 500, cls: 0.2 }),
+        speed("/checklist$", { performance: 0.8, lcp: 3000, tbt: 400, cls: 0.15 }),
+        speed("/dashboard$", { performance: 0.75, lcp: 4500, tbt: 260, cls: 0.15 }),
+        speed("#desktop$", { performance: 0.9, lcp: 1000, tbt: 60, cls: 0.15 }),
       ],
     },
     upload: {
