@@ -75,7 +75,7 @@ export const Settings: Story = {
   },
 };
 
-/** The browser won't keep the progress: the settings say so just above the backup, in the words the Sync screen uses at its top. */
+/** The browser won't keep the progress: the settings say so just above the backup, in the words the Sync screen uses at its top, and the dialog is described by it. */
 export const SettingsStorageUnavailable: Story = {
   args: { dialog: { kind: "settings" } },
   play: async ({ canvas, canvasElement }) => {
@@ -84,6 +84,7 @@ export const SettingsStorageUnavailable: Story = {
     const dialog = await page(canvasElement).findByRole("dialog", { name: "Guide settings" }, patient);
     // (visible once the dialog has faded in)
     await waitFor(() => expect(within(dialog).getByText("Browser storage is unavailable. Export a backup before closing this tab.")).toBeVisible(), patient);
+    await expect(dialog).toHaveAccessibleDescription("Browser storage is unavailable. Export a backup before closing this tab.");
   },
 };
 
@@ -102,7 +103,10 @@ export const Sync: Story = {
   },
 };
 
-/** The Sync screen when the browser won't keep the progress: the warning is the first thing in it, above what the screen is for, with an Export progress button under it. */
+/**
+ * The Sync screen when the browser won't keep the progress: the warning is the first thing in it, above what the screen is for, with an
+ * Export progress button under it, and the dialog's aria-describedby points to the warning (a dialog has one description).
+ */
 export const SyncStorageUnavailable: Story = {
   args: { dialog: { kind: "sync" } },
   play: async ({ canvas, canvasElement }) => {
@@ -114,6 +118,7 @@ export const SyncStorageUnavailable: Story = {
     await waitFor(() => expect(warning).toBeVisible(), patient);
     const description = within(dialog).getByText(/same on your other devices/);
     await expect(warning.compareDocumentPosition(description) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    await expect(dialog).toHaveAccessibleDescription("Browser storage is unavailable. Export a backup before closing this tab.");
     // the backup it asks for is right under it, and the screen doesn't say the progress is saved
     await expect(within(dialog).getByRole("button", { name: "Export progress" })).toBeVisible();
     await expect(within(dialog).queryByText(/already saved on this device/)).toBeNull();
