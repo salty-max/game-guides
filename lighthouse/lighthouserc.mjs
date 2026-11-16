@@ -32,14 +32,7 @@ const speed = (matchingUrlPattern, minScore, lcp) => ({
 
 export default {
   ci: {
-    collect: {
-      numberOfRuns: 3,
-      settings: {
-        // axe's target-size counts a row that sits under the phone's tab bar at the fold as a target too small to press. Held out
-        // until that and Echoes' 22px links on Progress are settled; every other accessibility audit counts.
-        skipAudits: ["target-size"],
-      },
-    },
+    collect: { numberOfRuns: 3 },
     assert: {
       assertMatrix: [
         everyPage,

@@ -131,7 +131,8 @@ export function Layout({ children }: { children: ReactNode }) {
         Skip to content
       </a>
       <TopBar chapter={chapter} view={view} menuOpen={menuOpen} onToggleMenu={() => setMenuOpen(!menuOpen)} menuToggle={menuToggle} />
-      <div className="grid min-h-[calc(100dvh-var(--bar)-var(--tabs))] grid-cols-[var(--rail-col)_minmax(0,1fr)] standalone:min-h-0 standalone:flex-1 standalone:grid-rows-[minmax(0,1fr)] drawer:block standalone:drawer:grid standalone:drawer:grid-cols-[minmax(0,1fr)]">
+      {/* The bottom margin is the room the phone's fixed tab bar covers in a browser tab (MainNav); --tabs is 0 from 551px up. */}
+      <div className="mb-(--tabs) grid min-h-[calc(100dvh-var(--bar)-var(--tabs))] grid-cols-[var(--rail-col)_minmax(0,1fr)] standalone:mb-0 standalone:min-h-0 standalone:flex-1 standalone:grid-rows-[minmax(0,1fr)] drawer:block standalone:drawer:grid standalone:drawer:grid-cols-[minmax(0,1fr)]">
         {/* The drawer stays mounted (closed, it renders nothing) so that widening past 800px closes it the ordinary way, focus and all. */}
         {drawer && (
           <drawer.RailDrawer

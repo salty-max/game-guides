@@ -9,16 +9,17 @@ import { placeOf, safePlace, tabPlaces } from "../store/place";
 import { useProgress } from "../store/progress";
 
 // Where the three pages are: in the top bar from 551px up, and in a bar across the bottom on a phone (Layout picks one, so there is only
-// ever one main navigation). The bottom bar is in the page's flow, pinned to the bottom of the screen as the top bar is to the top; in the
-// installed app it is the last row of the fixed frame. It is --tabs tall, edge and all, so what keeps clear of it keeps clear of exactly
-// that much; its own padding covers the home indicator, and it goes while a field you type in
-// has the focus on a touch screen, since the keyboard covers it anyway.
+// ever one main navigation). In a browser tab the bottom bar is fixed to the bottom of the screen, and Layout leaves --tabs of room under
+// the page so its end scrolls clear of the bar; in the installed app it is the last row of the fixed frame. Fixed rather than sticky:
+// a row passing under a sticky bar counts, for axe's target-size audit, as a target the bar's links cover, and a fixed one doesn't.
+// It is --tabs tall, edge and all, so what keeps clear of it keeps clear of exactly that much; its own padding covers the home indicator,
+// and it goes while a field you type in has the focus on a touch screen, since the keyboard covers it anyway.
 const root = cva("", {
   variants: {
     place: {
       top: "ml-[-42px] justify-self-center drawer:ml-0",
       bottom:
-        "sticky bottom-0 z-10 h-(--tabs) border-t border-line bg-surface pr-(--safe-right) pb-(--safe-bottom) pl-(--safe-left) text-ink pointer-coarse:in-[body:has(input:not([type=checkbox],[type=radio]):focus)]:hidden standalone:relative standalone:flex-none standalone:select-none standalone:[-webkit-touch-callout:none]",
+        "fixed inset-x-0 bottom-0 z-10 h-(--tabs) border-t border-line bg-surface pr-(--safe-right) pb-(--safe-bottom) pl-(--safe-left) text-ink pointer-coarse:in-[body:has(input:not([type=checkbox],[type=radio]):focus)]:hidden standalone:relative standalone:flex-none standalone:select-none standalone:[-webkit-touch-callout:none]",
     },
   },
 });
