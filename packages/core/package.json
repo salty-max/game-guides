@@ -14,6 +14,7 @@
     "./components/*": "./src/components/*.tsx",
     "./pages/*": "./src/pages/*.tsx",
     "./vite": "./vite.ts",
+    "./icon-versions": "./icon-versions.ts",
     "./icons": "./icons.mjs",
     "./app.css": "./src/app.css"
   },

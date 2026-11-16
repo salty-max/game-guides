@@ -2,6 +2,7 @@ import { Button as BaseButton } from "@base-ui/react/button";
 import { cva } from "class-variance-authority";
 import { useCallback, useEffect, useRef, type RefObject } from "react";
 import { Link, useLocation, useNavigate } from "react-router";
+import iconUrl from "virtual:icon-urls";
 import { MainNav } from "./MainNav";
 import { IconButton } from "./ui";
 import { brand } from "../guide";
@@ -160,7 +161,7 @@ export function TopBar({ chapter, view, menuOpen, onToggleMenu, menuToggle }: To
           aria-label={`${brand.name} home`}
         >
           {/* The guide's own painting, as the home screen shows it (pnpm icons writes the sizes). The link carries the name. */}
-          <img src={tileSrc(tileSizes[0])} srcSet={tileSrcSet} alt="" width={40} height={40} className={brandTile()} />
+          <img src={iconUrl(tileSrc(tileSizes[0]))} srcSet={tileSrcSet(iconUrl)} alt="" width={40} height={40} className={brandTile()} />
           <span className="grid min-w-0 gap-[3px] leading-[1.1] tiny:hidden">
             <strong className="truncate font-display text-[21px] leading-[1.05] font-bold tracking-[-0.01em] drawer:text-[17px]">{brand.mark}</strong>
             {/* The space isn't drawn (it's a grid), but without it the link's visible text reads "KoholintHundo", which its name, "Koholint Hundo home", doesn't contain. */}

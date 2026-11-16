@@ -23,11 +23,14 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /** On the guide: the page the reader is on is marked. The save status at the end is a button, named for where it leads. The brand tile is the
- * guide's painting, as its home-screen icon, at the screen's density; the link around it carries the name. */
+ * guide's painting, as its home-screen icon, at the screen's density, each size at a URL that carries its file's version; the link around it
+ * carries the name. */
 export const Guide: Story = {
   play: async ({ canvas }) => {
     const tile = canvas.getByRole("link", { name: /home$/ }).querySelector("img")!;
     await expect(tile).toHaveAttribute("alt", "");
+    await expect(tile.getAttribute("src")).toMatch(/^\/icons\/tile-40\.png\?v=[0-9a-f]{8}$/);
+    await expect(tile.getAttribute("srcset")!.split(", ").every((entry) => /\?v=[0-9a-f]{8} \dx$/.test(entry))).toBe(true);
     await waitFor(() => expect(tile.naturalWidth).toBeGreaterThanOrEqual(40));
     await expect(canvas.getByRole("button", { name: "Progress saved. Open progress settings" })).toBeEnabled();
   },

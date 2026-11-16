@@ -4,9 +4,10 @@ import { fileURLToPath } from "node:url";
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 import { defineConfig, type Plugin } from "vite";
-import { VitePWA } from "vite-plugin-pwa";
+import { VitePWA, type VitePWAOptions } from "vite-plugin-pwa";
 import { fontCss } from "./src/fonts.ts";
-import { manifestIcons, manifestScreenshots, manifestShortcuts } from "./src/icons.ts";
+import { iconUrl, iconUrls } from "./icon-versions.ts";
+import { guideManifest } from "./manifest.ts";
 import { darkPalette, lightPalette } from "./palette.ts";
 import type { Brand } from "./src/types.ts";
 
@@ -60,6 +61,31 @@ const guideShell = (root: string, brand: Brand, palette: Record<string, string>,
   };
 };
 
+/** The service worker and the manifest, as vite-plugin-pwa takes them (icon-versions.test.ts reads them as the build gets them). */
+export const pwaOptions = (root: string, brand: Brand, palette: Record<string, string>): Partial<VitePWAOptions> => ({
+  // "prompt": a new version takes over by itself only while the guide is just starting, untouched, and otherwise waits until the reader
+  // accepts, so a reload never lands mid-checklist (sw-updates.ts).
+  registerType: "prompt",
+  // The glob below precaches the icons and fonts already: listed here too, each went into sw.js twice. favicon.ico is no png or svg,
+  // so the glob would miss it.
+  includeAssets: ["favicon.ico"],
+  includeManifestIcons: false,
+  manifest: guideManifest(brand, palette, iconUrl(`${root}/public`)),
+  workbox: {
+    // Precache the whole shell, fonts and banners so the guide works offline.
+    globPatterns: ["**/*.{js,css,html,webp,woff2,png,svg}"],
+    // Client-side routes (/guide/3 …) all resolve to the app shell.
+    navigateFallback: "index.html",
+    // /api is the sync API, never a page.
+    navigateFallbackDenylist: [/^\/api\//],
+    // An icon's URL carries its version (`?v=`, icon-versions.ts) and the precache lists the bare file, under the same content's MD5:
+    // leaving `v` out of the match is what lets the page's versioned icons come from the precache, offline too. Workbox's own two stay.
+    ignoreURLParametersMatching: [/^utm_/, /^fbclid$/, /^v$/],
+    cleanupOutdatedCaches: true,
+  },
+  devOptions: { enabled: false },
+});
+
 /** The whole Vite and Vitest setup for a guide app: pass the app's folder and its brand. */
 export const guideConfig = (root: string, brand: Brand) => {
   const palette = lightPalette(root);
@@ -76,47 +102,12 @@ export const guideConfig = (root: string, brand: Brand) => {
     },
     plugins: [
       guideShell(root, brand, palette, dark),
+      iconUrls(`${root}/public`),
       react(),
       // The jsdom tests never process CSS (only ?raw text gets through), so Tailwind sits them out.
       ...(process.env.VITEST ? [] : [tailwindcss()]),
-      VitePWA({
-        // "prompt": a new version takes over by itself only while the guide is just starting, untouched, and otherwise waits until the reader
-        // accepts, so a reload never lands mid-checklist (sw-updates.ts).
-        registerType: "prompt",
-        // The glob below precaches the icons and fonts already: listed here too, each went into sw.js twice. favicon.ico is no png or svg,
-        // so the glob would miss it.
-        includeAssets: ["favicon.ico"],
-        includeManifestIcons: false,
-        manifest: {
-          id: "/",
-          name: brand.name,
-          short_name: brand.shortName,
-          description: brand.description,
-          start_url: "/",
-          scope: "/",
-          display: "standalone",
-          orientation: "any",
-          theme_color: palette["--surface"],
-          background_color: palette["--paper"],
-          categories: ["games", "utilities"],
-          icons: manifestIcons,
-          shortcuts: manifestShortcuts,
-          screenshots: manifestScreenshots(brand.name),
-          // A second launch while the guide's window is open brings that window forward instead of loading the guide again, and a
-          // shortcut's page opens in it (useLaunches.ts). Where a browser can't, it does what it always did.
-          launch_handler: { client_mode: ["focus-existing", "auto"] },
-        },
-        workbox: {
-          // Precache the whole shell, fonts and banners so the guide works offline.
-          globPatterns: ["**/*.{js,css,html,webp,woff2,png,svg}"],
-          // Client-side routes (/guide/3 …) all resolve to the app shell.
-          navigateFallback: "index.html",
-          // /api is the sync API, never a page.
-          navigateFallbackDenylist: [/^\/api\//],
-          cleanupOutdatedCaches: true,
-        },
-        devOptions: { enabled: false },
-      }),
+      // Always pwaOptions, never options written here: icon-versions.test.ts checks the manifest and the precache match on what it returns.
+      VitePWA(pwaOptions(root, brand, palette)),
     ],
     build: { target: "es2022", sourcemap: true },
     test: {
