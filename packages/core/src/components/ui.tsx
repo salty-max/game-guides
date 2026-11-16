@@ -10,7 +10,7 @@ import { buttonClass, type ButtonSize, type ButtonStyle } from "./buttonStyle";
 import { Icon, type IconName } from "./Icon";
 import { tones } from "./tone";
 import { tooltip as tooltipHandle } from "./tooltip-handle";
-import { brand, cats, config, tagName } from "../guide";
+import { cats, config, tagName } from "../guide";
 import type { Row } from "../types";
 import { pct } from "../format";
 import { press } from "./press-style";
@@ -46,8 +46,8 @@ export function LinkButton({ to, look = "outline", size = "default", icon, child
   );
 }
 
-// The top bar sets --icon-w where its buttons have to be narrower (the narrowest phones), so no class is needed on one.
-const iconButton = `${press} grid h-10 w-(--icon-w,2.5rem) place-items-center rounded-control border border-control-line bg-transparent p-0 text-inherit not-disabled:hover:bg-raised disabled:cursor-not-allowed disabled:opacity-[.46] [&_svg]:size-4.5`;
+// The top bar sets --icon-w and --icon-h where its buttons are a different size (a phone's title bar), so no class is needed on one.
+const iconButton = `${press} grid h-(--icon-h,2.5rem) w-(--icon-w,2.5rem) place-items-center rounded-control border border-control-line bg-transparent p-0 text-inherit not-disabled:hover:bg-raised disabled:cursor-not-allowed disabled:opacity-[.46] [&_svg]:size-4.5`;
 
 type IconButtonProps = { label: string; icon: IconName; tooltip?: boolean } & Omit<ComponentPropsWithRef<"button">, "className" | "style">;
 
@@ -64,9 +64,15 @@ export function IconButton({ label, icon, tooltip = false, ...rest }: IconButton
   return tooltip ? <Tooltip.Trigger handle={tooltipHandle} payload={label} render={button} /> : button;
 }
 
-const chipGroup = cva("flex flex-wrap gap-1.5", {
-  variants: { space: { none: "", above: "mt-2.5" } },
-  defaultVariants: { space: "none" },
+// The chips wrap onto as many lines as they need, or stay on one line that scrolls sideways (the checklist's on a phone, where a wall of
+// chips would push the list off the first screen). The line runs to the screen's edges, so a cut-off chip says there are more, and it
+// keeps room above and below for the focus ring, which a line that scrolls would otherwise cut off.
+const chipGroup = cva("flex gap-1.5", {
+  variants: {
+    space: { none: "", above: "mt-2.5" },
+    flow: { wrap: "flex-wrap", scroll: "-mx-(--gutter) -my-1.5 scrollbar-none overflow-x-auto overscroll-x-contain px-(--gutter) py-1.5 *:shrink-0" },
+  },
+  defaultVariants: { space: "none", flow: "wrap" },
 });
 
 interface ChipGroupProps {
@@ -77,6 +83,8 @@ interface ChipGroupProps {
   onChange: (value: string) => void;
   /** Room above, for a group under a panel's title. */
   space?: "none" | "above";
+  /** Wrap onto more lines (the default), or keep to one line that scrolls sideways. */
+  flow?: "wrap" | "scroll";
 }
 
 /**
@@ -84,7 +92,7 @@ interface ChipGroupProps {
  * the arrow keys move between chips without pressing them; Enter or Space presses one. Pressing the pressed chip again keeps it pressed,
  * so something is always chosen, and tells the page again. A value that isn't among the chips (a filter the page's select set) leaves none pressed.
  */
-export function ChipGroup({ label, choices, value, onChange, space }: ChipGroupProps) {
+export function ChipGroup({ label, choices, value, onChange, space, flow }: ChipGroupProps) {
   return (
     <ToggleGroup
       aria-label={label}
@@ -93,7 +101,7 @@ export function ChipGroup({ label, choices, value, onChange, space }: ChipGroupP
         // Pressing the pressed chip lets go of it in Base UI; here it stays pressed, and the page still hears it (the route clears a highlight).
         onChange(next[0] ?? value);
       }}
-      className={chipGroup({ space })}
+      className={chipGroup({ space, flow })}
     >
       {choices.map(([key, text]) => (
         <Toggle
@@ -108,6 +116,20 @@ export function ChipGroup({ label, choices, value, onChange, space }: ChipGroupP
   );
 }
 
+/** A filter that is on, as a chip that turns it off: the checklist's filters on a phone, where the controls that set them are in a sheet. */
+export function ActiveFilter({ label, onRemove }: { label: string; onRemove: () => void }) {
+  return (
+    <BaseButton
+      className={`${press} flex min-h-8 items-center gap-1 rounded-button border border-soft-line bg-soft px-2.5 text-[12px] font-bold text-soft-ink [&_svg]:size-3.5`}
+      aria-label={`Remove filter: ${label}`}
+      onClick={onRemove}
+    >
+      {label}
+      <Icon name="x" />
+    </BaseButton>
+  );
+}
+
 /** How much of something is done, as a thin bar: Base UI's progress, named by `label` and read as a percentage. It is as wide as what holds it. */
 export function ProgressBar({ done, total, label }: { done: number; total: number; label: string }) {
   return (
@@ -116,17 +138,6 @@ export function ProgressBar({ done, total, label }: { done: number; total: numbe
         <Progress.Indicator className="block h-full rounded-[inherit] bg-primary" />
       </Progress.Track>
     </Progress.Root>
-  );
-}
-
-export function Breadcrumb({ current }: { current: string }) {
-  return (
-    <div className="mb-[15px] flex items-center gap-2 text-[13px] font-bold text-muted phone:mb-2.5 [&_svg]:size-3.5">
-      <Icon name={brand.icon} />
-      <span>{brand.game}</span>
-      <Icon name="right" />
-      <strong className="text-ink">{current}</strong>
-    </div>
   );
 }
 
@@ -202,12 +213,12 @@ export function Callout({ icon, children }: { icon: IconName; children: ReactNod
   );
 }
 
-/** A page's title, the line under it, and a figure in a pill under that (the dashboard's overall count). */
+/** A page's title, the line under it, and a figure in a pill under that (the dashboard's overall count). Compact on a phone, as a large title is. */
 export function PageHeading({ title, intro, stat }: { title: string; intro?: ReactNode; stat?: ReactNode }) {
   return (
-    <header className="mt-[7px] mb-5">
-      <h1 className="font-display text-[clamp(38px,5vw,58px)] leading-[1.17] font-bold tracking-[-0.015em]">{title}</h1>
-      {intro && <p className="mt-[5px] text-[14px] text-muted">{intro}</p>}
+    <header className="mt-[7px] mb-5 phone:mt-0 phone:mb-3.5">
+      <h1 className="font-display text-[clamp(38px,5vw,58px)] leading-[1.17] font-bold tracking-[-0.015em] phone:text-[30px] phone:leading-[1.15]">{title}</h1>
+      {intro && <p className="mt-[5px] text-[14px] text-muted phone:mt-1 phone:text-[13px] phone:leading-[1.45]">{intro}</p>}
       {stat && <span className="mt-[9px] inline-block rounded-tag bg-soft px-3 py-[3px] text-[12px] font-extrabold text-soft-ink">{stat}</span>}
     </header>
   );

@@ -55,3 +55,14 @@ export const Offline: Story = {
 
 /** Both at once, stacked. */
 export const Both: Story = { args: { toast: { id: 3, message: "Checked 3 steps.", undo: fn() }, update: "refresh" } };
+
+/** On a phone the toasts sit above the tab bar, not over it. */
+export const AboveTheTabBar: Story = {
+  args: { toast: { id: 2, message: "Checked 7 steps.", undo: fn() } },
+  globals: { viewport: { value: "phone", isRotated: false } },
+  play: async ({ canvasElement }) => {
+    const message = await page(canvasElement).findByText("Checked 7 steps.", {}, patient);
+    const toast = message.closest("[data-base-ui-toast], [role=dialog], [role=status], [role=alert]") ?? message;
+    await waitFor(() => expect(window.innerHeight - toast.getBoundingClientRect().bottom).toBeGreaterThanOrEqual(58 + 12), patient);
+  },
+};

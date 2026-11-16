@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { Link, useParams } from "react-router";
 import { Stat } from "../components/Stats";
 import { WhatsLeft } from "../components/WhatsLeft";
-import { Breadcrumb, Button, PageHeading, Panel, PanelActions, PanelText, PanelTitle, ProgressBar } from "../components/ui";
+import { Button, PageHeading, Panel, PanelActions, PanelText, PanelTitle, ProgressBar } from "../components/ui";
 import { CHAPTER_COUNT, chapterRows, chapters, completion, overallLine, text } from "../guide";
 import { two } from "../format";
 import { exportProgress } from "../backup";
@@ -25,7 +25,6 @@ export function DashboardPage() {
 
   return (
     <>
-      <Breadcrumb current="Progress" />
       <PageHeading title="Your progress" intro={text.dashboardIntro} stat={overallLine(data.checks)} />
       <div className="mb-3.5 grid grid-cols-[1.1fr_1fr] items-start gap-[13px] phone:grid-cols-1">
         <Panel>

@@ -1,7 +1,7 @@
-import { ChipGroup } from "@hundo/core/components/ui";
+import { ActiveFilter, ChipGroup } from "@hundo/core/components/ui";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState, type ComponentProps } from "react";
-import { expect, userEvent } from "storybook/test";
+import { expect, fn, userEvent } from "storybook/test";
 
 /** Holds the choice, as a page's filter does. */
 function Holder(args: ComponentProps<typeof ChipGroup>) {
@@ -71,5 +71,42 @@ export const Keyboard: Story = {
     await userEvent.keyboard(" ");
     await expect(hearts).toHaveAttribute("aria-pressed", "true");
     await expect(getComputedStyle(hearts).outlineWidth).toBe("3px");
+  },
+};
+
+/** The checklist's chips on a phone: one line that scrolls sideways, the last chip cut off at the edge to say there are more. */
+export const OneLine: Story = {
+  args: {
+    flow: "scroll",
+    choices: [
+      ["all", "All entries"],
+      ["heart", "Heart pieces"],
+      ["shell", "Secret shells"],
+      ["chest", "Treasure chests"],
+      ["trade", "Trading quest"],
+      ["missable", "Missable"],
+    ],
+  },
+  globals: { viewport: { value: "phone", isRotated: false } },
+  play: async ({ canvas }) => {
+    const group = canvas.getByRole("group", { name: "Checklist categories" });
+    await expect(group.scrollWidth).toBeGreaterThan(group.clientWidth);
+    await expect(canvas.getByRole("button", { name: "All entries" }).offsetTop).toBe(canvas.getByRole("button", { name: "Missable" }).offsetTop);
+    // The line scrolls, and a scrolling box cuts off what sticks out of it: it keeps room above and below for the focus ring (3px, 3px out).
+    const line = group.getBoundingClientRect();
+    const chip = canvas.getByRole("button", { name: "All entries" }).getBoundingClientRect();
+    await expect(chip.top - line.top).toBeGreaterThanOrEqual(6);
+    await expect(line.bottom - chip.bottom).toBeGreaterThanOrEqual(6);
+  },
+};
+
+const removed = fn();
+
+/** A filter that's on, under the checklist's search on a phone: a press turns it off. */
+export const Active: Story = {
+  render: () => <ActiveFilter label="Completed" onRemove={removed} />,
+  play: async ({ canvas }) => {
+    await userEvent.click(canvas.getByRole("button", { name: "Remove filter: Completed" }));
+    await expect(removed).toHaveBeenCalledOnce();
   },
 };

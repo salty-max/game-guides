@@ -5,8 +5,8 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { MemoryRouter } from "react-router";
 import { expect } from "storybook/test";
 
-// The top of a chapter: the palette's tint with the chapter's banner fading in on the right (above the words up to 1050px wide), its
-// number, region, title and intro, and the two buttons under them.
+// The top of a chapter: the palette's tint with the chapter's banner fading in on the right (above the words up to 1050px wide, fading
+// into the card at its foot), its number, region, title and intro, and the two buttons under them.
 const meta = {
   title: "Core/ChapterHero",
   component: ChapterHero,
@@ -45,3 +45,15 @@ export const WithBanner: Story = {
 
 /** A chapter with no banner yet: the tint alone. */
 export const NoBanner: Story = { args: { banner: undefined } };
+
+/** On a phone: the banner above the words, fading downwards into the card as it fades towards the words on a wide screen. */
+export const Phone: Story = {
+  globals: { viewport: { value: "phone", isRotated: false } },
+  play: async ({ canvasElement }) => {
+    const banner = canvasElement.querySelector("img");
+    await expect(banner).not.toBeNull();
+    const mask = getComputedStyle(banner!).maskImage;
+    await expect(mask).toContain("linear-gradient");
+    await expect(mask).toContain("to top");
+  },
+};

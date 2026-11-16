@@ -1,10 +1,15 @@
 // @vitest-environment node
-import { allRows, byId, cats, chapterRows, chapters, CHAPTER_COUNT, completion, config, guideAnchor, hasMissables, isCategory, missablesLeft, nextUp, readChapter, tally, whatsLeft } from "./guide";
+import { allRows, brand, byId, cats, chapterRows, chapters, CHAPTER_COUNT, completion, config, guideAnchor, hasMissables, isCategory, missablesLeft, nextUp, readChapter, tally, whatsLeft } from "./guide";
 
 const everything = Object.fromEntries(allRows.map((row) => [row.id, true as const]));
 const hosts = (urls: string[]) => new Set(urls.map((url) => new URL(url).host));
 
 describe("guide data", () => {
+  it("names the game in the page's title and description, the only places the game's full name is", () => {
+    expect(brand.title).toContain(brand.game);
+    expect(brand.description).toContain(brand.game);
+  });
+
   it("has its chapters in order, each with rows", () => {
     expect(chapters.map((chapter) => chapter.id)).toEqual(Array.from({ length: CHAPTER_COUNT }, (_, i) => i + 1));
     for (const chapter of chapters) expect(chapterRows(chapter).length, chapter.title).toBeGreaterThan(0);

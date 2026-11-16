@@ -11,6 +11,9 @@
      screen (the media queries below). */
   --safe-top:env(safe-area-inset-top,0px);--safe-right:env(safe-area-inset-right,0px);--safe-bottom:env(safe-area-inset-bottom,0px);--safe-left:env(safe-area-inset-left,0px);
   --bar:calc(var(--bar-h) + var(--safe-top));--rail-col:calc(var(--rail-w) + var(--safe-left));
+  /* The tab bar's height, the home indicator included: 0 where there is no tab bar (over 550px), so the page and the toasts keep clear
+     of the bar only where it is (MainNav.tsx, Layout). */
+  --tabs:0px;
   --line-soft:color-mix(in srgb,var(--line) 55%,var(--surface));
   --control-line:color-mix(in srgb,var(--ink) 20%,var(--surface));
   /* checkbox edges and other boundaries that must stand out at 3:1 */
@@ -49,6 +52,8 @@
 /* The rail narrows from 1040px. From 800px it is a drawer rather than a column, and the top bar is shorter. */
 @media (max-width:1040px){:root{--rail-w:224px}}
 @media (max-width:800px){:root{--bar-h:60px;--rail-w:250px}}
+/* From 550px the pages move into a bar across the bottom, and the top bar, now a title bar, is a little shorter. */
+@media (max-width:550px){:root{--bar-h:56px;--tabs:calc(58px + var(--safe-bottom))}}
 }
 
 /* Tailwind keeps its spacing, type scale, weights, breakpoints and motion. Its colours, radii, shadows and fonts are cleared, so

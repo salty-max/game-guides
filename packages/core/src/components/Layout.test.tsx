@@ -277,3 +277,112 @@ describe("the chapter drawer under 800px", () => {
     await waitFor(() => expect(document.getElementById("main")).toContainElement(document.activeElement as HTMLElement));
   });
 });
+
+describe("on a phone", () => {
+  // The widths the layout reads in JavaScript (useNarrow.ts): a phone is under both.
+  // The top bar: the first header (a page's own heading block is a header too, which jsdom also counts as a banner).
+  const topBar = () => screen.getAllByRole("banner")[0];
+  const phone = () =>
+    vi.spyOn(window, "matchMedia").mockImplementation(
+      (query: string) => ({ matches: /max-width: (550|800)px/.test(query), media: query, addEventListener() {}, removeEventListener() {} }) as unknown as MediaQueryList,
+    );
+
+  it("has the pages in one bar after the page, and no theme button in the top bar", async () => {
+    phone();
+    render(<App />);
+    await screen.findByRole("heading", { level: 1 });
+    const navs = screen.getAllByRole("navigation", { name: "Main navigation" });
+    expect(navs).toHaveLength(1);
+    // After the main area, as a phone's tab bar is, and not in the top bar.
+    expect(screen.getByRole("main").compareDocumentPosition(navs[0]) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(within(topBar()).queryByRole("link", { name: /Checklist/ })).toBeNull();
+    expect(screen.queryByRole("button", { name: /Switch to (dark|light) mode/ })).toBeNull();
+    expect(within(navs[0]).getByRole("link", { name: /Guide/ })).toHaveAttribute("aria-current", "page");
+  });
+
+  it("takes a page back to its top when its tab is pressed again, and leaves a modified click to the browser", async () => {
+    phone();
+    history.replaceState(null, "", "/checklist");
+    const user = userEvent.setup();
+    render(<App />);
+    await screen.findByRole("heading", { name: "Completion checklist" });
+    const scrolled = vi.spyOn(window, "scrollTo");
+    const tab = within(screen.getByRole("navigation", { name: "Main navigation" })).getByRole("link", { name: /Checklist/ });
+    await user.click(tab);
+    expect(scrolled).toHaveBeenCalledWith(expect.objectContaining({ top: 0 }));
+    expect(location.pathname).toBe("/checklist");
+
+    scrolled.mockClear();
+    const click = new MouseEvent("click", { bubbles: true, cancelable: true, ctrlKey: true });
+    act(() => void tab.dispatchEvent(click));
+    expect(scrolled).not.toHaveBeenCalled();
+  });
+
+  it("is a top bar of links on a wider screen, with the theme button", async () => {
+    render(<App />);
+    await screen.findByRole("heading", { level: 1 });
+    expect(within(topBar()).getByRole("navigation", { name: "Main navigation" })).toBeInTheDocument();
+    expect(screen.getAllByRole("navigation", { name: "Main navigation" })).toHaveLength(1);
+    expect(screen.getByRole("button", { name: /Switch to (dark|light) mode/ })).toBeInTheDocument();
+  });
+
+  it("puts the checklist's category, chapter and status in a sheet, and shows what's on as chips that turn it off", async () => {
+    phone();
+    history.replaceState(null, "", "/checklist");
+    const user = userEvent.setup();
+    render(<App />);
+    await screen.findByRole("heading", { name: "Completion checklist" });
+    // The chips and the search stay on the page; the selects don't.
+    expect(screen.getByRole("group", { name: "Checklist categories" })).toBeInTheDocument();
+    expect(screen.getByRole("searchbox")).toBeInTheDocument();
+    expect(screen.queryByRole("combobox", { name: "Status" })).toBeNull();
+
+    const filters = screen.getByRole("button", { name: "Filters" });
+    await user.click(filters);
+    const sheet = await screen.findByRole("dialog", { name: "Filters" });
+    await user.click(within(sheet).getByRole("combobox", { name: "Status" }));
+    await user.click(await screen.findByRole("option", { name: "Completed" }));
+    expect(document.querySelectorAll("#collection-status")).toHaveLength(1);
+    await user.click(within(sheet).getByRole("button", { name: /^Show \d+ match/ }));
+    await waitFor(() => expect(screen.queryByRole("dialog", { name: "Filters" })).toBeNull());
+    await waitFor(() => expect(filters).toHaveFocus());
+
+    expect(filters).toHaveTextContent("Filters · 1");
+    expect(filters).toHaveAccessibleName("Filters, 1 on");
+    await user.click(screen.getByRole("button", { name: "Remove filter: Completed" }));
+    expect(screen.queryByRole("button", { name: /Remove filter/ })).toBeNull();
+    expect(filters.textContent).toBe("Filters");
+    // The chip went with the focus on it: the focus is on the button that still says what's on, not on the document.
+    expect(filters).toHaveFocus();
+  });
+
+  it("closes the sheet when the window widens past a phone's, with the focus on the search field and one of each field", async () => {
+    // A stand-in that can change its mind, and tells its listeners when it does.
+    let wide = false;
+    const listeners = new Set<() => void>();
+    vi.spyOn(window, "matchMedia").mockImplementation(
+      (query: string) =>
+        ({
+          get matches() {
+            return !wide && /max-width: (550|800)px/.test(query);
+          },
+          media: query,
+          addEventListener: (_: string, listener: () => void) => listeners.add(listener),
+          removeEventListener: (_: string, listener: () => void) => listeners.delete(listener),
+        }) as unknown as MediaQueryList,
+    );
+    history.replaceState(null, "", "/checklist");
+    const user = userEvent.setup();
+    render(<App />);
+    await screen.findByRole("heading", { name: "Completion checklist" });
+    await user.click(screen.getByRole("button", { name: "Filters" }));
+    await screen.findByRole("dialog", { name: "Filters" });
+
+    wide = true;
+    act(() => listeners.forEach((listener) => listener()));
+    await waitFor(() => expect(screen.queryByRole("dialog", { name: "Filters" })).toBeNull());
+    await waitFor(() => expect(screen.getByRole("searchbox")).toHaveFocus());
+    expect(document.querySelectorAll("#collection-status")).toHaveLength(1);
+    expect(screen.getAllByRole("navigation", { name: "Main navigation" })).toHaveLength(1);
+  });
+});

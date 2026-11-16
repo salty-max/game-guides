@@ -43,9 +43,10 @@
 @custom-variant tiny (@media (max-width: 360px));
 
 @layer base {
-  /* A link or a "jump to" that scrolls the page lands clear of the top bar. */
+  /* A link or a "jump to" that scrolls the page lands clear of the top bar, and so does a row the focus moves to. On a phone the same goes
+     for the tab bar at the bottom, which covers the page in a browser tab (in the app it is outside the area that scrolls). */
   html {
-    @apply scroll-pt-[calc(var(--bar)+24px)];
+    @apply scroll-pt-[calc(var(--bar)+24px)] scroll-pb-(--tabs);
   }
 
   /* The app is a fixed frame: the top bar and the rail stay put and only the content area scrolls (Layout), so the page behind

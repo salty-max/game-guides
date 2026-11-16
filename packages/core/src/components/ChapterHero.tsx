@@ -5,14 +5,15 @@ import type { Chapter } from "../types";
 
 /**
  * The top of a chapter: a tint from the guide's palette with the chapter's banner fading in on the right, its number, region, title and
- * intro, and `children`, the buttons under them. Up to 1050px wide the banner stacks above the words; on a phone the intro goes.
+ * intro, and `children`, the buttons under them. Up to 1050px wide the banner stacks above the words and fades into the card at its
+ * foot, as it fades at its left beside them; on a phone the intro goes. The banner is 3:1, as its stacked frame is, so nothing is cut.
  */
 export function ChapterHero({ chapter, banner, children }: { chapter: Chapter; banner?: string; children: ReactNode }) {
   return (
     <section className="relative isolate flex min-h-[245px] items-center overflow-hidden rounded-hero border border-line bg-[linear-gradient(120deg,var(--hero-from),var(--hero-to))] px-[clamp(23px,4vw,49px)] py-[22px] stack:block stack:min-h-0 stack:p-0 phone:rounded-card">
       {banner && (
         <img
-          className="absolute top-0 right-0 -z-1 h-full w-[68%] mask-[linear-gradient(to_right,transparent_9%,#000_66%)] object-cover object-[76%_center] stack:static stack:block stack:aspect-3/1 stack:h-auto stack:w-full stack:mask-none"
+          className="absolute top-0 right-0 -z-1 h-full w-[68%] mask-[linear-gradient(to_right,transparent_9%,#000_66%)] object-cover object-[76%_center] stack:static stack:block stack:aspect-3/1 stack:h-auto stack:w-full stack:mask-[linear-gradient(to_top,transparent_4%,#000_62%)]"
           src={banner}
           alt=""
           width={1800}
