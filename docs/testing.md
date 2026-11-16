@@ -69,7 +69,7 @@ CI's `lighthouse` job audits each guide's production build with Lighthouse on ev
 | Cumulative layout shift | all | 0.15 at most | the median run |
 | Performance, largest contentful paint | each page | its own floor and limit, from main's baseline less a margin for noise (provisional: measured on an M-series Mac, not yet on GitHub's runner) | the median run |
 
-axe's `target-size` audit is skipped for now, and every other accessibility audit counts. It reported rows passing under the phone's tab bar at the bottom of the screen as targets too small to press, and Echoes' 22px links on Progress. Once those are settled the skip goes.
+Every accessibility audit counts, axe's `target-size` (WCAG 2.2's 24px targets) included. It once failed on main for two reasons, both fixed in core on 16 Nov 2026: rows passing under the phone's tab bar at the fold, which axe counts as covered by the bar's links while the bar is `sticky` but not once it is `fixed` ([core.md](core.md#the-installed-app)), and What's left's 22px category links on Progress, now 24px.
 
 **Run it locally.** At the root:
 
