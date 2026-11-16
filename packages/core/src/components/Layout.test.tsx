@@ -1,6 +1,5 @@
 import { act, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { panels } from "virtual:guide/panels";
 import { App } from "../App";
 import { defaultState } from "../progress-state";
 import { CHAPTER_COUNT, cats } from "../guide";
@@ -21,57 +20,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-  delete document.documentElement.dataset.standalone;
   vi.restoreAllMocks();
-});
-
-const installed = () => {
-  document.documentElement.dataset.standalone = "";
-};
-
-describe("a way back in the installed app", () => {
-  it("is there once the reader has moved, takes them back, and goes when they are where they began", async () => {
-    installed();
-    const user = userEvent.setup();
-    render(<App />);
-    await screen.findByRole("heading", { level: 1 });
-    expect(screen.queryByRole("button", { name: "Back" })).toBeNull();
-
-    await user.click(screen.getByRole("link", { name: /Checklist/ }));
-    expect(await screen.findByRole("heading", { name: "Completion checklist" })).toBeInTheDocument();
-    await user.click(screen.getByRole("button", { name: "Back" }));
-    await waitFor(() => expect(location.pathname).toBe("/guide/1"));
-    await waitFor(() => expect(screen.queryByRole("button", { name: "Back" })).toBeNull());
-    // The button had the focus when it went, and the focus isn't left to fall to the page. (Here Layout's own page-change effect takes it
-    // for <main>; the hand-off to the brand is the next test, at an address where the page takes none.)
-    expect(document.body).not.toHaveFocus();
-  });
-
-  // A dashboard panel's address only scrolls to the panel: Layout leaves the focus alone for an address that points at something, and the
-  // page takes none, so the hand-off from the Back button that goes while pressed is all that keeps it off the document. (Echoes has no panel.)
-  const atAPanel = panels.length > 0 ? it : it.skip;
-  atAPanel("hands the focus to the brand when it goes while pressed and the page it returns to takes none", async () => {
-    installed();
-    const address = `/dashboard/${panels[0]?.id}`;
-    history.replaceState(null, "", address);
-    const user = userEvent.setup();
-    render(<App />);
-    await screen.findByRole("heading", { level: 1 });
-    await user.click(screen.getByRole("link", { name: /Checklist/ }));
-    await screen.findByRole("heading", { name: "Completion checklist" });
-    await user.click(screen.getByRole("button", { name: "Back" }));
-    await waitFor(() => expect(location.pathname).toBe(address));
-    await waitFor(() => expect(screen.queryByRole("button", { name: "Back" })).toBeNull());
-    await waitFor(() => expect(screen.getByRole("link", { name: /home$/ })).toHaveFocus());
-  });
-
-  it("is not in a browser tab, which has its own", async () => {
-    const user = userEvent.setup();
-    render(<App />);
-    await user.click(await screen.findByRole("link", { name: /Checklist/ }));
-    await screen.findByRole("heading", { name: "Completion checklist" });
-    expect(screen.queryByRole("button", { name: "Back" })).toBeNull();
-  });
 });
 
 describe("the colour of the strip above the page", () => {
@@ -467,7 +416,7 @@ describe("on a phone", () => {
       (query: string) => ({ matches: /max-width: (550|800)px/.test(query), media: query, addEventListener() {}, removeEventListener() {} }) as unknown as MediaQueryList,
     );
 
-  it("has the pages in one bar after the page, and no theme button in the top bar", async () => {
+  it("has the pages in one bar after the page, and the theme button in the top bar", async () => {
     phone();
     render(<App />);
     await screen.findByRole("heading", { level: 1 });
@@ -476,7 +425,7 @@ describe("on a phone", () => {
     // After the main area, as a phone's tab bar is, and not in the top bar.
     expect(screen.getByRole("main").compareDocumentPosition(navs[0]) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(within(topBar()).queryByRole("link", { name: /Checklist/ })).toBeNull();
-    expect(screen.queryByRole("button", { name: /Switch to (dark|light) mode/ })).toBeNull();
+    expect(within(topBar()).getByRole("button", { name: /Switch to (dark|light) mode/ })).toBeInTheDocument();
     expect(within(navs[0]).getByRole("link", { name: /Guide/ })).toHaveAttribute("aria-current", "page");
   });
 

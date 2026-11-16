@@ -20,8 +20,8 @@ export const Focused: Story = {
 };
 
 /**
- * `tooltip`: the label also shows in a small box under the button for a pointer or the keyboard (the theme toggle and Back in the top
- * bar). The page mounts the one tooltip they share (TooltipHost); a screen reader still reads the button's own name.
+ * `tooltip`: the label also shows in a small box under the button for a pointer or the keyboard (the theme toggle in the top
+ * bar). The page mounts the one tooltip every such button shares (TooltipHost); a screen reader still reads the button's own name.
  */
 export const WithTooltip: Story = {
   args: { label: "Switch to dark mode", icon: "moon", tooltip: true },
