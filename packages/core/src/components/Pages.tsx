@@ -1,6 +1,6 @@
 import { Activity, memo, useState, type ReactNode } from "react";
 import { Routes, useLocation, type Location } from "react-router";
-import { Arrival, useReturning, Visible } from "../store/place";
+import { Arrival, Showing, useReturning } from "../store/place";
 
 // The pages that are kept, one of each: the start address and any the guide doesn't know are the guide's (Home sends them to a chapter).
 const views = ["guide", "checklist", "dashboard", "sources"] as const;
@@ -17,6 +17,8 @@ interface Kept {
   returning: boolean;
   /** A new visit builds the page afresh: the history entry it began at. */
   since: string;
+  /** How many times it has come on screen (store/place.ts's Showing). */
+  showing: number;
 }
 
 interface Shown {
@@ -42,7 +44,8 @@ export function Pages({ children }: { children: ReactNode }) {
   const arrived = (before: Shown | null): Shown => {
     const kept = before?.pages[view];
     const fresh = !kept || (!returning && view !== before?.view);
-    return { pages: { ...before?.pages, [view]: { location, returning, since: fresh ? location.key : kept.since } }, key: location.key, view };
+    const showing = (kept?.showing ?? 0) + (view !== before?.view ? 1 : 0);
+    return { pages: { ...before?.pages, [view]: { location, returning, since: fresh ? location.key : kept.since, showing } }, key: location.key, view };
   };
   const [shown, setShown] = useState<Shown>(() => arrived(null));
   // A move: this render draws the new address at once (React renders again with the state set here before it shows anything).
@@ -56,10 +59,10 @@ export function Pages({ children }: { children: ReactNode }) {
 }
 
 /** One kept page: drawn again only when its own address, or whether it is on screen, changes. */
-const Page = memo(function Page({ location, returning, since, visible, routes }: Kept & { visible: boolean; routes: ReactNode }) {
+const Page = memo(function Page({ location, returning, since, showing, visible, routes }: Kept & { visible: boolean; routes: ReactNode }) {
   return (
     <Activity mode={visible ? "visible" : "hidden"}>
-      <Visible value={visible}>
+      <Showing value={visible ? showing : null}>
         <Arrival value={returning}>
           {/* One element, so Activity hides the page with one style, and the pages' own first and last children stay theirs. */}
           <div>
@@ -68,7 +71,7 @@ const Page = memo(function Page({ location, returning, since, visible, routes }:
             </Routes>
           </div>
         </Arrival>
-      </Visible>
+      </Showing>
     </Activity>
   );
 });

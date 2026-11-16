@@ -313,7 +313,7 @@ describe("coming back to a page", () => {
     await screen.findByRole("heading", { name: "Your progress" });
     act(() => history.forward());
     await screen.findByRole("heading", { name: "Completion checklist" });
-    await waitFor(() => expect(screen.queryByRole("listbox")).toBeNull());
+    expect(screen.queryByRole("listbox")).toBeNull();
   });
 
   it("keeps the checklist's filters for a reader coming back from another tab", async () => {
@@ -545,12 +545,12 @@ describe("on a phone", () => {
     await user.click(within(screen.getByRole("navigation", { name: "Main navigation" })).getByRole("link", { name: /Checklist/ }));
     await user.click(await screen.findByRole("button", { name: "Filters" }));
     await screen.findByRole("dialog", { name: "Filters" });
-    // Back, which the sheet doesn't stop.
+    // Back, which the sheet doesn't stop, and Forward, whenever React gets round to drawing the hidden page.
     act(() => history.back());
     await screen.findByRole("heading", { name: "Your progress" });
     act(() => history.forward());
     await screen.findByRole("heading", { name: "Completion checklist" });
-    await waitFor(() => expect(screen.queryByRole("dialog", { name: "Filters" })).toBeNull());
+    expect(screen.queryByRole("dialog", { name: "Filters" })).toBeNull();
   });
 
   it("closes the sheet when the window widens past a phone's, with the focus on the search field and one of each field", async () => {

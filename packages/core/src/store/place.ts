@@ -98,9 +98,13 @@ export const entryOffset = (key: string) => entries.get(key);
  */
 export const Arrival = createContext<boolean | null>(null);
 
-/** Whether a page Pages keeps is the one on screen, not one kept out of sight. */
-export const Visible = createContext(true);
-export const useVisible = () => useContext(Visible);
+/**
+ * Which showing of a page Pages keeps this is: a number that changes each time the page comes back on screen, null while it is out of
+ * sight. Something open on a page (a sheet) remembers the showing it was opened in and is closed in any other, so the page never comes
+ * back behind it: a hidden page only learns it was hidden in a render React may not have run yet when it comes back. Outside Pages, 0.
+ */
+export const Showing = createContext<number | null>(0);
+export const useShowing = () => useContext(Showing);
 
 /**
  * Whether the page being shown is one the reader is coming back to: Back or Forward (the router's POP, which is also the first page of a
