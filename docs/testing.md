@@ -14,7 +14,7 @@
 - `pnpm build` runs `tsc` and `vite build` per app, which is what Vercel runs.
 - `services/sync` is a package too, so `pnpm check` runs its lint, typecheck and tests (`pnpm -C services/sync test` alone). Its store contract also runs against real Upstash when `SYNC_TEST_REDIS_URL` and `SYNC_TEST_REDIS_TOKEN` name a test database ([its README](../services/sync/README.md#run-it)).
 
-CI (`.github/workflows/ci.yml`) runs the same four steps after `pnpm install --frozen-lockfile`, on every pull request and every push to `main`. A red CI and a green `pnpm check` on your machine usually means a lockfile left out of the commit or a file that isn't committed.
+CI (`.github/workflows/ci.yml`) runs the same four steps after `pnpm install --frozen-lockfile`, on every pull request and every push to `main`, and a [Lighthouse](#lighthouse) job per guide beside them. A red CI and a green `pnpm check` on your machine usually means a lockfile left out of the commit or a file that isn't committed.
 
 ## What the tests hold every guide to
 
@@ -47,6 +47,49 @@ Each guide's own `guide.test.ts` adds its totals, its legacy saves, its extra st
 - **No Tailwind classes in a story.** Tailwind only reads core's `.tsx` files, so a `className="flex gap-3"` in a story renders unstyled and raises no error. Lay a story out with inline `style`, as `Button.stories.tsx` does, or use core's own components.
 - Nothing in `packages/stories` reaches a guide's bundle, and a change to the stories alone doesn't rebuild a guide on Vercel. A change to the package's dependencies does, because it rewrites `pnpm-lock.yaml`, which each guide's ignore command watches, and so does the sync API's (`hundo-api`, `services/sync/scripts/vercel-ignore.sh`, which also watches the root `package.json`). Every guide's Vercel install and the API's (`pnpm install --frozen-lockfile`) also install the whole workspace, Storybook included; no browser is downloaded.
 - The pnpm workspace's `allowBuilds` records that esbuild's install script isn't run: an unanswered one makes `pnpm install --frozen-lockfile` exit 1.
+
+## Lighthouse
+
+CI's `lighthouse` job audits each guide's production build with Lighthouse on every pull request and every push to `main`, beside the four checks. A regression fails the pull request, as an axe violation in the stories does.
+
+**What runs.** One job per guide, so the three don't share a CPU and one failing doesn't stop the others. Each one builds its guide (`pnpm --filter hundo-<name> build`), serves `dist` with `vite preview` inside the runner, and runs Lighthouse CI (`@lhci/cli`, pinned at 0.16.1 in the root `package.json`, which pins Lighthouse 13.6.0) on the runner's own Google Chrome. The job prints Chrome's version, and the summary names its major version: the runner image updates it, so a jump in every number at once can be a new Chrome. `lighthouse/run.mjs` does all of it, and `pnpm lighthouse` runs that same script on a laptop.
+
+- **Pages:** `/guide/1`, `/checklist` (the heaviest page: Red Dead's has 307 rows) and `/dashboard` (Progress) on a phone, which is Lighthouse's default (a 412×823 screen, a slow 4G network and a four-times-slower CPU, all simulated), and `/checklist` again on a desktop. The desktop run's URL ends in `#desktop`: the app ignores the hash, and Lighthouse CI keeps it in the URL it groups runs by, which is how the thresholds tell the two apart.
+- **Runs:** three of each, so twelve per guide. Every run starts from an empty save: a reader with half of Red Dead ticked is never measured.
+- **Not audited here:** Vercel's headers and CDN (`vite preview` sends no CSP, so a CSP violation never shows as a console error here: [deploying.md](deploying.md#preview-first) covers headers on a preview), the service worker's offline mode and the manifest (Lighthouse 13 has no PWA category any more; the `guide-deploy` skill checks them), Lighthouse's new agentic browsing category, and byte budgets, which there are none of on purpose.
+
+**What it's held to.** `lighthouse/lighthouserc.mjs`, whose comments give each number's reason:
+
+| Assertion | Pages | Threshold | Runs it reads |
+| --- | --- | --- | --- |
+| Accessibility | all | 100 | the worst of three |
+| Best practices | all | 100 | the worst |
+| SEO | all | 92, until the guides serve a `robots.txt` | the worst |
+| Total blocking time | all | 300 ms at most | the median run |
+| Cumulative layout shift | all | 0.15 at most | the median run |
+| Performance, largest contentful paint | each page | its own floor and limit, from main's baseline less a margin for noise (provisional: measured on an M-series Mac, not yet on GitHub's runner) | the median run |
+
+axe's `target-size` audit is skipped for now, and every other accessibility audit counts. It reported rows passing under the phone's tab bar at the bottom of the screen as targets too small to press, and Echoes' 22px links on Progress. Once those are settled the skip goes.
+
+**Run it locally.** At the root:
+
+```bash
+pnpm lighthouse
+```
+
+```bash
+pnpm lighthouse rdr,echoes --no-build
+```
+
+The first builds and audits every guide, about two minutes each on an M-series Mac; the second audits two guides' existing `dist`. It uses the system Google Chrome (`CHROME_PATH` names another) and leaves the reports in `.cache/lighthouse/<guide>/report`, one HTML and one JSON per run, named after the page and its hash (`checklist-desktop-…` for the desktop runs, `-unknown-` where a phone run has no hash), and `manifest.json` saying which is each page's median. It isn't part of `pnpm check`, which stays fast. A laptop is faster than the runner: the table's `cpu` column is Lighthouse's benchmark of the machine (about 3,200 on an M-series Mac), and speed numbers from a faster machine pass more easily.
+
+**Read a failure.** The job log, and the run's summary page, end with a table of the median runs (performance, accessibility, best practices and SEO scores, LCP, TBT, CLS, `cpu`) and one line per failed assertion: `<guide> <page>: <audit>: <rule>, was <value>`. The run's artifacts hold `lighthouse-<guide>`, every run's report, for 14 days: open the HTML for the page that failed.
+
+- **Accessibility, best practices or SEO:** these don't depend on the machine. The report names the element and the audit. Fix the page.
+- **Performance, LCP or TBT:** look at `cpu` first. Far below the runner's usual figure means a slow machine: rerun the job. If it fails again at a normal `cpu`, the change made the page slower. The report's diagnostics say where the time went.
+- **A threshold that needs to move** moves in `lighthouserc.mjs`, in the pull request that needs it, with its reason in the comment beside it and the user's go.
+
+Checked on an M-series Mac on 16 Nov 2026, with `pnpm lighthouse koholint` and uncommitted edits reverted afterwards: an image without `alt` added to the page template and a 400 ms busy loop at start-up, built into Koholint, failed accessibility, SEO, performance and TBT on all four of its pages (and LCP on three) and exited 1. The same run on main's code passed.
 
 ## In a browser
 

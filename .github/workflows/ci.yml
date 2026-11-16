@@ -1,6 +1,7 @@
 # Every pull request and every push to main: the same four checks as `pnpm check`,
 # run from the root over every package. Vercel builds each app on its own, so this
-# is the one place that checks all three guides, and core against each of them.
+# is the one place that checks all three guides, and core against each of them. Beside them, Lighthouse audits
+# each guide's production build.
 name: CI
 
 on:
@@ -34,3 +35,33 @@ jobs:
       - run: pnpm typecheck
       - run: pnpm test
       - run: pnpm build
+
+  # Lighthouse on each guide's production build, served by `vite preview` in the runner: the same run as `pnpm lighthouse`, held to
+  # lighthouse/lighthouserc.mjs (docs/testing.md#lighthouse). One guide per job, so the three don't share a CPU, and none stops the
+  # others when it fails.
+  lighthouse:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        guide: [koholint, rdr, echoes]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 26
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      # (Lighthouse CI uses the runner's own Chrome, which the runner image updates: its version is in the summary)
+      - run: google-chrome --version
+      - run: pnpm lighthouse ${{ matrix.guide }}
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: ${{ !cancelled() }}
+        with:
+          name: lighthouse-${{ matrix.guide }}
+          path: .cache/lighthouse/${{ matrix.guide }}/report
+          # (.cache is a hidden folder, which upload-artifact leaves out unless told)
+          include-hidden-files: true
+          retention-days: 14

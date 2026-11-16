@@ -22,6 +22,7 @@ Each app's history from its old repository is kept under its folder, so `git log
 
   Its `vite.config.ts` is a single call to `guideConfig`.
 - **`services/sync`** is the sync API, a small server of its own: it lets a reader's devices share a guide's progress through a six-digit code, with no account. It is a separate Vercel project, `hundo-api`, at `api.hundo.quest` ([its README](services/sync/README.md)).
+- **`lighthouse/`**: the Lighthouse audit every pull request runs on each guide's production build, its thresholds (`lighthouserc.mjs`) and the script that runs it ([docs/testing.md](docs/testing.md#lighthouse)).
 - **`docs/`**: how to do each recurring task (below).
 - **`harness/`**, `harness.toml`, `.claude/`: the git hooks, the task board and the review helpers sessions work under. The rules are in [CLAUDE.md](CLAUDE.md).
 
@@ -58,7 +59,7 @@ pnpm check
 pnpm --filter hundo-koholint dev
 ```
 
-`pnpm check` runs `pnpm lint`, `pnpm typecheck`, `pnpm test` and `pnpm build`, each across every package (`pnpm -r`). Lint fails on warnings. Inside an app folder, `pnpm dev`, `pnpm build`, `pnpm preview`, `pnpm test` and `pnpm icons` work on that guide alone. `pnpm screenshots` at the root retakes every guide's install-dialog pictures from its production build ([docs/core.md](docs/core.md#the-installed-app)).
+`pnpm check` runs `pnpm lint`, `pnpm typecheck`, `pnpm test` and `pnpm build`, each across every package (`pnpm -r`). Lint fails on warnings. Inside an app folder, `pnpm dev`, `pnpm build`, `pnpm preview`, `pnpm test` and `pnpm icons` work on that guide alone. `pnpm screenshots` at the root retakes every guide's install-dialog pictures from its production build ([docs/core.md](docs/core.md#the-installed-app)). `pnpm lighthouse` runs CI's Lighthouse audit on every guide, or `pnpm lighthouse rdr` on one ([docs/testing.md](docs/testing.md#lighthouse)).
 
 ```bash
 pnpm --filter hundo-stories storybook
