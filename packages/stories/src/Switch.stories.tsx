@@ -44,6 +44,17 @@ export const Keyboard: Story = {
   },
 };
 
+/** Turning it on is one step: the thumb's slide and its fill, and the track's fill and edge, ease over the same 150ms. */
+export const OneStep: Story = {
+  play: async ({ canvas }) => {
+    const toggle = canvas.getByRole("switch", { name: "Keep screen on" });
+    await userEvent.click(toggle);
+    const clock = (element: Element) => [getComputedStyle(element).transitionProperty, getComputedStyle(element).transitionDuration];
+    await expect(clock(toggle.firstElementChild!)).toEqual(["translate, background-color", "0.15s"]);
+    await expect(clock(toggle)).toEqual(["color, background-color, border-color, box-shadow", "0.15s"]);
+  },
+};
+
 /** Clicking the words turns it on too: the whole 44px line is the target. */
 export const LabelClick: Story = {
   play: async ({ canvas }) => {

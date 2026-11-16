@@ -28,6 +28,12 @@ const preview: Preview = {
   // components, not the stand-ins shown while they load.
   loaders: [async () => void (await Promise.all(Object.values(chunks).map((chunk) => chunk.load())))],
   decorators: [withGuide],
+  // A story that ends on a change (a segment chosen, a box ticked) leaves the control's colours easing for 150ms (press-style.ts). This
+  // runs before axe's check, so axe reads the colours they end on, not one on the way.
+  afterEach: async () => {
+    const easing = document.getAnimations().filter((animation) => animation instanceof CSSTransition);
+    await Promise.all(easing.map((animation) => animation.finished.catch(() => undefined)));
+  },
   initialGlobals: { guide: "koholint", theme: "light" },
   globalTypes: {
     guide: {

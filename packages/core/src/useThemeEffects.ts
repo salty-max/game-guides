@@ -55,15 +55,32 @@ export function useChromeColor(dim: boolean) {
   }, [resolved, dim]);
 }
 
+/**
+ * Puts the theme on the root. A change of theme lands everywhere in the same frame: until the next frame has been drawn the root says
+ * so, and a pressable control, whose colours otherwise ease (press-style.ts), takes its new ones at once instead of lagging behind the
+ * page. Returns what clears that early, or nothing when the theme was already there (theme-init.js set it before the first paint).
+ */
+export function applyTheme(theme: "light" | "dark") {
+  const root = document.documentElement;
+  if (root.dataset.theme === theme) return;
+  root.dataset.themeSwitch = "";
+  root.dataset.theme = theme;
+  let frame = requestAnimationFrame(() => {
+    frame = requestAnimationFrame(() => delete root.dataset.themeSwitch);
+  });
+  return () => {
+    cancelAnimationFrame(frame);
+    delete root.dataset.themeSwitch;
+  };
+}
+
 /** Mirror the theme to the document, keep every tab in sync through storage events, ask to keep storage, and keep the screen on if asked. */
 export function useGlobalEffects() {
   const resolved = useResolvedTheme();
 
   // A layout effect: every layout effect runs before any passive one, and useChromeColor (a passive effect in Layout, a child of the
   // component that calls this) reads the colours of the theme this sets.
-  useLayoutEffect(() => {
-    document.documentElement.dataset.theme = resolved;
-  }, [resolved]);
+  useLayoutEffect(() => applyTheme(resolved), [resolved]);
 
   useEffect(() => {
     const onStorage = (event: StorageEvent) => {
