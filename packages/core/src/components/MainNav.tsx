@@ -1,6 +1,6 @@
 import { NavigationMenu } from "@base-ui/react/navigation-menu";
 import { cva } from "class-variance-authority";
-import type { MouseEvent } from "react";
+import { useState, type MouseEvent } from "react";
 import { Link, useLocation } from "react-router";
 import { Icon } from "./Icon";
 import { pages } from "../nav";
@@ -18,7 +18,7 @@ const root = cva("", {
     place: {
       top: "ml-[-42px] justify-self-center drawer:ml-0",
       bottom:
-        "sticky bottom-0 z-10 h-(--tabs) border-t border-line bg-surface pr-(--safe-right) pb-(--safe-bottom) pl-(--safe-left) text-ink [view-transition-name:tab-bar] pointer-coarse:in-[body:has(input:not([type=checkbox],[type=radio]):focus)]:hidden standalone:relative standalone:flex-none standalone:select-none standalone:[-webkit-touch-callout:none]",
+        "sticky bottom-0 z-10 h-(--tabs) border-t border-line bg-surface pr-(--safe-right) pb-(--safe-bottom) pl-(--safe-left) text-ink pointer-coarse:in-[body:has(input:not([type=checkbox],[type=radio]):focus)]:hidden standalone:relative standalone:flex-none standalone:select-none standalone:[-webkit-touch-callout:none]",
     },
   },
 });
@@ -45,10 +45,11 @@ const icon = cva("", {
   },
 });
 
+// A new tab or window (a modifier, or not the main button) is the browser's business.
+const elsewhere = (event: MouseEvent<HTMLAnchorElement>) => event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey;
+
 /** A press on the bottom bar's link to the page you're on: back to that page's top, and nowhere else. */
 function scrollUp(event: MouseEvent<HTMLAnchorElement>) {
-  // A new tab or window (a modifier, or not the main button) is the browser's business.
-  if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
   event.preventDefault();
   const behavior = matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth";
   // In the installed app the main area scrolls, not the page.
@@ -66,7 +67,12 @@ interface MainNavProps {
 
 /** Guide, Checklist and Progress: Base UI's navigation menu, its links the router's. The current page is marked for a screen reader too. */
 export function MainNav({ chapter, view, place }: MainNavProps) {
-  const { pathname } = useLocation();
+  const { pathname, key } = useLocation();
+  // The link pressed, marked at once: the router moves in a transition, which keeps the page and the address as they were until the new
+  // page is drawn, and the bar would say nothing until then. Forgotten as the address moves (to that page, or anywhere else).
+  const [pressed, setPressed] = useState<{ id: string; at: string } | null>(null);
+  if (pressed && pressed.at !== key) setPressed(null);
+  const current = pressed?.id ?? view;
   const data = useProgress((s) => s.data);
   // Each page's link goes back to it as the reader left it (store/place.ts): the checklist at its last address (a category, a chapter),
   // unless that chapter is hidden now, and every page at its scroll offset and with its filters.
@@ -80,10 +86,15 @@ export function MainNav({ chapter, view, place }: MainNavProps) {
           return (
             <NavigationMenu.Item key={id}>
               <NavigationMenu.Link
-                active={view === id}
+                active={current === id}
                 className={link({ place })}
-                // A tap on the tab of the page you're on takes you to its top, as a phone's tab bar does.
-                onClick={place === "bottom" && to === pathname ? scrollUp : undefined}
+                onClick={(event) => {
+                  if (elsewhere(event)) return;
+                  // A tap on the tab of the page you're on takes you to its top, as a phone's tab bar does.
+                  if (place === "bottom" && to === pathname) scrollUp(event);
+                  // (a press back on the page's own tab, while another is still on its way, unmarks that one)
+                  else setPressed(id === view ? null : { id, at: key });
+                }}
                 render={<Link to={to} state={{ restore: true }} />}
               >
                 <Icon name={name} className={icon({ place })} />

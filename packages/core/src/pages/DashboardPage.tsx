@@ -19,7 +19,7 @@ export function DashboardPage() {
   const persisted = usePersistence((s) => s.persisted);
   const visible = chapters.filter((chapter) => isOpen(data, chapter.id));
 
-  // A layout effect, so the panel is in view before the page change takes its picture (Layout).
+  // A layout effect, so the panel is in view before the page is shown (Layout); it runs again as a kept page comes back (Pages).
   useLayoutEffect(() => {
     if (section && panels.some((panel) => panel.id === section)) document.getElementById(section)?.scrollIntoView({ block: "start" });
   }, [section]);

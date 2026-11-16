@@ -75,7 +75,24 @@ Remove the base checkout afterwards with `git worktree remove <scratchpad>/base`
 
 When the user has to choose between looks, build one page that draws every option in all three guides' palettes, fonts and art, and ask through the question tool (a child sends the options to its opener, which asks). That's how the house style was picked.
 
-## 6. What this can't check
+## 6. Speed of a page change
+
+For a change to how pages are drawn or switched (the router, `Pages`, a page's mount), time it before and after, the base from the checkout in section 5:
+
+```bash
+node .claude/skills/guide-check/scripts/tab-switch.mjs --root <scratchpad>/base --out <scratchpad>/perf --label before
+```
+
+```bash
+node .claude/skills/guide-check/scripts/tab-switch.mjs --out <scratchpad>/perf --label after
+```
+
+- `tab-switch.mjs` walks the phone tab bar in production builds (Chrome at 4x and 6x CPU, Playwright's WebKit): per switch, the tab lit, the page committed, painted and settled, long tasks, the longest frame gap, a tick on the checklist, and the page's weight. `--video` counts blank frames in WebKit's recording; `--vt off` removes `document.startViewTransition` (only telling on a build that still has a view transition).
+- `tab-trace.mjs` traces one warm Guide → Checklist switch in Chrome at 6x and sums the main thread's work, and, given an unminified build (`vite build --minify false`), the JavaScript by function.
+- `reveal-probe.mjs` times revealing the checklist in WebKit with one suspect (`:has()`, the hidden inputs, transitions, shadows, rows' `content-visibility`) taken away at a time.
+- `sim-tabs.mjs` runs the same walk in the iOS simulator's Safari, behind a proxy that puts the timing script first in the page; record the screen with `xcrun simctl io <device> recordVideo` alongside. Shut down only the simulator you booted.
+
+## 7. What this can't check
 
 - The service worker, offline mode and the update prompt.
 - The CSP and the cache headers.

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { createContext, useContext, useState } from "react";
 import { useLocation, useNavigationType } from "react-router";
 import { brand, cats, hasMissables, readChapter, statusOptions } from "../guide";
 import { isOpen, useProgress } from "./progress";
@@ -93,13 +93,24 @@ export const offsetOf = (place: string) => memory.get(place)?.y;
 export const entryOffset = (key: string) => entries.get(key);
 
 /**
+ * What useReturning said when a page's address arrived, for the pages Pages keeps (components/Pages.tsx): each is drawn at an address of
+ * its own, which the router always reports as a POP, so the page can't ask the router.
+ */
+export const Arrival = createContext<boolean | null>(null);
+
+/** Whether a page Pages keeps is the one on screen, not one kept out of sight. */
+export const Visible = createContext(true);
+export const useVisible = () => useContext(Visible);
+
+/**
  * Whether the page being shown is one the reader is coming back to: Back or Forward (the router's POP, which is also the first page of a
  * visit), or a tab of the bar. Anything else is a new visit to a page, which starts at its top with its filters as the address says.
  */
 export function useReturning() {
+  const arrival = useContext(Arrival);
   const type = useNavigationType();
   const { state } = useLocation();
-  return type === "POP" || (state as { restore?: boolean } | null)?.restore === true;
+  return arrival ?? (type === "POP" || (state as { restore?: boolean } | null)?.restore === true);
 }
 
 /**

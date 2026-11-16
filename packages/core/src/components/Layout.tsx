@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState, ViewTransition, type ReactNode } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { useLocation, useNavigationType } from "react-router";
 import { chunks, loadFailed } from "./chunks";
 import { DialogHost } from "./DialogHost";
@@ -99,8 +99,7 @@ export function Layout({ children }: { children: ReactNode }) {
   // Moving to a new page: back to where the reader left it if they are coming back to it (Back or Forward to that very entry, a tab of the
   // bar, a launch that reopens the last place), its top otherwise, and the focus in <main>. An address that points at something to scroll
   // to (a guide section or entry, or a dashboard panel) is left to the page, unless Back returns to it, where it was left wins. A layout
-  // effect, so the page is where it belongs before it is shown, and in the picture the page change animates in. It runs after the
-  // page's own effects, so it has the last word.
+  // effect, so the page is where it belongs before it is shown. It runs after the page's own effects, so it has the last word.
   const pop = useNavigationType() === "POP";
   useLayoutEffect(() => {
     if (shown.current === key) return;
@@ -165,11 +164,7 @@ export function Layout({ children }: { children: ReactNode }) {
           // scrollbar and the wheel then belong to the window's edges) and --center is the margin that centring would have made.
           className="mx-auto w-full max-w-[1460px] min-w-0 pt-6 pr-[calc(var(--gutter)+var(--center,0px)+var(--safe-right))] pb-[calc(var(--pad-end)+var(--safe-bottom))] pl-[calc(var(--gutter)+var(--center,0px))] outline-none [--gutter:clamp(23px,3.25vw,53px)] [--pad-end:50px] standalone:max-w-none standalone:scroll-pt-6 standalone:overflow-y-auto standalone:overscroll-contain standalone:[--center:max(0px,calc((100%-1460px)/2))] drawer:pt-[18px] drawer:pl-[calc(var(--gutter)+var(--safe-left))] drawer:[--gutter:18px] drawer:[--pad-end:30px] phone:pt-[13px] phone:pb-(--pad-end) phone:[--gutter:12px] phone:[--pad-end:25px]"
         >
-          {/* Moving to another page animates (app.css): the page going out, the one coming in. Keyed by the place, so a filter or an
-              address within the same page changes nothing. One element, so one picture for the browser to take. */}
-          <ViewTransition key={place} enter="page-in" exit="page-out" default="none">
-            <div>{children}</div>
-          </ViewTransition>
+          {children}
         </main>
       </div>
       {phone && <MainNav chapter={chapter} view={view} place="bottom" />}

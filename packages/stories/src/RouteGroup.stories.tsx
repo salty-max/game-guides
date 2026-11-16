@@ -78,3 +78,14 @@ export const TickRow: Story = {
     await expect(box).not.toBeChecked();
   },
 };
+
+/** On the checklist (`origin`): each step links back to its chapter, and no step has the id a link to it points at, which belongs to the
+ * chapter's own page, kept beside the checklist (Pages). */
+export const OnTheChecklist: Story = {
+  args: { origin: true, groupKey: "index-1", fallbackFocusId: "collection-status" },
+  play: async ({ canvasElement }) => {
+    const row = group.rows[0];
+    await expect(canvasElement.ownerDocument.getElementById(`entry-${row.id}`)).toBeNull();
+    await expect(within(canvasElement).getAllByRole("link", { name: new RegExp(`in chapter ${row.chapter}`) })[0]).toHaveAttribute("href", `/guide/${row.chapter}/${row.id}`);
+  },
+};

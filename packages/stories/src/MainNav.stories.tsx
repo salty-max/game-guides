@@ -2,7 +2,8 @@ import { MainNav } from "@hundo/core/components/MainNav";
 import { cats } from "@hundo/core/guide";
 import { arrive, forgetPlaces } from "@hundo/core/store/place";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { MemoryRouter } from "react-router";
+import { use } from "react";
+import { MemoryRouter, Route, Routes, useLocation } from "react-router";
 import { expect, within } from "storybook/test";
 
 // Guide, Checklist and Progress. From 551px up they are links in the top bar (TopBar's stories show them there); on a phone, a tab bar
@@ -83,5 +84,40 @@ export const BackToTheChecklist: Story = {
     const nav = canvas.getByRole("navigation", { name: "Main navigation" });
     await expect(within(nav).getByRole("link", { name: "Guide" })).toHaveAttribute("aria-current", "page");
     await expect(within(nav).getByRole("link", { name: "Checklist" })).toHaveAttribute("href", `/checklist/${category}`);
+  },
+};
+
+// A page that never finishes drawing: the move to it stays pending, the way a slow page's does.
+const never = new Promise<never>(() => {});
+function Pending() {
+  use(never);
+  return null;
+}
+
+function Bar() {
+  const view = useLocation().pathname.split("/")[1] || "guide";
+  return (
+    <>
+      <MainNav chapter={1} view={view} place="bottom" />
+      <Routes>
+        <Route path="/checklist" element={<p>The checklist</p>} />
+        <Route path="/dashboard" element={<Pending />} />
+      </Routes>
+    </>
+  );
+}
+
+/** A tab pressed is marked at once, before its page is drawn (the router moves in a transition, which keeps the old page meanwhile). */
+export const PressedBeforeItsPage: Story = {
+  args: { place: "bottom" },
+  globals: { viewport: { value: "phone", isRotated: false } },
+  render: () => <Bar />,
+  play: async ({ canvas, userEvent }) => {
+    const nav = canvas.getByRole("navigation", { name: "Main navigation" });
+    await userEvent.click(within(nav).getByRole("link", { name: "Progress" }));
+    await expect(within(nav).getByRole("link", { name: "Progress" })).toHaveAttribute("aria-current", "page");
+    await expect(within(nav).getByRole("link", { name: "Checklist" })).not.toHaveAttribute("aria-current");
+    // The old page is still the one on screen.
+    await expect(canvas.getByText("The checklist")).toBeVisible();
   },
 };

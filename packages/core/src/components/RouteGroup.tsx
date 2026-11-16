@@ -40,7 +40,8 @@ export const RouteRow = memo(function RouteRow({ row, prefix, highlighted, origi
   const badges = row.tags.filter((entry) => entry !== tag && config.badges?.includes(entry));
 
   return (
-    <div className={routeRow({ tone: highlighted ? "highlight" : checked ? "done" : "plain" })} id={`entry-${row.id}`}>
+    // On the checklist the row isn't what a link points at, and its chapter's page, which is, may be kept beside it (Pages).
+    <div className={routeRow({ tone: highlighted ? "highlight" : checked ? "done" : "plain" })} id={origin ? undefined : `entry-${row.id}`}>
       <CheckBox id={boxId} labelId={labelId} row={row} fallbackFocusId={fallbackFocusId} />
       <div>
         {/* The label stretches over the whole row, so the row is the tap target; the box and the link sit above it. */}
