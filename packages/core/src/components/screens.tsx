@@ -4,6 +4,7 @@ import { Checkbox, FileField, RadioGroup, Switch } from "./controls";
 // The settings screen is in the dialog's chunk, so it uses the select itself: the shell's stand-in would flash while the select loaded.
 import { SelectImpl as Select } from "./select-impl";
 import { DialogDescription, DialogFooter, DialogSeparator, DialogStatus, DialogText } from "./dialog";
+import { StorageWarning } from "./StorageWarning";
 import { Button } from "./ui";
 import { brand, chapters, readChapter, text } from "../guide";
 import { exportProgress } from "../backup";
@@ -73,7 +74,6 @@ function InstallSection() {
 /** Theme, how far the guide reveals, keeping the screen on (where the browser can), the progress backup, and installing the guide. */
 export function SettingsScreen() {
   const data = useProgress((s) => s.data);
-  const storageError = useProgress((s) => s.storageError);
   const preference = useTheme((s) => s.preference);
   const keptAwake = useAwake((s) => s.on);
   const closeDialogThen = useUi((s) => s.closeDialogThen);
@@ -153,7 +153,7 @@ export function SettingsScreen() {
           Installed on a phone or tablet? The installed app can keep its own separate storage. Export here first, then import in the installed app.
         </DialogText>
       )}
-      {storageError && <DialogText error>Browser storage is unavailable. Export a backup before closing this tab.</DialogText>}
+      <StorageWarning />
       <FileField id="import-file" label="Import progress backup" accept=".json,application/json" onChange={(file) => void pickFile(file)} />
       <DialogStatus error={feedback.error}>{feedback.text}</DialogStatus>
       <DialogFooter>

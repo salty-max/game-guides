@@ -2,9 +2,11 @@ import { useEffect, useEffectEvent, useRef, useState, type ReactNode } from "rea
 import { CodeField } from "./controls";
 import { DialogDescription, DialogFooter, DialogSeparator, DialogStatus, DialogText } from "./dialog";
 import { ItemList, ItemRow } from "./list";
+import { StorageWarning } from "./StorageWarning";
 import { Button } from "./ui";
 import { ago } from "../format";
 import { installed } from "../persistence";
+import { useProgress } from "../store/progress";
 import { setSyncStatus, useSyncStatus, type SyncPhase } from "../store/sync";
 import { useUi } from "../store/ui";
 import { syncAfterLinking, syncSoon } from "../sync/engine";
@@ -95,11 +97,15 @@ interface Said {
 }
 
 function Off({ onShow, onEnter, busy, said }: { onShow: () => void; onEnter: () => void; busy: boolean; said: Said | null }) {
+  // Where the browser won't keep the progress, the warning above says it isn't saved, so this screen doesn't say it is.
+  const unavailable = useProgress((s) => s.storageError);
   return (
     <View>
+      <StorageWarning withExport />
       <DialogDescription>Keep this guide’s progress the same on your other devices. No account needed.</DialogDescription>
       <DialogText>
-        Show a code on one device and type it on the other. Linking works for every Hundo guide in this browser, and from then on changes follow by themselves.
+        {!unavailable && "Your progress is already saved on this device. "}To share it, show a code here and type it on your other device, or type the code that device
+        shows. Linking works for every Hundo guide in this browser, and from then on changes follow by themselves.
       </DialogText>
       {isApple() && (
         <DialogText small>
@@ -289,6 +295,7 @@ function Linked({
 
   return (
     <View>
+      <StorageWarning withExport />
       <DialogDescription>This device keeps its progress in step with your other devices, with no account.</DialogDescription>
       <DialogStatus error={busy ? false : said ? said.error : phase === "error"}>{busy ? "Working…" : said ? said.text : statusLine(phase, count, lastSync)}</DialogStatus>
       <ItemList label="Linked devices" empty={devices === "failed" ? "Couldn’t load the list of devices. Check your connection." : "Loading the devices…"}>

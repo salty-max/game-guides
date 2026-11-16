@@ -7,12 +7,14 @@ import { useSyncStatus } from "../store/sync";
 import { useUi } from "../store/ui";
 import { afterLinked, checkStatus, claimCode, forgetGroup, removeDevice, startCode, unlinkDevice } from "../sync/pairing";
 import { syncSoon } from "../sync/engine";
+import { exportProgress } from "../backup";
 import { allowSlowMounts } from "../test/slow";
 import { ago } from "../format";
 
 allowSlowMounts();
 
 vi.mock("../sync/engine", async (original) => ({ ...(await original<typeof import("../sync/engine")>()), syncSoon: vi.fn() }));
+vi.mock("../backup", async (original) => ({ ...(await original<typeof import("../backup")>()), exportProgress: vi.fn() }));
 
 vi.mock("../sync/pairing", () => ({
   startCode: vi.fn(),
@@ -438,17 +440,82 @@ describe("on an iPhone, where each guide on the Home Screen keeps its own link",
 });
 
 describe("where it is opened from", () => {
-  it("is the topbar's status for a linked device, which says how sync stands, and the settings' otherwise", async () => {
-    const user = userEvent.setup();
+  it("is the topbar's status, which is named for where it leads and says how sync stands", async () => {
     render(<App />);
     act(() => useSyncStatus.setState({ phase: "synced", devices: 2, lastSync: Date.now() }));
-    const status = await screen.findByRole("button", { name: "Progress saved. Synced. Open sync" });
+    const status = await screen.findByRole("button", { name: "Progress saved. Synced. Open sync devices" });
     expect(status).toHaveTextContent("Progress saved · Synced");
     act(() => useSyncStatus.setState({ phase: "offline" }));
     expect(status).toHaveAttribute("data-error");
+    expect(status).toHaveAccessibleName("Progress saved. Offline. Open sync devices");
     act(() => useSyncStatus.setState({ phase: "off" }));
-    await user.click(await screen.findByRole("button", { name: "Progress saved. Open progress settings" }));
-    expect(await screen.findByRole("dialog", { name: "Guide settings" })).toBeInTheDocument();
+    expect(status).toHaveAccessibleName("Progress saved. Open sync devices");
+    expect(status).not.toHaveAttribute("data-error");
+    act(() => useProgress.setState({ storageError: true }));
+    expect(status).toHaveAccessibleName("Storage unavailable. Open sync devices");
+    expect(status).toHaveTextContent("Storage unavailable");
+    expect(status).toHaveAttribute("data-error");
+  });
+
+  it.each([
+    ["a linked device", { phase: "synced" as const, devices: 2, lastSync: NOW }, false, "Progress saved. Synced. Open sync devices"],
+    ["a device that isn't linked", { phase: "off" as const, devices: 0, lastSync: null }, false, "Progress saved. Open sync devices"],
+    ["a device that isn't linked, when storage is unavailable", { phase: "off" as const, devices: 0, lastSync: null }, true, "Storage unavailable. Open sync devices"],
+    ["a linked device, when storage is unavailable", { phase: "synced" as const, devices: 2, lastSync: NOW }, true, "Storage unavailable. Open sync devices"],
+  ])("opens the Sync screen, and not the settings, for %s", async (_, status, storageError, name) => {
+    const user = userEvent.setup();
+    pairing.checkStatus.mockResolvedValue(group(Date.now()));
+    render(<App />);
+    act(() => {
+      useSyncStatus.setState(status);
+      useProgress.setState({ storageError });
+    });
+    await user.click(await screen.findByRole("button", { name }));
+    const dialog = await screen.findByRole("dialog", { name: "Sync devices" });
+    expect(screen.queryByRole("dialog", { name: "Guide settings" })).not.toBeInTheDocument();
+    const warning = within(dialog).queryByText("Browser storage is unavailable. Export a backup before closing this tab.");
+    if (!storageError) {
+      expect(warning).not.toBeInTheDocument();
+      return expect(within(dialog).queryByRole("button", { name: "Export progress" })).not.toBeInTheDocument();
+    }
+    // at the top: before the paragraph that says what the screen is for, with the backup it asks for in reach
+    expect(warning).toBeInTheDocument();
+    expect(warning!.compareDocumentPosition(within(dialog).getByText(/in step with your other devices|same on your other devices/)) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    await user.click(within(dialog).getByRole("button", { name: "Export progress" }));
+    expect(exportProgress).toHaveBeenCalledTimes(1);
+  });
+
+  it("doesn't say the progress is saved on this device where the browser won't keep it", async () => {
+    const saved = /Your progress is already saved on this device/;
+    const dialog = await open();
+    expect(within(dialog).getByText(saved)).toBeInTheDocument();
+    cleanup();
+    useUi.setState({ dialog: null });
+    render(<App />);
+    act(() => {
+      useProgress.setState({ storageError: true });
+      useUi.getState().openDialog({ kind: "sync" });
+    });
+    const unavailable = await screen.findByRole("dialog", { name: "Sync devices" });
+    expect(within(unavailable).queryByText(saved)).not.toBeInTheDocument();
+    expect(within(unavailable).getByText(/To share it, show a code here and type it on your other device/)).toBeInTheDocument();
+  });
+
+  it("says what syncing is and how to link on the first screen", async () => {
+    const dialog = await open();
+    expect(dialog).toHaveAccessibleDescription(/same on your other devices. No account needed/);
+    expect(within(dialog).getByText(/Your progress is already saved on this device. To share it, show a code here and type it on your other device, or type the code that device shows/)).toBeInTheDocument();
+    expect(within(dialog).getByText(/from then on changes follow by themselves/)).toBeInTheDocument();
+  });
+
+  it("has the settings carry the storage warning in the same words", async () => {
+    render(<App />);
+    act(() => {
+      useProgress.setState({ storageError: true });
+      useUi.getState().openDialog({ kind: "settings" });
+    });
+    const settings = await screen.findByRole("dialog", { name: "Guide settings" });
+    expect(within(settings).getByText("Browser storage is unavailable. Export a backup before closing this tab.")).toBeInTheDocument();
   });
 
   it("is a button in the settings, which also says that an import follows to the other devices", async () => {
