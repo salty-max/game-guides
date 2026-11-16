@@ -75,7 +75,7 @@ describe("the installed app in app.css", () => {
   it("changes nothing in a browser tab: every rule that makes the page a frame is behind the variant or the mark", () => {
     // The base layer's global rules are the only hand-written ones; each either is one of the page's own defaults, which every page has
     // (the scroll padding under the top bar, the body's type and colours, the native controls' colour, a button's pointer, the focus
-    // ring, reduced motion) and none of what makes a frame, or is keyed on the mark.
+    // ring, reduced motion) and none of what makes a frame, or is keyed on the mark, or draws the page transition.
     const base = /@layer base \{([\s\S]*?)\n\}\n/.exec(app)?.[1] ?? "";
     const rules = base.replace(/\/\*[\s\S]*?\*\//g, "").split("}").map((rule) => rule.trim()).filter(Boolean);
     expect(rules.length).toBeGreaterThan(4);
@@ -87,7 +87,9 @@ describe("the installed app in app.css", () => {
       const everyPage = pageWide.includes(selector) && !frame.test(body);
       const onlyApp = /standalone:/.test(body.replace(/@apply /, "")) && !body.split(/\s+/).some((cls) => cls !== "@apply" && !cls.startsWith("standalone:"));
       const marked = selector.startsWith("[data-standalone]");
-      expect(everyPage || onlyApp || marked, `"${selector}" would apply in a browser tab`).toBe(true);
+      // The page transition's pictures and their animations exist only while the page changes, and touch nothing of the frame.
+      const transition = (selector.startsWith("::view-transition-") || selector.startsWith("@keyframes page-")) && !frame.test(body);
+      expect(everyPage || onlyApp || marked || transition, `"${selector}" would apply in a browser tab`).toBe(true);
     }
   });
 

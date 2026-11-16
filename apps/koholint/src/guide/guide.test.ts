@@ -3,6 +3,7 @@ import { STORAGE_KEY, defaultState, validateState } from "@hundo/core/progress-s
 import { readRunLog } from "./run-log";
 import { THEME_KEY } from "@hundo/core/store/theme";
 import { AWAKE_KEY } from "@hundo/core/store/awake";
+import { PLACE_KEY } from "@hundo/core/store/place";
 import { SYNC_KEY } from "@hundo/core/sync/local";
 import { flatten, viewFrom } from "@hundo/core/sync/fields";
 import type { Entries } from "@hundo/core/sync/ledger";
@@ -58,6 +59,7 @@ describe("storage", () => {
     expect(STORAGE_KEY).toBe("koholint-field-guide.v1");
     expect(THEME_KEY).toBe("koholint-field-guide.theme");
     expect(AWAKE_KEY).toBe("koholint-field-guide.awake");
+    expect(PLACE_KEY).toBe("koholint-field-guide.place");
     expect(SYNC_KEY).toBe("koholint-field-guide.sync");
   });
 });

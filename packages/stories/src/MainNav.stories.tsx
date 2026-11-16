@@ -1,10 +1,13 @@
 import { MainNav } from "@hundo/core/components/MainNav";
+import { cats } from "@hundo/core/guide";
+import { arrive, forgetPlaces } from "@hundo/core/store/place";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { MemoryRouter } from "react-router";
 import { expect, within } from "storybook/test";
 
 // Guide, Checklist and Progress. From 551px up they are links in the top bar (TopBar's stories show them there); on a phone, a tab bar
-// across the bottom of the screen, each page's icon over its name, the current one tinted in the guide's own corners.
+// across the bottom of the screen, each page's icon over its name, the current one tinted in the guide's own corners. Each link goes back
+// to its page as the reader left it (store/place.ts).
 const meta = {
   title: "Core/MainNav",
   component: MainNav,
@@ -56,5 +59,29 @@ export const Bottom: Story = {
       .filter((rule): rule is CSSMediaRule => rule instanceof CSSMediaRule && rule.conditionText.includes("pointer: coarse"))
       .flatMap((rule) => walk(rule.cssRules).map((inner) => inner.cssText));
     await expect(touchRules.some((text) => text.includes("body:has(input") && text.includes(":focus") && text.includes("display: none"))).toBe(true);
+  },
+};
+
+const category = Object.keys(cats)[0];
+
+/** Away from the checklist, its tab goes back to the last checklist address the reader was on: here, one category's. */
+export const BackToTheChecklist: Story = {
+  args: { place: "bottom", view: "guide" },
+  globals: { viewport: { value: "phone", isRotated: false } },
+  decorators: [
+    (Story) => (
+      <div style={{ display: "flex", flexDirection: "column", justifyContent: "flex-end", minHeight: "100dvh" }}>
+        <Story />
+      </div>
+    ),
+  ],
+  beforeEach: () => {
+    arrive(`/checklist/${category}`, "story", false);
+    return () => forgetPlaces();
+  },
+  play: async ({ canvas }) => {
+    const nav = canvas.getByRole("navigation", { name: "Main navigation" });
+    await expect(within(nav).getByRole("link", { name: "Guide" })).toHaveAttribute("aria-current", "page");
+    await expect(within(nav).getByRole("link", { name: "Checklist" })).toHaveAttribute("href", `/checklist/${category}`);
   },
 };

@@ -107,7 +107,7 @@ export interface Brand {
   /** Document and social title. */
   title: string;
   description: string;
-  /** Storage keys are `<prefix>.v1` (progress), `<prefix>.theme`, `<prefix>.sync` (a synced device's ledger) and `<prefix>.awake` (Keep screen on). */
+  /** Storage keys are `<prefix>.v1` (progress), `<prefix>.theme`, `<prefix>.sync` (a synced device's ledger), `<prefix>.awake` (Keep screen on) and `<prefix>.place` (the last place read). */
   storagePrefix: string;
   backupFile: string;
   /** The word in the header brand, above "HUNDO". */

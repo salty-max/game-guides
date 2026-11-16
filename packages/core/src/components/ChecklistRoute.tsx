@@ -5,6 +5,7 @@ import { Button, ChipGroup, Empty } from "./ui";
 import { chapterRows, config, hasMissables, statusOptions } from "../guide";
 import { useProgress } from "../store/progress";
 import { useUi } from "../store/ui";
+import { isFilter, isStatus, useKept } from "../store/place";
 import type { Chapter } from "../types";
 
 const routeChips: [string, string][] = [["all", "All steps"], ...(config.chips.route ?? []), ...(hasMissables ? [["missable", "Missable"] as [string, string]] : [])];
@@ -14,8 +15,9 @@ export function ChecklistRoute({ chapter, target, footer }: { chapter: Chapter; 
   const checks = useProgress((s) => s.data.checks);
   const openGroups = useUi((s) => s.openGroups);
   const setGroupsOpen = useUi((s) => s.setGroupsOpen);
-  const [filter, setFilter] = useState("all");
-  const [status, setStatus] = useState("all");
+  // Kept while the guide is open, for a reader coming back to the chapter; an address that points at an entry starts afresh, so it shows.
+  const [filter, setFilter] = useKept("route-category", "all", isFilter, !target);
+  const [status, setStatus] = useKept("route-status", "all", isStatus, !target);
   const [highlighted, setHighlighted] = useState(target?.startsWith("entry-") ? target.slice("entry-".length) : "");
 
   const rows = chapterRows(chapter);

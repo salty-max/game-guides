@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState, type ReactNode } from "react";
-import { useLocation } from "react-router";
+import { useEffect, useLayoutEffect, useRef, useState, ViewTransition, type ReactNode } from "react";
+import { useLocation, useNavigationType } from "react-router";
 import { chunks, loadFailed } from "./chunks";
 import { DialogHost } from "./DialogHost";
 import { MainNav } from "./MainNav";
@@ -11,6 +11,7 @@ import { guideAnchor, readChapter } from "../guide";
 import { panels } from "virtual:guide/panels";
 import { useLoadable, whenIdle } from "../loadable";
 import { isOpen, useProgress } from "../store/progress";
+import { arrive, entryOffset, offsetOf, placeOf, savePlace, scrolled, useReturning } from "../store/place";
 import { useUi } from "../store/ui";
 import { isNarrow, useNarrow, usePhone } from "../useNarrow";
 import { useChromeColor } from "../useThemeEffects";
@@ -26,7 +27,7 @@ function viewOf(pathname: string) {
  * only the main area scrolls.
  */
 export function Layout({ children }: { children: ReactNode }) {
-  const { pathname } = useLocation();
+  const { pathname, key } = useLocation();
   const chapter = useProgress((s) => s.data.chapter);
   const announcement = useUi((s) => s.announcement);
   const dialogOpen = useUi((s) => s.dialog !== null);
@@ -63,26 +64,59 @@ export function Layout({ children }: { children: ReactNode }) {
   );
   const mainRef = useRef<HTMLElement>(null);
   const menuToggle = useRef<HTMLButtonElement>(null);
-  const firstRender = useRef(true);
+  // The history entry last shown: an effect run again for the same one (React does that in development) changes nothing.
+  const shown = useRef<string | null>(null);
   const { view, param, entry } = viewOf(pathname);
   const activeChapter = readChapter(param, chapter);
   const guideTarget = view === "guide" && guideAnchor(activeChapter, entry);
   const targetedGuide = useProgress((s) => Boolean(guideTarget && isOpen(s.data, activeChapter)));
   const targeted = targetedGuide || (view === "dashboard" && panels.some((panel) => panel.id === param));
+  const place = placeOf(pathname, chapter);
+  const returning = useReturning();
 
-  // Moving to a new page: reset scroll and focus <main>, unless the URL points at something
-  // to scroll to (a guide section or entry, or a dashboard panel).
+  // Where the reader is on each page, as they scroll (the window in a browser tab, the main area in the installed app), and the place
+  // saved as the guide goes into the background, for the next launch (store/place.ts).
   useEffect(() => {
-    if (firstRender.current) {
-      firstRender.current = false;
-      return;
-    }
-    if (targeted) return;
-    window.scrollTo(0, 0);
+    const onScroll = (event: Event) => {
+      const main = mainRef.current;
+      if (event.target === document) scrolled(window.scrollY);
+      else if (main && event.target === main) scrolled(main.scrollTop);
+    };
+    const onHide = () => {
+      if (document.visibilityState === "hidden") savePlace();
+    };
+    // A scroll doesn't bubble: the main area's is caught on its way down.
+    document.addEventListener("scroll", onScroll, { capture: true, passive: true });
+    document.addEventListener("visibilitychange", onHide);
+    window.addEventListener("pagehide", savePlace);
+    return () => {
+      document.removeEventListener("scroll", onScroll, { capture: true });
+      document.removeEventListener("visibilitychange", onHide);
+      window.removeEventListener("pagehide", savePlace);
+    };
+  }, []);
+
+  // Moving to a new page: back to where the reader left it if they are coming back to it (Back or Forward to that very entry, a tab of the
+  // bar, a launch that reopens the last place), its top otherwise, and the focus in <main>. An address that points at something to scroll
+  // to (a guide section or entry, or a dashboard panel) is left to the page, unless Back returns to it, where it was left wins. A layout
+  // effect, so the page is where it belongs before it is shown, and in the picture the page change animates in. It runs after the
+  // page's own effects, so it has the last word.
+  const pop = useNavigationType() === "POP";
+  useLayoutEffect(() => {
+    if (shown.current === key) return;
+    const first = shown.current === null;
+    shown.current = key;
+    arrive(place, key, returning);
+    const left = pop ? entryOffset(key) : undefined;
+    if (targeted && left === undefined) return;
+    const offset = left ?? (returning ? offsetOf(place) : undefined);
+    // The first page of a visit keeps the focus where the browser put it, and is scrolled only to a place being reopened.
+    if (first && offset === undefined) return;
+    window.scrollTo(0, offset ?? 0);
     // In the installed app the main area scrolls, not the page.
-    mainRef.current?.scrollTo(0, 0);
-    mainRef.current?.focus({ preventScroll: true });
-  }, [pathname, targeted]);
+    mainRef.current?.scrollTo(0, offset ?? 0);
+    if (!first && !targeted) mainRef.current?.focus({ preventScroll: true });
+  }, [key, place, pop, returning, targeted]);
 
   return (
     <>
@@ -131,7 +165,11 @@ export function Layout({ children }: { children: ReactNode }) {
           // scrollbar and the wheel then belong to the window's edges) and --center is the margin that centring would have made.
           className="mx-auto w-full max-w-[1460px] min-w-0 pt-6 pr-[calc(var(--gutter)+var(--center,0px)+var(--safe-right))] pb-[calc(var(--pad-end)+var(--safe-bottom))] pl-[calc(var(--gutter)+var(--center,0px))] outline-none [--gutter:clamp(23px,3.25vw,53px)] [--pad-end:50px] standalone:max-w-none standalone:scroll-pt-6 standalone:overflow-y-auto standalone:overscroll-contain standalone:[--center:max(0px,calc((100%-1460px)/2))] drawer:pt-[18px] drawer:pl-[calc(var(--gutter)+var(--safe-left))] drawer:[--gutter:18px] drawer:[--pad-end:30px] phone:pt-[13px] phone:pb-(--pad-end) phone:[--gutter:12px] phone:[--pad-end:25px]"
         >
-          {children}
+          {/* Moving to another page animates (app.css): the page going out, the one coming in. Keyed by the place, so a filter or an
+              address within the same page changes nothing. One element, so one picture for the browser to take. */}
+          <ViewTransition key={place} enter="page-in" exit="page-out" default="none">
+            <div>{children}</div>
+          </ViewTransition>
         </main>
       </div>
       {phone && <MainNav chapter={chapter} view={view} place="bottom" />}

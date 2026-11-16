@@ -9,6 +9,7 @@ import { allRows, CHAPTER_COUNT, cats, chapters, config, hasMissables, isCategor
 import { two } from "../format";
 import { useLoadable, whenIdle } from "../loadable";
 import { isOpen, useProgress } from "../store/progress";
+import { isChapterFilter, isFilter, isStatus, isText, useKept } from "../store/place";
 import { isPhone, usePhone } from "../useNarrow";
 
 // The Missable filter only exists once something is actually flagged.
@@ -29,12 +30,15 @@ export function ChecklistPage() {
 function ChecklistView() {
   const { category, chapter: chapterParam } = useParams();
   const data = useProgress((s) => s.data);
-  const [filter, setFilter] = useState(isCategory(category) || (hasMissables && category === "missable") ? category! : "all");
-  const [chapterFilter, setChapterFilter] = useState(() =>
-    chapterParam && isOpen(data, readChapter(chapterParam)) ? String(readChapter(chapterParam)) : "all",
+  // Kept while the guide is open, so a reader coming back from another tab (or with Back) finds the list as they left it.
+  const [filter, setFilter] = useKept("category", isCategory(category) || (hasMissables && category === "missable") ? category! : "all", isFilter);
+  const [chapterFilter, setChapterFilter] = useKept(
+    "chapter",
+    () => (chapterParam && isOpen(data, readChapter(chapterParam)) ? String(readChapter(chapterParam)) : "all"),
+    isChapterFilter,
   );
-  const [status, setStatus] = useState("all");
-  const [query, setQuery] = useState("");
+  const [status, setStatus] = useKept("status", "all", isStatus);
+  const [query, setQuery] = useKept("query", "", isText);
   // On a phone the category, chapter and status are in a sheet, behind one button (the chips and the search stay on the page).
   const phone = usePhone();
   const [sheetOpen, setSheetOpen] = useState(false);
