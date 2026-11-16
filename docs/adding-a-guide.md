@@ -47,7 +47,7 @@ Delete what's Echoes' own:
 - `backupFile`: the name of the exported JSON file.
 - `mark`: the word in the header, above "HUNDO".
 - `icon`: any name from `packages/core/src/components/Icon.tsx`.
-- `game` (the breadcrumb root) and `publisher` (named in the rail's small print: "Unofficial fan guide, not affiliated with …").
+- `game` (the game's full name, which the `title` and `description` must contain: no page shows it on its own, and `data.test.ts` checks it) and `publisher` (named in the rail's small print: "Unofficial fan guide, not affiliated with …").
 - `corners` and `fonts`: [house-style.md](house-style.md#fonts-and-corners).
 - `home`: the guide's address, `https://<sub>.hundo.quest`. The subdomain is chosen per guide, and the folder and package follow it (`apps/rdr`, `hundo-rdr`, `rdr.hundo.quest`). `movedFrom` stays out of a new guide; it's only for a guide that changes address ([deploying.md](deploying.md#pitfalls)).
 

@@ -3,8 +3,8 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { MemoryRouter } from "react-router";
 import { expect } from "storybook/test";
 
-// The bar across the top of every page. Under 800px its layout changes (the menu button, the pages as icons over words), which a story
-// can't show: the media queries look at the window, not at the story. The phone layout is checked in the browser (docs/testing.md).
+// The bar across the top of every page. From 800px down to 551px the menu button comes in and the pages shrink to icons over words; on a
+// phone the bar is a title bar (the Phone story, at a phone's width): the pages move to the tab bar (MainNav) and the theme to the settings.
 const meta = {
   title: "Core/TopBar",
   component: TopBar,
@@ -32,3 +32,15 @@ export const Guide: Story = {
 export const Checklist: Story = { args: { view: "checklist" } };
 
 export const Progress: Story = { args: { view: "dashboard" } };
+
+/** On a phone: the menu, the guide's name and the save status. No pages and no theme button, which are in the tab bar and the settings. */
+export const Phone: Story = {
+  globals: { viewport: { value: "phone", isRotated: false } },
+  play: async ({ canvas }) => {
+    await expect(canvas.getByRole("button", { name: "Open chapters" })).toBeVisible();
+    await expect(canvas.queryByRole("navigation", { name: "Main navigation" })).toBeNull();
+    await expect(canvas.queryByRole("button", { name: /Switch to (dark|light) mode/ })).toBeNull();
+    await expect(canvas.getByRole("link", { name: /home$/ })).toBeVisible();
+    await expect(canvas.getByRole("button", { name: "Open chapters" }).getBoundingClientRect().height).toBe(44);
+  },
+};

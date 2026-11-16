@@ -1,5 +1,5 @@
 import { ExternalLink } from "../components/SourceLinks";
-import { Breadcrumb, PageHeading, Panel, PanelTitle } from "../components/ui";
+import { PageHeading, Panel, PanelTitle } from "../components/ui";
 import { chapters, config, text } from "../guide";
 import { isOpen, useProgress } from "../store/progress";
 
@@ -11,7 +11,6 @@ export function SourcesPage() {
   const revealed = chapters.filter((chapter) => isOpen(data, chapter.id) && chapter.sources.length);
   return (
     <>
-      <Breadcrumb current="Sources" />
       <PageHeading title="Sources and maps" intro={text.sourcesIntro} />
       {config.sources.length > 0 && (
         <Panel>

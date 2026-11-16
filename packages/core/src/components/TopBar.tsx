@@ -3,12 +3,14 @@ import { cva } from "class-variance-authority";
 import { useCallback, useEffect, useRef, type RefObject } from "react";
 import { Link, useLocation, useNavigate } from "react-router";
 import { Icon } from "./Icon";
+import { MainNav } from "./MainNav";
 import { IconButton } from "./ui";
 import { brand } from "../guide";
 import { useProgress } from "../store/progress";
 import { useTheme } from "../store/theme";
 import { useSyncStatus, type SyncPhase } from "../store/sync";
 import { useUi } from "../store/ui";
+import { usePhone } from "../useNarrow";
 import { useResolvedTheme } from "../useThemeEffects";
 import { press } from "./press-style";
 
@@ -62,7 +64,7 @@ function SaveStatus() {
   // A linked device opens the Sync screen from here, where the settings are one button away; one that isn't opens the settings as before.
   return (
     <BaseButton
-      className={`${press} flex min-h-10 items-center gap-2 rounded-control border border-control-line bg-transparent px-3 py-1.5 text-[12px] font-bold whitespace-nowrap text-muted hover:bg-raised drawer:w-(--icon-w,2.5rem) drawer:justify-center drawer:gap-0 drawer:p-0 drawer:text-[0px]`}
+      className={`${press} flex min-h-10 items-center gap-2 rounded-control border border-control-line bg-transparent px-3 py-1.5 text-[12px] font-bold whitespace-nowrap text-muted hover:bg-raised drawer:h-(--icon-h,2.5rem) drawer:w-(--icon-w,2.5rem) drawer:justify-center drawer:gap-0 drawer:p-0 drawer:text-[0px]`}
       data-error={error || ["offline", "paused", "error"].includes(phase) ? "" : undefined}
       aria-label={
         error
@@ -79,16 +81,11 @@ function SaveStatus() {
   );
 }
 
-const navs = [
-  ["guide", "Guide", "book"],
-  ["checklist", "Checklist", "checkList"],
-  ["dashboard", "Progress", "chart"],
-] as const;
-
-// Where there is a way back, the brand gives its place to it under 1041px (a phone, or an iPad in portrait): there's no room for both
-// beside the menu and the pages. Checked with Echoes, whose name is the longest, at 820px, where its text ran into the Guide link.
-const brandLink = cva(`${press} flex w-max shrink-0 items-center gap-[11px] px-6 mid:pl-[17px] drawer:gap-[7px] drawer:px-2.5 slim:px-1.5`, {
-  variants: { canGoBack: { true: "mid:hidden", false: "" } },
+// Where there is a way back, the brand gives its place to it from 1040px down to 551px (an iPad in portrait, a phone on its side): there's
+// no room for both beside the menu and the pages. Checked with Echoes, whose name is the longest, at 820px, where its text ran into the
+// Guide link. On a phone the pages are at the bottom, so the brand comes back beside the way back: Echoes fits at 375px.
+const brandLink = cva(`${press} flex w-max shrink-0 items-center gap-[11px] px-6 mid:pl-[17px] drawer:gap-[7px] drawer:px-2.5 phone:w-auto phone:min-w-0 phone:shrink`, {
+  variants: { canGoBack: { true: "mid:hidden phone:flex", false: "" } },
 });
 
 interface TopBarProps {
@@ -101,7 +98,10 @@ interface TopBarProps {
   menuToggle: RefObject<HTMLButtonElement | null>;
 }
 
-/** The bar across the top: the way back (installed app only), the brand, the three pages, and the theme and save buttons. */
+/**
+ * The bar across the top: the chapters menu (800px and under), the way back (installed app only), the brand, the three pages, and the theme
+ * and save buttons. On a phone it is a title bar: the pages are in the tab bar at the bottom (Layout), and the theme is in the settings.
+ */
 export function TopBar({ chapter, view, menuOpen, onToggleMenu, menuToggle }: TopBarProps) {
   const canGoBack = useCanGoBack();
   const navigate = useNavigate();
@@ -122,9 +122,9 @@ export function TopBar({ chapter, view, menuOpen, onToggleMenu, menuToggle }: To
       brandLinkRef.current?.focus();
     }
   }, [canGoBack]);
-  const to = (id: (typeof navs)[number][0]) => (id === "guide" ? `/guide/${chapter}` : `/${id}`);
+  const phone = usePhone();
   return (
-    <header className="sticky top-0 z-10 grid h-(--bar) grid-cols-[var(--rail-w)_1fr_auto] items-center border-b border-line bg-surface pt-(--safe-top) pr-(--safe-right) pl-(--safe-left) text-ink standalone:relative standalone:flex-none standalone:select-none standalone:[-webkit-touch-callout:none] drawer:grid-cols-[auto_auto_1fr_auto] tiny:[--icon-w:34px]">
+    <header className="sticky top-0 z-10 grid h-(--bar) grid-cols-[var(--rail-w)_1fr_auto] items-center border-b border-line bg-surface pt-(--safe-top) pr-(--safe-right) pl-(--safe-left) text-ink standalone:relative standalone:flex-none standalone:select-none standalone:[-webkit-touch-callout:none] drawer:grid-cols-[auto_auto_1fr_auto] phone:grid-cols-[auto_minmax(0,1fr)_auto] phone:[--icon-h:2.75rem] phone:[--icon-w:2.75rem]">
       {/* Shown only under 800px: `hidden` is the class's own, and `drawer:block` brings it back. */}
       <div className="ml-[11px] hidden drawer:block tiny:ml-[7px]">
         <IconButton
@@ -137,7 +137,7 @@ export function TopBar({ chapter, view, menuOpen, onToggleMenu, menuToggle }: To
           onClick={onToggleMenu}
         />
       </div>
-      <div className="flex items-center">
+      <div className="flex min-w-0 items-center">
         {canGoBack && (
           <div className="ml-4 drawer:ml-1.5">
             <IconButton
@@ -158,29 +158,17 @@ export function TopBar({ chapter, view, menuOpen, onToggleMenu, menuToggle }: To
           <span className="grid size-10 place-items-center rounded-control bg-primary text-on-primary drawer:size-[34px]">
             <Icon name={brand.icon} className="size-6 drawer:size-5" />
           </span>
-          <span className="grid gap-[3px] leading-[1.1] slim:hidden">
-            <strong className="font-display text-[21px] leading-[1.05] font-bold tracking-[-0.01em] drawer:text-[17px]">{brand.mark}</strong>
+          <span className="grid min-w-0 gap-[3px] leading-[1.1] tiny:hidden">
+            <strong className="truncate font-display text-[21px] leading-[1.05] font-bold tracking-[-0.01em] drawer:text-[17px]">{brand.mark}</strong>
             {/* The space isn't drawn (it's a grid), but without it the link's visible text reads "KoholintHundo", which its name, "Koholint Hundo home", doesn't contain. */}
             {" "}
             <small className="text-[11px] font-extrabold tracking-[0.2em] text-primary uppercase drawer:hidden">Hundo</small>
           </span>
         </Link>
       </div>
-      <nav id="top-nav" className="ml-[-42px] flex gap-2 justify-self-center drawer:ml-0 drawer:gap-0.5" aria-label="Main navigation">
-        {navs.map(([id, label, icon]) => (
-          <Link
-            key={id}
-            to={to(id)}
-            aria-current={view === id ? "page" : undefined}
-            className={`${press} flex min-h-10 items-center gap-2 rounded-button px-3.5 py-2.5 text-[14px] leading-[1.2] font-bold whitespace-nowrap text-muted hover:bg-raised hover:text-ink drawer:gap-1 drawer:p-2 phone:grid phone:justify-items-center phone:gap-[3px] phone:px-1.5 phone:py-[5px] phone:text-[11px] tiny:px-[3px] [&[aria-current=page]:not(:hover)]:bg-soft [&[aria-current=page]:not(:hover)]:text-soft-ink`}
-          >
-            <Icon name={icon} className="size-4 drawer:size-3.5" />
-            {label}
-          </Link>
-        ))}
-      </nav>
+      {!phone && <MainNav chapter={chapter} view={view} place="top" />}
       <div className="mr-[25px] flex items-center gap-[9px] drawer:mr-[11px] drawer:gap-1.5 tiny:mr-[7px] tiny:gap-1">
-        <ThemeToggle />
+        {!phone && <ThemeToggle />}
         <SaveStatus />
       </div>
     </header>

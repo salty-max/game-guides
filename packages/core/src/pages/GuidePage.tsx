@@ -9,7 +9,7 @@ import { ChecklistRoute } from "../components/ChecklistRoute";
 import { MissablesStrip } from "../components/MissablesStrip";
 import { NextUp } from "../components/NextUp";
 import { SourceLinks } from "../components/SourceLinks";
-import { Breadcrumb, Button, LinkButton, PageHeading } from "../components/ui";
+import { Button, LinkButton, PageHeading } from "../components/ui";
 import { chapterRows, chapters, completion, config, guideAnchor, overall, readChapter, text } from "../guide";
 import { useReveal } from "../useReveal";
 import { isOpen, useProgress } from "../store/progress";
@@ -33,7 +33,6 @@ export function GuidePage() {
   if (!open) {
     return (
       <>
-        <Breadcrumb current={`Chapter ${chapterId}`} />
         <PageHeading title={`Chapter ${chapterId} is hidden`} intro="Revealing it also reveals every chapter before it." />
         <Button look="" icon="unlock" onClick={() => reveal(chapterId, target ? entry : undefined)}>
           Reveal chapter
@@ -73,7 +72,6 @@ function GuideView({ chapter, target }: { chapter: Chapter; target?: string }) {
 
   return (
     <>
-      <Breadcrumb current={chapter.title} />
       <ChapterHero chapter={chapter} banner={config.banners[chapter.id]}>
         {config.layout === "article" ? (
           <LinkButton to={`${path}/${chapter.groups[0].key}`} look="accent" icon="down">

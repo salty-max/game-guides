@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useLocation } from "react-router";
 import { chunks, loadFailed } from "./chunks";
 import { DialogHost } from "./DialogHost";
+import { MainNav } from "./MainNav";
 import { Rail } from "./Rail";
 import { TopBar } from "./TopBar";
 import { ToastHost } from "./ToastHost";
@@ -11,7 +12,7 @@ import { panels } from "virtual:guide/panels";
 import { useLoadable, whenIdle } from "../loadable";
 import { isOpen, useProgress } from "../store/progress";
 import { useUi } from "../store/ui";
-import { isNarrow, useNarrow } from "../useNarrow";
+import { isNarrow, useNarrow, usePhone } from "../useNarrow";
 import { useChromeColor } from "../useThemeEffects";
 
 function viewOf(pathname: string) {
@@ -20,7 +21,7 @@ function viewOf(pathname: string) {
 }
 
 /**
- * The frame of every page: the top bar, the chapter rail (a drawer on a phone), the page itself and the toasts. In a browser tab the
+ * The frame of every page: the top bar, the chapter rail (a drawer under 800px), the page itself, the tab bar (a phone) and the toasts. In a browser tab the
  * whole page scrolls under a sticky top bar. In the installed app (`standalone:`, see app.css) the frame is fixed to the screen and
  * only the main area scrolls.
  */
@@ -32,6 +33,8 @@ export function Layout({ children }: { children: ReactNode }) {
   useChromeColor(dialogOpen);
   // Under 800px the chapter rail is a drawer (RailDrawer.tsx, a chunk of its own); wider, a column beside the page.
   const narrow = useNarrow();
+  // On a phone the three pages are a tab bar at the bottom instead of links in the top bar (TopBar.tsx).
+  const phone = usePhone();
   // The drawer is open only for the page it was opened on, so navigating closes it, and only while there is a drawer.
   const [menuPath, setMenuPath] = useState<string | null>(null);
   if (menuPath !== null && (!narrow || menuPath !== pathname)) setMenuPath(null);
@@ -95,7 +98,7 @@ export function Layout({ children }: { children: ReactNode }) {
         Skip to content
       </a>
       <TopBar chapter={chapter} view={view} menuOpen={menuOpen} onToggleMenu={() => setMenuOpen(!menuOpen)} menuToggle={menuToggle} />
-      <div className="grid min-h-[calc(100dvh-var(--bar))] grid-cols-[var(--rail-col)_minmax(0,1fr)] standalone:min-h-0 standalone:flex-1 standalone:grid-rows-[minmax(0,1fr)] drawer:block standalone:drawer:grid standalone:drawer:grid-cols-[minmax(0,1fr)]">
+      <div className="grid min-h-[calc(100dvh-var(--bar)-var(--tabs))] grid-cols-[var(--rail-col)_minmax(0,1fr)] standalone:min-h-0 standalone:flex-1 standalone:grid-rows-[minmax(0,1fr)] drawer:block standalone:drawer:grid standalone:drawer:grid-cols-[minmax(0,1fr)]">
         {/* The drawer stays mounted (closed, it renders nothing) so that widening past 800px closes it the ordinary way, focus and all. */}
         {drawer && (
           <drawer.RailDrawer
@@ -122,14 +125,16 @@ export function Layout({ children }: { children: ReactNode }) {
           id="main"
           tabIndex={-1}
           ref={mainRef}
-          // --gutter is the page's side padding, --pad-end the room under it (and both get the notch and the home indicator on top).
+          // --gutter is the page's side padding, --pad-end the room under it (and both get the notch and the home indicator on top, but on a
+          // phone the tab bar covers the home indicator, so the room under the page is --pad-end alone).
           // The page is at most 1460px wide, centred. In the installed app <main> is what scrolls, so it takes the whole width (the
           // scrollbar and the wheel then belong to the window's edges) and --center is the margin that centring would have made.
-          className="mx-auto w-full max-w-[1460px] min-w-0 pt-6 pr-[calc(var(--gutter)+var(--center,0px)+var(--safe-right))] pb-[calc(var(--pad-end)+var(--safe-bottom))] pl-[calc(var(--gutter)+var(--center,0px))] outline-none [--gutter:clamp(23px,3.25vw,53px)] [--pad-end:50px] standalone:max-w-none standalone:scroll-pt-6 standalone:overflow-y-auto standalone:overscroll-contain standalone:[--center:max(0px,calc((100%-1460px)/2))] drawer:pt-[18px] drawer:pl-[calc(var(--gutter)+var(--safe-left))] drawer:[--gutter:18px] drawer:[--pad-end:30px] phone:pt-[13px] phone:[--gutter:12px] phone:[--pad-end:25px]"
+          className="mx-auto w-full max-w-[1460px] min-w-0 pt-6 pr-[calc(var(--gutter)+var(--center,0px)+var(--safe-right))] pb-[calc(var(--pad-end)+var(--safe-bottom))] pl-[calc(var(--gutter)+var(--center,0px))] outline-none [--gutter:clamp(23px,3.25vw,53px)] [--pad-end:50px] standalone:max-w-none standalone:scroll-pt-6 standalone:overflow-y-auto standalone:overscroll-contain standalone:[--center:max(0px,calc((100%-1460px)/2))] drawer:pt-[18px] drawer:pl-[calc(var(--gutter)+var(--safe-left))] drawer:[--gutter:18px] drawer:[--pad-end:30px] phone:pt-[13px] phone:pb-(--pad-end) phone:[--gutter:12px] phone:[--pad-end:25px]"
         >
           {children}
         </main>
       </div>
+      {phone && <MainNav chapter={chapter} view={view} place="bottom" />}
       <DialogHost />
       <ToastHost />
       <TooltipHost />

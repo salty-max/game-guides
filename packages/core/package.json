@@ -12,6 +12,7 @@
     "./sync/*": "./src/sync/*.ts",
     "./components/chunks": "./src/components/chunks.ts",
     "./components/*": "./src/components/*.tsx",
+    "./pages/*": "./src/pages/*.tsx",
     "./vite": "./vite.ts",
     "./icons": "./icons.mjs",
     "./app.css": "./src/app.css"

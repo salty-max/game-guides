@@ -43,6 +43,9 @@ const preview: Preview = {
     layout: "padded",
     // Every story is checked with axe, in every guide and theme, and a violation fails the test run.
     a11y: { test: "error" },
+    // A phone's screen, for the stories of what changes at 550px and under (a story asks for it with its viewport global). The test
+    // runner sizes its page to it too (addon-vitest), so the media queries and usePhone see a phone.
+    viewport: { options: { phone: { name: "Phone", styles: { width: "375px", height: "812px" }, type: "mobile" } } },
   },
 };
 

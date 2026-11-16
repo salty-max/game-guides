@@ -1,5 +1,5 @@
 // Builds each guide, serves the build with `vite preview` on a free port, and screenshots it with the system Chrome:
-// desktop 1280×860 and phone 390×844, light and dark. Service workers are blocked, and the theme is seeded in
+// desktop 1280×860, tablet 768×1024 and phone 375×812, light and dark (the phone as a touch screen). Service workers are blocked, and the theme is seeded in
 // localStorage before the first paint, the way theme-init.js reads it. Writes <out>/<app>-<page>-<size>-<theme>.png
 // and <out>/report.md (sideways scroll, console errors and loaded fonts per shot). Exits 1 if any shot had a problem.
 // --pages replaces the default pages. --reveal also seeds a save with spoiler protection off, so every chapter shows.
@@ -23,7 +23,7 @@ const root = resolve(args.root === true || !args.root ? "." : args.root);
 const out = resolve(args.out);
 const apps = typeof args.apps === "string" ? args.apps.split(",") : readdirSync(join(root, "apps")).filter((app) => existsSync(join(root, "apps", app, "vercel.json")));
 const pages = (typeof args.pages === "string" ? args.pages : "guide=/guide/1,checklist=/checklist,progress=/dashboard,sources=/sources").split(",").map((pair) => pair.split("="));
-const sizes = { desktop: { width: 1280, height: 860 }, phone: { width: 390, height: 844 } };
+const sizes = { desktop: { width: 1280, height: 860 }, tablet: { width: 768, height: 1024 }, phone: { width: 375, height: 812 } };
 
 const freePort = () =>
   new Promise((done) => {
@@ -64,7 +64,7 @@ for (const app of apps) {
     if (!(await answers(`http://localhost:${port}/`, 30000))) throw new Error(`${app}: vite preview never answered on ${port}`);
     for (const [size, viewport] of Object.entries(sizes)) {
       for (const theme of ["light", "dark"]) {
-        const context = await browser.newContext({ viewport, deviceScaleFactor: 2, colorScheme: theme, serviceWorkers: "block" });
+        const context = await browser.newContext({ viewport, deviceScaleFactor: 2, isMobile: size === "phone", hasTouch: size === "phone", colorScheme: theme, serviceWorkers: "block" });
         // (once per context, so a reload inside a check keeps what the page saved since)
         await context.addInitScript(([themeKey, value, saveKey, saved]) => {
           if (sessionStorage.getItem("shoot-seeded")) return;
