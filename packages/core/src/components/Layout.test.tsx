@@ -260,6 +260,62 @@ describe("coming back to a page", () => {
     expect(screen.getByRole("main")).not.toHaveFocus();
   });
 
+  it("shows a tab's page as it was left, not one built again, and a link to it builds it afresh", async () => {
+    history.replaceState(null, "", "/checklist");
+    const user = userEvent.setup();
+    render(<App />);
+    const search = await screen.findByRole("searchbox", { name: "Search entries" });
+    await user.click(tab(/Progress/));
+    await screen.findByRole("heading", { name: "Your progress" });
+    // Kept, out of sight: not in the accessibility tree while another page is on screen.
+    expect(screen.queryByRole("searchbox")).toBeNull();
+    expect(search.isConnected).toBe(true);
+    await user.click(tab(/Checklist/));
+    expect(await screen.findByRole("searchbox", { name: "Search entries" })).toBe(search);
+
+    await user.click(tab(/Progress/));
+    const link = within(screen.getByRole("main")).getAllByRole("link").find((each) => each.getAttribute("href") === "/guide/1")!;
+    await user.click(tab(/Guide/));
+    const heading = await screen.findByRole("heading", { level: 1 });
+    await user.click(tab(/Progress/));
+    await user.click(link);
+    expect(await screen.findByRole("heading", { level: 1 })).not.toBe(heading);
+  });
+
+  for (const width of ["wide", "phone"] as const) {
+    it(`never has two of an id in the page while pages are kept (${width})`, async () => {
+      if (width === "phone")
+        vi.spyOn(window, "matchMedia").mockImplementation(
+          (query: string) => ({ matches: /max-width: (550|800)px/.test(query), media: query, addEventListener() {}, removeEventListener() {} }) as unknown as MediaQueryList,
+        );
+      history.replaceState(null, "", "/sources");
+      const user = userEvent.setup();
+      render(<App />);
+      await screen.findByRole("heading", { level: 1 });
+      for (const [name, heading] of [[/Checklist/, "Completion checklist"], [/Guide/, undefined], [/Progress/, "Your progress"]] as const) {
+        await user.click(tab(name));
+        await screen.findByRole("heading", { level: 1, ...(heading ? { name: heading } : {}) });
+      }
+      const ids = [...document.querySelectorAll("[id]")].map((element) => element.id);
+      expect(ids.filter((id, i) => ids.indexOf(id) !== i)).toEqual([]);
+    });
+  }
+
+  it("comes back without an open select: it closes as the focus moves into the next page", async () => {
+    history.replaceState(null, "", "/dashboard");
+    const user = userEvent.setup();
+    render(<App />);
+    await screen.findByRole("heading", { name: "Your progress" });
+    await user.click(tab(/Checklist/));
+    await user.click(await screen.findByRole("combobox", { name: "Status" }));
+    await screen.findByRole("listbox");
+    act(() => history.back());
+    await screen.findByRole("heading", { name: "Your progress" });
+    act(() => history.forward());
+    await screen.findByRole("heading", { name: "Completion checklist" });
+    await waitFor(() => expect(screen.queryByRole("listbox")).toBeNull());
+  });
+
   it("keeps the checklist's filters for a reader coming back from another tab", async () => {
     history.replaceState(null, "", "/checklist");
     const user = userEvent.setup();
@@ -478,6 +534,23 @@ describe("on a phone", () => {
     expect(filters.textContent).toBe("Filters");
     // The chip went with the focus on it: the focus is on the button that still says what's on, not on the document.
     expect(filters).toHaveFocus();
+  });
+
+  it("closes the sheet as its page goes out of sight, so the page comes back without it", async () => {
+    phone();
+    history.replaceState(null, "", "/dashboard");
+    const user = userEvent.setup();
+    render(<App />);
+    await screen.findByRole("heading", { name: "Your progress" });
+    await user.click(within(screen.getByRole("navigation", { name: "Main navigation" })).getByRole("link", { name: /Checklist/ }));
+    await user.click(await screen.findByRole("button", { name: "Filters" }));
+    await screen.findByRole("dialog", { name: "Filters" });
+    // Back, which the sheet doesn't stop.
+    act(() => history.back());
+    await screen.findByRole("heading", { name: "Your progress" });
+    act(() => history.forward());
+    await screen.findByRole("heading", { name: "Completion checklist" });
+    await waitFor(() => expect(screen.queryByRole("dialog", { name: "Filters" })).toBeNull());
   });
 
   it("closes the sheet when the window widens past a phone's, with the focus on the search field and one of each field", async () => {

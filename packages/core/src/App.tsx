@@ -1,5 +1,6 @@
-import { BrowserRouter, Navigate, Route, Routes } from "react-router";
+import { BrowserRouter, Navigate, Route } from "react-router";
 import { Layout } from "./components/Layout";
+import { Pages } from "./components/Pages";
 import { ChecklistPage } from "./pages/ChecklistPage";
 import { DashboardPage } from "./pages/DashboardPage";
 import { GuidePage } from "./pages/GuidePage";
@@ -20,6 +21,18 @@ function Launches() {
   return null;
 }
 
+// One element for the life of the app, so a move redraws only the page it shows (Pages).
+const routes = (
+  <>
+    <Route path="/" element={<Home />} />
+    <Route path="/guide/:chapter?/:entry?" element={<GuidePage />} />
+    <Route path="/checklist/:category?/:chapter?" element={<ChecklistPage />} />
+    <Route path="/dashboard/:section?" element={<DashboardPage />} />
+    <Route path="/sources" element={<SourcesPage />} />
+    <Route path="*" element={<Home />} />
+  </>
+);
+
 export function App() {
   useGlobalEffects();
   useSync();
@@ -27,14 +40,7 @@ export function App() {
     <BrowserRouter>
       <Launches />
       <Layout>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/guide/:chapter?/:entry?" element={<GuidePage />} />
-          <Route path="/checklist/:category?/:chapter?" element={<ChecklistPage />} />
-          <Route path="/dashboard/:section?" element={<DashboardPage />} />
-          <Route path="/sources" element={<SourcesPage />} />
-          <Route path="*" element={<Home />} />
-        </Routes>
+        <Pages>{routes}</Pages>
       </Layout>
     </BrowserRouter>
   );

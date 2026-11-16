@@ -9,7 +9,7 @@ import { allRows, CHAPTER_COUNT, cats, chapters, config, hasMissables, isCategor
 import { two } from "../format";
 import { useLoadable, whenIdle } from "../loadable";
 import { isOpen, useProgress } from "../store/progress";
-import { isChapterFilter, isFilter, isStatus, isText, useKept } from "../store/place";
+import { isChapterFilter, isFilter, isStatus, isText, useKept, useVisible } from "../store/place";
 import { isPhone, usePhone } from "../useNarrow";
 
 // The Missable filter only exists once something is actually flagged.
@@ -42,8 +42,10 @@ function ChecklistView() {
   // On a phone the category, chapter and status are in a sheet, behind one button (the chips and the search stay on the page).
   const phone = usePhone();
   const [sheetOpen, setSheetOpen] = useState(false);
-  // Widened past a phone's width, the filters are back on the page: the sheet closes, the focus going to the search field.
-  if (sheetOpen && !phone) setSheetOpen(false);
+  // Widened past a phone's width, the filters are back on the page: the sheet closes, the focus going to the search field. And it closes
+  // as the page goes out of sight (Back from it, say): the page comes back as it was, not behind a sheet.
+  const onScreen = useVisible();
+  if (sheetOpen && (!phone || !onScreen)) setSheetOpen(false);
   const sheet = useLoadable(chunks.sheet, sheetOpen, () => {
     setSheetOpen(false);
     loadFailed();

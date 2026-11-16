@@ -54,8 +54,8 @@ function GuideView({ chapter, target }: { chapter: Chapter; target?: string }) {
   const firstLeft = rows.find((row) => checks[row.id] !== true);
   const started = rows.some((row) => checks[row.id] === true);
 
-  // Arrive at a linked section or entry, focused, every time the link is followed. A layout effect, so the page is there before the page
-  // change takes its picture (Layout).
+  // Arrive at a linked section or entry, focused, every time the link is followed. A layout effect, so the page is there before it is
+  // shown (Layout); it runs again as a kept page comes back (Pages), where Layout's own effect, after it, has the last word.
   useLayoutEffect(() => {
     if (!target) return;
     const element = document.getElementById(target);
