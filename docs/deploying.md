@@ -97,6 +97,8 @@ Nothing reaches production without being looked at on a preview deployment first
    - in a regular browser, the service worker registers, the guide works offline after one visit, and a newer deploy takes over at the next untouched start, or shows the update prompt to a page already in use.
 3. Once every preview is right, merge to `main` with the user's go. Each project that sees a change builds production from `main`.
 
+CI's [Lighthouse](testing.md#lighthouse) audit runs on a build served in the runner, not on a preview, so a preview's headers and its CDN are this list's to check, not Lighthouse's.
+
 Previews sit behind Vercel's deployment protection, so a plain `curl` doesn't get through. `vercel curl`, run from a folder linked to the project, does. Anywhere else it gets a 302. The `guide-deploy` skill's `headers.sh` does this. A signed-in browser's network panel works too.
 
 ## The sync API
