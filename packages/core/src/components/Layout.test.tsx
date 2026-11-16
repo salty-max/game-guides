@@ -3,6 +3,8 @@ import userEvent from "@testing-library/user-event";
 import { panels } from "virtual:guide/panels";
 import { App } from "../App";
 import { defaultState } from "../progress-state";
+import { CHAPTER_COUNT, cats } from "../guide";
+import { arrive, forgetPlaces, restoreLaunch } from "../store/place";
 import { useProgress } from "../store/progress";
 import { useTheme } from "../store/theme";
 import { useUi } from "../store/ui";
@@ -145,6 +147,128 @@ describe("moving to another page", () => {
     await screen.findByRole("heading", { name: "Completion checklist" });
     expect(scrolled).toHaveBeenCalledWith(0, 0);
     expect(scrolled.mock.contexts.some((element) => (element as HTMLElement).id === "main")).toBe(true);
+  });
+});
+
+describe("coming back to a page", () => {
+  // jsdom doesn't scroll: the window's offset is set by hand, and a scroll event tells Layout, as the browser would.
+  const scrollWindowTo = (y: number) => {
+    Object.defineProperty(window, "scrollY", { value: y, configurable: true });
+    act(() => void document.dispatchEvent(new Event("scroll")));
+  };
+  const tab = (name: RegExp) => within(screen.getByRole("navigation", { name: "Main navigation" })).getByRole("link", { name });
+
+  beforeEach(() => forgetPlaces());
+  afterEach(() => Object.defineProperty(window, "scrollY", { value: 0, configurable: true }));
+
+  it("finds each tab's page where the reader left it, and a page reached by a link at its top", async () => {
+    history.replaceState(null, "", "/checklist");
+    const scrolled = vi.spyOn(window, "scrollTo");
+    const user = userEvent.setup();
+    render(<App />);
+    await screen.findByRole("heading", { name: "Completion checklist" });
+    scrollWindowTo(900);
+
+    await user.click(tab(/Progress/));
+    await screen.findByRole("heading", { name: "Your progress" });
+    expect(scrolled).toHaveBeenLastCalledWith(0, 0);
+    scrollWindowTo(250);
+
+    await user.click(tab(/Checklist/));
+    await screen.findByRole("heading", { name: "Completion checklist" });
+    expect(scrolled).toHaveBeenLastCalledWith(0, 900);
+    // The focus goes into the page, as it does for any page change.
+    expect(screen.getByRole("main")).toHaveFocus();
+
+    await user.click(tab(/Progress/));
+    await screen.findByRole("heading", { name: "Your progress" });
+    expect(scrolled).toHaveBeenLastCalledWith(0, 250);
+
+    // A chapter's link on the progress page is a new visit: its top.
+    await user.click(screen.getAllByRole("link", { name: /Chapter|01/ }).find((link) => link.getAttribute("href") === "/guide/1")!);
+    await screen.findByRole("heading", { level: 1 });
+    expect(scrolled).toHaveBeenLastCalledWith(0, 0);
+  });
+
+  it("goes Back to where that very entry of the history was left, when the page is in the history twice", async () => {
+    history.replaceState(null, "", "/checklist");
+    const scrolled = vi.spyOn(window, "scrollTo");
+    const user = userEvent.setup();
+    render(<App />);
+    await screen.findByRole("heading", { name: "Completion checklist" });
+    scrollWindowTo(700);
+    await user.click(tab(/Progress/));
+    await screen.findByRole("heading", { name: "Your progress" });
+    // The checklist again, a second entry in the history, left further up.
+    await user.click(tab(/Checklist/));
+    await screen.findByRole("heading", { name: "Completion checklist" });
+    scrollWindowTo(300);
+    act(() => history.back());
+    await screen.findByRole("heading", { name: "Your progress" });
+    act(() => history.back());
+    await screen.findByRole("heading", { name: "Completion checklist" });
+    await waitFor(() => expect(scrolled).toHaveBeenLastCalledWith(0, 700));
+  });
+
+  const later = CHAPTER_COUNT > 1 ? it : it.skip;
+  later("sends the Checklist tab to the plain list when its last address names a chapter that is hidden now", async () => {
+    const category = Object.keys(cats)[0];
+    arrive(`/checklist/${category}/2`, "earlier", false);
+    render(<App />);
+    await screen.findByRole("heading", { level: 1 });
+    expect(tab(/Checklist/)).toHaveAttribute("href", "/checklist");
+  });
+
+  it("brings back no filter from an earlier visit to a page the reader went to afresh", async () => {
+    history.replaceState(null, "", "/dashboard");
+    const user = userEvent.setup();
+    render(<App />);
+    await screen.findByRole("heading", { name: "Your progress" });
+    // A category's link on the progress page (the Checklist tab, which goes back to the last checklist address, is in the top bar).
+    const category = () => within(screen.getByRole("main")).getAllByRole("link").find((link) => link.getAttribute("href")?.startsWith("/checklist/"))!;
+    const search = () => screen.findByRole("searchbox", { name: "Search entries" });
+    await user.click(category());
+    await user.type(await search(), "sword");
+    await user.click(tab(/Progress/));
+    await waitFor(() => expect(screen.queryByRole("searchbox")).toBeNull());
+    // The same link again is a new visit: the search is empty, and stays so after a tab away and back.
+    await user.click(category());
+    expect(await search()).toHaveValue("");
+    await user.click(tab(/Guide/));
+    await screen.findByRole("heading", { level: 1 });
+    await user.click(tab(/Checklist/));
+    expect(await search()).toHaveValue("");
+  });
+
+  it("opens at the place saved when the guide went into the background, filters and all, without taking the focus", async () => {
+    history.replaceState(null, "", "/checklist");
+    const user = userEvent.setup();
+    const { unmount } = render(<App />);
+    await user.type(await screen.findByRole("searchbox", { name: "Search entries" }), "sword");
+    scrollWindowTo(480);
+    act(() => void window.dispatchEvent(new Event("pagehide")));
+    unmount();
+    forgetPlaces();
+
+    // The next launch, at the start address.
+    history.replaceState(null, "", "/");
+    const scrolled = vi.spyOn(window, "scrollTo");
+    expect(restoreLaunch()).toBe("/checklist");
+    render(<App />);
+    expect(await screen.findByRole("searchbox", { name: "Search entries" })).toHaveValue("sword");
+    expect(scrolled).toHaveBeenLastCalledWith(0, 480);
+    expect(screen.getByRole("main")).not.toHaveFocus();
+  });
+
+  it("keeps the checklist's filters for a reader coming back from another tab", async () => {
+    history.replaceState(null, "", "/checklist");
+    const user = userEvent.setup();
+    render(<App />);
+    await user.type(await screen.findByRole("searchbox", { name: "Search entries" }), "sword");
+    await user.click(tab(/Guide/));
+    await screen.findByRole("heading", { level: 1 });
+    await user.click(tab(/Checklist/));
+    expect(await screen.findByRole("searchbox", { name: "Search entries" })).toHaveValue("sword");
   });
 });
 

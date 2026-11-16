@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useLayoutEffect } from "react";
 import { Link, useParams } from "react-router";
 import { Stat } from "../components/Stats";
 import { WhatsLeft } from "../components/WhatsLeft";
@@ -19,7 +19,8 @@ export function DashboardPage() {
   const persisted = usePersistence((s) => s.persisted);
   const visible = chapters.filter((chapter) => isOpen(data, chapter.id));
 
-  useEffect(() => {
+  // A layout effect, so the panel is in view before the page change takes its picture (Layout).
+  useLayoutEffect(() => {
     if (section && panels.some((panel) => panel.id === section)) document.getElementById(section)?.scrollIntoView({ block: "start" });
   }, [section]);
 

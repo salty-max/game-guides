@@ -4,6 +4,8 @@ import type { MouseEvent } from "react";
 import { Link, useLocation } from "react-router";
 import { Icon } from "./Icon";
 import { press } from "./press-style";
+import { placeOf, safePlace, tabPlaces } from "../store/place";
+import { useProgress } from "../store/progress";
 
 const pages = [
   ["guide", "Guide", "book"],
@@ -21,7 +23,7 @@ const root = cva("", {
     place: {
       top: "ml-[-42px] justify-self-center drawer:ml-0",
       bottom:
-        "sticky bottom-0 z-10 h-(--tabs) border-t border-line bg-surface pr-(--safe-right) pb-(--safe-bottom) pl-(--safe-left) text-ink pointer-coarse:in-[body:has(input:not([type=checkbox],[type=radio]):focus)]:hidden standalone:relative standalone:flex-none standalone:select-none standalone:[-webkit-touch-callout:none]",
+        "sticky bottom-0 z-10 h-(--tabs) border-t border-line bg-surface pr-(--safe-right) pb-(--safe-bottom) pl-(--safe-left) text-ink [view-transition-name:tab-bar] pointer-coarse:in-[body:has(input:not([type=checkbox],[type=radio]):focus)]:hidden standalone:relative standalone:flex-none standalone:select-none standalone:[-webkit-touch-callout:none]",
     },
   },
 });
@@ -70,11 +72,16 @@ interface MainNavProps {
 /** Guide, Checklist and Progress: Base UI's navigation menu, its links the router's. The current page is marked for a screen reader too. */
 export function MainNav({ chapter, view, place }: MainNavProps) {
   const { pathname } = useLocation();
+  const data = useProgress((s) => s.data);
+  // Each page's link goes back to it as the reader left it (store/place.ts): the checklist at its last address (a category, a chapter),
+  // unless that chapter is hidden now, and every page at its scroll offset and with its filters.
+  const checklist = view === "checklist" ? placeOf(pathname, chapter) : (safePlace(tabPlaces.checklist, data) ?? "/checklist");
+  const targets = { guide: `/guide/${chapter}`, checklist, dashboard: "/dashboard" };
   return (
     <NavigationMenu.Root className={root({ place })} aria-label="Main navigation">
       <NavigationMenu.List className={list({ place })}>
         {pages.map(([id, label, name]) => {
-          const to = id === "guide" ? `/guide/${chapter}` : `/${id}`;
+          const to = targets[id];
           return (
             <NavigationMenu.Item key={id}>
               <NavigationMenu.Link
@@ -82,7 +89,7 @@ export function MainNav({ chapter, view, place }: MainNavProps) {
                 className={link({ place })}
                 // A tap on the tab of the page you're on takes you to its top, as a phone's tab bar does.
                 onClick={place === "bottom" && to === pathname ? scrollUp : undefined}
-                render={<Link to={to} />}
+                render={<Link to={to} state={{ restore: true }} />}
               >
                 <Icon name={name} className={icon({ place })} />
                 {label}

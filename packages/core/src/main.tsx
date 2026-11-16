@@ -2,6 +2,7 @@ import { leaving } from "./boot";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { App } from "./App";
+import { restoreLaunch } from "./store/place";
 import "./app.css";
 import "virtual:guide/theme.css";
 
@@ -10,6 +11,8 @@ import "virtual:guide/theme.css";
 document.addEventListener("touchstart", () => {}, { passive: true });
 
 if (!leaving) {
+  // Opened at its start address (the home screen icon), the guide goes back to where the reader was (store/place.ts).
+  restoreLaunch();
   createRoot(document.getElementById("root")!).render(
     <StrictMode>
       <App />

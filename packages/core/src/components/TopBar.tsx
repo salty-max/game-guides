@@ -128,7 +128,7 @@ export function TopBar({ chapter, view, menuOpen, onToggleMenu, menuToggle }: To
   }, [canGoBack]);
   const phone = usePhone();
   return (
-    <header className="sticky top-0 z-10 grid h-(--bar) grid-cols-[var(--rail-w)_1fr_auto] items-center border-b border-line bg-surface pt-(--safe-top) pr-(--safe-right) pl-(--safe-left) text-ink standalone:relative standalone:flex-none standalone:select-none standalone:[-webkit-touch-callout:none] drawer:grid-cols-[auto_auto_1fr_auto] phone:grid-cols-[auto_minmax(0,1fr)_auto] phone:[--icon-h:2.75rem] phone:[--icon-w:2.75rem]">
+    <header className="sticky top-0 z-10 grid h-(--bar) grid-cols-[var(--rail-w)_1fr_auto] items-center border-b border-line bg-surface pt-(--safe-top) pr-(--safe-right) pl-(--safe-left) text-ink [view-transition-name:top-bar] standalone:relative standalone:flex-none standalone:select-none standalone:[-webkit-touch-callout:none] drawer:grid-cols-[auto_auto_1fr_auto] phone:grid-cols-[auto_minmax(0,1fr)_auto] phone:[--icon-h:2.75rem] phone:[--icon-w:2.75rem]">
       {/* Shown only under 800px: `hidden` is the class's own, and `drawer:block` brings it back. */}
       <div className="ml-[11px] hidden drawer:block tiny:ml-[7px]">
         <IconButton

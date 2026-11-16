@@ -30,7 +30,7 @@ Core's suites run against each guide:
 - **`icons.test.ts`**: the icons the page links and the manifest lists are in `public` at the sizes they declare, the Apple and maskable icons are opaque, `favicon.ico` holds 16 and 32px frames, the top bar's brand tile is opaque squares at 40, 80 and 120px, and `public/icons/favicon.svg` is the guide's tab drawing ([house-style.md](house-style.md#icon)).
 - **`sync/*.test.ts`, `SyncScreen.test.tsx`**: sync, from the ledger's merge to the screen ([core.md](core.md#syncing-devices)). `cycle.test.ts` runs two simulated browsers against the real API handler on an in-memory store, so the guide and the API are tested against each other. `ledger.test.ts` holds core's ledger equal to the API's.
 
-Each guide's own `guide.test.ts` adds its totals, its legacy saves, its extra state (and how that syncs) and its four storage keys.
+Each guide's own `guide.test.ts` adds its totals, its legacy saves, its extra state (and how that syncs) and its five storage keys.
 
 ## Stories
 

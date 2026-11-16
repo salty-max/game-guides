@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useLayoutEffect } from "react";
 import { Link, useLocation, useParams } from "react-router";
 import { buttonClass } from "../components/buttonStyle";
 import { Icon } from "../components/Icon";
@@ -54,8 +54,9 @@ function GuideView({ chapter, target }: { chapter: Chapter; target?: string }) {
   const firstLeft = rows.find((row) => checks[row.id] !== true);
   const started = rows.some((row) => checks[row.id] === true);
 
-  // Arrive at a linked section or entry, focused, every time the link is followed.
-  useEffect(() => {
+  // Arrive at a linked section or entry, focused, every time the link is followed. A layout effect, so the page is there before the page
+  // change takes its picture (Layout).
+  useLayoutEffect(() => {
     if (!target) return;
     const element = document.getElementById(target);
     const focusable = element?.hasAttribute("tabindex") ? element : (element?.querySelector<HTMLElement>('[role="checkbox"], button') ?? element);
