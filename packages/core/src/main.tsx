@@ -1,4 +1,6 @@
 import { leaving } from "./boot";
+// Before the app, so its Back listener comes ahead of the router's (beforeBack.ts).
+import "./beforeBack";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { App } from "./App";

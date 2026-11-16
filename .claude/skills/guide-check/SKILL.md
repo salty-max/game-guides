@@ -90,6 +90,7 @@ node .claude/skills/guide-check/scripts/tab-switch.mjs --out <scratchpad>/perf -
 - `tab-switch.mjs` walks the phone tab bar in production builds (Chrome at 4x and 6x CPU, Playwright's WebKit): per switch, the tab lit, the page committed, painted and settled, long tasks, the longest frame gap, a tick on the checklist, and the page's weight. `--video` counts blank frames in WebKit's recording; `--vt off` removes `document.startViewTransition` (only telling on a build that still has a view transition).
 - `tab-trace.mjs` traces one warm Guide → Checklist switch in Chrome at 6x and sums the main thread's work, and, given an unminified build (`vite build --minify false`), the JavaScript by function.
 - `reveal-probe.mjs` times revealing the checklist in WebKit with one suspect (`:has()`, the hidden inputs, transitions, shadows, rows' `content-visibility`) taken away at a time.
+- `sheet-probe.mjs` opens the checklist's filter sheet on a phone, goes Back and Forward, and counts the frames that still draw the sheet on the way back, with where the focus is (Chrome as Android and as desktop, WebKit).
 - `sim-tabs.mjs` runs the same walk in the iOS simulator's Safari, behind a proxy that puts the timing script first in the page; record the screen with `xcrun simctl io <device> recordVideo` alongside. Shut down only the simulator you booted.
 
 ## 7. What this can't check
