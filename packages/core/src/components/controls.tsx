@@ -60,7 +60,7 @@ export function Switch({ label, checked, onChange, disabled = false }: SwitchPro
         onCheckedChange={onChange}
         className={`${press} relative inline-flex h-7 w-12 shrink-0 items-center rounded-button border-2 border-edge bg-surface p-0.5 data-checked:border-primary data-checked:bg-primary`}
       >
-        <BaseSwitch.Thumb className="size-5 rounded-button bg-edge transition-transform duration-150 ease-out data-checked:translate-x-5 data-checked:bg-on-primary" />
+        <BaseSwitch.Thumb className="size-5 rounded-button bg-edge transition-[translate,background-color] duration-150 ease-out in-data-theme-switch:transition-none data-checked:translate-x-5 data-checked:bg-on-primary" />
       </BaseSwitch.Root>
     </label>
   );

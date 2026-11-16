@@ -3,7 +3,7 @@ import { cva } from "class-variance-authority";
 import type { MouseEvent } from "react";
 import { Link, useLocation } from "react-router";
 import { Icon } from "./Icon";
-import { press } from "./press-style";
+import { press, pressPart } from "./press-style";
 import { placeOf, safePlace, tabPlaces } from "../store/place";
 import { useProgress } from "../store/progress";
 
@@ -45,7 +45,7 @@ const icon = cva("", {
   variants: {
     place: {
       top: "size-4 drawer:size-3.5",
-      bottom: "box-content size-[22px] rounded-button px-4 py-[3px] group-aria-[current=page]/page:bg-soft",
+      bottom: `${pressPart} box-content size-[22px] rounded-button px-4 py-[3px] group-aria-[current=page]/page:bg-soft`,
     },
   },
 });

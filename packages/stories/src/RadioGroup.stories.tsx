@@ -59,3 +59,40 @@ export const Click: Story = {
     await expect(canvas.getByRole("radio", { name: "Dark" })).toBeChecked();
   },
 };
+
+/** What an element's colours ease with: each property it transitions, and over how long. */
+const clock = (element: Element) => {
+  const style = getComputedStyle(element);
+  const durations = style.transitionDuration.split(", ");
+  return Object.fromEntries(style.transitionProperty.split(", ").map((property, i) => [property, durations[i % durations.length]]));
+};
+
+/**
+ * Choosing a segment is one step: its fill, edge and words, and those of the segment it replaces, ease over the same 150ms as the press's
+ * tint, so nothing jumps while the tint lets go.
+ */
+export const OneStep: Story = {
+  play: async ({ canvas }) => {
+    await userEvent.click(canvas.getByText("Dark"));
+    for (const name of ["Dark", "Use device setting"]) {
+      await expect(clock(canvas.getByText(name).closest("label")!)).toEqual({ color: "0.15s", "background-color": "0.15s", "border-color": "0.15s", "box-shadow": "0.15s" });
+    }
+  },
+};
+
+/** While the theme changes (the root says so for a frame, useThemeEffects), the segments take their new colours at once, with the page. */
+export const ThemeChange: Story = {
+  play: async ({ canvasElement }) => {
+    const root = document.documentElement;
+    const theme = root.dataset.theme;
+    root.dataset.themeSwitch = "";
+    try {
+      root.dataset.theme = theme === "dark" ? "light" : "dark";
+      await expect([...canvasElement.querySelectorAll("label")].flatMap((label) => label.getAnimations())).toEqual([]);
+    } finally {
+      if (theme) root.dataset.theme = theme;
+      await new Promise(requestAnimationFrame);
+      delete root.dataset.themeSwitch;
+    }
+  },
+};

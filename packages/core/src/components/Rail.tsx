@@ -9,7 +9,7 @@ import { isOpen, useProgress } from "../store/progress";
 import { useReveal } from "../useReveal";
 import { useUi } from "../store/ui";
 import { railHeading, railPanel } from "./rail-style";
-import { press, pressText } from "./press-style";
+import { press, pressPart, pressText } from "./press-style";
 
 // A chapter in the rail: a link to it, or, while spoiler protection hides it, a button that reveals it (and says what it's hidden by).
 // A locked one keeps its muted colour when it's hovered; an open one darkens.
@@ -19,7 +19,7 @@ const chapterLink = cva(
 );
 
 const number =
-  "grid size-7 place-items-center rounded-small border border-soft-line text-[12px] text-muted tabular-nums group-aria-[current=page]/chapter:border-primary group-aria-[current=page]/chapter:bg-primary group-aria-[current=page]/chapter:text-on-primary";
+  `${pressPart} grid size-7 place-items-center rounded-small border border-soft-line text-[12px] text-muted tabular-nums group-aria-[current=page]/chapter:border-primary group-aria-[current=page]/chapter:bg-primary group-aria-[current=page]/chapter:text-on-primary`;
 
 interface RailProps {
   activeChapter: number;
