@@ -12,6 +12,7 @@ import { useProgress } from "../store/progress";
 import { useUi } from "../store/ui";
 import type { IconName } from "./Icon";
 import type { Row, SourceLink } from "../types";
+import { press, pressRow } from "./press-style";
 
 interface RowProps {
   row: Row;
@@ -46,7 +47,7 @@ export const RouteRow = memo(function RouteRow({ row, prefix, highlighted, origi
         <label
           id={labelId}
           htmlFor={boxId}
-          className="inline-block cursor-pointer text-[15px] leading-[1.3] font-extrabold after:absolute after:inset-0 after:cursor-pointer"
+          className={`${pressRow} inline-block cursor-pointer text-[15px] leading-[1.3] font-extrabold after:absolute after:inset-0 after:cursor-pointer`}
         >
           {row.title}
         </label>
@@ -93,8 +94,7 @@ interface GroupProps {
 }
 
 // The group's header is its heading, and the button inside it opens and closes the steps (a button can't hold a heading).
-const trigger =
-  "group/trigger grid min-h-[58px] w-full cursor-pointer grid-cols-[36px_minmax(0,1fr)_auto_20px] items-center gap-[11px] border-0 bg-transparent px-3.5 py-3 text-left font-sans text-base leading-[1.58] font-normal text-inherit hover:bg-raised phone:grid-cols-[28px_minmax(0,1fr)_auto_15px] phone:gap-2 phone:p-[9px]";
+const trigger = `${press} group/trigger grid min-h-[58px] w-full cursor-pointer grid-cols-[36px_minmax(0,1fr)_auto_20px] items-center gap-[11px] border-0 bg-transparent px-3.5 py-3 text-left font-sans text-base leading-[1.58] font-normal text-inherit hover:bg-raised phone:grid-cols-[28px_minmax(0,1fr)_auto_15px] phone:gap-2 phone:p-[9px]`;
 
 export function RouteGroup({ groupKey, title, location, icon, note, sources = [], rows, open, highlightedId, origin, fallbackFocusId, rememberToggle }: GroupProps) {
   const setGroupOpen = useUi((s) => s.setGroupOpen);

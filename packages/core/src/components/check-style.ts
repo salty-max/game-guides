@@ -1,9 +1,10 @@
 import { cva } from "class-variance-authority";
+import { press } from "./press-style";
 
 // The house tick box, Base UI's Checkbox root: 26px (tokens.css), the guide's check corners, the primary fill once ticked. Shared by the labelled
 // Checkbox in settings and the rows' CheckBox. In prose it sits before the words it ticks.
 export const checkBox = cva(
-  "relative z-1 inline-flex size-check shrink-0 cursor-pointer items-center justify-center rounded-check border-2 border-edge bg-surface align-middle text-on-primary data-checked:border-primary data-checked:bg-primary",
+  `${press} relative z-1 inline-flex size-check shrink-0 cursor-pointer items-center justify-center rounded-check border-2 border-edge bg-surface align-middle text-on-primary data-checked:border-primary data-checked:bg-primary`,
   { variants: { at: { line: "", prose: "me-check-gap" } }, defaultVariants: { at: "line" } },
 );
 

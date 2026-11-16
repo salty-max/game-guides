@@ -1,6 +1,7 @@
 import { Collapsible } from "@base-ui/react/collapsible";
 import { Link } from "react-router";
 import { Icon } from "./Icon";
+import { pressText } from "./press-style";
 
 type Item = [label: string, url: string];
 
@@ -17,7 +18,7 @@ export function ExternalLink({ label, url }: { label: string; url: string }) {
 export function SourceLinks({ items }: { items: Item[] }) {
   return (
     <Collapsible.Root className="mt-[23px] text-[13px] text-muted">
-      <Collapsible.Trigger className="group/trigger flex min-h-8 w-max cursor-pointer items-center gap-1 border-0 bg-transparent p-0 font-sans text-[13px] font-extrabold text-primary">
+      <Collapsible.Trigger className={`${pressText} group/trigger flex min-h-8 w-max cursor-pointer items-center gap-1 border-0 bg-transparent p-0 font-sans text-[13px] font-extrabold text-primary`}>
         <Icon name="right" className="size-3.5 group-data-panel-open/trigger:rotate-90" />
         Sources and maps
       </Collapsible.Trigger>

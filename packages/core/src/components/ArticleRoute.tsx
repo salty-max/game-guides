@@ -7,6 +7,7 @@ import { BulkCheck } from "./BulkCheck";
 import { CheckBox } from "./CheckBox";
 import { Quantity, SourceLine, Tag } from "./ui";
 import type { Chapter, Group, Row } from "../types";
+import { press, pressText } from "./press-style";
 
 /** The chapter as prose: one section per group, each step's opening sentence is its checkbox. */
 export function ArticleRoute({ chapter, target, footer }: { chapter: Chapter; target?: string; footer: ReactNode }) {
@@ -16,7 +17,7 @@ export function ArticleRoute({ chapter, target, footer }: { chapter: Chapter; ta
       {chapter.groups.map((group) => (
         <li key={group.key}>
           <Link
-            className="block rounded-tag px-1.5 py-2 text-[14px] leading-[1.4] text-muted no-underline hover:bg-surface hover:text-primary aria-[current=location]:bg-surface aria-[current=location]:font-bold aria-[current=location]:text-primary"
+            className={`${press} block rounded-tag px-1.5 py-2 text-[14px] leading-[1.4] text-muted no-underline hover:bg-surface hover:text-primary aria-[current=location]:bg-surface aria-[current=location]:font-bold aria-[current=location]:text-primary`}
             to={`/guide/${chapter.id}/${group.key}`}
             aria-current={current === group.key ? "location" : undefined}
           >
@@ -31,7 +32,7 @@ export function ArticleRoute({ chapter, target, footer }: { chapter: Chapter; ta
     <div className="mt-[clamp(24px,3vw,40px)] grid grid-cols-[minmax(0,1fr)_minmax(174px,218px)] items-start gap-[clamp(24px,4vw,66px)] fold:grid-cols-[minmax(0,1fr)] fold:gap-6">
       {/* Up to 1000px wide the list of sections folds away above the article; wider, it sits beside it. */}
       <Collapsible.Root className="hidden max-w-[72ch] rounded-small border border-line bg-surface px-3 fold:block">
-        <Collapsible.Trigger className="group/trigger flex min-h-11 w-full cursor-pointer items-center justify-between border-0 bg-transparent p-0 text-left font-sans text-[14px] leading-tight font-bold text-ink">
+        <Collapsible.Trigger className={`${press} group/trigger flex min-h-11 w-full cursor-pointer items-center justify-between border-0 bg-transparent p-0 text-left font-sans text-[14px] leading-tight font-bold text-ink`}>
           In this chapter <Icon name="down" className="size-4 text-muted group-data-panel-open/trigger:rotate-180" />
         </Collapsible.Trigger>
         <Collapsible.Panel hiddenUntilFound>
@@ -59,7 +60,7 @@ export function ArticleRoute({ chapter, target, footer }: { chapter: Chapter; ta
 
 // A step's opening words, which hold its box: clicking them ticks it. In prose they run on into the step's text; in a compact list they
 // sit on one line with the badges after them.
-const check = cva("cursor-pointer font-extrabold hover:text-primary", { variants: { in: { prose: "py-1.5", list: "flex items-center" } } });
+const check = cva(`${pressText} cursor-pointer font-extrabold hover:text-primary`, { variants: { in: { prose: "py-1.5", list: "flex items-center" } } });
 
 // A step, as a paragraph of prose or a line of a compact list. Linked to (a deep link), it stands out on the page's own colour with a bar of
 // the accent at its start.

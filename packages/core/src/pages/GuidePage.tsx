@@ -14,6 +14,7 @@ import { chapterRows, chapters, completion, config, guideAnchor, overall, readCh
 import { useReveal } from "../useReveal";
 import { isOpen, useProgress } from "../store/progress";
 import type { Chapter } from "../types";
+import { press } from "../components/press-style";
 
 export function GuidePage() {
   const { chapter: param, entry } = useParams();
@@ -90,7 +91,7 @@ function GuideView({ chapter, target }: { chapter: Chapter; target?: string }) {
       <NextUp chapter={chapter.id} />
       <MissablesStrip chapter={chapter} />
       <Link
-        className="mt-3.5 mb-[26px] flex min-h-11 items-center justify-between gap-3 rounded-card border border-line bg-surface px-4 py-1.5 text-[14px] hover:border-control-line"
+        className={`${press} mt-3.5 mb-[26px] flex min-h-11 items-center justify-between gap-3 rounded-card border border-line bg-surface px-4 py-1.5 text-[14px] hover:border-control-line`}
         to="/dashboard"
       >
         <SummaryFigure />

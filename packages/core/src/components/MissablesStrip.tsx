@@ -6,6 +6,7 @@ import { config, hasMissables, missablesLeft, missableWhy } from "../guide";
 import { useHeldRows } from "../useHeldRows";
 import { useProgress } from "../store/progress";
 import type { Chapter } from "../types";
+import { press } from "./press-style";
 
 /**
  * "Don't miss" strip for a chapter: the unchecked entries that can be lost for good. While the guide flags
@@ -24,7 +25,7 @@ const caret = cva("size-4 flex-none text-muted group-data-panel-open/trigger:rot
 function Reassurance({ text, sources }: NonNullable<typeof config.reassurance>) {
   return (
     <Collapsible.Root render={<aside />} className={frame({ tone: "clear" })} aria-label="Missable entries">
-      <Collapsible.Trigger className="group/trigger flex min-h-12 w-full cursor-pointer items-start justify-between gap-2.5 border-0 bg-transparent px-4 py-2.5 text-left font-sans text-[14px] leading-normal text-muted phone:px-3">
+      <Collapsible.Trigger className={`${press} group/trigger flex min-h-12 w-full cursor-pointer items-start justify-between gap-2.5 border-0 bg-transparent px-4 py-2.5 text-left font-sans text-[14px] leading-normal text-muted phone:px-3`}>
         <span>
           <strong className="font-extrabold text-ink">Nothing is flagged as permanently missable.</strong> {text}
         </span>
@@ -52,7 +53,7 @@ function MissablesList({ chapter }: { chapter: Chapter }) {
   const left = rows.filter((row) => checks[row.id] !== true).length;
   return (
     <Collapsible.Root render={<aside />} defaultOpen className={frame({ tone: "flagged" })} aria-label="Missable entries">
-      <Collapsible.Trigger className="group/trigger flex min-h-12 w-full cursor-pointer items-center justify-between gap-2.5 border-0 bg-transparent px-4 py-3 text-left font-sans text-base text-inherit phone:px-3">
+      <Collapsible.Trigger className={`${press} group/trigger flex min-h-12 w-full cursor-pointer items-center justify-between gap-2.5 border-0 bg-transparent px-4 py-3 text-left font-sans text-base text-inherit phone:px-3`}>
         <strong className="font-display text-[24px] leading-[1.2] font-bold tracking-[-0.015em]">Don’t miss before moving on</strong>
         <span className="ml-auto flex items-center gap-2.5 text-[12px] whitespace-nowrap text-muted tabular-nums">
           {left} left

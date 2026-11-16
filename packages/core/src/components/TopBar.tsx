@@ -10,6 +10,7 @@ import { useTheme } from "../store/theme";
 import { useSyncStatus, type SyncPhase } from "../store/sync";
 import { useUi } from "../store/ui";
 import { useResolvedTheme } from "../useThemeEffects";
+import { press } from "./press-style";
 
 /**
  * Whether there is somewhere in the app to go back to, in the guide installed as an app, which has no browser back button. (iOS lets
@@ -61,7 +62,7 @@ function SaveStatus() {
   // A linked device opens the Sync screen from here, where the settings are one button away; one that isn't opens the settings as before.
   return (
     <BaseButton
-      className="flex min-h-10 items-center gap-2 rounded-control border border-control-line bg-transparent px-3 py-1.5 text-[12px] font-bold whitespace-nowrap text-muted hover:bg-raised drawer:w-(--icon-w,2.5rem) drawer:justify-center drawer:gap-0 drawer:p-0 drawer:text-[0px]"
+      className={`${press} flex min-h-10 items-center gap-2 rounded-control border border-control-line bg-transparent px-3 py-1.5 text-[12px] font-bold whitespace-nowrap text-muted hover:bg-raised drawer:w-(--icon-w,2.5rem) drawer:justify-center drawer:gap-0 drawer:p-0 drawer:text-[0px]`}
       data-error={error || ["offline", "paused", "error"].includes(phase) ? "" : undefined}
       aria-label={
         error
@@ -86,7 +87,7 @@ const navs = [
 
 // Where there is a way back, the brand gives its place to it under 1041px (a phone, or an iPad in portrait): there's no room for both
 // beside the menu and the pages. Checked with Echoes, whose name is the longest, at 820px, where its text ran into the Guide link.
-const brandLink = cva("flex w-max shrink-0 items-center gap-[11px] px-6 mid:pl-[17px] drawer:gap-[7px] drawer:px-2.5 slim:px-1.5", {
+const brandLink = cva(`${press} flex w-max shrink-0 items-center gap-[11px] px-6 mid:pl-[17px] drawer:gap-[7px] drawer:px-2.5 slim:px-1.5`, {
   variants: { canGoBack: { true: "mid:hidden", false: "" } },
 });
 
@@ -171,7 +172,7 @@ export function TopBar({ chapter, view, menuOpen, onToggleMenu, menuToggle }: To
             key={id}
             to={to(id)}
             aria-current={view === id ? "page" : undefined}
-            className="flex min-h-10 items-center gap-2 rounded-button px-3.5 py-2.5 text-[14px] leading-[1.2] font-bold whitespace-nowrap text-muted hover:bg-raised hover:text-ink drawer:gap-1 drawer:p-2 phone:grid phone:justify-items-center phone:gap-[3px] phone:px-1.5 phone:py-[5px] phone:text-[11px] tiny:px-[3px] [&[aria-current=page]:not(:hover)]:bg-soft [&[aria-current=page]:not(:hover)]:text-soft-ink"
+            className={`${press} flex min-h-10 items-center gap-2 rounded-button px-3.5 py-2.5 text-[14px] leading-[1.2] font-bold whitespace-nowrap text-muted hover:bg-raised hover:text-ink drawer:gap-1 drawer:p-2 phone:grid phone:justify-items-center phone:gap-[3px] phone:px-1.5 phone:py-[5px] phone:text-[11px] tiny:px-[3px] [&[aria-current=page]:not(:hover)]:bg-soft [&[aria-current=page]:not(:hover)]:text-soft-ink`}
           >
             <Icon name={icon} className="size-4 drawer:size-3.5" />
             {label}
