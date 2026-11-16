@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { useLocation, useNavigate } from "react-router";
-import { Checkbox, FileField, RadioGroup } from "./controls";
+import { Checkbox, FileField, RadioGroup, Switch } from "./controls";
 // The settings screen is in the dialog's chunk, so it uses the select itself: the shell's stand-in would flash while the select loaded.
 import { SelectImpl as Select } from "./select-impl";
 import { DialogDescription, DialogFooter, DialogSeparator, DialogStatus, DialogText } from "./dialog";
@@ -10,6 +10,7 @@ import { exportProgress } from "../backup";
 import { validateState } from "../progress-state";
 import { isOpen, useProgress } from "../store/progress";
 import { useSyncStatus } from "../store/sync";
+import { canKeepAwake, useAwake } from "../store/awake";
 import { normalizeTheme, themeOptions, useTheme } from "../store/theme";
 import { useUi, type DialogState } from "../store/ui";
 import type { ProgressState } from "../types";
@@ -36,11 +37,12 @@ export function ConfirmScreen({ dialog }: { dialog: Extract<Screens, { kind: "co
   );
 }
 
-/** Theme, how far the guide reveals, and the progress backup. */
+/** Theme, how far the guide reveals, keeping the screen on (where the browser can), and the progress backup. */
 export function SettingsScreen() {
   const data = useProgress((s) => s.data);
   const storageError = useProgress((s) => s.storageError);
   const preference = useTheme((s) => s.preference);
+  const keptAwake = useAwake((s) => s.on);
   const closeDialogThen = useUi((s) => s.closeDialogThen);
   const openDialog = useUi((s) => s.openDialog);
   const announce = useUi((s) => s.announce);
@@ -48,6 +50,7 @@ export function SettingsScreen() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const [theme, setTheme] = useState(preference);
+  const [awake, setAwake] = useState(keptAwake);
   const [spoilers, setSpoilers] = useState(data.spoilers);
   const [ceiling, setCeiling] = useState(data.ceiling);
   const [imported, setImported] = useState<ProgressState>();
@@ -56,6 +59,7 @@ export function SettingsScreen() {
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     useTheme.getState().setPreference(theme);
+    useAwake.getState().setOn(awake);
     useProgress.getState().saveSettings({ spoilers, ceiling });
     closeDialogThen(() => announce("Guide settings saved."));
     const next = useProgress.getState().data;
@@ -99,6 +103,7 @@ export function SettingsScreen() {
           value={ceiling}
           onChange={(next) => setCeiling(readChapter(next))}
         />
+        {canKeepAwake() && <Switch label="Keep screen on" checked={awake} onChange={setAwake} />}
         <DialogFooter>
           <Button type="submit" look="">
             Save settings

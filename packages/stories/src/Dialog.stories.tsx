@@ -56,13 +56,14 @@ const confirm = (danger: boolean, onConfirm: () => void = fn()): Opened => ({
   onConfirm,
 });
 
-/** The settings screen: a dialog with a form, a list of choices, and the backup. */
+/** The settings screen: a dialog with a form, a list of choices, Keep screen on (Chrome has a wake lock), and the backup. */
 export const Settings: Story = {
   play: async ({ canvas, canvasElement }) => {
     await userEvent.click(canvas.getByRole("button", { name: "Open" }));
     const dialog = await page(canvasElement).findByRole("dialog", { name: "Guide settings" }, patient);
     // The first field has the focus, not the close button.
     await waitFor(() => expect(within(dialog).getByRole("radio", { checked: true })).toHaveFocus(), patient);
+    await expect(within(dialog).getByRole("switch", { name: "Keep screen on" })).not.toBeChecked();
   },
 };
 
