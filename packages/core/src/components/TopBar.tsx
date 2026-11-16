@@ -2,10 +2,10 @@ import { Button as BaseButton } from "@base-ui/react/button";
 import { cva } from "class-variance-authority";
 import { useCallback, useEffect, useRef, type RefObject } from "react";
 import { Link, useLocation, useNavigate } from "react-router";
-import { Icon } from "./Icon";
 import { MainNav } from "./MainNav";
 import { IconButton } from "./ui";
 import { brand } from "../guide";
+import { tileSizes, tileSrc, tileSrcSet } from "../icons";
 import { useProgress } from "../store/progress";
 import { useTheme } from "../store/theme";
 import { useSyncStatus, type SyncPhase } from "../store/sync";
@@ -88,6 +88,10 @@ const brandLink = cva(`${press} flex w-max shrink-0 items-center gap-[11px] px-6
   variants: { canGoBack: { true: "mid:hidden phone:flex", false: "" } },
 });
 
+// The guide's painting, its square the dark surface: a hairline in the guide's line keeps the cornered tile on a dark bar.
+// (an outline inset over the edge, not a border, so the painting draws at the size it was written for)
+const brandTile = cva("size-10 shrink-0 rounded-control outline-1 -outline-offset-1 outline-line drawer:size-[34px]");
+
 interface TopBarProps {
   /** The chapter the Guide link opens. */
   chapter: number;
@@ -155,9 +159,8 @@ export function TopBar({ chapter, view, menuOpen, onToggleMenu, menuToggle }: To
           to={`/guide/${chapter}`}
           aria-label={`${brand.name} home`}
         >
-          <span className="grid size-10 place-items-center rounded-control bg-primary text-on-primary drawer:size-[34px]">
-            <Icon name={brand.icon} className="size-6 drawer:size-5" />
-          </span>
+          {/* The guide's own painting, as the home screen shows it (pnpm icons writes the sizes). The link carries the name. */}
+          <img src={tileSrc(tileSizes[0])} srcSet={tileSrcSet} alt="" width={40} height={40} className={brandTile()} />
           <span className="grid min-w-0 gap-[3px] leading-[1.1] tiny:hidden">
             <strong className="truncate font-display text-[21px] leading-[1.05] font-bold tracking-[-0.01em] drawer:text-[17px]">{brand.mark}</strong>
             {/* The space isn't drawn (it's a grid), but without it the link's visible text reads "KoholintHundo", which its name, "Koholint Hundo home", doesn't contain. */}

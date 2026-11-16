@@ -1,7 +1,7 @@
 // @vitest-environment node
 import { existsSync, readFileSync } from "node:fs";
 import page from "../index.html?raw";
-import { manifestIcons } from "./icons.ts";
+import { manifestIcons, tileSizes, tileSrc } from "./icons.ts";
 
 // The icons each guide ships, as `pnpm icons` writes them (icons.mjs) and the page and manifest name them.
 const root = process.env.GUIDE_ROOT!;
@@ -71,6 +71,10 @@ describe("icons", () => {
       if (purpose === "maskable") expect(icon.alpha, src).toBe(false);
     }
     expect(manifestIcons.filter(({ purpose }) => purpose === "maskable"), "one maskable icon").toHaveLength(1);
+  });
+
+  it("ships the top bar's brand tile as opaque squares at each size the page asks for", () => {
+    for (const size of tileSizes) expect(png(readFileSync(publicFile(tileSrc(size)))), tileSrc(size)).toEqual({ width: size, height: size, alpha: false });
   });
 
   it("keeps its painting beside the script that exports it", () => {

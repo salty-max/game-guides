@@ -112,7 +112,6 @@ export interface Brand {
   backupFile: string;
   /** The word in the header brand, above "HUNDO". */
   mark: string;
-  icon: IconName;
   /** The game's full name. No page shows it on its own: the title and the description name it, for search (data.test.ts holds them to it). */
   game: string;
   /** The game's publisher, named in the rail's fan disclaimer ("not affiliated with …"). */

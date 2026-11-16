@@ -2,6 +2,7 @@
 import { copyFile, mkdir, writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import sharp from "sharp";
+import { tileSizes, tileSrc } from "./src/icons.ts";
 
 /** An ICO file holding PNG frames, which every browser reads; sharp writes no ICO itself. */
 const ico = (frames) => {
@@ -50,6 +51,8 @@ export const writeIcons = async ({ master, favicon }) => {
     // Launchers crop to a circle as small as 80% of the side: the painting shrinks to 440px, its disk to 70% of the
     // canvas, and its own edge pixels fill the margin.
     sharp(painting).resize(440, 440).extend({ top: 36, bottom: 36, left: 36, right: 36, extendWith: "copy" }).png(png).toFile(`${out}/maskable-512.png`),
+    // The top bar's brand tile: square, as the tile's own corners clip it.
+    ...tileSizes.map((size) => sharp(painting).resize(size, size).removeAlpha().png(png).toFile(`public${tileSrc(size)}`)),
     copyFile(drawing, `${out}/favicon.svg`),
     // At the root, where browsers and other clients look when a page names no icon.
     Promise.all([16, 32].map(async (size) => ({ size, data: await tab(size) }))).then((frames) => writeFile("public/favicon.ico", ico(frames))),

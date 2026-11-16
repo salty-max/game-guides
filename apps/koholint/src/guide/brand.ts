@@ -10,7 +10,6 @@ export const brand = {
   storagePrefix: "koholint-field-guide",
   backupFile: "koholint-progress.json",
   mark: "Koholint",
-  icon: "compass",
   game: "Link’s Awakening",
   publisher: "Nintendo",
   corners: "narrow",

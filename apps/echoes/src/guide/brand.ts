@@ -10,7 +10,6 @@ export const brand = {
   storagePrefix: "echoes-of-wisdom-field-guide",
   backupFile: "echoes-of-wisdom-progress.json",
   mark: "Echoes of Wisdom",
-  icon: "tri",
   game: "Echoes of Wisdom",
   publisher: "Nintendo",
   corners: "normal",
