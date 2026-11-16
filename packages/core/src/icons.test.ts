@@ -1,7 +1,7 @@
 // @vitest-environment node
 import { existsSync, readFileSync } from "node:fs";
 import page from "../index.html?raw";
-import { manifestIcons, tileSizes, tileSrc } from "./icons.ts";
+import { manifestScreenshots, manifestShortcuts, manifestIcons, tileSizes, tileSrc } from "./icons.ts";
 
 // The icons each guide ships, as `pnpm icons` writes them (icons.mjs) and the page and manifest name them.
 const root = process.env.GUIDE_ROOT!;
@@ -75,6 +75,34 @@ describe("icons", () => {
 
   it("ships the top bar's brand tile as opaque squares at each size the page asks for", () => {
     for (const size of tileSizes) expect(png(readFileSync(publicFile(tileSrc(size)))), tileSrc(size)).toEqual({ width: size, height: size, alpha: false });
+  });
+
+  it("ships every shortcut's icons at the sizes they declare, the full-bleed one opaque, for pages the guide has", () => {
+    expect(manifestShortcuts.map(({ name, url }) => `${name} ${url}`)).toEqual(["Guide /guide", "Checklist /checklist", "Progress /dashboard"]);
+    for (const { icons } of manifestShortcuts) {
+      for (const { src, sizes, purpose } of icons) {
+        const icon = png(readFileSync(publicFile(src)));
+        expect(`${icon.width}x${icon.height}`, src).toBe(sizes);
+        if (purpose === "maskable") expect(icon.alpha, src).toBe(false);
+      }
+    }
+  });
+
+  it("ships the install dialog's screenshots as small JPEGs at the sizes they declare, wide and narrow", () => {
+    const shots = manifestScreenshots("Guide");
+    expect(shots.map(({ form_factor }) => form_factor)).toEqual(["wide", "narrow"]);
+    for (const { src, sizes } of shots) {
+      const bytes = readFileSync(publicFile(src));
+      expect(bytes.subarray(0, 3).toString("hex"), `${src} is a JPEG`).toBe("ffd8ff");
+      // (the size from the first start-of-frame marker)
+      let at = 2;
+      while (bytes[at + 1] < 0xc0 || bytes[at + 1] > 0xc2) at += 2 + bytes.readUInt16BE(at + 2);
+      expect(`${bytes.readUInt16BE(at + 7)}x${bytes.readUInt16BE(at + 5)}`, src).toBe(sizes);
+      const [width, height] = sizes.split("x").map(Number);
+      // Chromium's install dialog takes 320 to 3840px with the long side at most 2.3 times the short one (web.dev, Richer install UI).
+      expect(Math.max(width, height) / Math.min(width, height), src).toBeLessThanOrEqual(2.3);
+      expect(bytes.length, `${src} stays small`).toBeLessThan(160_000);
+    }
   });
 
   it("keeps its painting beside the script that exports it", () => {

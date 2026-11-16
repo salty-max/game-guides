@@ -1,5 +1,6 @@
 import { DialogHost } from "@hundo/core/components/DialogHost";
 import { Button, PageHeading } from "@hundo/core/components/ui";
+import { useInstall, type InstallOffer } from "@hundo/core/store/install";
 import { useUi, type DialogState } from "@hundo/core/store/ui";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { MemoryRouter } from "react-router";
@@ -35,6 +36,8 @@ const meta = {
     (Story) => {
       // Each story starts with no dialog open: the store is shared by every story.
       useUi.setState({ dialog: null, afterClose: null });
+      // Nor any install line: Chromium hasn't offered, and the story isn't Safari on an iPhone.
+      useInstall.setState({ offer: null, safari: false });
       return (
         <MemoryRouter initialEntries={["/guide/1"]}>
           <Story />
@@ -64,6 +67,31 @@ export const Settings: Story = {
     // The first field has the focus, not the close button.
     await waitFor(() => expect(within(dialog).getByRole("radio", { checked: true })).toHaveFocus(), patient);
     await expect(within(dialog).getByRole("switch", { name: "Keep screen on" })).not.toBeChecked();
+  },
+};
+
+/** Settings once Chromium has offered to install the guide: Install app, whose press shows the browser's own dialog. */
+export const SettingsInstall: Story = {
+  play: async ({ canvas, canvasElement }) => {
+    const offer = Object.assign(new Event("beforeinstallprompt"), { prompt: fn(() => Promise.resolve()) }) as unknown as InstallOffer;
+    useInstall.setState({ offer });
+    await userEvent.click(canvas.getByRole("button", { name: "Open" }));
+    const dialog = await page(canvasElement).findByRole("dialog", { name: "Guide settings" }, patient);
+    await userEvent.click(within(dialog).getByRole("button", { name: "Install app" }));
+    await expect(offer.prompt).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(within(dialog).queryByRole("button", { name: "Install app" })).toBeNull(), patient);
+  },
+};
+
+/** Settings in Safari on an iPhone or iPad: the way to the Home Screen, and what the app starts with. */
+export const SettingsSafari: Story = {
+  play: async ({ canvas, canvasElement }) => {
+    useInstall.setState({ safari: true });
+    await userEvent.click(canvas.getByRole("button", { name: "Open" }));
+    const dialog = await page(canvasElement).findByRole("dialog", { name: "Guide settings" }, patient);
+    // (visible once the dialog has faded in)
+    await waitFor(() => expect(within(dialog).getByText(/Add to Home Screen/)).toBeVisible(), patient);
+    await expect(within(dialog).getByText(/none of this tab’s progress/)).toBeVisible();
   },
 };
 

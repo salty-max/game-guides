@@ -11,6 +11,8 @@ import { validateState } from "../progress-state";
 import { isOpen, useProgress } from "../store/progress";
 import { useSyncStatus } from "../store/sync";
 import { canKeepAwake, useAwake } from "../store/awake";
+import { install, useInstall } from "../store/install";
+import { installed } from "../persistence";
 import { normalizeTheme, themeOptions, useTheme } from "../store/theme";
 import { useUi, type DialogState } from "../store/ui";
 import type { ProgressState } from "../types";
@@ -37,7 +39,38 @@ export function ConfirmScreen({ dialog }: { dialog: Extract<Screens, { kind: "co
   );
 }
 
-/** Theme, how far the guide reveals, keeping the screen on (where the browser can), and the progress backup. */
+/**
+ * Installing the guide, where the browser can: Chromium's own dialog once it has offered one, or in Safari on an iPhone or iPad the way to
+ * the Home Screen, with what an app added from there starts with. Nothing once the guide runs installed.
+ */
+function InstallSection() {
+  const offer = useInstall((s) => s.offer);
+  const safari = useInstall((s) => s.safari);
+  if (!offer && !safari) return null;
+  return (
+    <>
+      <DialogSeparator />
+      {offer ? (
+        <>
+          <DialogText>Install the guide as an app, with an icon of its own.</DialogText>
+          <DialogFooter>
+            <Button onClick={install}>Install app</Button>
+          </DialogFooter>
+        </>
+      ) : (
+        <>
+          <DialogText>To use the guide as an app, open Safari’s Share menu and choose Add to Home Screen.</DialogText>
+          <DialogText small>
+            The app starts with none of this tab’s progress. Sync devices here first and it should come up linked, or export a backup and
+            import it in the app.
+          </DialogText>
+        </>
+      )}
+    </>
+  );
+}
+
+/** Theme, how far the guide reveals, keeping the screen on (where the browser can), the progress backup, and installing the guide. */
 export function SettingsScreen() {
   const data = useProgress((s) => s.data);
   const storageError = useProgress((s) => s.storageError);
@@ -47,6 +80,7 @@ export function SettingsScreen() {
   const openDialog = useUi((s) => s.openDialog);
   const announce = useUi((s) => s.announce);
   const synced = useSyncStatus((s) => s.phase !== "off");
+  const safari = useInstall((s) => s.safari);
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const [theme, setTheme] = useState(preference);
@@ -114,9 +148,11 @@ export function SettingsScreen() {
       <DialogText>
         {text.backupBlurb} Importing replaces the current progress{synced ? ", here and on every device you sync with" : ""}.
       </DialogText>
-      <DialogText small>
-        Installed on a phone or tablet? The installed app can keep its own separate storage. Export here first, then import in the installed app.
-      </DialogText>
+      {!safari && !installed() && (
+        <DialogText small>
+          Installed on a phone or tablet? The installed app can keep its own separate storage. Export here first, then import in the installed app.
+        </DialogText>
+      )}
       {storageError && <DialogText error>Browser storage is unavailable. Export a backup before closing this tab.</DialogText>}
       <FileField id="import-file" label="Import progress backup" accept=".json,application/json" onChange={(file) => void pickFile(file)} />
       <DialogStatus error={feedback.error}>{feedback.text}</DialogStatus>
@@ -127,6 +163,7 @@ export function SettingsScreen() {
         </Button>
         <Button onClick={() => openDialog({ kind: "sync" })}>Sync devices</Button>
       </DialogFooter>
+      <InstallSection />
     </>
   );
 }

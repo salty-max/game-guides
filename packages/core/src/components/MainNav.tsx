@@ -3,15 +3,10 @@ import { cva } from "class-variance-authority";
 import type { MouseEvent } from "react";
 import { Link, useLocation } from "react-router";
 import { Icon } from "./Icon";
+import { pages } from "../nav";
 import { press, pressPart } from "./press-style";
 import { placeOf, safePlace, tabPlaces } from "../store/place";
 import { useProgress } from "../store/progress";
-
-const pages = [
-  ["guide", "Guide", "book"],
-  ["checklist", "Checklist", "checkList"],
-  ["dashboard", "Progress", "chart"],
-] as const;
 
 // Where the three pages are: in the top bar from 551px up, and in a bar across the bottom on a phone (Layout picks one, so there is only
 // ever one main navigation). The bottom bar is in the page's flow, pinned to the bottom of the screen as the top bar is to the top; in the

@@ -6,29 +6,13 @@ import react from "@vitejs/plugin-react";
 import { defineConfig, type Plugin } from "vite";
 import { VitePWA } from "vite-plugin-pwa";
 import { fontCss } from "./src/fonts.ts";
-import { manifestIcons } from "./src/icons.ts";
+import { manifestIcons, manifestScreenshots, manifestShortcuts } from "./src/icons.ts";
+import { darkPalette, lightPalette } from "./palette.ts";
 import type { Brand } from "./src/types.ts";
 
 const here = (path: string) => fileURLToPath(new URL(path, import.meta.url));
 // index.html loads the app through this id, which resolves to core's main.tsx.
 const ENTRY = "/@core/main.tsx";
-
-/**
- * One palette from the guide's theme.css (the light one opens `:root{`, the dark one `:root[data-theme="dark"]{`, with or without a space
- * before the brace). Without a `--surface` the page would ship a placeholder as its theme colour, so a palette that has none stops the build.
- */
-const readPalette = (root: string, opening: RegExp) => {
-  const css = readFileSync(`${root}/src/guide/theme.css`, "utf8");
-  const block = css.split(opening)[1]?.split("}")[0] ?? "";
-  const palette = Object.fromEntries([...block.matchAll(/(--[a-z-]+):([^;]+)/g)].map(([, key, value]) => [key, value.trim()]));
-  if (!palette["--surface"]) throw new Error(`${root}/src/guide/theme.css: no --surface after ${opening}, which the theme-color tag is built from`);
-  return palette;
-};
-
-/** The light palette, for the colours the browser and the installed app show before CSS loads. */
-const lightPalette = (root: string) => readPalette(root, /:root\s*\{/);
-/** The dark one, whose surface colour theme-init.js puts in the theme-color tag when the page opens in dark. */
-const darkPalette = (root: string) => readPalette(root, /:root\[data-theme="dark"\]\s*\{/);
 
 /**
  * Serves the page every guide shares: core's index.html with the brand filled in, and theme-init.js beside it.
@@ -99,8 +83,10 @@ export const guideConfig = (root: string, brand: Brand) => {
         // "prompt": a new version takes over by itself only while the guide is just starting, untouched, and otherwise waits until the reader
         // accepts, so a reload never lands mid-checklist (sw-updates.ts).
         registerType: "prompt",
-        // (favicon.ico is no png or svg, so the glob below would miss it)
-        includeAssets: ["favicon.ico", "icons/favicon.svg", "icons/apple-touch-icon.png", "fonts/*.woff2"],
+        // The glob below precaches the icons and fonts already: listed here too, each went into sw.js twice. favicon.ico is no png or svg,
+        // so the glob would miss it.
+        includeAssets: ["favicon.ico"],
+        includeManifestIcons: false,
         manifest: {
           id: "/",
           name: brand.name,
@@ -114,6 +100,11 @@ export const guideConfig = (root: string, brand: Brand) => {
           background_color: palette["--paper"],
           categories: ["games", "utilities"],
           icons: manifestIcons,
+          shortcuts: manifestShortcuts,
+          screenshots: manifestScreenshots(brand.name),
+          // A second launch while the guide's window is open brings that window forward instead of loading the guide again, and a
+          // shortcut's page opens in it (useLaunches.ts). Where a browser can't, it does what it always did.
+          launch_handler: { client_mode: ["focus-existing", "auto"] },
         },
         workbox: {
           // Precache the whole shell, fonts and banners so the guide works offline.
