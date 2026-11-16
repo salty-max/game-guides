@@ -1,5 +1,5 @@
 import { byChapter } from "@hundo/core/format";
-import type { GuideConfig } from "@hundo/core/types";
+import type { Banner, GuideConfig } from "@hundo/core/types";
 import { brand } from "./brand";
 import chapter1 from "./data/chapter-1";
 import chapter2 from "./data/chapter-2";
@@ -10,7 +10,7 @@ import { missables } from "./data/missables";
 import { sources } from "./data/sources";
 import { countsTowardStat, estimate, pointsLeft, readReported } from "./estimate";
 
-const banners = byChapter(import.meta.glob<string>("./banners/chapter-*.webp", { eager: true, query: "?url", import: "default" }));
+const banners = byChapter(import.meta.glob<Banner>("./banners/chapter-*.webp", { eager: true, query: "?banner", import: "default" }));
 
 const categories: GuideConfig["categories"] = {
   mission: ["Story Missions", "Mission", "book", "rose"],

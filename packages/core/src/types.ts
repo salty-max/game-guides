@@ -91,6 +91,12 @@ export interface ProgressState {
   extra: Extra;
 }
 
+/** A chapter banner: the original, and in a build the smaller copies beside it as a `srcset` (banners.ts). */
+export interface Banner {
+  src: string;
+  srcSet?: string;
+}
+
 export interface FontFace {
   family: string;
   /** File name in public/fonts. */
@@ -191,8 +197,8 @@ export interface GuideConfig {
   missables: Missable[];
   /** Shown while nothing is flagged as missable: why that is safe, with its sources. */
   reassurance?: { text: string; sources: SourceLink[] };
-  /** Chapter id → banner image URL. */
-  banners: Record<number, string>;
+  /** Chapter id → banner, imported with `?banner` (core's banners.ts). */
+  banners: Record<number, Banner>;
   /** Rows "Next up" holds back until nothing else is left in the revealed chapters. */
   defer?: (row: Row) => boolean;
   completion: Completion;

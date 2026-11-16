@@ -62,7 +62,7 @@ Write the light block's selector as `:root{`, with no space before the brace, as
   - a `weight`: the variable range the file covers, such as `"100 900"`, or a single weight;
   - a CSS `fallback` stack.
 
-  The build writes the `@font-face` rules into the page head, and the service worker precaches the files. The display font must have weight 700, because every heading uses it. Red Dead's Barlow Condensed ships only 700, and that's why the house style settled on it. Keep the font's licence text beside the file, as `Fraunces-OFL.txt` is.
+  The build writes the `@font-face` rules into the page head with a preload for each file (`fontPreloads` in `packages/core/src/fonts.ts`), and the service worker precaches the files. Without the preloads a font is asked for only once the app has drawn text in it, and the page drawn in the fallback moved when the fonts arrived: the chapter page shifted by 0.11 to 0.14 on GitHub's Lighthouse runner in all three guides, and by 0 with them on a Mac (16 Nov 2026). The display font must have weight 700, because every heading uses it. Red Dead's Barlow Condensed ships only 700, and that's why the house style settled on it. Keep the font's licence text beside the file, as `Fraunces-OFL.txt` is.
 - **`brand.corners`**: `"narrow"` gives soft squares (8px buttons, 6px tags, 12px cards). Koholint and Red Dead use it. `"normal"` gives pills (round buttons, chips and tags, 16px cards); Echoes uses it. It changes corners only, not spacing. The value reaches the page as `<html data-corners>` at build time.
 
 ## Icon
@@ -85,12 +85,12 @@ The PNGs are 256 dithered colours: a quarter to a half of the bytes of full colo
 
 ## Banners
 
-One WebP per chapter, `src/guide/banners/chapter-N.webp`, picked up by `byChapter(import.meta.glob(…))` in `config.ts`.
+One WebP per chapter, `src/guide/banners/chapter-N.webp`, picked up by `byChapter(import.meta.glob(…, { query: "?banner" }))` in `config.ts`. The build adds an 800 and a 1320px copy of each (`packages/core/banners.ts`), and the page offers all three as a `srcset`: a phone takes a copy, a desktop the original. The banner is the chapter page's largest paint: with the copies and the font preloads together, Lighthouse's phone on a Mac put the first chapter's at 3.8 to 4.2 s, from 4.4 to 4.8 s.
 
 - The current banners are 1700 to 1800 pixels wide and 567 to 630 tall, about 3:1. Echoes' are 1800×600.
 - The art fills the right 68% of the banner, anchored at 76% across. It fades in from the left over the palette tint: fully transparent for the first 9% of the art's width, fully opaque from 66%. At 1050px and narrower, the whole image stacks above the text. Keep the subject right of centre, and keep the left third quiet.
 - The page crops any image that isn't 3:1 to fit (`object-fit: cover`), so make them exactly 1800×600.
-- The service worker precaches every banner, so its size counts toward a reader's first install. The three guides' sets run from about 0.6 MB to 1.5 MB.
+- The service worker precaches every banner and both its copies, so whichever one a screen picks is there offline, and their size counts toward a reader's first install. With the copies the three guides' sets run from about 1.0 MB (Red Dead) to 2.4 MB (Echoes); the originals alone are 0.66 to 1.47 MB.
 - Credit the art in the guide's README.
 
 ## Components

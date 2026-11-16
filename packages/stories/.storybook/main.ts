@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 import tailwindcss from "@tailwindcss/vite";
 import type { StorybookConfig } from "@storybook/react-vite";
 import { mergeConfig } from "vite";
+import { bannerSizes } from "@hundo/core/banners";
 import { iconUrls } from "@hundo/core/icon-versions";
 
 const fromHere = (path: string) => fileURLToPath(new URL(path, import.meta.url));
@@ -36,8 +37,8 @@ const config: StorybookConfig = {
   ],
   viteFinal: (base) =>
     mergeConfig(base, {
-      // The tile's versioned URLs (virtual:icon-urls), for the same guide's icons staticDirs serves.
-      plugins: [tailwindcss(), iconUrls(app("koholint/public"))],
+      // The tile's versioned URLs (virtual:icon-urls), for the same guide's icons staticDirs serves, and the banners as the guides import them.
+      plugins: [tailwindcss(), iconUrls(app("koholint/public")), bannerSizes()],
       // Core reads a guide's config through virtual:guide/…. Stories use one fixed guide's data; only the look switches.
       resolve: { alias: [{ find: /^virtual:guide\//, replacement: app("koholint/src/guide/") }] },
       optimizeDeps: { include: baseUiParts() },

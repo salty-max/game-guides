@@ -1,5 +1,5 @@
 import { byChapter } from "@hundo/core/format";
-import type { GuideConfig } from "@hundo/core/types";
+import type { Banner, GuideConfig } from "@hundo/core/types";
 import { brand } from "./brand";
 import chapter1 from "./data/chapter-1";
 import chapter2 from "./data/chapter-2";
@@ -12,7 +12,7 @@ import chapter8 from "./data/chapter-8";
 import chapter9 from "./data/chapter-9";
 import { missables, reassurance } from "./data/missables";
 
-const banners = byChapter(import.meta.glob<string>("./banners/chapter-*.webp", { eager: true, query: "?url", import: "default" }));
+const banners = byChapter(import.meta.glob<Banner>("./banners/chapter-*.webp", { eager: true, query: "?banner", import: "default" }));
 
 /** The guide's own completion list. A test pins every goal to the data, so a missing row shows up as a failing count. */
 export const targets = [
