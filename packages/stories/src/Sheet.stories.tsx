@@ -2,6 +2,7 @@ import { Sheet } from "@hundo/core/components/Sheet";
 import { Button } from "@hundo/core/components/ui";
 import { Select } from "@hundo/core/components/Select";
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { useState, type ComponentProps } from "react";
 import { expect, fn, userEvent, waitFor, within } from "storybook/test";
 
 // A sheet from the bottom of a phone's screen, over a dimmed page: the checklist's filters. Its fields scroll, its buttons stay at its foot.
@@ -42,7 +43,7 @@ export const Open: Story = {
     await expect(within(sheet).getByRole("combobox", { name: "Status" })).toBeVisible();
     await expect(within(sheet).getByRole("button", { name: "Show 40 matches" })).toBeVisible();
     await userEvent.click(within(sheet).getByRole("button", { name: "Close" }));
-    await waitFor(() => expect(args.onOpenChange).toHaveBeenCalledWith(false, expect.anything()), patient);
+    await waitFor(() => expect(args.onOpenChange).toHaveBeenCalledWith(false), patient);
   },
 };
 
@@ -51,6 +52,22 @@ export const Escape: Story = {
   play: async ({ canvasElement, args }) => {
     await page(canvasElement).findByRole("dialog", { name: "Filters" }, patient);
     await userEvent.keyboard("{Escape}");
-    await waitFor(() => expect(args.onOpenChange).toHaveBeenCalledWith(false, expect.anything()), patient);
+    await waitFor(() => expect(args.onOpenChange).toHaveBeenCalledWith(false), patient);
+  },
+};
+
+/** Holds the open state, as the checklist does. */
+function Holder(args: ComponentProps<typeof Sheet>) {
+  const [open, setOpen] = useState(args.open);
+  return <Sheet {...args} open={open} onOpenChange={setOpen} />;
+}
+
+/** Back while it's open: gone at once, with no slide, before the page it's on goes out of sight (which would hold the slide until it came back). */
+export const GoneOnBack: Story = {
+  render: (args) => <Holder {...args} />,
+  play: async ({ canvasElement }) => {
+    await page(canvasElement).findByRole("dialog", { name: "Filters" }, patient);
+    window.dispatchEvent(new PopStateEvent("popstate"));
+    await expect(page(canvasElement).queryByRole("dialog", { name: "Filters" })).toBeNull();
   },
 };

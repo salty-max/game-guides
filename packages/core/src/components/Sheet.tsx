@@ -1,7 +1,9 @@
 import { Drawer } from "@base-ui/react/drawer";
 import { useRef, type ReactNode } from "react";
+import { flushSync } from "react-dom";
 import { IconButton } from "./ui";
 import { lastInput } from "../lastInput";
+import { useBeforeBack } from "../beforeBack";
 
 // Base UI's drawer layers, as in RailDrawer.tsx, from the bottom of the screen. The backdrop dims the whole screen, bars included, and is
 // placed the way the dialog's is (DialogFrames.tsx): against the screen in a browser tab, against the fixed body in the installed app on
@@ -35,8 +37,26 @@ interface SheetProps {
  */
 export function Sheet({ open, onOpenChange, title, children, footer, returnFocus }: SheetProps) {
   const popupRef = useRef<HTMLDivElement>(null);
+  const actions = useRef<Drawer.Root.Actions>(null);
+  const leaving = useRef(false);
+  // Back while it's open (the one way off a page past a modal sheet): gone at once, with no slide, while the page is still on screen. A
+  // page kept out of sight (Pages) runs no transition and no effect, so a sheet closed later would slide away as the page comes back.
+  useBeforeBack(() => {
+    leaving.current = true;
+    flushSync(() => actions.current?.close());
+    flushSync(() => actions.current?.unmount());
+    leaving.current = false;
+  }, open);
   return (
-    <Drawer.Root open={open} onOpenChange={onOpenChange} swipeDirection="down">
+    <Drawer.Root
+      open={open}
+      onOpenChange={(next, details) => {
+        if (!next && leaving.current) details.preventUnmountOnClose();
+        onOpenChange(next);
+      }}
+      actionsRef={actions}
+      swipeDirection="down"
+    >
       <Drawer.Portal>
         <Drawer.Backdrop className={backdrop} />
         <Drawer.Viewport className={viewport}>
