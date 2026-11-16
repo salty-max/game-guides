@@ -10,7 +10,6 @@ export const brand = {
   storagePrefix: "red-dead-field-guide",
   backupFile: "rdr-progress.json",
   mark: "RDR",
-  icon: "compass",
   game: "Red Dead Redemption",
   publisher: "Rockstar Games",
   corners: "narrow",

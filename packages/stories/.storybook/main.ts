@@ -28,7 +28,11 @@ const config: StorybookConfig = {
   framework: "@storybook/react-vite",
   core: { disableTelemetry: true },
   // The guides' fonts, so a story shows a guide's own type. (Koholint and Red Dead ship the same DM Sans file.)
-  staticDirs: ["koholint", "rdr", "echoes"].map((name) => ({ from: app(`${name}/public/fonts`), to: "/fonts" })),
+  staticDirs: [
+    ...["koholint", "rdr", "echoes"].map((name) => ({ from: app(`${name}/public/fonts`), to: "/fonts" })),
+    // The top bar's brand tile, from the guide whose data the stories use: it stays Koholint's painting in every guide's look.
+    { from: app("koholint/public/icons"), to: "/icons" },
+  ],
   viteFinal: (base) =>
     mergeConfig(base, {
       plugins: [tailwindcss()],

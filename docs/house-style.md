@@ -69,7 +69,7 @@ Write the light block's selector as `:root{`, with no space before the brace, as
 
 A guide's icon is two pieces of art, both in `scripts/`:
 
-- **`icon-master.webp`**, the painting: a 1024px opaque, full-bleed square, its subject inside a centred disk about 81% of the side, the square around it in the guide's dark `--surface`. It's what the home screen and the installed app show. The [artwork notes](icon-art.md) keep the prompts.
+- **`icon-master.webp`**, the painting: a 1024px opaque, full-bleed square, its subject inside a centred disk about 81% of the side, the square around it in the guide's dark `--surface`. It's what the home screen, the installed app and the top bar's brand tile show. The [artwork notes](icon-art.md) keep the prompts.
 - **`favicon.svg`**, the tab drawing: a 32-unit square SVG, a rounded tile in the guide's light `--primary` with a flat version of the same subject. A painting shrunk to 16px is a smudge, the Red Dead hat worst of all, so the tab gets a drawing made for that size. Its tile carries its own background, so it reads in light and dark browser chrome alike.
 
 `scripts/icons.mjs` hands both to core's `writeIcons`. Run `pnpm icons` from the app folder after changing either, and commit what it writes. Nothing regenerates them in the build.
@@ -77,10 +77,11 @@ A guide's icon is two pieces of art, both in `scripts/`:
 - `icon-192.png` and `icon-512.png`: the painting with rounded corners (22% of the side), for the manifest.
 - `maskable-512.png`: the painting at 440px on a 512 canvas filled from its own edge, so the disk is 70% of the side and inside the 80% circle a launcher may crop to.
 - `apple-touch-icon.png`: the painting as an opaque 180px square, because iOS rounds the corners itself.
+- `tile-40.png`, `tile-80.png` and `tile-120.png`: the painting for the brand tile in the top bar, at 1x, 2x and 3x of its 40px, square because the tile clips it to the guide's corners, with a hairline in its `--line`, an outline inset over the edge, that keeps the tile's shape on a dark bar, where the painting's own square is the bar's colour. They come to under 15 kB a guide.
 - `favicon.svg`: the tab drawing as it is, which Chrome, Firefox and Safari since version 26 ([its release notes](https://developer.apple.com/documentation/safari-release-notes/safari-26-release-notes)) use in the tab.
 - `public/favicon.ico`, at the root: the tab drawing at 16 and 32px, in full colour, for a browser that takes no SVG, and for any client that asks for `/favicon.ico` without reading the page (that path would otherwise get the app's page).
 
-The PNGs are 256 dithered colours: a quarter to a half of the bytes of full colour, with no banding to see in the paintings. The service worker precaches them all, so the four PNGs (125 to 230 kB a guide) reach every reader at install. The page links the ico (`sizes="32x32"`, with which Chrome takes the SVG over it: [Evil Martians' recipe](https://evilmartians.com/chronicles/how-to-favicon-in-six-files-that-fit-most-needs)), then the SVG, then the Apple icon. The manifest lists the three PNGs and no SVG: a scalable icon fits every size, so installed-app surfaces would show the tab drawing instead of the painting. `icons.test.ts` checks each guide's files against the page and the manifest.
+The PNGs are 256 dithered colours: a quarter to a half of the bytes of full colour, with no banding to see in the paintings. The service worker precaches them all, so the home-screen PNGs (125 to 230 kB a guide) reach every reader at install. The page links the ico (`sizes="32x32"`, with which Chrome takes the SVG over it: [Evil Martians' recipe](https://evilmartians.com/chronicles/how-to-favicon-in-six-files-that-fit-most-needs)), then the SVG, then the Apple icon. The manifest lists the three PNGs and no SVG: a scalable icon fits every size, so installed-app surfaces would show the tab drawing instead of the painting. `icons.test.ts` checks each guide's files against the page and the manifest.
 
 ## Banners
 
