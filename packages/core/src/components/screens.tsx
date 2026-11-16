@@ -157,7 +157,15 @@ export function SettingsScreen() {
       <FileField id="import-file" label="Import progress backup" accept=".json,application/json" onChange={(file) => void pickFile(file)} />
       <DialogStatus error={feedback.error}>{feedback.text}</DialogStatus>
       <DialogFooter>
-        <Button onClick={exportProgress}>Export progress</Button>
+        <Button
+          onClick={() => {
+            exportProgress();
+            // (the page's own announcement is behind the modal, where a screen reader can't hear it)
+            setFeedback({ text: "Progress backup exported.", error: false });
+          }}
+        >
+          Export progress
+        </Button>
         <Button id="import-button" disabled={!imported} onClick={replace}>
           Replace with backup
         </Button>

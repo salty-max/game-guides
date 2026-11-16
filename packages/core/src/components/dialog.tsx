@@ -31,9 +31,14 @@ export function DialogText({ children, small = false, error = false }: { childre
   return <p className={text({ size: small ? "small" : "default", tone: error ? "error" : "quiet" })}>{children}</p>;
 }
 
-/** The paragraph that says what the dialog is about: the dialog is described by it for screen readers. */
-export function DialogDescription({ children }: { children: ReactNode }) {
-  return <Dialog.Description className={text({ size: "default", tone: "quiet" })}>{children}</Dialog.Description>;
+/**
+ * The paragraph that says what the dialog is about: the dialog's aria-describedby points to it. A dialog has one, and only one may be mounted
+ * at a time: Base UI keeps a single id, and a description that unmounts clears it whichever paragraph set it, so two together leave the dialog
+ * with none when either goes. `error` is for a problem the reader should be told on opening; a screen that can show one writes its own
+ * description with `ScreenIntro` (StorageWarning.tsx), which steps aside for it.
+ */
+export function DialogDescription({ children, error = false }: { children: ReactNode; error?: boolean }) {
+  return <Dialog.Description className={text({ size: "default", tone: error ? "error" : "quiet" })}>{children}</Dialog.Description>;
 }
 
 /**

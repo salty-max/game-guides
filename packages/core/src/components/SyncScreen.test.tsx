@@ -29,6 +29,7 @@ vi.mock("../sync/pairing", () => ({
 const pairing = { startCode: vi.mocked(startCode), checkStatus: vi.mocked(checkStatus), claimCode: vi.mocked(claimCode), afterLinked: vi.mocked(afterLinked), unlinkDevice: vi.mocked(unlinkDevice), forgetGroup: vi.mocked(forgetGroup), removeDevice: vi.mocked(removeDevice) };
 
 const NOW = Date.UTC(2026, 10, 15, 12, 0, 0);
+const STORAGE_WARNING = "Browser storage is unavailable. Export a backup before closing this tab.";
 const group = (now = NOW) => ({
   ok: true as const,
   linked: true,
@@ -46,6 +47,7 @@ beforeEach(() => {
   useSyncStatus.setState({ phase: "off", devices: 0, lastSync: null });
   history.replaceState(null, "", "/guide/1");
   for (const mock of Object.values(pairing)) mock.mockReset();
+  vi.mocked(exportProgress).mockClear();
   pairing.checkStatus.mockResolvedValue({ ok: true, linked: false, devices: [], now: NOW });
 });
 
@@ -473,7 +475,7 @@ describe("where it is opened from", () => {
     await user.click(await screen.findByRole("button", { name }));
     const dialog = await screen.findByRole("dialog", { name: "Sync devices" });
     expect(screen.queryByRole("dialog", { name: "Guide settings" })).not.toBeInTheDocument();
-    const warning = within(dialog).queryByText("Browser storage is unavailable. Export a backup before closing this tab.");
+    const warning = within(dialog).queryByText(STORAGE_WARNING);
     if (!storageError) {
       expect(warning).not.toBeInTheDocument();
       return expect(within(dialog).queryByRole("button", { name: "Export progress" })).not.toBeInTheDocument();
@@ -481,8 +483,24 @@ describe("where it is opened from", () => {
     // at the top: before the paragraph that says what the screen is for, with the backup it asks for in reach
     expect(warning).toBeInTheDocument();
     expect(warning!.compareDocumentPosition(within(dialog).getByText(/in step with your other devices|same on your other devices/)) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    // it is what the dialog's aria-describedby points to
+    expect(dialog).toHaveAccessibleDescription(STORAGE_WARNING);
     await user.click(within(dialog).getByRole("button", { name: "Export progress" }));
     expect(exportProgress).toHaveBeenCalledTimes(1);
+    // said in the dialog, since the page's own announcement is behind the modal
+    expect(within(dialog).getByText("Progress backup exported.")).toBeInTheDocument();
+  });
+
+  it("is described by the screen's own words, and by the storage warning instead while the browser won't keep the progress", async () => {
+    const dialog = await open();
+    expect(dialog).toHaveAccessibleDescription(/same on your other devices/);
+    act(() => useProgress.setState({ storageError: true }));
+    await waitFor(() => expect(dialog).toHaveAccessibleDescription(STORAGE_WARNING));
+    // the screen's own words stay on it, as a plain paragraph
+    expect(within(dialog).getByText(/Keep this guide’s progress the same on your other devices/)).toBeInTheDocument();
+    act(() => useProgress.setState({ storageError: false }));
+    await waitFor(() => expect(dialog).toHaveAccessibleDescription(/same on your other devices/));
+    expect(within(dialog).queryByText(STORAGE_WARNING)).not.toBeInTheDocument();
   });
 
   it("doesn't say the progress is saved on this device where the browser won't keep it", async () => {
@@ -508,14 +526,19 @@ describe("where it is opened from", () => {
     expect(within(dialog).getByText(/from then on changes follow by themselves/)).toBeInTheDocument();
   });
 
-  it("has the settings carry the storage warning in the same words", async () => {
+  it("has the settings carry the storage warning in the same words, as what the dialog is described by", async () => {
+    const user = userEvent.setup();
     render(<App />);
-    act(() => {
-      useProgress.setState({ storageError: true });
-      useUi.getState().openDialog({ kind: "settings" });
-    });
+    act(() => useUi.getState().openDialog({ kind: "settings" }));
     const settings = await screen.findByRole("dialog", { name: "Guide settings" });
-    expect(within(settings).getByText("Browser storage is unavailable. Export a backup before closing this tab.")).toBeInTheDocument();
+    expect(within(settings).queryByText(STORAGE_WARNING)).not.toBeInTheDocument();
+    act(() => useProgress.setState({ storageError: true }));
+    expect(await within(settings).findByText(STORAGE_WARNING)).toBeInTheDocument();
+    await waitFor(() => expect(settings).toHaveAccessibleDescription(STORAGE_WARNING));
+    // the settings' own Export button says it was done inside the dialog, where a screen reader can hear it
+    await user.click(within(settings).getByRole("button", { name: "Export progress" }));
+    expect(exportProgress).toHaveBeenCalledTimes(1);
+    expect(within(settings).getByText("Progress backup exported.")).toBeInTheDocument();
   });
 
   it("is a button in the settings, which also says that an import follows to the other devices", async () => {

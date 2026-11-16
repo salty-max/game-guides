@@ -2,7 +2,7 @@ import { useEffect, useEffectEvent, useRef, useState, type ReactNode } from "rea
 import { CodeField } from "./controls";
 import { DialogDescription, DialogFooter, DialogSeparator, DialogStatus, DialogText } from "./dialog";
 import { ItemList, ItemRow } from "./list";
-import { StorageWarning } from "./StorageWarning";
+import { ScreenIntro, StorageWarning } from "./StorageWarning";
 import { Button } from "./ui";
 import { ago } from "../format";
 import { installed } from "../persistence";
@@ -102,7 +102,7 @@ function Off({ onShow, onEnter, busy, said }: { onShow: () => void; onEnter: () 
   return (
     <View>
       <StorageWarning withExport />
-      <DialogDescription>Keep this guide’s progress the same on your other devices. No account needed.</DialogDescription>
+      <ScreenIntro>Keep this guide’s progress the same on your other devices. No account needed.</ScreenIntro>
       <DialogText>
         {!unavailable && "Your progress is already saved on this device. "}To share it, show a code here and type it on your other device, or type the code that device
         shows. Linking works for every Hundo guide in this browser, and from then on changes follow by themselves.
@@ -296,7 +296,7 @@ function Linked({
   return (
     <View>
       <StorageWarning withExport />
-      <DialogDescription>This device keeps its progress in step with your other devices, with no account.</DialogDescription>
+      <ScreenIntro>This device keeps its progress in step with your other devices, with no account.</ScreenIntro>
       <DialogStatus error={busy ? false : said ? said.error : phase === "error"}>{busy ? "Working…" : said ? said.text : statusLine(phase, count, lastSync)}</DialogStatus>
       <ItemList label="Linked devices" empty={devices === "failed" ? "Couldn’t load the list of devices. Check your connection." : "Loading the devices…"}>
         {shown?.list.map((device, index) => (
