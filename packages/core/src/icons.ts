@@ -12,7 +12,8 @@ export const manifestIcons = [
 /** The top bar's brand tile, the painting at 40px and its 2x and 3x (a phone's 34px tile at 3x takes 102). */
 export const tileSizes = [40, 80, 120];
 export const tileSrc = (size: number) => `/icons/tile-${size}.png`;
-export const tileSrcSet = tileSizes.map((size, i) => `${tileSrc(size)} ${i + 1}x`).join(", ");
+/** The tile's srcset, each file through `url`, which versions it (`virtual:icon-urls` in the page, icon-versions.ts). */
+export const tileSrcSet = (url: (path: string) => string) => tileSizes.map((size, i) => `${url(tileSrc(size))} ${i + 1}x`).join(", ");
 
 /**
  * The installed app's shortcuts (its icon's menu on Android and on the desktop): the three pages, each with its glyph drawn on the guide's

@@ -3,5 +3,5 @@
   "compilerOptions": {
     "paths": { "virtual:guide/*": ["../../apps/koholint/src/guide/*"] }
   },
-  "include": [".storybook", "src", "vitest.config.ts"]
+  "include": [".storybook", "src", "vitest.config.ts", "../core/src/icon-urls.d.ts"]
 }
