@@ -47,6 +47,7 @@ export const LINK_FOLLOW_UPS = [3_000, 8_000, 15_000];
 interface Engine {
   kick: () => void;
   linking: () => void;
+  busy: () => boolean;
 }
 
 let active: Engine | null = null;
@@ -54,6 +55,11 @@ let active: Engine | null = null;
 /** Run a round soon, for when something just changed what sync should do. */
 export function syncSoon() {
   active?.kick();
+}
+
+/** A round is under way: its requests are out and their answers not yet in. */
+export function syncing() {
+  return active?.busy() ?? false;
 }
 
 /** A device has just been linked, or another has joined this one's group: a round now, and a few more shortly after. */
@@ -200,6 +206,7 @@ export function startEngine(): () => void {
 
   active = {
     kick: () => schedule(0),
+    busy: () => running,
     linking: () => {
       wait = POLL_FAST;
       schedule(0);

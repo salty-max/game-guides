@@ -95,7 +95,8 @@ export const guideConfig = (root: string, brand: Brand) => {
       // The jsdom tests never process CSS (only ?raw text gets through), so Tailwind sits them out.
       ...(process.env.VITEST ? [] : [tailwindcss()]),
       VitePWA({
-        // "prompt": a new version waits until the reader accepts, so a reload never lands mid-checklist.
+        // "prompt": a new version takes over by itself only while the guide is just starting, untouched, and otherwise waits until the reader
+        // accepts, so a reload never lands mid-checklist (sw-updates.ts).
         registerType: "prompt",
         includeAssets: ["icons/favicon.svg", "icons/apple-touch-icon.png", "fonts/*.woff2"],
         manifest: {
