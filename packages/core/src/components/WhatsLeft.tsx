@@ -2,6 +2,7 @@ import { Link } from "react-router";
 import { Panel, PanelText, PanelTitle } from "./ui";
 import { cats, completion, whatsLeft } from "../guide";
 import { useProgress } from "../store/progress";
+import { pressText } from "./press-style";
 
 const points = (value: number) => (Math.round(value * 10) / 10).toFixed(1);
 
@@ -25,7 +26,7 @@ export function WhatsLeft() {
           <ul className="mt-3 mb-0 grid list-none gap-2.5 p-0">
             {items.map((item) => (
               <li key={item.tag} className="grid grid-cols-[minmax(120px,190px)_1fr_auto] items-center gap-3 text-[14px] phone:grid-cols-[1fr_auto]">
-                <Link className="hover:text-primary hover:underline hover:underline-offset-3" to={`/checklist/${item.tag}`}>
+                <Link className={`${pressText} hover:text-primary hover:underline hover:underline-offset-3`} to={`/checklist/${item.tag}`}>
                   {cats[item.tag][0]}
                 </Link>
                 {/* Decoration: the numbers beside it say the same. Its length is the category's share of the biggest, and the darker part is what's done. */}

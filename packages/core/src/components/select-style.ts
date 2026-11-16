@@ -1,3 +1,5 @@
+import { press } from "./press-style";
+
 // What the select's two forms share: its props, and the look of its closed trigger. Plain values, no Base UI, so the shell (Select.tsx),
 // which is on every page that has a select, can use them without pulling in the select behind it. The field's frame is here too, for
 // the same reason: every labelled control (controls.tsx) uses it.
@@ -14,8 +16,7 @@ export interface SelectProps {
   disabled?: boolean;
 }
 
-export const selectTrigger =
-  "flex min-h-11 w-full items-center justify-between gap-2 rounded-control border border-control-line bg-surface px-2.5 py-1.5 text-start text-sm font-bold text-ink select-none not-data-disabled:hover:bg-raised data-disabled:cursor-not-allowed data-disabled:opacity-[.46] data-popup-open:bg-raised";
+export const selectTrigger = `${press} flex min-h-11 w-full items-center justify-between gap-2 rounded-control border border-control-line bg-surface px-2.5 py-1.5 text-start text-sm font-bold text-ink select-none not-data-disabled:hover:bg-raised data-disabled:cursor-not-allowed data-disabled:opacity-[.46] data-popup-open:bg-raised`;
 
 /** A labelled control's frame: the label over the control, with a line of description or error under it. */
 export const field = "grid gap-1 text-[13px] font-bold";

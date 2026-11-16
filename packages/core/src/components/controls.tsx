@@ -7,6 +7,7 @@ import { buttonClass } from "./buttonStyle";
 import { checkBox, checkIcon, checkMark } from "./check-style";
 import { Icon } from "./Icon";
 import { field } from "./select-style";
+import { press } from "./press-style";
 
 // Core's form controls: Base UI's headless parts, styled from the guide's palette through the tokens in tokens.css. Like Button, none of
 // them takes a className or a style: a guide gets the look it's given. The parts follow shadcn's Base UI components, adapted to the house tokens.
@@ -54,7 +55,7 @@ export function RadioGroup({ label, choices, value, onChange }: RadioGroupProps)
         {choices.map(([key, text]) => (
           <label
             key={key}
-            className="flex min-h-11 cursor-pointer items-center justify-center rounded-control border border-control-line bg-surface px-3 text-center text-sm font-bold text-muted select-none not-has-data-checked:hover:bg-raised has-focus-visible:outline-3 has-focus-visible:outline-offset-3 has-focus-visible:outline-focus has-data-checked:border-soft-line has-data-checked:bg-soft has-data-checked:text-soft-ink"
+            className={`${press} flex min-h-11 cursor-pointer items-center justify-center rounded-control border border-control-line bg-surface px-3 text-center text-sm font-bold text-muted select-none not-has-data-checked:hover:bg-raised has-focus-visible:outline-3 has-focus-visible:outline-offset-3 has-focus-visible:outline-focus has-data-checked:border-soft-line has-data-checked:bg-soft has-data-checked:text-soft-ink`}
           >
             <Radio.Root value={key} className="sr-only" />
             {text}

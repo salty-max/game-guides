@@ -5,6 +5,7 @@ import { tones } from "./tone";
 import { ProgressBar } from "./ui";
 import { cats, tally } from "../guide";
 import { useProgress } from "../store/progress";
+import { press } from "./press-style";
 
 const statIcon = cva("grid size-7 flex-none place-items-center rounded-small [&_svg]:size-[15px]", { variants: { tone: tones }, defaultVariants: { tone: "none" } });
 
@@ -15,7 +16,7 @@ export function Stat({ tag, goal }: { tag: string; goal?: number }) {
   const [name, , graphic, tone] = cats[tag];
   return (
     <Link
-      className="flex min-w-0 flex-col gap-1.5 rounded-card border border-line bg-surface px-[11px] py-2.5 text-left hover:border-control-line hover:bg-raised"
+      className={`${press} flex min-w-0 flex-col gap-1.5 rounded-card border border-line bg-surface px-[11px] py-2.5 text-left hover:border-control-line hover:bg-raised`}
       to={`/checklist/${tag}`}
     >
       <span className="flex items-center gap-2 text-[12px] leading-[1.18] font-extrabold">

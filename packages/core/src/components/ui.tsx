@@ -13,6 +13,7 @@ import { tooltip as tooltipHandle } from "./tooltip-handle";
 import { brand, cats, config, tagName } from "../guide";
 import type { Row } from "../types";
 import { pct } from "../format";
+import { press } from "./press-style";
 
 interface ButtonProps extends Omit<ComponentPropsWithRef<"button">, "style" | "className"> {
   look?: ButtonStyle;
@@ -46,8 +47,7 @@ export function LinkButton({ to, look = "outline", size = "default", icon, child
 }
 
 // The top bar sets --icon-w where its buttons have to be narrower (the narrowest phones), so no class is needed on one.
-const iconButton =
-  "grid h-10 w-(--icon-w,2.5rem) place-items-center rounded-control border border-control-line bg-transparent p-0 text-inherit not-disabled:hover:bg-raised disabled:cursor-not-allowed disabled:opacity-[.46] [&_svg]:size-4.5";
+const iconButton = `${press} grid h-10 w-(--icon-w,2.5rem) place-items-center rounded-control border border-control-line bg-transparent p-0 text-inherit not-disabled:hover:bg-raised disabled:cursor-not-allowed disabled:opacity-[.46] [&_svg]:size-4.5`;
 
 type IconButtonProps = { label: string; icon: IconName; tooltip?: boolean } & Omit<ComponentPropsWithRef<"button">, "className" | "style">;
 
@@ -99,7 +99,7 @@ export function ChipGroup({ label, choices, value, onChange, space }: ChipGroupP
         <Toggle
           key={key}
           value={key}
-          className="min-h-10 rounded-button border border-line bg-surface px-3.5 py-2 text-[13px] leading-[1.4] font-bold text-muted hover:border-control-line data-pressed:border-soft-line data-pressed:bg-soft data-pressed:text-soft-ink phone:px-[11px]"
+          className={`${press} min-h-10 rounded-button border border-line bg-surface px-3.5 py-2 text-[13px] leading-[1.4] font-bold text-muted hover:border-control-line data-pressed:border-soft-line data-pressed:bg-soft data-pressed:text-soft-ink phone:px-[11px]`}
         >
           {text}
         </Toggle>

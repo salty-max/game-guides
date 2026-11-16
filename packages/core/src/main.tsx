@@ -5,6 +5,10 @@ import { App } from "./App";
 import "./app.css";
 import "virtual:guide/theme.css";
 
+// iOS Safari applies :active on touch only on a page that listens for touchstart (MDN's :active page; WebKit bug 138816): this listener is
+// what lets a pressed control show it (press-style.ts). It does nothing and never blocks a scroll.
+document.addEventListener("touchstart", () => {}, { passive: true });
+
 if (!leaving) {
   createRoot(document.getElementById("root")!).render(
     <StrictMode>

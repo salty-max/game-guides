@@ -9,11 +9,12 @@ import { isOpen, useProgress } from "../store/progress";
 import { useReveal } from "../useReveal";
 import { useUi } from "../store/ui";
 import { railHeading, railPanel } from "./rail-style";
+import { press, pressText } from "./press-style";
 
 // A chapter in the rail: a link to it, or, while spoiler protection hides it, a button that reveals it (and says what it's hidden by).
 // A locked one keeps its muted colour when it's hovered; an open one darkens.
 const chapterLink = cva(
-  "group/chapter grid min-h-12 w-full cursor-pointer grid-cols-[30px_minmax(0,1fr)_17px] items-center gap-2.5 rounded-small border border-transparent bg-transparent p-2 text-left font-sans font-bold no-underline hover:bg-rail-hover aria-[current=page]:border-soft-line aria-[current=page]:text-ink [&_svg]:size-3.5 [&_svg]:text-muted [&[aria-current=page]:not(:hover)]:bg-soft",
+  `${press} group/chapter grid min-h-12 w-full cursor-pointer grid-cols-[30px_minmax(0,1fr)_17px] items-center gap-2.5 rounded-small border border-transparent bg-transparent p-2 text-left font-sans font-bold no-underline hover:bg-rail-hover aria-[current=page]:border-soft-line aria-[current=page]:text-ink [&_svg]:size-3.5 [&_svg]:text-muted [&[aria-current=page]:not(:hover)]:bg-soft`,
   { variants: { locked: { true: "text-[13px] text-muted", false: "text-[14px] text-inherit hover:text-ink" } } },
 );
 
@@ -80,7 +81,7 @@ export function RailContent({ activeChapter, view, heading }: RailProps & { head
             <strong className="text-[13px]">Spoiler protection {data.spoilers ? "on" : "off"}</strong>
             <p className="mt-0.5 mb-[5px] text-[12px] leading-[1.46] text-muted">{data.spoilers ? `Chapters past ${data.ceiling} are hidden.` : "All chapters are visible."}</p>
             <BaseButton
-              className="inline-flex min-h-8 cursor-pointer items-center border-0 bg-transparent px-0 py-1 text-left font-sans text-[12px] font-bold text-primary underline underline-offset-[3px]"
+              className={`${pressText} inline-flex min-h-8 cursor-pointer items-center border-0 bg-transparent px-0 py-1 text-left font-sans text-[12px] font-bold text-primary underline underline-offset-[3px]`}
               onClick={() => openDialog({ kind: "settings" })}
             >
               Change settings
