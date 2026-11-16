@@ -51,6 +51,7 @@ Work out which projects will build before asking for the push. The ignore step, 
    - `/` and the deep link `/guide/3` return 200 HTML: the app, not a 404;
    - `/assets/nope.js`, `/workbox-nope.js`, `/fonts/nope.woff2` and `/icons/nope.svg` return a 404 (not the app's HTML) with no long cache: no `immutable`, no `max-age` above 0. The long cache rules apply only to a file that exists;
    - `/api/sync` (405) and `/api/nope` (404) are the sync API's own answers, not the app's page;
+   - `/favicon.ico` is the icon file (an image, with no long cache), not the app's page;
    - every route has the CSP;
    - `index.html`, `sw.js`, `theme-init.js` and the manifest carry the revalidate rule, and `sw.js` has `Service-Worker-Allowed: /` (`swa=/`);
    - hashed `/assets` and the Workbox chunk (`/workbox-<hash>.js`) carry the one-year immutable rule, and `/fonts` and `/icons` the week-long one;

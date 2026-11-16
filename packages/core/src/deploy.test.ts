@@ -115,6 +115,8 @@ describe("deploy settings", () => {
       expect(cacheControl(hit, path), path).toEqual([value]);
       expect(cacheControl(before, path), path).toEqual([]);
     }
+    // (the root favicon is found by the filesystem phase, ahead of the catch-all, and keeps the default cache)
+    expect(cacheControl([...before, ...hit], "/favicon.ico")).toEqual([]);
     // (the shell and the worker still revalidate, found or not)
     for (const path of ["/", "/index.html", "/sw.js", "/theme-init.js", "/manifest.webmanifest"]) {
       expect(cacheControl(before, path), path).toEqual(["public, max-age=0, must-revalidate"]);

@@ -12,7 +12,7 @@ pnpm build      # typecheck + production build into dist/
 pnpm preview    # serve the production build
 pnpm test       # this guide's tests plus core's shared suites, run against this guide
 pnpm lint
-pnpm icons      # regenerate public/icons from the tri-rod motif in scripts/icons.mjs
+pnpm icons      # regenerate public/icons and public/favicon.ico from scripts/icon-master.webp and scripts/favicon.svg
 ```
 
 `src/guide` is what makes this guide Echoes of Wisdom: `brand.ts` (names, storage keys, fonts, corner style), `config.ts` (article layout, categories, completion targets), the chapter data in `src/guide/data` (one module per chapter, plus `sweep-lists.ts`), the banners and `theme.css`, which sets only the palette.
@@ -35,4 +35,4 @@ The chapter text was drafted from community guides, which are linked per group a
 
 ## Credits
 
-Fraunces and Nunito are bundled with their SIL OFL licenses in `public/fonts`. The icon is drawn in SVG. Chapter banners use original AI-generated landscape illustrations stored in `src/guide/banners`. *The Legend of Zelda* belongs to Nintendo; this is an unofficial fan guide.
+Fraunces and Nunito are bundled with their SIL OFL licenses in `public/fonts`. The Tri Rod app icon is an original generated illustration, with its master in [scripts/icon-master.webp](scripts/icon-master.webp). Chapter banners use original AI-generated landscape illustrations stored in `src/guide/banners`. *The Legend of Zelda* belongs to Nintendo; this is an unofficial fan guide.

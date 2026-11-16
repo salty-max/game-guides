@@ -12,7 +12,7 @@ pnpm build      # typecheck + production build into dist/
 pnpm preview    # serve the production build
 pnpm test       # this guide's tests plus core's shared suites, run against this guide
 pnpm lint
-pnpm icons      # regenerate public/icons from the compass motif in scripts/icons.mjs
+pnpm icons      # regenerate public/icons and public/favicon.ico from scripts/icon-master.webp and scripts/favicon.svg
 ```
 
 `src/guide` is what makes this guide Koholint: `brand.ts` (names, storage keys, fonts, corner style), `config.ts` (article layout, categories, completion rules), the chapter data in `src/guide/data`, the deathless-run panel (`run-log.ts` and `DeathlessRun.tsx`, at `/dashboard/deathless`), the banners and `theme.css`, which sets only the palette.
@@ -38,5 +38,7 @@ Directions come from published Switch remake guides and haven't been played thro
 A "Don't miss" strip appears on a chapter when `src/guide/data/missables.ts` flags an unchecked entry there. An entry is flagged only when two independent sources agree on the exact condition. Today nothing qualifies for the Switch remake, since you can reload the clear save after the ending, so the strip says that and links the sources. Open questions are in `docs/facts-to-verify.md`.
 
 ## Artwork and fonts
+
+The Wind Fish egg icon is an original generated illustration. The master is in [scripts/icon-master.webp](scripts/icon-master.webp).
 
 The chapter banners in `src/guide/banners` are decorative. DM Sans and Playfair Display are bundled with their licenses in `public/fonts`. *The Legend of Zelda* and *Link’s Awakening* belong to Nintendo. This is an unofficial guide.

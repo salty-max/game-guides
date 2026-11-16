@@ -27,6 +27,7 @@ Core's suites run against each guide:
 - **`MissablesStrip*.test.tsx`**: the strip with and without flagged rows.
 - **`persistence.test.ts`**: storage is asked to stay on the first tick in that tab, not for another tab's tick, at most every 30 days, and never with an error ([core.md](core.md#keeping-storage)).
 - **`deploy.test.ts`**: the app's `vercel.json`, the same in every app, and core's page template, held to the pitfalls in [deploying.md](deploying.md#pitfalls), the `/api` route and its place before the catch-all, and a long cache only after the file was found, among them.
+- **`icons.test.ts`**: the icons the page links and the manifest lists are in `public` at the sizes they declare, the Apple and maskable icons are opaque, `favicon.ico` holds 16 and 32px frames, and `public/icons/favicon.svg` is the guide's tab drawing ([house-style.md](house-style.md#icon)).
 - **`sync/*.test.ts`, `SyncScreen.test.tsx`**: sync, from the ledger's merge to the screen ([core.md](core.md#syncing-devices)). `cycle.test.ts` runs two simulated browsers against the real API handler on an in-memory store, so the guide and the API are tested against each other. `ledger.test.ts` holds core's ledger equal to the API's.
 
 Each guide's own `guide.test.ts` adds its totals, its legacy saves, its extra state (and how that syncs) and its four storage keys.
