@@ -2,6 +2,8 @@ import { useEffect, useLayoutEffect, useSyncExternalStore } from "react";
 import { THEME_KEY, useTheme } from "./store/theme";
 import { STORAGE_KEY } from "./progress-state";
 import { askAfterFirstTick, checkPersistence, reloadFromAnotherTab } from "./persistence";
+import { AWAKE_KEY, useAwake } from "./store/awake";
+import { useKeepAwake } from "./useKeepAwake";
 
 const query = () => matchMedia("(prefers-color-scheme: dark)");
 const subscribeSystem = (callback: () => void) => {
@@ -53,7 +55,7 @@ export function useChromeColor(dim: boolean) {
   }, [resolved, dim]);
 }
 
-/** Mirror the theme to the document, keep every tab in sync through storage events, and ask to keep storage. */
+/** Mirror the theme to the document, keep every tab in sync through storage events, ask to keep storage, and keep the screen on if asked. */
 export function useGlobalEffects() {
   const resolved = useResolvedTheme();
 
@@ -66,6 +68,7 @@ export function useGlobalEffects() {
   useEffect(() => {
     const onStorage = (event: StorageEvent) => {
       if (event.key === THEME_KEY || event.key === null) useTheme.getState().sync(event.newValue);
+      if (event.key === AWAKE_KEY || event.key === null) useAwake.getState().sync(event.newValue);
       if (event.key === STORAGE_KEY) reloadFromAnotherTab();
     };
     window.addEventListener("storage", onStorage);
@@ -76,4 +79,6 @@ export function useGlobalEffects() {
     void checkPersistence();
     return askAfterFirstTick();
   }, []);
+
+  useKeepAwake();
 }

@@ -2,6 +2,7 @@ import { allRows, chapters, rowsByTag, tally } from "@hundo/core/guide";
 import { STORAGE_KEY, validateState } from "@hundo/core/progress-state";
 import { targets } from "./config";
 import { THEME_KEY } from "@hundo/core/store/theme";
+import { AWAKE_KEY } from "@hundo/core/store/awake";
 import { SYNC_KEY } from "@hundo/core/sync/local";
 import { flatten } from "@hundo/core/sync/fields";
 
@@ -49,6 +50,7 @@ describe("storage", () => {
   it("keeps its storage keys", () => {
     expect(STORAGE_KEY).toBe("echoes-of-wisdom-field-guide.v1");
     expect(THEME_KEY).toBe("echoes-of-wisdom-field-guide.theme");
+    expect(AWAKE_KEY).toBe("echoes-of-wisdom-field-guide.awake");
     expect(SYNC_KEY).toBe("echoes-of-wisdom-field-guide.sync");
   });
 });

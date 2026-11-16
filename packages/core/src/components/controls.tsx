@@ -2,6 +2,7 @@ import { Checkbox as BaseCheckbox } from "@base-ui/react/checkbox";
 import { OTPField as BaseOTPField } from "@base-ui/react/otp-field";
 import { Radio } from "@base-ui/react/radio";
 import { RadioGroup as BaseRadioGroup } from "@base-ui/react/radio-group";
+import { Switch as BaseSwitch } from "@base-ui/react/switch";
 import { useId, useState } from "react";
 import { buttonClass } from "./buttonStyle";
 import { checkBox, checkIcon, checkMark } from "./check-style";
@@ -34,6 +35,33 @@ export function Checkbox({ label, checked, onChange, disabled = false }: Checkbo
         </BaseCheckbox.Indicator>
       </BaseCheckbox.Root>
       {label}
+    </label>
+  );
+}
+
+interface SwitchProps {
+  label: string;
+  checked: boolean;
+  onChange: (checked: boolean) => void;
+  disabled?: boolean;
+}
+
+/**
+ * An on/off setting, Base UI's switch: the words, then the switch at the end of the line, which is 44px tall and the target as a whole. The
+ * track takes the guide's button corners (a pill where buttons are pills), the house edge while off and the primary fill while on.
+ */
+export function Switch({ label, checked, onChange, disabled = false }: SwitchProps) {
+  return (
+    <label className="flex min-h-11 cursor-pointer items-center justify-between gap-2.5 text-sm font-bold has-data-disabled:cursor-not-allowed has-data-disabled:opacity-[.46]">
+      {label}
+      <BaseSwitch.Root
+        checked={checked}
+        disabled={disabled}
+        onCheckedChange={onChange}
+        className={`${press} relative inline-flex h-7 w-12 shrink-0 items-center rounded-button border-2 border-edge bg-surface p-0.5 data-checked:border-primary data-checked:bg-primary`}
+      >
+        <BaseSwitch.Thumb className="size-5 rounded-button bg-edge transition-transform duration-150 ease-out data-checked:translate-x-5 data-checked:bg-on-primary" />
+      </BaseSwitch.Root>
     </label>
   );
 }

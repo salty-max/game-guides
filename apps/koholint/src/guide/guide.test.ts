@@ -2,6 +2,7 @@ import { allRows, chapters, coreRows } from "@hundo/core/guide";
 import { STORAGE_KEY, defaultState, validateState } from "@hundo/core/progress-state";
 import { readRunLog } from "./run-log";
 import { THEME_KEY } from "@hundo/core/store/theme";
+import { AWAKE_KEY } from "@hundo/core/store/awake";
 import { SYNC_KEY } from "@hundo/core/sync/local";
 import { flatten, viewFrom } from "@hundo/core/sync/fields";
 import type { Entries } from "@hundo/core/sync/ledger";
@@ -56,6 +57,7 @@ describe("storage", () => {
   it("keeps its storage keys", () => {
     expect(STORAGE_KEY).toBe("koholint-field-guide.v1");
     expect(THEME_KEY).toBe("koholint-field-guide.theme");
+    expect(AWAKE_KEY).toBe("koholint-field-guide.awake");
     expect(SYNC_KEY).toBe("koholint-field-guide.sync");
   });
 });
