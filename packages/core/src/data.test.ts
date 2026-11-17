@@ -65,6 +65,24 @@ describe("guide data", () => {
     if (!hasMissables && config.reassurance) expect(hosts(config.reassurance.sources.map(([, url]) => url)).size).toBeGreaterThanOrEqual(2);
   });
 
+  it("keeps each questline to real rows, once each and in route order, under a stable id, and covers every row its tags name", () => {
+    const at = new Map(allRows.map((row, index) => [row.id, index]));
+    const { lines, cover = [] } = config.questlines;
+    expect(new Set(lines.map((line) => line.id)).size).toBe(lines.length);
+    for (const line of lines) {
+      expect(line.id).toMatch(/^[a-z0-9]+(?:-[a-z0-9]+)*$/);
+      expect(line.name.trim(), line.id).not.toBe("");
+      expect(line.steps.length, line.id).toBeGreaterThan(0);
+      for (const id of line.steps) expect(byId.has(id), `${line.id}: ${id}`).toBe(true);
+      // Strictly in route order: the steps a reader has revealed are then always the line's first ones (questlines.ts).
+      const order = line.steps.map((id) => at.get(id)!);
+      expect(order, `${line.id} keeps to route order`).toEqual([...new Set(order)].sort((a, b) => a - b));
+    }
+    for (const tag of cover) expect(isCategory(tag), tag).toBe(true);
+    const inLine = new Set(lines.flatMap((line) => line.steps));
+    expect(allRows.filter((row) => row.tags.some((tag) => cover.includes(tag)) && !inLine.has(row.id)).map((row) => row.id)).toEqual([]);
+  });
+
   it("finds the missables left in a chapter and drops them once checked", () => {
     for (const chapter of chapters) {
       const left = missablesLeft(chapter, {});

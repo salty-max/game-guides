@@ -88,6 +88,27 @@ export interface Missable {
   sources: string[];
 }
 
+/** A chained side quest: one character's arc, or one task in parts, as existing rows. Progress stays per row. */
+export interface Questline {
+  /** Stable once live: it's the line's address, `/questlines/<id>`. Never shown. */
+  id: string;
+  /** Only what the line's first step already says: the character as first met (docs/chapter-data.md). */
+  name: string;
+  /** Row ids in route order (data.test.ts holds them to it), so the steps a reader has revealed are always the line's first ones. A row may be in two lines. */
+  steps: string[];
+}
+
+/** The Questlines page: its tab and title, and its lines. */
+export interface Questlines {
+  /** The tab's word in the navigation ("Quests", "Strangers"). */
+  tab: string;
+  title: string;
+  intro: string;
+  /** Every row carrying one of these tags is in a line (data.test.ts). */
+  cover?: string[];
+  lines: Questline[];
+}
+
 /**
  * Per-guide state saved beside the shared fields. A guide that keeps some declares its type here through
  * declaration merging: `declare module "@hundo/core/types" { interface Register { extra: MyExtra } }`.
@@ -205,6 +226,8 @@ export interface GuideConfig {
   /** The category a row's `quantity` counts toward (Might Crystals by amount). */
   quantity?: string;
   missables: Missable[];
+  /** Chained side quests, on the Questlines page. */
+  questlines: Questlines;
   /** Shown while nothing is flagged as missable: why that is safe. Its sources back the claim and aren't shown. */
   reassurance?: { text: string; sources: SourceLink[] };
   /** Chapter id → banner, imported with `?banner` (core's banners.ts). */

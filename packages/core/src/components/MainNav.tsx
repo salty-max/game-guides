@@ -3,12 +3,14 @@ import { cva } from "class-variance-authority";
 import { useState, type MouseEvent } from "react";
 import { Link, useLocation } from "react-router";
 import { Icon } from "./Icon";
+import { config } from "../guide";
+import type { IconName } from "./Icon";
 import { pages } from "../nav";
 import { press, pressPart } from "./press-style";
 import { placeOf, safePlace, tabPlaces } from "../store/place";
 import { useProgress } from "../store/progress";
 
-// Where the three pages are: in the top bar from 551px up, and in a bar across the bottom on a phone (Layout picks one, so there is only
+// Where the four pages are: in the top bar from 551px up, and in a bar across the bottom on a phone (Layout picks one, so there is only
 // ever one main navigation). In a browser tab the bottom bar is fixed to the bottom of the screen, and Layout leaves --tabs of room under
 // the page so its end scrolls clear of the bar; in the installed app it is the last row of the fixed frame. Fixed rather than sticky:
 // a row passing under a sticky bar counts, for axe's target-size audit, as a target the bar's links cover, and a fixed one doesn't.
@@ -26,7 +28,7 @@ const root = cva("", {
   },
 });
 
-const list = cva("", { variants: { place: { top: "flex gap-2 drawer:gap-0.5", bottom: "grid h-full grid-cols-3" } } });
+const list = cva("", { variants: { place: { top: "flex gap-2 drawer:gap-0.5", bottom: "grid h-full grid-cols-4" } } });
 
 // The page the reader is on: a tint behind its words in the top bar, and behind its icon in the bottom bar, in the guide's own button
 // corners. A press tints the whole cell.
@@ -42,7 +44,9 @@ const link = cva(`${press} group/page font-bold whitespace-nowrap text-muted`, {
 const icon = cva("", {
   variants: {
     place: {
-      top: "size-4 drawer:size-3.5",
+      // Four pages' words and icons don't leave the brand its room beside the rail, or fit a small tablet with large text: up to 1040px
+      // the top bar's links are their words alone. The tab bar keeps its icons.
+      top: "size-4 mid:hidden",
       bottom: `${pressPart} box-content size-[22px] rounded-button px-4 py-[3px] group-aria-[current=page]/page:bg-soft`,
     },
   },
@@ -68,7 +72,11 @@ interface MainNavProps {
   place: "top" | "bottom";
 }
 
-/** Guide, Checklist and Progress: Base UI's navigation menu, its links the router's. The current page is marked for a screen reader too. */
+// The installed app's shortcuts are the three pages of nav.ts; the bar has the guide's Questlines page too, named by the guide.
+const [guidePage, checklistPage, dashboardPage] = pages;
+const links: (readonly [id: string, label: string, icon: IconName])[] = [guidePage, checklistPage, ["questlines", config.questlines.tab, "scroll"], dashboardPage];
+
+/** Guide, Checklist, Questlines and Progress: Base UI's navigation menu, its links the router's. The current page is marked for a screen reader too. */
 export function MainNav({ chapter, view, place }: MainNavProps) {
   const { pathname, key } = useLocation();
   // The link pressed, marked at once: the router moves in a transition, which keeps the page and the address as they were until the new
@@ -80,11 +88,11 @@ export function MainNav({ chapter, view, place }: MainNavProps) {
   // Each page's link goes back to it as the reader left it (store/place.ts): the checklist at its last address (a category, a chapter),
   // unless that chapter is hidden now, and every page at its scroll offset and with its filters.
   const checklist = view === "checklist" ? placeOf(pathname, chapter) : (safePlace(tabPlaces.checklist, data) ?? "/checklist");
-  const targets = { guide: `/guide/${chapter}`, checklist, dashboard: "/dashboard" };
+  const targets: Record<string, string> = { guide: `/guide/${chapter}`, checklist, questlines: "/questlines", dashboard: "/dashboard" };
   return (
     <NavigationMenu.Root className={root({ place })} aria-label="Main navigation">
       <NavigationMenu.List className={list({ place })}>
-        {pages.map(([id, label, name]) => {
+        {links.map(([id, label, name]) => {
           const to = targets[id];
           return (
             <NavigationMenu.Item key={id}>

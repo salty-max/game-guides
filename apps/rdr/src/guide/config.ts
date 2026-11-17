@@ -7,6 +7,7 @@ import chapter3 from "./data/chapter-3";
 import chapter4 from "./data/chapter-4";
 import chapter5 from "./data/chapter-5";
 import { missables } from "./data/missables";
+import { questlines } from "./data/questlines";
 import { sources } from "./data/sources";
 import { countsTowardStat, estimate, pointsLeft, readReported } from "./estimate";
 
@@ -56,6 +57,7 @@ const config: GuideConfig = {
     ],
   },
   missables,
+  questlines,
   banners,
   defer: (row) => sweep.has(row.tags[0]),
   completion: {

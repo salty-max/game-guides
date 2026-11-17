@@ -19,6 +19,7 @@ describe("a place", () => {
     expect(placeOf("/guide/1/some-entry", 3)).toBe("/guide/1");
     expect(placeOf("/guide", 3)).toBe("/guide/3");
     expect(placeOf("/dashboard/a-panel", 3)).toBe("/dashboard");
+    expect(placeOf("/questlines/a-line", 3)).toBe("/questlines");
     expect(placeOf(`/checklist/${category}/1`, 3)).toBe(`/checklist/${category}/1`);
     // The start address, and one the guide doesn't know (the old Sources page among them), are the chapter Home goes to.
     expect(placeOf("/sources", 3)).toBe("/guide/3");
@@ -29,6 +30,8 @@ describe("a place", () => {
   it("is kept only while the guide still shows it: a page it has, and nothing the reader's settings hide", () => {
     expect(safePlace("/guide/1", fresh)).toBe("/guide/1");
     expect(safePlace("/dashboard", fresh)).toBe("/dashboard");
+    expect(safePlace("/questlines", fresh)).toBe("/questlines");
+    expect(safePlace("/questlines/a-line", fresh)).toBeNull();
     // (the Sources page is gone: a place saved on it sends the reader to the start)
     expect(safePlace("/sources", everything)).toBeNull();
     expect(safePlace(`/checklist/${category}/1`, fresh)).toBe(`/checklist/${category}/1`);

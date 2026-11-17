@@ -1,6 +1,6 @@
 # Writing and sourcing chapter data
 
-A guide's content is plain TypeScript in `apps/<name>/src/guide/data`: one module per chapter, plus `missables.ts`, and `sources.ts` where the guide has guide-wide references. The types are in `packages/core/src/types.ts`. The rules below that core's tests enforce are marked **(tested)**. The rest is how the three guides are written.
+A guide's content is plain TypeScript in `apps/<name>/src/guide/data`: one module per chapter, plus `missables.ts`, `questlines.ts`, and `sources.ts` where the guide has guide-wide references. The types are in `packages/core/src/types.ts`. The rules below that core's tests enforce are marked **(tested)**. The rest is how the three guides are written.
 
 ## A chapter
 
@@ -90,6 +90,26 @@ export const missables: Missable[] = [
 - An entry needs **two independent sources on different hosts** that agree on the exact condition **(tested: two hosts, https, a real row id, a `why` of more than 10 characters)**. Anything weaker goes in `docs/facts-to-verify.md`, not in the strip.
 - `why` is one line: the exact condition for losing it.
 - While nothing qualifies, export a `reassurance` instead: one honest sentence and two sources on different hosts **(tested)**. Echoes and Koholint do this. The strip then shows the sentence alone in place of a "Don't miss" list.
+
+## Questlines
+
+`data/questlines.ts` exports `questlines`: the Questlines page's tab word, title and intro, and its lines, each a chained side quest made of rows that already exist.
+
+```ts
+export const questlines: Questlines = {
+  tab: "Quests",
+  title: "NPC questlines",
+  intro: "Each character’s story in order, as far as you’ve revealed. Ticking a step here ticks it in the guide.",
+  cover: ["quest", "invasion"],
+  lines: [{ id: "siegmeyer", name: "Siegmeyer of Catarina", steps: ["quest-sieg-gate", "quest-sieg-sens", …] }],
+};
+```
+
+- **Steps are row ids in route order, each once** **(tested)**. Order comes from the route alone: the steps a reader has revealed are then always the line's first ones. An arc that truly runs against the route is two lines.
+- **`cover`** lists tags whose every row must be in some line **(tested)**. A row may be in two lines, as Logan's and Griggs's farewell is.
+- **A line's `id`** is kebab-case and unique **(tested)**, and stays once live: it's the line's address.
+- **A name says only what the line's first step's chapter already says**: the character as first met ("Siegmeyer of Catarina", never the daughter met later). It shows as soon as that chapter is revealed, so it follows the same rule as a chapter's `teaser`. There's no blurb, for the same reason. No test can catch a name that spoils.
+- A line is a claim that its steps belong together. Group only what the rows' own texts or two sources tie together, and put any doubt in `facts-to-verify.md`.
 
 ## Counts
 

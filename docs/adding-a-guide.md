@@ -18,7 +18,7 @@ Then, in `apps/<name>`:
 
 Delete what's Echoes' own:
 
-- `src/guide/data/*`, apart from `missables.ts`, which you rewrite;
+- `src/guide/data/*`, apart from `missables.ts` and `questlines.ts`, which you rewrite;
 - `src/guide/banners/*`;
 - `public/fonts/*` and `public/icons/*`;
 - the Echoes cases in `src/guide/guide.test.ts`, such as the crystal counts and the v1 saves.
@@ -31,6 +31,7 @@ Delete what's Echoes' own:
 | `config.ts` | layout, categories, chips, completion, texts | below |
 | `data/chapter-N.ts` | one module per chapter | [chapter-data.md](chapter-data.md) |
 | `data/missables.ts` | missables, or a reassurance while there are none | [chapter-data.md](chapter-data.md#missables) |
+| `data/questlines.ts` | the Questlines page's words and its chained side quests | [chapter-data.md](chapter-data.md#questlines) |
 | `theme.css` | the palette: eleven colours, light and dark | [house-style.md](house-style.md#the-palette) |
 | `panels.ts` | `export const panels: Panel[] = [];` | a panel only for a real per-game tracker, as Koholint's deathless run or Red Dead's calibration |
 | `banners/chapter-N.webp` | one per chapter | [house-style.md](house-style.md#banners) |
@@ -60,6 +61,7 @@ The full type is `GuideConfig` in `packages/core/src/types.ts`, and every field 
 - **`badges`** (optional): secondary tags shown as a badge beside the label in route rows.
 - **`quantity`** (optional): the category a row's `quantity` counts toward, like Echoes' Might Crystals.
 - **`missables`** and **`reassurance`**: from `data/missables.ts`.
+- **`questlines`**: from `data/questlines.ts`.
 - **`banners`**: `byChapter(import.meta.glob<Banner>("./banners/chapter-*.webp", { eager: true, query: "?banner", import: "default" }))`, as Echoes has it (`?banner` adds the phone-sized copies, [house-style.md](house-style.md#banners)).
 - **`defer`** (optional): rows Next up holds back until nothing else is left, such as optional amiibo outfits.
 - **`completion`**:

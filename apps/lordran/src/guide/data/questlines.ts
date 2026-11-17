@@ -1,0 +1,37 @@
+import type { Questlines } from "@hundo/core/types";
+
+// Each NPC's arc as a line of rows, in route order. A name says only what the line's first step already says (docs/chapter-data.md).
+export const questlines: Questlines = {
+  tab: "Quests",
+  title: "NPC questlines",
+  intro: "Each character’s story in order, as far as you’ve revealed. Ticking a step here ticks it in the guide.",
+  cover: ["quest", "invasion"],
+  lines: [
+    { id: "solaire", name: "Solaire of Astora", steps: ["quest-solaire-bridge", "quest-solaire-summons", "quest-solaire-anor", "quest-solaire-altar", "quest-solaire-shortcut", "quest-solaire-saved"] },
+    { id: "lautrec", name: "Lautrec of Carim", steps: ["quest-lautrec", "quest-lautrec-before-gargoyles", "quest-lautrec-invasion", "quest-anastacia-return"] },
+    { id: "siegmeyer", name: "Siegmeyer of Catarina", steps: ["quest-sieg-gate", "quest-sieg-sens", "quest-sieg-anor", "quest-sieg-firelink", "quest-sieg-blighttown", "quest-sieg-linda", "quest-sieg-izalith", "quest-sieg-ash"] },
+    { id: "patches", name: "Patches", steps: ["quest-patches-catacombs", "quest-patches-tomb", "quest-patches-forgive", "quest-patches"] },
+    { id: "griggs", name: "Griggs of Vinheim", steps: ["quest-griggs", "quest-griggs-clerics", "quest-logan-departs", "quest-griggs-cleanup"] },
+    { id: "reah", name: "Reah and Petrus", steps: ["quest-reah-firelink", "quest-lautrec-tip", "quest-reah-pit", "quest-reah", "quest-reah-cleanup"] },
+    { id: "laurentius", name: "Laurentius of the Great Swamp", steps: ["quest-laurentius", "quest-laurentius-after-depths", "extra-laurentius-goodbye"] },
+    { id: "kirk", name: "Kirk", steps: ["invasion-kirk-depths", "invasion-kirk-ruins", "invasion-kirk-izalith"] },
+    { id: "domhnall", name: "Domhnall of Zena", steps: ["quest-domhnall-depths", "quest-domhnall-firelink"] },
+    { id: "mildred", name: "Maneater Mildred", steps: ["invasion-mildred"] },
+    { id: "fair-lady", name: "The Fair Lady and Quelana", steps: ["quest-fair-lady", "quest-eingyi", "quest-quelaana", "quest-chaos-rank"] },
+    { id: "frampt", name: "Kingseeker Frampt", steps: ["quest-frampt"] },
+    { id: "crestfallen", name: "The Crestfallen Warrior", steps: ["quest-crestfallen-firelink", "quest-crestfallen-new-londo"] },
+    { id: "shiva", name: "Shiva", steps: ["quest-shiva-shop"] },
+    { id: "dusk", name: "Dusk", steps: ["quest-dusk", "quest-dusk-rescued"] },
+    { id: "logan", name: "Big Hat Logan", steps: ["quest-logan", "quest-logan-departs", "quest-logans-cell", "quest-logan-finish", "quest-logan-study"] },
+    { id: "darkmoon", name: "The Darkmoon Knightess", steps: ["quest-anor-knightess", "quest-darkmoon-rank"] },
+    { id: "jeremiah", name: "Xanthous King Jeremiah", steps: ["invasion-jeremiah"] },
+    { id: "beatrice", name: "Beatrice", steps: ["quest-beatrice-remains"] },
+    { id: "ingward", name: "Ingward", steps: ["quest-ingward-firelink"] },
+    { id: "leeroy", name: "Paladin Leeroy", steps: ["invasion-leeroy"] },
+    { id: "elizabeth", name: "Elizabeth", steps: ["quest-elizabeth-request", "quest-elizabeth"] },
+    { id: "chester", name: "Marvelous Chester", steps: ["quest-chester-merchant", "invasion-chester", "quest-chester-return"] },
+    { id: "ciaran", name: "Ciaran", steps: ["quest-ciaran"] },
+    { id: "sif", name: "Young Sif", steps: ["quest-young-sif"] },
+    { id: "gough", name: "Hawkeye Gough", steps: ["quest-gough"] },
+  ],
+};

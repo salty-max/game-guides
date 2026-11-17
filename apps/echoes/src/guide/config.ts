@@ -11,6 +11,7 @@ import chapter7 from "./data/chapter-7";
 import chapter8 from "./data/chapter-8";
 import chapter9 from "./data/chapter-9";
 import { missables, reassurance } from "./data/missables";
+import { questlines } from "./data/questlines";
 
 const banners = byChapter(import.meta.glob<Banner>("./banners/chapter-*.webp", { eager: true, query: "?banner", import: "default" }));
 
@@ -75,6 +76,7 @@ const config: GuideConfig = {
   },
   quantity: "might-crystal",
   missables,
+  questlines,
   reassurance,
   banners,
   defer: (row) => row.tags.includes("amiibo"),

@@ -12,7 +12,7 @@ allowSlowMounts();
 const chapterTitles = chapters.map((chapter) => chapter.title);
 const chips = config.chips.checklist.map(([, label]) => label);
 /** A first visit, which is what a crawler always is: chapter 1 open, the rest hidden. */
-const fresh: HeadContext = { brand, chapterTitles, chips, savedChapter: 1, open: (n) => n <= 1 };
+const fresh: HeadContext = { brand, chapterTitles, chips, questlines: config.questlines.title, savedChapter: 1, open: (n) => n <= 1 };
 const allOpen: HeadContext = { ...fresh, open: () => true };
 const head = (path: string, context = fresh) => headFor(path, context);
 const last = chapters.length;
@@ -35,21 +35,25 @@ describe("what search engines get (search.ts)", () => {
       ["/checklist/all/3", "/checklist"],
       [`/checklist/${chips[0]}`, "/checklist"],
       ["/dashboard/left", "/dashboard"],
+      ["/questlines/any-line", "/questlines"],
     ];
     for (const [path, canonical] of cases) expect(head(path).canonical, path).toBe(brand.home + canonical);
     // (the chapter `/` opens at is the reader's own)
     expect(head("/", { ...allOpen, savedChapter: 2 }).canonical).toBe(`${brand.home}/guide/2`);
   });
 
-  it("says noindex on a hidden chapter, and nowhere else", () => {
+  it("says noindex on a hidden chapter and on the Questlines page, and nowhere else", () => {
     for (let n = 2; n <= last; n++) {
       expect(head(`/guide/${n}`), `${n}`).toMatchObject({ title: `Chapter ${n} is hidden · ${brand.name}`, noindex: true });
       expect(head(`/guide/${n}`, allOpen).noindex).toBe(false);
     }
+    for (const context of [fresh, allOpen]) {
+      expect(head("/questlines", context)).toMatchObject({ title: `${config.questlines.title} · ${brand.name}`, canonical: `${brand.home}/questlines`, noindex: true });
+    }
   });
 
   it("never puts a later chapter's name in a title or description a first visit can reach", () => {
-    const paths = [...INDEXED_PATHS, "/", "/nope", "/checklist/all/2", ...chapters.flatMap(({ id }) => [`/guide/${id}`, `/guide/${id}/x`])];
+    const paths = [...INDEXED_PATHS, "/", "/nope", "/checklist/all/2", "/questlines", ...chapters.flatMap(({ id }) => [`/guide/${id}`, `/guide/${id}/x`])];
     for (const title of chapterTitles.slice(1)) {
       for (const path of paths) {
         const { title: shown, description } = head(path);

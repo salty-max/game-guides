@@ -11,6 +11,7 @@ import chapter7 from "./data/chapter-7";
 import chapter8 from "./data/chapter-8";
 import chapter9 from "./data/chapter-9";
 import { missables, reassurance } from "./data/missables";
+import { questlines } from "./data/questlines";
 import { sources } from "./data/sources";
 import { blankLog, readRunLog } from "./run-log";
 
@@ -57,6 +58,7 @@ const config: GuideConfig = {
   },
   badges: ["heart", "shell", "chest", "bottle", "container"],
   missables,
+  questlines,
   reassurance,
   banners,
   defer: (row) => row.tags.includes("amiibo"),
