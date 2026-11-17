@@ -67,6 +67,7 @@ Chained side quests (an NPC's arc, a trading sequence, a Stranger's task) are li
 - **Only revealed steps show.** A line keeps to route order (`data.test.ts`), so those are always its first steps, and no count says how many are left.
 - **No line says it is complete while a chapter is hidden.** Every card ends with the same "Anything past chapter N stays hidden.", and a line whose revealed steps are ticked is "Done through chapter N". Saying "Complete" of only the lines that end would tell which go on.
 - **The next step is the first unticked one after the last ticked one** (or the first unticked one, when the last revealed step is ticked). An earlier unticked step isn't called skipped: some are conditional, and one stray tick shouldn't brand the steps before it. A line is done only with every revealed step ticked.
+- **A row's chip** (`LineChip.tsx`), beside a row in either layout, says "Name · step k" and links to the line's card, once the line has two revealed steps or more (counting hidden ones would tell that a line goes on). It never says "of n": every step up to the row is revealed, the later ones may not be.
 - A line's id is in its address, so it stays once live. Its count field is `p:questlines`, never the id.
 
 ## The page shell
