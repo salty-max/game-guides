@@ -1130,6 +1130,155 @@ describe("deleting the synced progress", () => {
   });
 });
 
+describe("visit counts", () => {
+  const DAY_KEY = (ns: string, guide = GUIDE, day = "2026-11-15") => `hs:${ns}:st:${guide}:${day}`;
+  const totals = (world: World, ns = "prod", guide = GUIDE, day = "2026-11-15") =>
+    Object.fromEntries(world.store.keys().includes(DAY_KEY(ns, guide, day)) ? (JSON.parse(world.store.snapshot()) as [string, [string, string][]][]).find(([name]) => name === DAY_KEY(ns, guide, day))![1] : []);
+
+  it("adds a visit's counts to the guide's totals for the day, and keeps them 25 months", async () => {
+    const world = new World();
+    const d = world.device();
+    const reply = await d.count({ "v:app": 1, "p:guide/3": 2, "p:checklist": 1, "s:3": 1 });
+    expect(reply.status).toBe(200);
+    expect(reply.body).toEqual({ ok: true, counted: true });
+    NO_STORE(reply.headers);
+    expect(reply.cookies).toEqual([]);
+    await world.device().count({ "v:tab": 1, "p:guide/3": 1, "f:2": 1 });
+    expect(totals(world)).toEqual({ "v:app": "1", "v:tab": "1", "p:guide/3": "3", "p:checklist": "1", "s:3": "1", "f:2": "1" });
+    expect(world.store.ttl(DAY_KEY("prod"))).toBe(761 * 86_400);
+  });
+
+  it("keeps a day per guide, by the server's UTC date, and keeps previews' and localhost's a week apart from production's", async () => {
+    const world = new World();
+    world.clock.now = Date.UTC(2026, 10, 15, 23, 59, 0);
+    await world.device().count({ "v:app": 1 });
+    world.advance(2 * 60_000);
+    await world.device().count({ "v:tab": 1 }, { guide: "red-dead-redemption" });
+    await world.device().count({ "v:tab": 1 }, {}, { origin: PREVIEW });
+    await world.device().count({ "v:tab": 1 }, {}, { origin: LOCAL });
+    expect(totals(world)).toEqual({ "v:app": "1" });
+    expect(totals(world, "prod", "red-dead-redemption", "2026-11-16")).toEqual({ "v:tab": "1" });
+    expect(totals(world, "test", GUIDE, "2026-11-16")).toEqual({ "v:tab": "2" });
+    expect(world.store.ttl(DAY_KEY("test", GUIDE, "2026-11-16"))).toBe(7 * 86_400);
+  });
+
+  it("stores the sums alone: no address, no cookie, no device, whoever sends them", async () => {
+    const world = new World();
+    const { a } = await link(world);
+    const before = new Set(world.store.keys());
+    // Even a client that sends its cookies (the guides don't) leaves nothing of them.
+    await a.post("/api/count", { guide: GUIDE, counts: { "v:app": 1 } });
+    await world.device("198.51.100.77").count({ "v:tab": 1 });
+    const added = world.store.keys().filter((name) => !before.has(name));
+    expect(added.sort()).toEqual(["hs:prod:st:budget:2026-11", DAY_KEY("prod")]);
+    const stored = JSON.stringify(added.map((name) => JSON.parse(world.store.snapshot()).find(([n]: [string]) => n === name)));
+    for (const trace of ["198.51.100.77", a.ip, ...[...a.jar.values()].flatMap((value) => value.split("."))]) expect(stored).not.toContain(trace);
+  });
+
+  it("refuses anything but the known fields, a whole count from 1 to 50 each, at most 12 of them, for a known guide", async () => {
+    const world = new World();
+    const d = world.device();
+    const refused: [string, unknown, Record<string, unknown>?][] = [
+      ["no counts", undefined],
+      ["a list", [["v:app", 1]]],
+      ["nothing in it", {}],
+      ["an unknown field", { "v:app": 1, x: 1 }],
+      ["a chapter title", { "p:guide/the-castle": 1 }],
+      ["a row's anchor", { "p:guide/3/heart-well": 1 }],
+      ["a checklist filter", { "p:checklist/heart/1": 1 }],
+      ["chapter 0", { "s:0": 1 }],
+      ["the server's own field", { pair: 1 }],
+      ["zero", { "v:app": 0 }],
+      ["a fraction", { "v:app": 1.5 }],
+      ["too many", { "v:app": 51 }],
+      ["text", { "v:app": "1" }],
+      ["thirteen fields", Object.fromEntries(Array.from({ length: 13 }, (_, i) => [`p:guide/${i + 1}`, 1]))],
+      ["an unknown guide", { "v:app": 1 }, { guide: "zelda-3" }],
+    ];
+    for (const [why, counts, extra] of refused) {
+      const reply = await d.count(counts, extra);
+      expect(reply.status, why).toBe(400);
+    }
+    expect(world.store.commands).toBe(0);
+    expect((await d.count(Object.fromEntries(Array.from({ length: 12 }, (_, i) => [`p:guide/${i + 1}`, 50])))).status).toBe(200);
+  });
+
+  it("costs the store two commands more than it has fields, and spends at most the month's budget", async () => {
+    const world = new World();
+    const d = world.device();
+    world.store.commands = 0;
+    await d.count({ "v:app": 1, "p:guide/1": 1 });
+    // the month's first call also starts the budget's clock
+    expect(world.store.commands).toBe(5);
+    world.store.commands = 0;
+    await d.count({ "v:app": 1, "p:guide/1": 1 });
+    expect(world.store.commands).toBe(4);
+    expect(world.store.ttl("hs:prod:st:budget:2026-11")).toBe(40 * 86_400);
+
+    // 100,000 a month in production: a call that would pass it costs one command and counts nothing, until the next month.
+    await world.store.exec([["SET", "hs:prod:st:budget:2026-11", "99996"]]);
+    expect((await d.count({ "v:app": 1, "p:guide/1": 1 })).body).toEqual({ ok: true, counted: true });
+    world.store.commands = 0;
+    expect((await d.count({ "v:app": 1 })).body).toEqual({ ok: true, counted: false });
+    expect(world.store.commands).toBe(1);
+    // and once an instance has seen the budget spent, a call costs the store nothing
+    expect((await d.count({ "v:app": 1 })).body).toEqual({ ok: true, counted: false });
+    expect(world.store.commands).toBe(1);
+    expect(totals(world)["v:app"]).toBe("3");
+    world.clock.now = Date.UTC(2026, 11, 1, 0, 0, 1);
+    expect((await d.count({ "v:app": 1 })).body).toEqual({ ok: true, counted: true });
+  });
+
+  it("gives previews and localhost a budget of their own, a tenth of production's", async () => {
+    const world = new World();
+    await world.store.exec([["SET", "hs:test:st:budget:2026-11", "9999"]]);
+    expect((await world.device().count({ "v:app": 1 }, {}, { origin: LOCAL })).body.counted).toBe(false);
+    expect((await world.device().count({ "v:app": 1 })).body.counted).toBe(true);
+  });
+
+  it("answers 503 when the store is down, as every call does", async () => {
+    const world = new World({ store: { exec: async () => Promise.reject(new StoreError("down")) } });
+    expect((await world.device().count({ "v:app": 1 })).status).toBe(503);
+  });
+});
+
+describe("links counted", () => {
+  it("counts a new link for the guide it was made in, and not a code typed again on a device already in the group", async () => {
+    const world = new World();
+    const a = world.device();
+    const b = world.device();
+    const { code } = await a.show();
+    await b.claim(code, "Second device", undefined, { guide: "echoes-of-wisdom" });
+    const pairs = () => world.store.snapshot().match(/"pair","(\d+)"/)?.[1];
+    expect(world.store.keys()).toContain("hs:prod:st:echoes-of-wisdom:2026-11-15");
+    expect(pairs()).toBe("1");
+    const again = await a.show();
+    expect((await b.claim(again.code, "Second device", undefined, { guide: "echoes-of-wisdom" })).body.already).toBe(true);
+    expect(pairs()).toBe("1");
+  });
+
+  it("counts nothing for a client that names no guide, or one it doesn't know", async () => {
+    const world = new World();
+    await link(world);
+    const c = world.device();
+    const { code } = await world.device().show();
+    await c.claim(code, "Third", undefined, { guide: "zelda-3" });
+    expect(world.store.keys().filter((name) => name.includes(":st:"))).toEqual([]);
+  });
+
+  it("still links when counting fails", async () => {
+    const world = new World();
+    const a = world.device();
+    const { code } = await a.show();
+    const real = world.store;
+    const flaky = { exec: (commands: readonly (readonly (string | number)[])[]) => (commands.some(([name]) => name === "INCRBY") ? Promise.reject(new StoreError("down")) : real.exec(commands)) };
+    const b = world.device();
+    const reply = await b.claim(code, "Second", { deps: { ...world.deps, store: flaky } }, { guide: GUIDE });
+    expect(reply.status).toBe(200);
+    expect(reply.body.linked).toBe(true);
+  });
+});
+
 describe("the guides", () => {
   it("knows the three of them", () => {
     expect([...GUIDES].sort()).toEqual(["echoes-of-wisdom", "links-awakening", "red-dead-redemption"]);

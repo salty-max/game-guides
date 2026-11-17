@@ -4,6 +4,7 @@ import { STORAGE_KEY } from "./progress-state";
 import { askAfterFirstTick, checkPersistence, reloadFromAnotherTab } from "./persistence";
 import { AWAKE_KEY, useAwake } from "./store/awake";
 import { useKeepAwake } from "./useKeepAwake";
+import { COUNTS_KEY, startCounting, useCounts } from "./counts";
 
 const query = () => matchMedia("(prefers-color-scheme: dark)");
 const subscribeSystem = (callback: () => void) => {
@@ -74,7 +75,10 @@ export function applyTheme(theme: "light" | "dark") {
   };
 }
 
-/** Mirror the theme to the document, keep every tab in sync through storage events, ask to keep storage, and keep the screen on if asked. */
+/**
+ * Mirror the theme to the document, keep every tab in sync through storage events, ask to keep storage, count the visit (counts.ts),
+ * and keep the screen on if asked.
+ */
 export function useGlobalEffects() {
   const resolved = useResolvedTheme();
 
@@ -86,6 +90,7 @@ export function useGlobalEffects() {
     const onStorage = (event: StorageEvent) => {
       if (event.key === THEME_KEY || event.key === null) useTheme.getState().sync(event.newValue);
       if (event.key === AWAKE_KEY || event.key === null) useAwake.getState().sync(event.newValue);
+      if (event.key === COUNTS_KEY || event.key === null) useCounts.getState().sync(event.newValue);
       if (event.key === STORAGE_KEY) reloadFromAnotherTab();
     };
     window.addEventListener("storage", onStorage);
@@ -96,6 +101,8 @@ export function useGlobalEffects() {
     void checkPersistence();
     return askAfterFirstTick();
   }, []);
+
+  useEffect(() => startCounting(), []);
 
   useKeepAwake();
 }

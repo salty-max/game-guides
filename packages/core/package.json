@@ -8,6 +8,8 @@
     "./fonts": "./src/fonts.ts",
     "./guide": "./src/guide.ts",
     "./progress-state": "./src/progress-state.ts",
+    "./persistence": "./src/persistence.ts",
+    "./counts": "./src/counts.ts",
     "./store/*": "./src/store/*.ts",
     "./sync/*": "./src/sync/*.ts",
     "./components/chunks": "./src/components/chunks.ts",

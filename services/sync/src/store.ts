@@ -150,9 +150,10 @@ export class MemoryStore implements Store {
         this.data.set(key, { kind: "string", value, expires: ex >= 0 ? this.now() + Number(flags[ex + 1]) * 1000 : undefined });
         return "OK";
       }
-      case "INCR": {
+      case "INCR":
+      case "INCRBY": {
         const slot = this.typed(args[0], "string");
-        const next = Number(slot?.value ?? 0) + 1;
+        const next = Number(slot?.value ?? 0) + (name.toUpperCase() === "INCRBY" ? Number(args[1]) : 1);
         this.data.set(args[0], { kind: "string", value: String(next), expires: slot?.expires });
         return next;
       }
@@ -193,6 +194,18 @@ export class MemoryStore implements Store {
         for (const field of args.slice(1)) if (slot?.value.delete(field)) removed++;
         if (slot && slot.value.size === 0) this.data.delete(args[0]);
         return removed;
+      }
+      case "HINCRBY": {
+        const hash = this.make(args[0], "hash").value;
+        const next = Number(hash.get(args[1]) ?? 0) + Number(args[2]);
+        hash.set(args[1], String(next));
+        return next;
+      }
+      case "SCAN": {
+        // The whole keyspace in one page, as a cursor of "0" says: SCAN 0 [MATCH pattern] [COUNT n]. Only "*" is a wildcard in a pattern here.
+        const at = args.findIndex((arg) => arg.toUpperCase() === "MATCH");
+        const pattern = at >= 0 ? new RegExp(`^${args[at + 1].split("*").map((part) => part.replace(/[.+?^${}()|[\]\\]/g, "\\$&")).join(".*")}$`) : /^/;
+        return ["0", this.keys().filter((name) => pattern.test(name))];
       }
       case "HLEN":
         return this.typed(args[0], "hash")?.value.size ?? 0;

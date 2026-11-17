@@ -61,6 +61,9 @@ export async function requestPersistence(storage = manager(), now = Date.now(), 
 
 let fromElsewhere = false;
 
+/** Whether the change being made now came from elsewhere (notATick): visit counts skip it too (counts.ts). */
+export const elsewhere = () => fromElsewhere;
+
 /** Runs `change`, whose new checks aren't a tick the reader made in this tab (another tab's save, or what sync pulled): they don't start the request. */
 export function notATick(change: () => void) {
   fromElsewhere = true;

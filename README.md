@@ -32,16 +32,32 @@ Core reaches the guide through `virtual:guide/config`, `virtual:guide/panels` an
 
 Routes are real paths (`/guide/3`, `/checklist/heart`, `/dashboard/<panel>`, `/sources`), and old `#guide/3` hash links redirect. Each app is a PWA. It precaches the shell, fonts and banners, works offline, and asks before swapping in a new version.
 
-## Sync codes and privacy
+## Privacy
+
+### Sync codes
 
 Progress lives in the reader's browser, and that stays true. To keep the same progress on another device (a Mac's browser and an installed phone app, say), a reader opens Sync devices in the guide, shows a six-digit code on one device and types it on the other, with no account. From then on each device sends its changes shortly after making them and picks up the others' when the guide opens or comes back to the front, and every 20 seconds to 2 minutes while it stays open (a short question, answered from one read when nothing has changed). Export and import still work; an import on a synced device replaces progress on every linked device, and the settings say so.
 
 What the server keeps ([services/sync](services/sync/README.md#what-it-keeps) has the detail):
 
-- No email, no name and no analytics. Per device: a random id, a label like "Safari · iPhone · Koholint app" (the app part only for an installed guide), and the time it last synced. Per guide: the reader's checks and settings, each with the time it was last changed. The theme isn't synced.
+- No email and no name. Per device: a random id, a label like "Safari · iPhone · Koholint app" (the app part only for an installed guide), and the time it last synced. Per guide: the reader's checks and settings, each with the time it was last changed. The theme isn't synced.
 - Two cookies, both set by the guide's own host through its `/api` rewrite: `hundo_sync` (a random device id and secret, unreadable by script, sent only to `/api`) and `hundo_link` (a short fingerprint of the group that opens nothing, which lets a guide know it is linked without a request). On hundo.quest they cover every guide in the browser, and last 400 days.
 - The API is its own Vercel project, and the data is in an Upstash Redis database in Frankfurt. The server sees IP addresses, as any web server does, and uses them only through counters keyed by a salted hash, kept an hour at most, to limit tries at a code.
 - Unlinking a device stops it syncing and leaves its progress. Another device of the group can also remove it (it is unlinked the next time it connects, and its progress stays on it), and one not synced for 60 days is removed by itself and has to be linked again. "Delete synced progress" erases the server's copy and every device record. Anything not synced for 400 days expires by itself.
+
+### Visit counts
+
+Each guide counts visits, with no cookie and no id, to learn which guides and chapters get used, how far readers get, and how much reading happens in the installed app. When the page goes to the background, the guide sends its own `/api` (the sync API) a few numbers:
+
+- whether it ran as the installed app or in a browser tab, once a page load and again after half an hour away;
+- which pages it showed: a chapter by its number only, a hidden chapter not at all, and no row, filter or search;
+- which chapters a tick on this device started (the first row checked) or finished (the last one), at most once each a page load. Ticks from sync, from another tab or from a backup don't count, though two devices that haven't caught up with each other can each count the same start, so these numbers are indicative.
+
+The request carries no cookie and nothing that names the device. The server adds the numbers to that guide's totals for the day and keeps nothing else: no address, no browser, no time of day. The totals are per day, so on a quiet day with a single visit they are that one visit's numbers. The sync server also adds one to those totals for each new link between devices, and the stats script reads the sync groups' records to count how many hold how many devices; the records hold the device labels, and it prints none.
+
+- The totals are kept 25 months in the same Upstash Redis database in Frankfurt as sync's data. They're sent to no one else and read with the project's own script (`pnpm -C services/sync stats`). Vercel, which runs the API, and Upstash handle the requests the way they handle sync's. Vercel's logs and firewall see the visitor's address, as they do for any page, and the counts never hold it.
+- A browser sending Global Privacy Control or Do Not Track sends no counts, and a link it makes isn't counted. Guide settings has a switch, Count my visits, that does the same, and this device keeps it (it isn't synced).
+- Counting stops writing for the month once it has used 100,000 of the database's commands, to leave sync its share. A call refused after that can still cost one command, and only the API's rate limit bounds those.
 
 ## Scripts
 

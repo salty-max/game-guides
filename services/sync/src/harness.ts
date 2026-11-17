@@ -37,7 +37,7 @@ export class World {
 
   constructor(options: { between?: () => Promise<void>; store?: Store } = {}) {
     this.store = new MemoryStore({ now: () => this.clock.now, between: options.between });
-    this.deps = { store: options.store ?? this.store, now: () => this.clock.now, salt: "test-salt" };
+    this.deps = { store: options.store ?? this.store, now: () => this.clock.now, salt: "test-salt", spent: new Set() };
   }
 
   /** A browser (or an installed app): one cookie jar and one IP address. */
@@ -108,8 +108,13 @@ export class Device {
     return { reply, code: String(reply.body.code) };
   }
 
-  claim(code: string, label = "Other device", options?: Parameters<Device["post"]>[2]) {
-    return this.post("/api/pair/claim", { code, label }, options);
+  claim(code: string, label = "Other device", options?: Parameters<Device["post"]>[2], extra: Record<string, unknown> = {}) {
+    return this.post("/api/pair/claim", { code, label, ...extra }, options);
+  }
+
+  /** A visit's counts, sent the way a guide sends them: with no cookies. */
+  count(counts: unknown, extra: Record<string, unknown> = {}, options?: Parameters<Device["post"]>[2]) {
+    return this.post("/api/count", { guide: GUIDE, counts, ...extra }, { ...options, headers: { cookie: "", ...options?.headers } });
   }
 
   sync(entries: Record<string, unknown> = {}, extra: Record<string, unknown> = {}, options?: Parameters<Device["post"]>[2]) {

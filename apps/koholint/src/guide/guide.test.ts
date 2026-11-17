@@ -5,6 +5,8 @@ import { THEME_KEY } from "@hundo/core/store/theme";
 import { AWAKE_KEY } from "@hundo/core/store/awake";
 import { PLACE_KEY } from "@hundo/core/store/place";
 import { SYNC_KEY } from "@hundo/core/sync/local";
+import { PERSIST_KEY } from "@hundo/core/persistence";
+import { COUNTS_KEY } from "@hundo/core/counts";
 import { flatten, viewFrom } from "@hundo/core/sync/fields";
 import type { Entries } from "@hundo/core/sync/ledger";
 
@@ -61,6 +63,8 @@ describe("storage", () => {
     expect(AWAKE_KEY).toBe("koholint-field-guide.awake");
     expect(PLACE_KEY).toBe("koholint-field-guide.place");
     expect(SYNC_KEY).toBe("koholint-field-guide.sync");
+    expect(PERSIST_KEY).toBe("koholint-field-guide.persist");
+    expect(COUNTS_KEY).toBe("koholint-field-guide.counts");
   });
 });
 

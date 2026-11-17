@@ -9,12 +9,13 @@ Every endpoint is a POST with a JSON body that carries `"p": 1`, the protocol, w
 | Path | Body | Answer |
 | --- | --- | --- |
 | `/api/pair/start` | `label` | a six-digit `code`, good for ten minutes and one use. A device with no link waits as pending for fifteen minutes. |
-| `/api/pair/claim` | `code`, `label` | `linked: true`, with `already` or `moved` when they apply. A wrong, expired or used code is `400 code`, and a group that already has twelve devices is `409 devices`. |
+| `/api/pair/claim` | `code`, `label`, `guide` (optional, counted with the link) | `linked: true`, with `already` or `moved` when they apply. A wrong, expired or used code is `400 code`, and a group that already has twelve devices is `409 devices`. |
 | `/api/status` | | `linked` and the devices in the group (label, last seen, which is this one). A device that was showing a code finds out here that it was used. |
 | `/api/sync` | `guide`, `entries`, `touch`, and `rev` (optional) | the winning entries for the guide, the device count, the server's clock and `rev`, the revision of the guide's data. A call with `rev`, no entries and no `touch` that finds the revision unchanged is answered `{"unchanged": true, "rev", "now"}` and nothing else. |
 | `/api/remove` | `id` | `ok`. Takes another device of the group out (the id is in `/api/status`'s list); it can't name itself (that is unlinking) or a device of another group (`400`). Its next call is `401 unlinked`. |
 | `/api/unlink` | | takes this device out and clears its cookies. The last device out deletes the group's data. |
 | `/api/forget` | | deletes the group's data and every device in it. |
+| `/api/count` | `guide`, `counts` | `ok`, and `counted`, false once the month's budget is spent. Reads no cookie and needs none ([Visit counts](#visit-counts)). |
 
 Errors: `400` (bad body, code, guide, entries, or a stamp more than a day ahead, which also returns `now`), `401 unlinked` (and the cookies are cleared), `403 origin`, `409 devices`, `413`, `429 limit`, `503` (the store is down or not set up).
 
@@ -40,9 +41,21 @@ All keys sit under `hs:<namespace>:`.
 | `p:<group>:<guide>` | the guide's progress, as a sorted set with one member per entry, `key<TAB>stamp<TAB>value`, scored by the stamp | 400 days from the last touch |
 | `pc:<code>` | the device that showed the code | 10 minutes |
 | `rv:<group>:<guide>` | the revision of that guide's data in the group: a counter that goes up, last of all, whenever a sync writes it, and that a poll can read in one command to learn that nothing changed | 400 days from the last touch |
+| `st:<guide>:<yyyy-mm-dd>` | that guide's visit counts for the day (UTC), one field each, and `pair`, the links made that day | 25 months (a week under `test`) |
+| `st:budget:<yyyy-mm>` | the store commands counting has used this month | 40 days |
 | `rl:…` | counters for the limits: for pairing, keyed by a salted hash of the visitor's IP address, and for sync, by the device | the length of their window, an hour at most |
 
-No email, no name. The server sees IP addresses, as any web server does, and uses them only through those counters. A "touch" is the once-a-day request that pushes the expiry out.
+No email, no name. The server sees IP addresses, as any web server does, and uses them only through those counters. The visit counts hold no address, cookie or device. A "touch" is the once-a-day request that pushes the expiry out.
+
+### Visit counts
+
+The guides count visits (what and why: [core.md](../../docs/core.md#visit-counts), and the README's "Privacy" section for readers). A guide sends `/api/count` its counts without cookies, so nothing in a call names the device, and `count` in `src/app.ts` reads no cookie and no address either: it adds the counts to the guide's day hash and nothing else. A field must fit `COUNT_FIELD` (`v:app`, `v:tab`, `p:guide/<n>`, `p:checklist`, `p:dashboard`, `p:sources`, `s:<n>`, `f:<n>`), at most 12 of them, each a whole number from 1 to 50, or the call is a 400 that costs the store nothing. `pair` is the server's own: a successful `/api/pair/claim` that made a new link (not `already`) adds one under the `guide` it names, and a client that names none isn't counted: an older build, or a reader who turned counting off or whose browser sends Global Privacy Control or Do Not Track (the guide then leaves `guide` out). A count that fails never fails the link.
+
+Counting shares the store's 500,000 commands a month with sync, which mustn't run short for it, so it has a budget: 100,000 commands a month in production and 10,000 under `test`. A call first adds what its write will cost (its fields plus two) to `st:budget:<month>`, and once that is past the budget it writes nothing more that month and answers `counted: false`. Counting's own writes stay within the budget. A refused call still costs one command, until the instance answering it has seen the budget spent: it then refuses without the store (`spent` in `Deps`). Only the firewall's rate limit bounds those calls, and it is the one for every `/api/` call, 120 a minute an address: one address at that pace could spend some 170,000 commands a day on refusals, from instances that haven't seen the budget spent yet. A rate-limit rule for `/api/count` alone, a few calls a minute, would close that; it isn't set up. A call costs its fields plus two commands, and the month's first one more. At about four a call, the budget is some 25,000 visits' worth a month across the three guides; when it runs out early, that's the time to move the database to pay-as-you-go.
+
+Anyone can POST made-up counts with a forged Origin from outside a browser, as with any counter: the caps keep one call from skewing a day, and the numbers are indicative, not audited.
+
+`pnpm stats [days] [--test]` (from this folder; 30 days by default) prints each guide's visits (and the installed app's share), pages, each chapter shown, started and finished, and links made, then the sync groups as they stand: how many hold how many devices, and how many have two or more devices synced in the last 30 days. It reads each group's record (`gd:`), whose values hold the device labels beside their last-synced times, and prints only counts, never a label. It runs with the database's read-only token, `KV_REST_API_READ_ONLY_TOKEN` with `KV_REST_API_URL`, from the environment or from `.env.local`, which `vercel env pull --project hundo-api --environment production` writes (git ignores it). A 30-day read costs 91 commands, plus a SCAN and one for each group.
 
 ### Revisions
 
