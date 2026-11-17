@@ -73,14 +73,6 @@
   --spacing-check-indent: calc(var(--spacing-check) + var(--spacing-check-gap));
 }
 
-/* How wide a chapter's article may grow (`max-w-article`, ArticleRoute), Koholint's old 72ch. In px, like the page's text (16px) and its
-   columns: not `ch`, the width of the body font's "0", which would make a guide's font change how wide its page is (Lordran's narrow
-   digits made its cards 215px narrower than Koholint's), and not rem, which would follow the reader's root font size while the text
-   doesn't. */
-@theme {
-  --container-article: 788px;
-}
-
 /* `inline` writes `var(--paper)` itself into each utility instead of a copy, so the guide's own value (and the dark theme) applies. */
 @theme inline {
   --color-paper: var(--paper);
