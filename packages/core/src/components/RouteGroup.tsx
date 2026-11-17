@@ -26,7 +26,7 @@ interface RowProps {
 // A step: its box, its title over its text, and its tags and link at the end. Ticked, it takes the done tint; linked to (a deep link or the
 // checklist's highlight), the highlight.
 const routeRow = cva(
-  "relative grid scroll-mt-4 grid-cols-[28px_minmax(0,1fr)_auto] items-start gap-3 border-t border-line-soft p-3.5 first:border-t-0 target:bg-highlight phone:gap-2.5 phone:px-2.5 phone:py-3",
+  "relative grid scroll-mt-4 grid-cols-[auto_minmax(0,1fr)_auto] items-start gap-3 border-t border-line-soft p-3.5 first:border-t-0 target:bg-highlight phone:gap-2.5 phone:px-2.5 phone:py-3",
   { variants: { tone: { plain: "", done: "bg-done", highlight: "bg-highlight" } } },
 );
 
@@ -95,7 +95,7 @@ interface GroupProps {
 }
 
 // The group's header is its heading, and the button inside it opens and closes the steps (a button can't hold a heading).
-const trigger = `${press} group/trigger grid min-h-[58px] w-full cursor-pointer grid-cols-[36px_minmax(0,1fr)_auto_20px] items-center gap-[11px] border-0 bg-transparent px-3.5 py-3 text-left font-sans text-base leading-[1.58] font-normal text-inherit hover:bg-raised phone:grid-cols-[28px_minmax(0,1fr)_auto_15px] phone:gap-2 phone:p-[9px]`;
+const trigger = `${press} group/trigger grid min-h-[58px] w-full cursor-pointer grid-cols-[auto_minmax(0,1fr)_auto_auto] items-center gap-[11px] border-0 bg-transparent px-3.5 py-3 text-left font-sans text-base leading-[1.58] font-normal text-inherit hover:bg-raised phone:gap-2 phone:p-[9px]`;
 
 export function RouteGroup({ groupKey, title, location, icon, note, sources = [], rows, open, highlightedId, origin, fallbackFocusId, rememberToggle }: GroupProps) {
   const setGroupOpen = useUi((s) => s.setGroupOpen);

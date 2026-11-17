@@ -65,8 +65,13 @@ function SaveStatus() {
   );
 }
 
-// On a phone the brand gives way: its name ellipsizes before the buttons beside it move, and under 361px only the tile shows.
-const brandLink = cva(`${press} flex w-max shrink-0 items-center gap-[11px] px-6 mid:pl-[17px] drawer:gap-[7px] drawer:px-2.5 phone:w-auto phone:min-w-0 phone:shrink`);
+// The brand is the part of the bar that gives way: when the pages and the buttons leave it less than its width, at any screen or text size,
+// its name ellipsizes. With no room left for a few letters of it, the name wraps to a second line, which the link's height (the tile's)
+// clips: the tile shows alone rather than a cut letter. Clipped, not hidden, so find in page can't scroll the link to the name. Under 361px
+// only the tile shows.
+const brandLink = cva(
+  `${press} flex h-10 min-w-0 flex-wrap content-start items-center gap-x-[11px] overflow-clip px-6 mid:pl-[17px] drawer:h-[34px] drawer:gap-x-[7px] drawer:px-2.5`,
+);
 
 // The guide's painting, its square the dark surface: a hairline in the guide's line keeps the cornered tile on a dark bar.
 // (an outline inset over the edge, not a border, so the painting draws at the size it was written for)
@@ -89,7 +94,9 @@ interface TopBarProps {
 export function TopBar({ chapter, view, menuOpen, onToggleMenu, menuToggle }: TopBarProps) {
   const phone = usePhone();
   return (
-    <header className="sticky top-0 z-10 grid h-(--bar) grid-cols-[var(--rail-w)_1fr_auto] items-center border-b border-line bg-surface pt-(--safe-top) pr-(--safe-right) pl-(--safe-left) text-ink standalone:relative standalone:flex-none standalone:select-none standalone:[-webkit-touch-callout:none] drawer:grid-cols-[auto_auto_1fr_auto] phone:grid-cols-[auto_minmax(0,1fr)_auto] phone:[--icon-h:2.75rem] phone:[--icon-w:2.75rem]">
+    // Beside the rail the brand's columns come to the rail's width or the brand's, whichever is wider, so the pages start over the page
+    // when there's room. The pages' column is `1fr`, whose minimum is the pages' own width, so they never shrink: the brand's columns give way.
+    <header className="sticky top-0 z-10 grid h-(--bar) grid-cols-[minmax(0,var(--rail-w))_minmax(0,auto)_1fr_auto] items-center border-b border-line bg-surface pt-(--safe-top) pr-(--safe-right) pl-(--safe-left) text-ink standalone:relative standalone:flex-none standalone:select-none standalone:[-webkit-touch-callout:none] drawer:grid-cols-[auto_minmax(0,auto)_1fr_auto] phone:grid-cols-[auto_minmax(0,1fr)_auto] phone:[--icon-h:2.75rem] phone:[--icon-w:2.75rem]">
       {/* Shown only under 800px: `hidden` is the class's own, and `drawer:block` brings it back. */}
       <div className="ml-[11px] hidden drawer:block tiny:ml-[7px]">
         <IconButton
@@ -102,7 +109,8 @@ export function TopBar({ chapter, view, menuOpen, onToggleMenu, menuToggle }: To
           onClick={onToggleMenu}
         />
       </div>
-      <div className="flex min-w-0 items-center">
+      {/* Beside the rail the brand spans the rail's column and one that fits whatever of the brand runs past it. */}
+      <div className="col-span-2 flex min-w-0 items-center drawer:col-span-1">
         <Link
           className={brandLink()}
           to={`/guide/${chapter}`}
@@ -110,7 +118,8 @@ export function TopBar({ chapter, view, menuOpen, onToggleMenu, menuToggle }: To
         >
           {/* The guide's own painting, as the home screen shows it (pnpm icons writes the sizes). The link carries the name. */}
           <img src={iconUrl(tileSrc(tileSizes[0]))} srcSet={tileSrcSet(iconUrl)} alt="" width={40} height={40} className={brandTile()} />
-          <span className="grid min-w-0 gap-[3px] leading-[1.1] tiny:hidden">
+          {/* (wraps away, rather than ellipsizing, when there isn't room for 5ch of the body text, or all of the name if it's shorter; then grows to all of it) */}
+          <span className="grid max-w-max min-w-0 grow basis-[5ch] gap-[3px] leading-[1.1] tiny:hidden">
             <strong className="truncate font-display text-[21px] leading-[1.05] font-bold tracking-[-0.01em] drawer:text-[17px]">{brand.mark}</strong>
             {/* The space isn't drawn (it's a grid), but without it the link's visible text reads "KoholintHundo", which its name, "Koholint Hundo home", doesn't contain. */}
             {" "}

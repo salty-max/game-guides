@@ -51,7 +51,15 @@ const preview: Preview = {
     a11y: { test: "error" },
     // A phone's screen, for the stories of what changes at 550px and under (a story asks for it with its viewport global). The test
     // runner sizes its page to it too (addon-vitest), so the media queries and usePhone see a phone.
-    viewport: { options: { phone: { name: "Phone", styles: { width: "375px", height: "812px" }, type: "mobile" } } },
+    // The two in between are where the top bar is tightest: a small tablet's (the menu button and the pages, no rail), and just past
+    // 800px (the rail beside the page).
+    viewport: {
+      options: {
+        phone: { name: "Phone", styles: { width: "375px", height: "812px" }, type: "mobile" },
+        smallTablet: { name: "Small tablet", styles: { width: "560px", height: "800px" }, type: "tablet" },
+        narrowLaptop: { name: "Narrow laptop", styles: { width: "820px", height: "800px" }, type: "desktop" },
+      },
+    },
   },
 };
 
