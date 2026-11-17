@@ -213,11 +213,14 @@ export function Callout({ icon, children }: { icon: IconName; children: ReactNod
   );
 }
 
-/** A page's title, the line under it, and a figure in a pill under that (the dashboard's overall count). Compact on a phone, as a large title is. */
+/**
+ * A page's title, the line under it, and a figure in a pill under that (the dashboard's overall count). The title scales with the page
+ * column (`cqi` of `<main>`, the screen's width where there is no container), down to 30px on a phone; its spacing is compact there.
+ */
 export function PageHeading({ title, intro, stat }: { title: string; intro?: ReactNode; stat?: ReactNode }) {
   return (
     <header className="mt-[7px] mb-5 phone:mt-0 phone:mb-3.5">
-      <h1 className="font-display text-[clamp(38px,5vw,58px)] leading-[1.17] font-bold tracking-[-0.015em] phone:text-[30px] phone:leading-[1.15]">{title}</h1>
+      <h1 className="font-display text-[clamp(1.875rem,6cqi,3.625rem)] leading-[1.17] font-bold tracking-[-0.015em] phone:leading-[1.15]">{title}</h1>
       {intro && <p className="mt-[5px] text-[14px] text-muted phone:mt-1 phone:text-[13px] phone:leading-[1.45]">{intro}</p>}
       {stat && <span className="mt-[9px] inline-block rounded-tag bg-soft px-3 py-[3px] text-[12px] font-extrabold text-soft-ink">{stat}</span>}
     </header>

@@ -23,15 +23,16 @@ export function WhatsLeft() {
               ? `About ${points(items.reduce((sum, item) => sum + item.left, 0))} points to go. Biggest remaining first, using the estimate’s weights.`
               : "Biggest gaps first."}
           </PanelText>
-          <ul className="mt-3 mb-0 grid list-none gap-2.5 p-0">
+          {/* Its own width decides (`/left`): under 28rem a category's bar goes under its name and figures, so the bar keeps a length worth reading. */}
+          <ul className="@container/left mt-3 mb-0 grid list-none gap-2.5 p-0">
             {items.map((item) => (
-              <li key={item.tag} className="grid grid-cols-[minmax(120px,190px)_1fr_auto] items-center gap-3 text-[14px] phone:grid-cols-[1fr_auto]">
+              <li key={item.tag} className="grid grid-cols-[minmax(120px,190px)_1fr_auto] items-center gap-3 text-[14px] @max-[28rem]/left:grid-cols-[1fr_auto]">
                 {/* At least 24px tall, the smallest target WCAG 2.2's target size allows, where its line alone is 22px. */}
                 <Link className={`${pressText} flex min-h-6 items-center hover:text-primary hover:underline hover:underline-offset-3`} to={`/checklist/${item.tag}`}>
                   {cats[item.tag][0]}
                 </Link>
                 {/* Decoration: the numbers beside it say the same. Its length is the category's share of the biggest, and the darker part is what's done. */}
-                <span className="block h-2.5 phone:order-3 phone:col-span-full" aria-hidden="true">
+                <span className="block h-2.5 @max-[28rem]/left:order-3 @max-[28rem]/left:col-span-full" aria-hidden="true">
                   <span className="block h-full overflow-hidden rounded-[10px] bg-bar-track" style={{ width: `${(item.total / max) * 100}%` }}>
                     <span className="block h-full bg-primary" style={{ width: `${((item.total - item.left) / item.total) * 100}%` }} />
                   </span>

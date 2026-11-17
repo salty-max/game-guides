@@ -6,8 +6,8 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { MemoryRouter } from "react-router";
 import { expect } from "storybook/test";
 
-// A chapter as prose: a section per group, each step's opening words its checkbox, the list of sections beside it (folded above it up
-// to 1000px wide). The second group is shown as a compact list, whose text lines up under each step's words, not its box.
+// A chapter as prose: a section per group, each step's opening words its checkbox, the list of sections beside it (folded above it when
+// the route is narrower than 52rem, whatever the screen). The second group is shown as a compact list, whose text lines up under each step's words, not its box.
 const chapter = { ...chapters[0], groups: [chapters[0].groups[0], { ...chapters[0].groups[1], compact: true }] };
 const linked = chapter.groups[0].rows[1];
 
@@ -62,7 +62,7 @@ export const FillsItsColumn: Story = {
   play: async ({ canvas }) => {
     const article = canvas.getByRole("article");
     const { grid, tracks, gap } = layout(article);
-    // The contents beside the article, which takes a viewport over 1000px wide (the story's default is 1200): one track would be the folded layout.
+    // The contents beside the article, which takes a route at least 52rem wide (1500px here): one track would be the folded layout.
     await expect(tracks).toHaveLength(2);
     await expect(article.getBoundingClientRect().width).toBeCloseTo(tracks[0], 1);
     await expect(article.querySelector("section")!.getBoundingClientRect().width).toBeCloseTo(tracks[0], 1);
@@ -81,10 +81,12 @@ export const FillsItsColumn: Story = {
   },
 };
 
-/** Folded above the article on a narrow screen, the contents box and the article are one column wide, however wide that is (a column wider than a cap would show it). */
+/**
+ * Folded above the article in a route under 52rem, the contents box and the article are one column wide, however wide that is (a column
+ * wider than a cap would show it). The fold follows the route's own width: 780px on the story's wide screen folds it all the same.
+ */
 export const FoldedFillsItsColumn: Story = {
-  decorators: inWidth(900),
-  globals: { viewport: { value: "phone", isRotated: false } },
+  decorators: inWidth(780),
   play: async ({ canvas }) => {
     const article = canvas.getByRole("article");
     const { tracks } = layout(article);

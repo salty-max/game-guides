@@ -95,7 +95,8 @@ export function TopBar({ chapter, view, menuOpen, onToggleMenu, menuToggle }: To
   const phone = usePhone();
   return (
     // Beside the rail the brand's columns come to the rail's width or the brand's, whichever is wider, so the pages start over the page
-    // when there's room. The pages' column is `1fr`, whose minimum is the pages' own width, so they never shrink: the brand's columns give way.
+    // when there's room. The pages' column is `1fr`, whose minimum is the pages' words (their icons wrap away first, MainNav), so they
+    // never shrink past their words: the brand's columns give way. It gets anything over that only after the brand has all its width.
     <header className="sticky top-0 z-10 grid h-(--bar) grid-cols-[minmax(0,var(--rail-w))_minmax(0,auto)_1fr_auto] items-center border-b border-line bg-surface pt-(--safe-top) pr-(--safe-right) pl-(--safe-left) text-ink standalone:relative standalone:flex-none standalone:select-none standalone:[-webkit-touch-callout:none] drawer:grid-cols-[auto_minmax(0,auto)_1fr_auto] phone:grid-cols-[auto_minmax(0,1fr)_auto] phone:[--icon-h:2.75rem] phone:[--icon-w:2.75rem]">
       {/* Shown only under 800px: `hidden` is the class's own, and `drawer:block` brings it back. */}
       <div className="ml-[11px] hidden drawer:block tiny:ml-[7px]">

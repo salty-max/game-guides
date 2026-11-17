@@ -94,7 +94,7 @@ Checked on an M-series Mac on 16 Nov 2026, against the first limits (before the 
 
 ## In a browser
 
-The tests don't see layout, fonts, colour or how a page reads. Look at every visible change in a browser before calling it done. The `guide-check` skill (`.claude/skills/guide-check`) scripts what follows. It builds, serves and screenshots each guide at 1280×860, 768×1024 and 375×812 in both themes, and makes a before/after page. The tablet size is there because 551 to 800px has its own layout (the top bar's links as icons over words, the drawer), between a phone's tab bar and the desktop.
+The tests don't see layout, fonts, colour or how a page reads. Look at every visible change in a browser before calling it done. The `guide-check` skill (`.claude/skills/guide-check`) scripts what follows. It builds, serves and screenshots each guide at 1280×860, 768×1024 and 375×812 in both themes, and makes a before/after page. The tablet size is there because 551 to 800px has its own layout (the drawer, and the top bar at its tightest, where the pages' icons wrap away and the brand's name gives way), between a phone's tab bar and the desktop; there the hero and the article follow their own width, as on a desktop.
 
 ### Start a guide
 
@@ -163,7 +163,7 @@ Do each of these on desktop, on a tablet width (768) and on a phone-sized viewpo
 
 1. **The page you changed**, and the guide, checklist and progress pages if the change is in core.
 2. **The theme:** the sun or moon in the header switches it from 551px up (on a phone it's in Guide settings, Appearance), and the choice is saved under `<storagePrefix>.theme`. With nothing saved, the page follows the system setting.
-3. **Fonts and banner:** both fonts load (not the fallback), and the chapter banner shows with its art on the right fading towards the words, or, up to 1050px, stacked above them and fading into the card.
+3. **Fonts and banner:** both fonts load (not the fallback), and the chapter banner shows with its art on the right fading towards the words, or, where the hero is under 40rem wide (a phone, a small tablet), stacked above them and fading into the card.
 4. **No sideways scroll on the phone.** `document.documentElement.scrollWidth <= innerWidth` in the console should be `true`.
 5. **No console errors.**
 6. **Progress:** tick a row, reload, and it's still ticked. The undo toast undoes it (on a phone it sits above the tab bar).
