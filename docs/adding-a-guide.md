@@ -73,7 +73,7 @@ The full type is `GuideConfig` in `packages/core/src/types.ts`, and every field 
 ### `guide.test.ts`
 
 - Pin the game's own totals, as Echoes does with `targets`, so a missing row fails a count.
-- Pin the storage keys, as every guide does at the bottom of its test. `STORAGE_KEY` comes from `@hundo/core/progress-state`, `THEME_KEY` from `@hundo/core/store/theme` and `SYNC_KEY` from `@hundo/core/sync/local`:
+- Pin the seven storage keys, as every guide does at the bottom of its test. `STORAGE_KEY` comes from `@hundo/core/progress-state`, `THEME_KEY` from `@hundo/core/store/theme`, `AWAKE_KEY` from `@hundo/core/store/awake`, `PLACE_KEY` from `@hundo/core/store/place`, `SYNC_KEY` from `@hundo/core/sync/local`, `PERSIST_KEY` from `@hundo/core/persistence` and `COUNTS_KEY` from `@hundo/core/counts`:
 
   ```ts
   describe("storage", () => {
@@ -81,7 +81,11 @@ The full type is `GuideConfig` in `packages/core/src/types.ts`, and every field 
     it("keeps its storage keys", () => {
       expect(STORAGE_KEY).toBe("hundo-<sub>.v1");
       expect(THEME_KEY).toBe("hundo-<sub>.theme");
+      expect(AWAKE_KEY).toBe("hundo-<sub>.awake");
+      expect(PLACE_KEY).toBe("hundo-<sub>.place");
       expect(SYNC_KEY).toBe("hundo-<sub>.sync");
+      expect(PERSIST_KEY).toBe("hundo-<sub>.persist");
+      expect(COUNTS_KEY).toBe("hundo-<sub>.counts");
     });
   });
   ```

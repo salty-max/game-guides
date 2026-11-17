@@ -55,6 +55,28 @@ describe.each(stands)("store contract: $name", ({ make }) => {
     expect(await store.exec([["EXPIRE", k, 100], ["EXPIRE", key("missing"), 100]])).toEqual([1, 0]);
   });
 
+  it("INCRBY and HINCRBY add any amount from nothing, and give the new total", async () => {
+    const k = key("budget");
+    const h = key("totals");
+    expect(await store.exec([["INCRBY", k, 5], ["INCRBY", k, 3]])).toEqual([5, 8]);
+    expect(await store.exec([["HINCRBY", h, "v:app", 2], ["HINCRBY", h, "v:app", 1], ["HINCRBY", h, "p:guide/3", 4]])).toEqual([2, 3, 4]);
+    expect(toPairs((await store.exec([["HGETALL", h]]))[0]).sort()).toEqual([["p:guide/3", "4"], ["v:app", "3"]]);
+  });
+
+  it("SCAN with MATCH finds the keys that fit, page by page until the cursor is back at 0", async () => {
+    const hits = [key("scan:gd:a"), key("scan:gd:b")];
+    key("scan:other");
+    await store.exec([...hits, `contract:${run}:scan:other`].map((name) => ["SET", name, "1"]));
+    const found: string[] = [];
+    let cursor = "0";
+    do {
+      const [page] = (await store.exec([["SCAN", cursor, "MATCH", `contract:${run}:scan:gd:*`, "COUNT", 1000]])) as [[string, string[]]];
+      cursor = String(page[0]);
+      found.push(...page[1]);
+    } while (cursor !== "0");
+    expect(found.sort()).toEqual(hits.sort());
+  });
+
   it("DEL counts what it removed", async () => {
     const [a, b] = [key("a"), key("b")];
     await store.exec([["SET", a, "1"], ["SET", b, "2"]]);

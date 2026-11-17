@@ -4,7 +4,7 @@ import { MemoryStore } from "./store";
 
 /** The API on a local port with an in-memory store, for the guides' dev servers to proxy /api to. Data is lost on restart. */
 export function startDev(port = 8787): Server {
-  const deps = { store: new MemoryStore(), now: Date.now, salt: "dev" };
+  const deps = { store: new MemoryStore(), now: Date.now, salt: "dev", spent: new Set<string>() };
   const server = createServer(async (req, res) => {
     const chunks: Buffer[] = [];
     for await (const chunk of req) chunks.push(chunk as Buffer);

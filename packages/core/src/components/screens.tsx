@@ -12,6 +12,7 @@ import { validateState } from "../progress-state";
 import { isOpen, useProgress } from "../store/progress";
 import { useSyncStatus } from "../store/sync";
 import { canKeepAwake, useAwake } from "../store/awake";
+import { declined, uncounted, useCounts } from "../counts";
 import { install, useInstall } from "../store/install";
 import { installed } from "../persistence";
 import { normalizeTheme, themeOptions, useTheme } from "../store/theme";
@@ -71,11 +72,15 @@ function InstallSection() {
   );
 }
 
-/** Theme, how far the guide reveals, keeping the screen on (where the browser can), the progress backup, and installing the guide. */
+/**
+ * Theme, how far the guide reveals, keeping the screen on (where the browser can), counting visits (counts.ts), the progress backup, and
+ * installing the guide.
+ */
 export function SettingsScreen() {
   const data = useProgress((s) => s.data);
   const preference = useTheme((s) => s.preference);
   const keptAwake = useAwake((s) => s.on);
+  const counting = useCounts((s) => s.on);
   const closeDialogThen = useUi((s) => s.closeDialogThen);
   const openDialog = useUi((s) => s.openDialog);
   const announce = useUi((s) => s.announce);
@@ -85,6 +90,8 @@ export function SettingsScreen() {
   const { pathname } = useLocation();
   const [theme, setTheme] = useState(preference);
   const [awake, setAwake] = useState(keptAwake);
+  const [count, setCount] = useState(counting);
+  const [notTracked] = useState(declined);
   const [spoilers, setSpoilers] = useState(data.spoilers);
   const [ceiling, setCeiling] = useState(data.ceiling);
   const [imported, setImported] = useState<ProgressState>();
@@ -94,6 +101,7 @@ export function SettingsScreen() {
     event.preventDefault();
     useTheme.getState().setPreference(theme);
     useAwake.getState().setOn(awake);
+    useCounts.getState().setOn(count);
     useProgress.getState().saveSettings({ spoilers, ceiling });
     closeDialogThen(() => announce("Guide settings saved."));
     const next = useProgress.getState().data;
@@ -117,7 +125,8 @@ export function SettingsScreen() {
 
   const replace = () => {
     if (!imported) return;
-    useProgress.getState().replaceAll(imported);
+    // A backup's ticks weren't made here: they start and finish no chapter in the visit counts.
+    uncounted(() => useProgress.getState().replaceAll(imported));
     closeDialogThen(() => announce("Progress backup loaded."));
     const [view, param] = pathname.split("/").filter(Boolean);
     if (view === "guide") navigate(`/guide/${isOpen(imported, imported.chapter) ? imported.chapter : imported.ceiling}`);
@@ -138,6 +147,12 @@ export function SettingsScreen() {
           onChange={(next) => setCeiling(readChapter(next))}
         />
         {canKeepAwake() && <Switch label="Keep screen on" checked={awake} onChange={setAwake} />}
+        <Switch label="Count my visits" checked={count && !notTracked} onChange={setCount} disabled={notTracked} />
+        <DialogText small>
+          {notTracked
+            ? "Your browser asks sites not to track it, so this guide counts nothing here."
+            : "Anonymous totals, with no cookie and no id: whether the guide runs as an app, which pages and chapter numbers you open, which chapters you start or finish, and each device you link. Kept 25 months by the guides’ sync server, in Frankfurt."}
+        </DialogText>
         <DialogFooter>
           <Button type="submit" look="">
             Save settings

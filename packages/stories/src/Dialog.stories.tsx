@@ -1,4 +1,5 @@
 import { DialogHost } from "@hundo/core/components/DialogHost";
+import { useCounts } from "@hundo/core/counts";
 import { Button, PageHeading } from "@hundo/core/components/ui";
 import { useInstall, type InstallOffer } from "@hundo/core/store/install";
 import { useProgress } from "@hundo/core/store/progress";
@@ -43,6 +44,8 @@ const meta = {
       // Storage that works and a device that isn't linked: a story that needs otherwise says so.
       useProgress.setState({ storageError: false });
       useSyncStatus.setState({ phase: "off", devices: 0, lastSync: null });
+      // Visit counts on, as for a reader who hasn't turned them off.
+      useCounts.setState({ on: true });
       return (
         <MemoryRouter initialEntries={["/guide/1"]}>
           <Story />
@@ -64,7 +67,7 @@ const confirm = (danger: boolean, onConfirm: () => void = fn()): Opened => ({
   onConfirm,
 });
 
-/** The settings screen: a dialog with a form, a list of choices, Keep screen on (Chrome has a wake lock), and the backup. */
+/** The settings screen: a dialog with a form, a list of choices, Keep screen on (Chrome has a wake lock), Count my visits, and the backup. */
 export const Settings: Story = {
   play: async ({ canvas, canvasElement }) => {
     await userEvent.click(canvas.getByRole("button", { name: "Open" }));
@@ -72,6 +75,41 @@ export const Settings: Story = {
     // The first field has the focus, not the close button.
     await waitFor(() => expect(within(dialog).getByRole("radio", { checked: true })).toHaveFocus(), patient);
     await expect(within(dialog).getByRole("switch", { name: "Keep screen on" })).not.toBeChecked();
+    // Counting is on until the reader turns it off, and says what it counts right under the switch.
+    await expect(within(dialog).getByRole("switch", { name: "Count my visits" })).toBeChecked();
+    await expect(within(dialog).getByText(/^Anonymous totals, with no cookie and no id/)).toBeInTheDocument();
+  },
+};
+
+/** Turning Count my visits off takes effect when the settings are saved, like the rest of the form. */
+export const SettingsCountsOff: Story = {
+  play: async ({ canvas, canvasElement }) => {
+    await userEvent.click(canvas.getByRole("button", { name: "Open" }));
+    const dialog = await page(canvasElement).findByRole("dialog", { name: "Guide settings" }, patient);
+    const toggle = within(dialog).getByRole("switch", { name: "Count my visits" });
+    await userEvent.click(toggle);
+    await expect(toggle).not.toBeChecked();
+    await expect(useCounts.getState().on).toBe(true);
+    await userEvent.click(within(dialog).getByRole("button", { name: "Save settings" }));
+    await waitFor(() => expect(useCounts.getState().on).toBe(false), patient);
+    useCounts.getState().setOn(true);
+  },
+};
+
+/** A browser sending Global Privacy Control (or Do Not Track) is never counted: the switch is off and can't be turned on, and the note says why. */
+export const SettingsNotTracked: Story = {
+  play: async ({ canvas, canvasElement }) => {
+    Object.defineProperty(navigator, "globalPrivacyControl", { value: true, configurable: true });
+    try {
+      await userEvent.click(canvas.getByRole("button", { name: "Open" }));
+      const dialog = await page(canvasElement).findByRole("dialog", { name: "Guide settings" }, patient);
+      const toggle = within(dialog).getByRole("switch", { name: "Count my visits" });
+      await expect(toggle).not.toBeChecked();
+      await expect(toggle).toHaveAttribute("aria-disabled", "true");
+      await expect(within(dialog).getByText("Your browser asks sites not to track it, so this guide counts nothing here.")).toBeInTheDocument();
+    } finally {
+      Reflect.deleteProperty(navigator, "globalPrivacyControl");
+    }
   },
 };
 

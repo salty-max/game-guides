@@ -13,6 +13,8 @@ export interface Deps {
   now: () => number;
   /** Secret salt for the IP hashes behind the rate limits. */
   salt: string;
+  /** The counting budgets (a month's, in a namespace) this instance has seen spent, so it refuses later calls without the store. */
+  spent?: Set<string>;
 }
 
 /** The brand.id of every guide. A test holds this list to the apps' own brands. */
@@ -32,6 +34,18 @@ const STALE_MS = 60 * 86_400_000;
 /** Syncs a minute from one device: a runaway client or a stolen cookie gets a trickle. It does not guard the store's quota. */
 const SYNCS_PER_MINUTE = 120;
 const SEEN_EVERY = 60_000;
+
+/*
+ * The visit counts (/api/count): a guide's totals for the day, one hash per guide and day, and nothing about who sent them. They share the
+ * store's monthly commands with sync, which must never run short for them, so counting has a budget of its own each month and stops at it.
+ */
+export const COUNT_BUDGET: Record<Ns, number> = { prod: 100_000, test: 10_000 };
+/** 25 months, the longest the CNIL lets audience measurement keep what it collects. */
+const KEEP_COUNTS_SECONDS = 761 * DAY;
+const MAX_COUNT_FIELDS = 12;
+const MAX_COUNT = 50;
+/** What a guide may count: a visit by where it runs, a page shown (a chapter by its number), a chapter started or finished. */
+const COUNT_FIELD = /^(?:v:(?:app|tab)|p:(?:guide\/[1-9]\d{0,2}|checklist|dashboard|sources)|[sf]:[1-9]\d{0,2})$/;
 
 const DEVICE_COOKIE = "hundo_sync";
 const LINK_COOKIE = "hundo_link";
@@ -328,6 +342,8 @@ async function pairClaim(ctx: Ctx) {
       token = tokenOf(me);
     } else token = tokenOf(await createDevice(ctx, group, label));
   }
+  // A new link is counted for the guide it was made in (a client that sends no guide isn't), and a count that fails never fails the link.
+  if (!outcome.already && typeof ctx.body.guide === "string" && GUIDES.includes(ctx.body.guide)) await tally(ctx, ctx.body.guide, [["pair", 1]]).catch(() => false);
   return reply(200, { linked: true, ...outcome }, sessionCookies(ctx, token, group));
 }
 
@@ -462,6 +478,47 @@ async function forget(ctx: Ctx) {
   return reply(200, { ok: true }, clearCookies(ctx));
 }
 
+/**
+ * Add counts to a guide's totals for the day (`st:<guide>:<yyyy-mm-dd>`, UTC), unless this month's budget is spent. The budget is charged
+ * first, with what the write will cost, so a month's counting never takes more than its budget plus one command for each refused call.
+ * Whether it counted.
+ */
+async function tally(ctx: Ctx, guide: string, fields: [string, number][]): Promise<boolean> {
+  const ns = ctx.where.ns;
+  const day = new Date(ctx.now).toISOString().slice(0, 10);
+  const budget = key(ns, "st", "budget", day.slice(0, 7));
+  // An instance that has seen this month's budget spent refuses without asking the store again: a refused call then costs nothing.
+  if (ctx.deps.spent?.has(budget)) return false;
+  const totals = key(ns, "st", guide, day);
+  const cost = fields.length + 2;
+  const [spent] = await exec(ctx, [["INCRBY", budget, cost]]);
+  if (Number(spent) > COUNT_BUDGET[ns]) {
+    ctx.deps.spent?.add(budget);
+    return false;
+  }
+  const commands: Command[] = fields.map(([field, by]) => ["HINCRBY", totals, field, by]);
+  commands.push(["EXPIRE", totals, ns === "test" ? KEEP_TEST_SECONDS : KEEP_COUNTS_SECONDS, "NX"]);
+  // The month's first call starts its budget's clock; later ones don't pay for it.
+  if (Number(spent) === cost) commands.push(["EXPIRE", budget, 40 * DAY, "NX"]);
+  await exec(ctx, commands);
+  return true;
+}
+
+/**
+ * A visit's counts from a guide. Nothing here reads a cookie or the address: the guide sends this without its cookies, and what is
+ * stored is the sum alone. Fields outside COUNT_FIELD, or too many of them, or a count that isn't a whole number from 1 to 50, are refused.
+ */
+async function count(ctx: Ctx) {
+  const guide = ctx.body.guide;
+  if (typeof guide !== "string" || !GUIDES.includes(guide)) return reply(400, { error: "guide" });
+  const given = ctx.body.counts;
+  if (given === null || typeof given !== "object" || Array.isArray(given)) return reply(400, { error: "counts" });
+  const fields = Object.entries(given as Record<string, unknown>);
+  const valid = ([field, by]: [string, unknown]) => COUNT_FIELD.test(field) && Number.isInteger(by) && (by as number) >= 1 && (by as number) <= MAX_COUNT;
+  if (fields.length === 0 || fields.length > MAX_COUNT_FIELDS || !fields.every(valid)) return reply(400, { error: "counts" });
+  return reply(200, { ok: true, counted: await tally(ctx, guide, fields as [string, number][]) });
+}
+
 const routes: Record<string, (ctx: Ctx) => Promise<Response>> = {
   "/api/pair/start": pairStart,
   "/api/pair/claim": pairClaim,
@@ -470,6 +527,7 @@ const routes: Record<string, (ctx: Ctx) => Promise<Response>> = {
   "/api/unlink": unlink,
   "/api/remove": remove,
   "/api/forget": forget,
+  "/api/count": count,
 };
 
 /** Answer one request. `deps` is null when the store isn't set up, which is a 503 for every real call. */

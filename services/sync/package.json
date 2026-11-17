@@ -4,6 +4,7 @@
   "version": "0.1.0",
   "scripts": {
     "dev": "node scripts/dev.mjs",
+    "stats": "node scripts/stats.mjs",
     "build": "tsc",
     "typecheck": "tsc",
     "lint": "eslint . --max-warnings 0",

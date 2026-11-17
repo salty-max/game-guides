@@ -8,7 +8,7 @@ export function depsFromEnv(): Deps | null {
   if (cached === undefined) {
     const store = storeFromEnv();
     const salt = process.env.SYNC_IP_SALT;
-    cached = store && salt ? { store, salt, now: Date.now } : null;
+    cached = store && salt ? { store, salt, now: Date.now, spent: new Set() } : null;
   }
   return cached;
 }

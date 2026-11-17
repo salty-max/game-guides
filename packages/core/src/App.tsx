@@ -10,6 +10,7 @@ import { useGlobalEffects } from "./useThemeEffects";
 import { useProgress } from "./store/progress";
 import { useSync } from "./sync/engine";
 import { useLaunches } from "./useLaunches";
+import { useCountPages } from "./counts";
 
 function Home() {
   const chapter = useProgress((s) => s.data.chapter);
@@ -19,6 +20,7 @@ function Home() {
 /** What needs the router but draws nothing. */
 function Launches() {
   useLaunches();
+  useCountPages();
   return null;
 }
 

@@ -37,7 +37,7 @@ Then follow [step 1 of the doc](../../../docs/adding-a-guide.md#1-copy-the-folde
 - **`config.ts`**: as [the doc](../../../docs/adding-a-guide.md#configts) says, with `state: {}`.
 - **Chapter data, missables, `facts-to-verify.md`**: use the `guide-content` skill.
 - **`panels.ts`**: `export const panels: Panel[] = [];`. A panel only for a real per-game tracker, and only with the user's say (a child asks it through its opener).
-- **`guide.test.ts`**: pin the game's own totals and the two storage keys. The snippet is in the doc.
+- **`guide.test.ts`**: pin the game's own totals and the seven storage keys. The snippet is in the doc.
 
 ## 4. Art
 

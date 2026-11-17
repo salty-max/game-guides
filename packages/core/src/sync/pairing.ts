@@ -5,6 +5,7 @@ import { dropRecord } from "./local";
 import { syncAfterLinking } from "./engine";
 import { installed } from "../persistence";
 import { setSyncStatus } from "../store/sync";
+import { allowed } from "../counts";
 
 /** The calls behind the Sync screen: showing a code, typing one, listing the devices, and leaving. */
 
@@ -45,7 +46,8 @@ export async function checkStatus(): Promise<StatusResult> {
 
 /** Type the code another device is showing. */
 export async function claimCode(code: string): Promise<ClaimResult> {
-  const { status, body } = await call<{ already?: boolean; moved?: boolean }>("/pair/claim", { code, label: label() });
+  // The guide is named only to count the link (the server counts none without it), so not for a reader who turned counting off.
+  const { status, body } = await call<{ already?: boolean; moved?: boolean }>("/pair/claim", { code, label: label(), ...(allowed() ? { guide: brand.id } : {}) });
   if (status === 200) return { ok: true, already: body?.already === true, moved: body?.moved === true };
   if (status === 400) return { ok: false, why: "code" };
   if (status === 409) return { ok: false, why: "full" };
