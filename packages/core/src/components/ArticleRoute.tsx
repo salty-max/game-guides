@@ -5,6 +5,7 @@ import { Link } from "react-router";
 import { Icon } from "./Icon";
 import { BulkCheck } from "./BulkCheck";
 import { CheckBox } from "./CheckBox";
+import { LineChips } from "./LineChip";
 import { MapLink } from "./MapLink";
 import { Quantity, Tag } from "./ui";
 import type { Chapter, Group, Row } from "../types";
@@ -101,6 +102,7 @@ function Section({ group, target }: { group: Group; target?: string }) {
               </label>
               <Badges row={row} />
               {row.map && <MapLink map={row.map} of={row.title} at="row" />}
+              <LineChips row={row} at="prose" />
               {/* Under the step's words, not under its box. */}
               {row.text && <span className="basis-full ps-check-indent text-[14px] leading-normal text-muted">{row.text}</span>}
             </li>
@@ -122,6 +124,7 @@ function Section({ group, target }: { group: Group; target?: string }) {
                 <MapLink map={row.map} of={row.title} at="row" />
               </>
             )}
+            <LineChips row={row} at="prose" />
           </p>
         ))
       )}

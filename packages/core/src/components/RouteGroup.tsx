@@ -5,6 +5,7 @@ import { Link } from "react-router";
 import { Icon } from "./Icon";
 import { BulkCheck } from "./BulkCheck";
 import { CheckBox } from "./CheckBox";
+import { LineChips } from "./LineChip";
 import { MapLink } from "./MapLink";
 import { rowLink } from "./TickItem";
 import { Quantity, Tag } from "./ui";
@@ -68,7 +69,10 @@ export const RouteRow = memo(function RouteRow({ row, prefix, highlighted, origi
             Chapter {row.chapter}
           </Link>
         ) : (
-          row.map && <MapLink map={row.map} of={row.title} at="row" />
+          <>
+            {row.map && <MapLink map={row.map} of={row.title} at="row" />}
+            <LineChips row={row} at="column" />
+          </>
         )}
       </div>
     </div>
