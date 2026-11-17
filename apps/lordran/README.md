@@ -19,7 +19,7 @@ pnpm icons      # regenerate public/icons and public/favicon.ico from scripts/ic
 
 ## Deploy
 
-The Vercel project `hundo-lordran` builds this folder as its Root Directory and serves [lordran.hundo.quest](https://lordran.hundo.quest), a domain it takes only at launch: before the merge, its deployments live on `hundo-lordran.vercel.app` and the branch addresses, as [a new project](../../docs/deploying.md#a-new-project) says. `vercel.json` here sets the install, build, ignore command, rewrites, CSP and cache rules; [docs/deploying.md](../../docs/deploying.md) explains them.
+The Vercel project `hundo-lordran` builds this folder as its Root Directory and serves [lordran.hundo.quest](https://lordran.hundo.quest), a domain it takes only at launch: before the merge, its deployments live on `hundo-lordran.vercel.app` and the branch addresses, as [a new project](../../docs/deploying.md#a-new-project) says. Its first deployment went to production; the next push, on 17 Nov 2026, built a preview. `vercel.json` here sets the install, build, ignore command, rewrites, CSP and cache rules; [docs/deploying.md](../../docs/deploying.md) explains them.
 
 ## Use the guide
 
