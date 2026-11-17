@@ -1,4 +1,5 @@
 import { BrowserRouter, Navigate, Route } from "react-router";
+import { Head } from "./components/Head";
 import { Layout } from "./components/Layout";
 import { Pages } from "./components/Pages";
 import { ChecklistPage } from "./pages/ChecklistPage";
@@ -39,6 +40,7 @@ export function App() {
   return (
     <BrowserRouter>
       <Launches />
+      <Head />
       <Layout>
         <Pages>{routes}</Pages>
       </Layout>

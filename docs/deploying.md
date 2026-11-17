@@ -94,12 +94,29 @@ Nothing reaches production without being looked at on a preview deployment first
    - a made-up hashed asset such as `/assets/nope.js` returns 404 with no long cache, and so do a made-up font, icon and `/workbox-nope.js` (`headers.sh` checks all four), while `/api/sync` and `/api/nope` are the sync API's own answers;
    - the headers: `curl -sI <preview-url>/` shows the Content-Security-Policy and the security headers;
    - `/theme-init.js` loads, and the page doesn't flash the wrong theme on reload;
+   - `/robots.txt` and `/sitemap.xml` come back as `text/plain` and XML, not as the page. The `og:image` tag always names the production address (`brand.home`), which may not have the new picture yet, so fetch its path from the preview instead, `<preview-url>/assets/og-<hash>.jpg`: it should come back as a JPEG;
    - in a regular browser, the service worker registers, the guide works offline after one visit, and a newer deploy takes over at the next untouched start, or shows the update prompt to a page already in use.
 3. Once every preview is right, merge to `main` with the user's go. Each project that sees a change builds production from `main`.
 
 CI's [Lighthouse](testing.md#lighthouse) audit runs on a build served in the runner, not on a preview, so a preview's headers and its CDN are this list's to check, not Lighthouse's.
 
 Previews sit behind Vercel's deployment protection, so a plain `curl` doesn't get through. `vercel curl`, run from a folder linked to the project, does. Anywhere else it gets a 302. The `guide-deploy` skill's `headers.sh` does this. A signed-in browser's network panel works too.
+
+## Search Console
+
+Not set up yet. The owner verifies the domain by hand, and nothing in the build waits on it. These are the steps:
+
+1. In [Google Search Console](https://search.google.com/search-console), add a **Domain** property for `hundo.quest` (not a URL-prefix one). A Domain property covers every subdomain, so one verification serves all three guides and any later one.
+2. Search Console gives a `google-site-verification=…` TXT record. Add it to `hundo.quest`'s DNS records in Vercel (team jellycat, which holds the domain): type `TXT`, name `@` (the bare domain), the value as given. Then press Verify. DNS can take a while to propagate, and Search Console says when it hasn't seen the record yet.
+3. Under Sitemaps, submit each guide's sitemap:
+   - `https://koholint.hundo.quest/sitemap.xml`
+   - `https://rdr.hundo.quest/sitemap.xml`
+   - `https://echoes.hundo.quest/sitemap.xml`
+4. With URL Inspection, inspect `https://<sub>.hundo.quest/guide/1` for each guide, and run the live test. The rendered HTML should show the guide's title, one canonical to that same address, and no `noindex`.
+5. Then watch, over the following weeks:
+   - **Pages, under Indexing.** The four sitemap pages should end up indexed. Hidden chapters show as "Excluded by 'noindex' tag", and the deep addresses as "Alternate page with proper canonical tag". Both are intended.
+   - **`/`.** It shows chapter 1 by a change of address in the page, so Google is expected to treat it as a duplicate of `/guide/1`. If a result names the guide by its hostname rather than by its name (the WebSite block's `name`), that's the case where rendering chapter 1 at `/` itself, for a reader with no progress, would be worth doing.
+   - **reddead.hundo.quest.** It's under the same Domain property. Its pages should drop out as Google follows the redirect to rdr.
 
 ## The sync API
 

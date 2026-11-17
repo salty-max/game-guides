@@ -7,6 +7,7 @@ import { defineConfig, type Plugin } from "vite";
 import { VitePWA, type VitePWAOptions } from "vite-plugin-pwa";
 import { fontCss, fontPreloads } from "./src/fonts.ts";
 import { bannerSizes } from "./banners.ts";
+import { OG_HEIGHT, OG_WIDTH, ogFile, ogImage, searchFiles, websiteJsonLd } from "./seo.ts";
 import { iconUrl, iconUrls } from "./icon-versions.ts";
 import { guideManifest } from "./manifest.ts";
 import { darkPalette, lightPalette } from "./palette.ts";
@@ -16,25 +17,49 @@ const here = (path: string) => fileURLToPath(new URL(path, import.meta.url));
 // index.html loads the app through this id, which resolves to core's main.tsx.
 const ENTRY = "/@core/main.tsx";
 
-/**
- * Serves the page every guide shares: core's index.html with the brand filled in, and theme-init.js beside it.
- * theme-init.js stays an external file so the CSP can forbid inline scripts.
- */
-const guideShell = (root: string, brand: Brand, palette: Record<string, string>, dark: Record<string, string>): Plugin => {
-  const page = `${root}/index.html`;
-  const template = readFileSync(here("./index.html"), "utf8");
-  const themeInit = readFileSync(here("./theme-init.js"), "utf8");
-  const values: Record<string, string> = {
+const escapeHtml = (value: string) => value.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+/** What index.html's `%GUIDE_<KEY>%` marks are filled with. `ogFile` is the link preview picture's path in the build (seo.ts). */
+export const shellValues = (brand: Brand, palette: Record<string, string>, dark: Record<string, string>, ogFile: string) => {
+  // Text that goes into an attribute or an element as it is, escaped; the fonts and the WebSite block are markup and script already.
+  const text: Record<string, string> = {
     TITLE: brand.title,
+    NAME: brand.name,
     SHORT_NAME: brand.shortName,
     DESCRIPTION: brand.description,
+    HOME: brand.home,
     THEME_COLOR: palette["--surface"],
     THEME_COLOR_DARK: dark["--surface"],
     CORNERS: brand.corners,
     STORAGE: brand.storagePrefix,
+    OG_WIDTH: String(OG_WIDTH),
+    OG_HEIGHT: String(OG_HEIGHT),
+    OG_ALT: `${brand.name}: the chapter 1 banner`,
+    OG_IMAGE: `${brand.home}/${ogFile}`,
+  };
+  const values: Record<string, string> = {
+    ...Object.fromEntries(Object.entries(text).map(([key, value]) => [key, escapeHtml(value)])),
+    JSONLD: websiteJsonLd(brand),
     FONTS: fontCss(brand),
     FONT_PRELOADS: fontPreloads(brand),
   };
+  return values;
+};
+
+/**
+ * Serves the page every guide shares: core's index.html with the brand filled in, and theme-init.js beside it.
+ * theme-init.js stays an external file so the CSP can forbid inline scripts.
+ */
+const guideShell = (
+  root: string,
+  brand: Brand,
+  palette: Record<string, string>,
+  dark: Record<string, string>,
+  og: () => Promise<{ file: string }>,
+): Plugin => {
+  const page = `${root}/index.html`;
+  const template = readFileSync(here("./index.html"), "utf8");
+  const themeInit = readFileSync(here("./theme-init.js"), "utf8");
 
   return {
     name: "guide-shell",
@@ -43,7 +68,10 @@ const guideShell = (root: string, brand: Brand, palette: Record<string, string>,
     load: (id) => (id === page ? template : undefined),
     transformIndexHtml: {
       order: "pre",
-      handler: (html) => html.replace(/%GUIDE_([A-Z_]+)%/g, (match, key: string) => values[key] ?? match),
+      handler: async (html) => {
+        const filled = shellValues(brand, palette, dark, (await og()).file);
+        return html.replace(/%GUIDE_([A-Z_]+)%/g, (match, key: string) => filled[key] ?? match);
+      },
     },
     configureServer(server) {
       server.middlewares.use(async (req, res, next) => {
@@ -78,8 +106,8 @@ export const pwaOptions = (root: string, brand: Brand, palette: Record<string, s
     globPatterns: ["**/*.{js,css,html,webp,woff2,png,svg}"],
     // Client-side routes (/guide/3 …) all resolve to the app shell.
     navigateFallback: "index.html",
-    // /api is the sync API, never a page.
-    navigateFallbackDenylist: [/^\/api\//],
+    // /api is the sync API, never a page; robots.txt, the sitemap and the link preview picture are files a reader may open in a tab.
+    navigateFallbackDenylist: [/^\/api\//, /\.(?:txt|xml|jpg)$/],
     // An icon's URL carries its version (`?v=`, icon-versions.ts) and the precache lists the bare file, under the same content's MD5:
     // leaving `v` out of the match is what lets the page's versioned icons come from the precache, offline too. Workbox's own two stay.
     ignoreURLParametersMatching: [/^utm_/, /^fbclid$/, /^v$/],
@@ -92,6 +120,10 @@ export const pwaOptions = (root: string, brand: Brand, palette: Record<string, s
 export const guideConfig = (root: string, brand: Brand) => {
   const palette = lightPalette(root);
   const dark = darkPalette(root);
+  // The link preview picture, made once per build or server from chapter 1's banner (seo.ts).
+  let preview: Promise<{ file: string; source: Buffer }> | undefined;
+  const og = () =>
+    (preview ??= ogImage(`${root}/src/guide/banners/chapter-1.webp`).then((source) => ({ file: ogFile(source), source })));
   // In production /api is a rewrite to the sync API (vercel.json). Here the dev and preview servers send it to the local one
   // (`pnpm -C services/sync dev`, on 8787), keeping the page's own host so the API sees what it would see behind the rewrite.
   const proxy = { "/api": { target: process.env.SYNC_API ?? "http://127.0.0.1:8787" } };
@@ -103,7 +135,8 @@ export const guideConfig = (root: string, brand: Brand) => {
       alias: [{ find: /^virtual:guide\//, replacement: `${root}/src/guide/` }],
     },
     plugins: [
-      guideShell(root, brand, palette, dark),
+      guideShell(root, brand, palette, dark, og),
+      searchFiles(brand, og),
       iconUrls(`${root}/public`),
       bannerSizes(),
       react(),
