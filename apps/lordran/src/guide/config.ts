@@ -20,9 +20,12 @@ import { sources } from "./data/sources";
 const banners = byChapter(import.meta.glob<Banner>("./banners/chapter-*.webp", { eager: true, query: "?banner", import: "default" }));
 
 /**
- * The guide's own completion list: the Steam achievements, the lists they count, the rings and the expansion's gear.
- * A test pins every goal to the data, so a missing row shows up as a failing count. The expansion equipment is the
- * guide's own selection, not a game total, so it has no goal. Base-game spells have their own tags, so the five
+ * The guide's own completion list: the Steam achievements, the lists they count, the rings, the expansion's gear and the
+ * NPC quests. A test pins every goal to the data, so a missing row shows up as a failing count. The expansion equipment
+ * and the NPC quests are the guide's own rows, not a game total, so they have no goal: an NPC's arc ends in a death, a
+ * hollowing or a choice, so no number of steps is "all of them". The quests are also `optional`, so they show on the
+ * board and stay out of What's left, which would otherwise rank them first and need every quest step for "100%". The
+ * seven `invasion` rows are fights, not questlines, and have no line. Base-game spells have their own tags, so the five
  * expansion spells count in their schools without inflating the three spell achievements.
  */
 export const targets = [
@@ -37,6 +40,7 @@ export const targets = [
   { tag: "ember", goal: 10 },
   { tag: "reinforcement", goal: 10 },
   { tag: "ending", goal: 2 },
+  { tag: "quest", optional: true },
   { tag: "dlc-spell", goal: 5 },
   { tag: "dlc-gear" },
 ];
@@ -94,10 +98,10 @@ const config: GuideConfig = {
   text: {
     checklistIntro: "Search by item, boss, NPC or place. Checks are shared with the walkthrough.",
     searchPlaceholder: "Search items, bosses or places",
-    dashboardIntro: "Counts follow the Steam achievements, the lists they count, the rings and the expansion’s gear, across three playthroughs.",
+    dashboardIntro: "Counts follow the Steam achievements, the lists they count, the rings, the expansion’s gear and the NPC quests, across three playthroughs.",
     boardTitle: "Completion targets",
     boardNote:
-      "Spell counts are the base game’s, as the achievements count them; the five expansion spells have their own line. Knight’s Honor counts all 47 rare weapons.",
+      "Spell counts are the base game’s, as the achievements count them; the five expansion spells have their own line. Knight’s Honor counts all 47 rare weapons. NPC quests count the guide’s own quest steps: a story can end in a death or a choice, so there is no finish line, and they stay out of What’s left.",
     nextUpDone: "Everything revealed is checked. Reveal the next chapter or check the totals on the Progress page.",
     backupBlurb: "Export a copy of your checks and spoiler settings.",
   },
