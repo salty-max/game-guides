@@ -5,6 +5,7 @@ import { Link } from "react-router";
 import { Icon } from "./Icon";
 import { BulkCheck } from "./BulkCheck";
 import { CheckBox } from "./CheckBox";
+import { MapLink } from "./MapLink";
 import { Quantity, Tag } from "./ui";
 import type { Chapter, Group, Row } from "../types";
 import { press, pressText } from "./press-style";
@@ -83,6 +84,11 @@ function Section({ group, target }: { group: Group; target?: string }) {
         </h2>
         {group.location && <p className="mt-[.35rem] text-[14px] font-semibold text-muted">{group.location}</p>}
         {group.note && <p className="mt-[.35rem] text-[14px] text-muted">{group.note}</p>}
+        {group.map && (
+          <p className="mt-[.35rem]">
+            <MapLink map={group.map} of={group.title} at="group" />
+          </p>
+        )}
         <BulkCheck rows={group.rows} label={group.title} space="above" />
       </header>
       {group.compact ? (
@@ -94,6 +100,7 @@ function Section({ group, target }: { group: Group; target?: string }) {
                 {row.title}
               </label>
               <Badges row={row} />
+              {row.map && <MapLink map={row.map} of={row.title} at="row" />}
               {/* Under the step's words, not under its box. */}
               {row.text && <span className="basis-full ps-check-indent text-[14px] leading-normal text-muted">{row.text}</span>}
             </li>
@@ -109,6 +116,12 @@ function Section({ group, target }: { group: Group; target?: string }) {
             </label>{" "}
             <Badges row={row} />
             {row.text}
+            {row.map && (
+              <>
+                {" "}
+                <MapLink map={row.map} of={row.title} at="row" />
+              </>
+            )}
           </p>
         ))
       )}

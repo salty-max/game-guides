@@ -71,6 +71,7 @@ export default {
       sources: [
         ["iRedDead · outfits", "https://www.ireddead.com/rdr/guides/outfits"],
       ],
+      map: ["iRedDead", "https://www.ireddead.com/rdr/maps/us-army-uniform"],
       rows: [
         ["scrap-army-1", ["scrap"], "U.S. Army 1 · Aurora Basin chest", "Open the chest inside the cabin at Aurora Basin, by the lake.", { reference: "https://www.ireddead.com/rdr/maps/us-army-uniform" }],
         ["scrap-army-2", ["scrap"], "U.S. Army 2 · Camp Arm Wrestling", "Play Arm Wrestling at Pacific Union Railroad Camp and keep playing until you defeat the opponents there. The scrap is tied to the railroad camp.", { reference: "https://www.ireddead.com/rdr/maps/us-army-uniform" }],
@@ -86,6 +87,7 @@ export default {
       sources: [
         ["iRedDead · location map", "https://www.ireddead.com/rdr/maps/towns-and-locations"],
       ],
+      map: ["iRedDead", "https://www.ireddead.com/rdr/maps/towns-and-locations"],
       rows: [
         ["location-tall-trees", ["location"], "Tall Trees", ""],
         ["location-aurora-basin", ["location"], "Aurora Basin", ""],
@@ -107,6 +109,7 @@ export default {
       sources: [
         ["iRedDead · location map", "https://www.ireddead.com/rdr/maps/towns-and-locations"],
       ],
+      map: ["iRedDead", "https://www.ireddead.com/rdr/maps/towns-and-locations"],
       rows: [
         ["location-great-plains", ["location"], "Great Plains", ""],
         ["location-beechers-hope", ["location"], "Beecher’s Hope", ""],
@@ -147,6 +150,7 @@ export default {
       sources: [
         ["iRedDead · rare weapons map", "https://www.ireddead.com/rdr/maps/rare-weapons"],
       ],
+      map: ["iRedDead", "https://www.ireddead.com/rdr/maps/rare-weapons"],
       rows: [
         ["weapon-carcano-rifle", ["weapon"], "Carcano Rifle", "Buy it from the Blackwater gunsmith once West Elizabeth is open."],
         ["weapon-evans-repeater", ["weapon"], "Evans Repeater", "Buy it from the Blackwater gunsmith. Its capacity is handy for the final Sharpshooter ranks."],
@@ -170,6 +174,7 @@ export default {
       sources: [
         ["iRedDead · animal map", "https://www.ireddead.com/rdr/maps/animals"],
       ],
+      map: ["iRedDead", "https://www.ireddead.com/rdr/maps/animals"],
       rows: [
         ["hunter-7", ["challenge"], "Master Hunter 7 · Five elk meat and five bighorn skins", "Hunt elk and bighorn sheep in the high ground north of Manzanita Post. Skin five of each to collect the requested items."],
         ["hunter-8", ["challenge"], "Master Hunter 8 · A bear with the knife", "Find a bear in Tall Trees. Bring Medicine and use the hunting knife for the final hit, then skin the bear. Check the minimap for a second bear before getting off your horse."],
@@ -198,6 +203,7 @@ export default {
       sources: [
         ["iRedDead · plant map", "https://www.ireddead.com/rdr/maps/plants"],
       ],
+      map: ["iRedDead", "https://www.ireddead.com/rdr/maps/plants"],
       rows: [
         ["survivalist-7", ["challenge"], "Survivalist 7 · Ten Hummingbird Sage", "Look for pale flower spikes in Tall Trees."],
         ["survivalist-8", ["challenge"], "Survivalist 8 · Twelve Prairie Poppy", "Pick yellow poppies in the open grass of the Great Plains."],
@@ -212,6 +218,7 @@ export default {
       sources: [
         ["PowerPyx · treasure maps", "https://www.powerpyx.com/red-dead-redemption-all-treasure-locations/"],
       ],
+      map: ["PowerPyx", "https://www.powerpyx.com/red-dead-redemption-all-treasure-locations/"],
       rows: [
         ["treasure-9", ["challenge"], "Treasure Hunter 9 · Pickett’s Gold", "Visit the Broken Tree east of Beecher’s Hope. Look for the short broken stone wall at its base and inspect the gap between the wall sections."],
         ["treasure-10", ["challenge"], "Treasure Hunter 10 · Stonewall’s Gold", "Ride to Nekoti Rock north of Manzanita Post. Dismount and follow the rising path to the cave. Check for wildlife before searching the stone pile at the back."],

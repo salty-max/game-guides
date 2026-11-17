@@ -37,6 +37,7 @@ export default {
   - `icon`;
   - `note`: a tip that covers the whole section;
   - `sources`;
+  - `map`: one map for every row in the group (see Maps);
   - `compact: true`, for catalogue lists such as monsters, recipes or crystals. The article layout then shows a tight checklist instead of prose. Echoes' `sweep-lists.ts` is the example.
 
 ## A row
@@ -53,6 +54,15 @@ export default {
 - **`extra`** (optional):
   - `{ quantity: 3 }`: the row awards that many of the guide's `quantity` category, counted by amount.
   - `{ reference: "https://…" }`: the page this row alone was written from (see Sources: it isn't shown). It must be https **(tested)**.
+  - `{ map: ["Site", "https://…"] }`: this row's own map, only where it differs from its group's (see Maps).
+
+## Maps
+
+- A map is a reader's tool, not a citation: `map: [site, url]` on a group shows "Map on <site>" under its title, and on a row "Map" beside its tags or after its text, each opening in a new tab. It's a field of its own so a source never comes back into view.
+- Only a page whose main content marks where the thing is qualifies: a map image or an interactive map of those rows (iRedDead's outfit and location maps, Nintendo Life's regional Might Crystal maps). A walkthrough, an area's wiki page or another tracker doesn't.
+- Give a group its map; give a row one only when its map differs from the group's. Each has a site name and an https address, and a row never repeats its group's map **(tested)**.
+- Link to a heading on the page (`#…`) when the page has one for that region or item, read from the page's own HTML, not guessed. A heading that moves only lands the reader at the top of the page.
+- Link, never copy: a map's image is the game's art and the site's work, so it is never saved, embedded or hotlinked.
 
 ## Sources
 

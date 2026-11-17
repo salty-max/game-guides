@@ -127,7 +127,7 @@ describe("App", () => {
     expect(screen.queryByText(/Sources and maps/)).not.toBeInTheDocument();
   });
 
-  it("shows no source in a chapter: they are kept in the data for checking it, never shown", async () => {
+  it("shows no source in a chapter: they are kept in the data for checking it, never shown (a page the data also names as a map shows as that)", async () => {
     history.replaceState(null, "", "/guide/1");
     render(<App />);
     await screen.findByRole("heading", { level: 1 });
@@ -140,6 +140,7 @@ describe("App", () => {
     ].map(([, url]) => url));
     for (const row of chapterRows(chapter)) if (row.reference) cited.add(row.reference);
     for (const missable of config.missables) for (const url of missable.sources) cited.add(url);
+    for (const group of chapter.groups) for (const map of [group.map, ...group.rows.map((row) => row.map)]) if (map) cited.delete(map[1]);
     const hrefs = [...document.querySelectorAll("a[href]")].map((link) => link.getAttribute("href"));
     expect(hrefs.filter((href) => href && cited.has(href))).toEqual([]);
     expect(hrefs).not.toContain("/sources");

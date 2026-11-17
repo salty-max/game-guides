@@ -62,4 +62,24 @@ describe("a route group", () => {
     rerender(draw(true, false));
     expect(header()).toHaveAttribute("aria-expanded", "true");
   });
+
+  it("shows the group's map and a step's own, but on the checklist only the way back to the chapter", () => {
+    const map: [string, string] = ["Somewhere", "https://example.com/map"];
+    const rows = [{ ...group.rows[0], map }];
+    const { rerender } = render(
+      <MemoryRouter>
+        <RouteGroup groupKey={group.key} title={group.title} map={map} rows={rows} open highlightedId="" fallbackFocusId="route-status" rememberToggle={false} />
+      </MemoryRouter>,
+    );
+    expect(screen.getByRole("link", { name: `Map on Somewhere for ${group.title} (opens in a new tab)` })).toHaveAttribute("rel", "noopener noreferrer");
+    expect(screen.getByRole("link", { name: `Map for ${rows[0].title} on Somewhere (opens in a new tab)` }).textContent).toBe("Map");
+    // Each name starts with the words on screen, so a voice command that reads them finds the link (WCAG 2.5.3).
+    for (const link of screen.getAllByRole("link", { name: /^Map/ })) expect(link.getAttribute("aria-label")?.startsWith(link.textContent ?? "-")).toBe(true);
+    rerender(
+      <MemoryRouter>
+        <RouteGroup groupKey="index-1" title={group.title} rows={rows} open highlightedId="" origin fallbackFocusId="route-status" rememberToggle={false} />
+      </MemoryRouter>,
+    );
+    expect(screen.queryByRole("link", { name: /^Map/ })).toBeNull();
+  });
 });

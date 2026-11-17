@@ -18,6 +18,7 @@ export const chapters: Chapter[] = config.chapters.map((chapter) => ({
     icon: group.icon,
     note: group.note,
     sources: group.sources ?? [],
+    map: group.map,
     compact: group.compact === true,
     rows: group.rows.map(
       ([id, tags, title, text, extra]): Row => ({
@@ -30,6 +31,7 @@ export const chapters: Chapter[] = config.chapters.map((chapter) => ({
         tags: missableIds.has(id) ? [...tags, "missable"] : tags,
         quantity: extra?.quantity ?? 0,
         reference: extra?.reference,
+        map: extra?.map,
       }),
     ),
   })),

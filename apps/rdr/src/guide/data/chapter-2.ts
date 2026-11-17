@@ -89,8 +89,9 @@ export default {
       sources: [
         ["iRedDead · outfits", "https://www.ireddead.com/rdr/guides/outfits"],
       ],
+      map: ["iRedDead", "https://www.ireddead.com/rdr/maps/bandito-outfit"],
       rows: [
-        ["outfit-mexican-poncho", ["outfit"], "Mexican Poncho", "Buy your first safehouse in Nuevo Paraíso. If you haven’t bought one by An Appointed Time, check the Outfits menu after that mission for the story unlock.", { reference: "https://www.ireddead.com/rdr/maps/mexican-poncho" }],
+        ["outfit-mexican-poncho", ["outfit"], "Mexican Poncho", "Buy your first safehouse in Nuevo Paraíso. If you haven’t bought one by An Appointed Time, check the Outfits menu after that mission for the story unlock.", { reference: "https://www.ireddead.com/rdr/maps/mexican-poncho", map: ["iRedDead", "https://www.ireddead.com/rdr/maps/mexican-poncho"] }],
         ["scrap-bandito-1", ["scrap"], "Bandito 1 · Sidewinder Gulch chest", "Check the cluster of three structure markers at the east end of Sidewinder Gulch. The isolated one has the scrap chest.", { reference: "https://www.ireddead.com/rdr/maps/bandito-outfit" }],
         ["scrap-bandito-2", ["scrap"], "Bandito 2 · Chuparosa Nightwatch", "Take the Nightwatch job in Chuparosa after dark, follow the dog through its patrol, and complete the shift.", { reference: "https://www.ireddead.com/rdr/maps/bandito-outfit" }],
         ["scrap-bandito-3", ["scrap"], "Bandito 3 · Casa Madrugada Liar’s Dice", "Play at the Liar’s Dice table in Casa Madrugada and win the entire match. Stay in until every other player has lost their dice.", { reference: "https://www.ireddead.com/rdr/maps/bandito-outfit" }],
@@ -106,6 +107,7 @@ export default {
       sources: [
         ["iRedDead · outfits", "https://www.ireddead.com/rdr/guides/outfits"],
       ],
+      map: ["iRedDead", "https://www.ireddead.com/rdr/maps/reyes-rebels-outfit"],
       rows: [
         ["scrap-reyes-1", ["scrap"], "Reyes’ Rebels 1 · Sepulcro chest", "Enter Sepulcro’s cemetery and check behind the statue and rubble along the southeastern section of the inner wall for the chest.", { reference: "https://www.ireddead.com/rdr/maps/reyes-rebels-outfit" }],
         ["scrap-reyes-2", ["scrap"], "Reyes’ Rebels 2 · Poppycock", "Finish Tollets’s package delivery, including the return conversation in the Chuparosa mayor’s office.", { reference: "https://www.ireddead.com/rdr/maps/reyes-rebels-outfit" }],
@@ -123,6 +125,7 @@ export default {
       sources: [
         ["iRedDead · location map", "https://www.ireddead.com/rdr/maps/towns-and-locations"],
       ],
+      map: ["iRedDead", "https://www.ireddead.com/rdr/maps/towns-and-locations"],
       rows: [
         ["location-punta-orgullo", ["location"], "Punta Orgullo", ""],
         ["location-crooked-toes", ["location"], "Crooked Toes", ""],
@@ -141,6 +144,7 @@ export default {
       sources: [
         ["iRedDead · location map", "https://www.ireddead.com/rdr/maps/towns-and-locations"],
       ],
+      map: ["iRedDead", "https://www.ireddead.com/rdr/maps/towns-and-locations"],
       rows: [
         ["location-perdido", ["location"], "Perdido", ""],
         ["location-agave-viejo", ["location"], "Agave Viejo", ""],
@@ -165,6 +169,7 @@ export default {
       sources: [
         ["iRedDead · location map", "https://www.ireddead.com/rdr/maps/towns-and-locations"],
       ],
+      map: ["iRedDead", "https://www.ireddead.com/rdr/maps/towns-and-locations"],
       rows: [
         ["location-diez-coronas", ["location"], "Diez Coronas", ""],
         ["location-alta-cabeza", ["location"], "Alta Cabeza", ""],
@@ -228,6 +233,7 @@ export default {
       sources: [
         ["iRedDead · rare weapons map", "https://www.ireddead.com/rdr/maps/rare-weapons"],
       ],
+      map: ["iRedDead", "https://www.ireddead.com/rdr/maps/rare-weapons"],
       rows: [
         ["weapon-semi-auto-shotgun", ["weapon"], "Semi-Auto Shotgun", "Buy it from the Escalera gunsmith. If you plan to buy the other rare weapon here, return after the last mission in this chapter."],
         ["weapon-lemat-revolver", ["weapon"], "LeMat Revolver", "After An Appointed Time, purchase it from the Escalera gunsmith."],
@@ -261,6 +267,7 @@ export default {
       sources: [
         ["iRedDead · plant map", "https://www.ireddead.com/rdr/maps/plants"],
       ],
+      map: ["iRedDead", "https://www.ireddead.com/rdr/maps/plants"],
       rows: [
         ["survivalist-4", ["challenge"], "Survivalist 4 · Eight Prickly Pear", "Look for flowering cactus in Punta Orgullo, around Escalera and its surrounding trails."],
         ["survivalist-5", ["challenge"], "Survivalist 5 · Seven Woolly Blue Curls", "Look for purple flower spikes among the scrub in Perdido. Pick seven new plants during the rank."],
@@ -274,6 +281,7 @@ export default {
       sources: [
         ["PowerPyx · treasure maps", "https://www.powerpyx.com/red-dead-redemption-all-treasure-locations/"],
       ],
+      map: ["PowerPyx", "https://www.powerpyx.com/red-dead-redemption-all-treasure-locations/"],
       rows: [
         ["treasure-5", ["challenge"], "Treasure Hunter 5 · Tubman’s Gold", "Find the tree hung with skulls north of Chuparosa near Río del Toro. Cross the road toward the river and look along the far side of the low stone wall."],
         ["treasure-6", ["challenge"], "Treasure Hunter 6 · Brown’s Gold", "Go to Crooked Toes south of Puerto Cuchillo. Climb to the shelf between the tall rock spires and inspect the stacked stones."],

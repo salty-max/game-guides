@@ -63,6 +63,7 @@ export const sweepLists: RawGroup[] = [
       ["Pickup and unlock cross-check", "https://www.zeldadungeon.net/wiki/Echoes_of_Wisdom_Might_Crystals"],
     ],
     compact: true,
+    map: ["Nintendo Life", "https://www.nintendolife.com/guides/zelda-echoes-of-wisdom-all-might-crystal-locations#suthorn-prairie-andamp-forest-11-might-crystals"],
     rows: [
       ["crystal-suthorn-prairie-pond", ["might-crystal"], "Dive in the northwest prairie pond and cut the center of the grass ring", "1 crystal", { quantity: 1 }],
       ["crystal-suthorn-desert-ledge", ["might-crystal"], "Lift the rock on the ledge north of the entrance to the desert canyon", "1 crystal", { quantity: 1 }],
@@ -76,6 +77,7 @@ export const sweepLists: RawGroup[] = [
       ["Pickup and unlock cross-check", "https://www.zeldadungeon.net/wiki/Echoes_of_Wisdom_Might_Crystals"],
     ],
     compact: true,
+    map: ["Nintendo Life", "https://www.nintendolife.com/guides/zelda-echoes-of-wisdom-all-might-crystal-locations#hyrule-field-23-might-crystals"],
     rows: [
       ["crystal-hyrule-suthorn-grass-cross", ["might-crystal"], "Just northwest of the prairie north exit, check the rock in the cross of grass patches", "1 crystal", { quantity: 1 }],
       ["crystal-hyrule-grove-ledge", ["might-crystal"], "Cut thick grass on the higher ground northeast of the grove east of Hyrule Ranch", "1 crystal", { quantity: 1 }],
@@ -98,6 +100,7 @@ export const sweepLists: RawGroup[] = [
       ["Pickup and unlock cross-check", "https://www.zeldadungeon.net/wiki/Echoes_of_Wisdom_Might_Crystals"],
     ],
     compact: true,
+    map: ["Nintendo Life", "https://www.nintendolife.com/guides/zelda-echoes-of-wisdom-all-might-crystal-locations#hyrule-castle-town-12-might-crystals"],
     rows: [
       ["crystal-castle-bird-statue", ["might-crystal"], "Move the bird statue west of the town center with Bind. Take the hidden stairs to the chest", "2 crystals", { quantity: 2 }],
       ["crystal-castle-roof", ["might-crystal"], "Build onto the castle roof and collect the crystal in the open", "1 crystal", { quantity: 1 }],
@@ -110,6 +113,7 @@ export const sweepLists: RawGroup[] = [
       ["Pickup and unlock cross-check", "https://www.zeldadungeon.net/wiki/Echoes_of_Wisdom_Might_Crystals"],
     ],
     compact: true,
+    map: ["Nintendo Life", "https://www.nintendolife.com/guides/zelda-echoes-of-wisdom-all-might-crystal-locations#eastern-hyrule-field-9-might-crystals"],
     rows: [
       ["crystal-east-field-rock-field", ["might-crystal"], "Lift the rock in the southwest corner of the boulder field southeast of Castle Town", "1 crystal", { quantity: 1 }],
       ["crystal-east-field-riverbank", ["might-crystal"], "Check below the boulder by the riverbank north of the waterfall toward Lake Hylia", "1 crystal", { quantity: 1 }],
@@ -127,6 +131,7 @@ export const sweepLists: RawGroup[] = [
       ["Pickup and unlock cross-check", "https://www.zeldadungeon.net/wiki/Echoes_of_Wisdom_Might_Crystals"],
     ],
     compact: true,
+    map: ["Nintendo Life", "https://www.nintendolife.com/guides/zelda-echoes-of-wisdom-all-might-crystal-locations#lake-hylia-4-might-crystals"],
     rows: [
       ["crystal-lake-hylia-submerged-rock", ["might-crystal"], "Dive southwest of the shrine and move the submerged boulder with Bind", "1 crystal", { quantity: 1 }],
     ],
@@ -138,6 +143,7 @@ export const sweepLists: RawGroup[] = [
       ["Pickup and unlock cross-check", "https://www.zeldadungeon.net/wiki/Echoes_of_Wisdom_Might_Crystals"],
     ],
     compact: true,
+    map: ["Nintendo Life", "https://www.nintendolife.com/guides/zelda-echoes-of-wisdom-all-might-crystal-locations#gerudo-desert-22-might-crystals"],
     rows: [
       ["crystal-gerudo-canyon-tree", ["might-crystal"], "Climb to the rock on top of a tree along the north side of the entrance canyon and lift it", "1 crystal", { quantity: 1 }],
       ["crystal-gerudo-oasis-east-rock", ["might-crystal"], "Climb the ridge east of the Oasis and lift the rock at the end", "1 crystal", { quantity: 1 }],
@@ -155,6 +161,7 @@ export const sweepLists: RawGroup[] = [
       ["Pickup and unlock cross-check", "https://www.zeldadungeon.net/wiki/Echoes_of_Wisdom_Might_Crystals"],
     ],
     compact: true,
+    map: ["Nintendo Life", "https://www.nintendolife.com/guides/zelda-echoes-of-wisdom-all-might-crystal-locations#jabul-waters-20-might-crystals"],
     rows: [
       ["crystal-seesyde-dock", ["might-crystal"], "Dive beneath the southern dock at Seesyde Village", "1 crystal", { quantity: 1 }],
       ["crystal-seesyde-dig", ["might-crystal"], "Use Holmill on the small ledge north of the Seesyde Waypoint", "1 crystal", { quantity: 1 }],
@@ -171,6 +178,7 @@ export const sweepLists: RawGroup[] = [
       ["Pickup and unlock cross-check", "https://www.zeldadungeon.net/wiki/Echoes_of_Wisdom_Might_Crystals"],
     ],
     compact: true,
+    map: ["Nintendo Life", "https://www.nintendolife.com/guides/zelda-echoes-of-wisdom-all-might-crystal-locations#eldin-volcano-20-might-crystals"],
     rows: [
       ["crystal-eldin-lizalfos-camp", ["might-crystal"], "Clear the Lizalfos camp on the volcano trail and open its reward chest", "3 crystals", { quantity: 3 }],
       ["crystal-eldin-quarry-ledge", ["might-crystal"], "Northwest of Rock-Roast Quarry, climb to the chest guarded by a Lizalfos Lv. 2", "1 crystal", { quantity: 1 }],
@@ -185,6 +193,7 @@ export const sweepLists: RawGroup[] = [
       ["Pickup and unlock cross-check", "https://www.zeldadungeon.net/wiki/Echoes_of_Wisdom_Might_Crystals"],
     ],
     compact: true,
+    map: ["Nintendo Life", "https://www.nintendolife.com/guides/zelda-echoes-of-wisdom-all-might-crystal-locations#faron-wetlands-14-might-crystals"],
     rows: [
       ["crystal-faron-west-shrub", ["might-crystal"], "Take the short side path off the grassy western approach to Heart Lake and cut the shrub", "1 crystal", { quantity: 1 }],
       ["crystal-faron-south-shrub-ring", ["might-crystal"], "Cut the middle shrub in the ring above the south cave on the route to Blossu", "1 crystal", { quantity: 1 }],
@@ -198,6 +207,7 @@ export const sweepLists: RawGroup[] = [
       ["Pickup and unlock cross-check", "https://www.zeldadungeon.net/wiki/Echoes_of_Wisdom_Might_Crystals"],
     ],
     compact: true,
+    map: ["Nintendo Life", "https://www.nintendolife.com/guides/zelda-echoes-of-wisdom-all-might-crystal-locations#hebra-mountain-14-might-crystals"],
     rows: [
       ["crystal-hebra-snowstorm-cave", ["might-crystal"], "Climb above the cave at the back of the snowstorm route and melt the ice", "1 crystal", { quantity: 1 }],
       ["crystal-hebra-broken-bridge", ["might-crystal"], "Lift the rock in the corner near the Wolfos before the broken bridge", "1 crystal", { quantity: 1 }],

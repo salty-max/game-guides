@@ -94,3 +94,25 @@ export const FoldedFillsItsColumn: Story = {
     await expect(contents.getBoundingClientRect().width).toBeCloseTo(tracks[0], 1);
   },
 };
+
+const sectionMap: [string, string] = ["Nintendo Life", "https://www.nintendolife.com/guides/zelda-echoes-of-wisdom-all-might-crystal-locations#lake-hylia-4-might-crystals"];
+const stepMap: [string, string] = ["Nintendo Life", "https://www.nintendolife.com/guides/zelda-links-awakening-all-heart-pieces-map-and-locations"];
+const [prose, list] = chapter.groups;
+
+/** Maps: a section's under its title, named by its site; a step's after its text in prose, and after its badges in a list. */
+export const WithMaps: Story = {
+  args: {
+    chapter: {
+      ...chapter,
+      groups: [
+        { ...prose, map: sectionMap, rows: [{ ...prose.rows[0], map: stepMap }, ...prose.rows.slice(1)] },
+        { ...list, rows: [{ ...list.rows[0], map: stepMap }, ...list.rows.slice(1)] },
+      ],
+    },
+  },
+  play: async ({ canvas }) => {
+    await expect(canvas.getByRole("link", { name: `Map on Nintendo Life for ${prose.title} (opens in a new tab)` })).toHaveAttribute("href", sectionMap[1]);
+    await expect(canvas.getByRole("link", { name: `Map for ${prose.rows[0].title} on Nintendo Life (opens in a new tab)` })).toHaveTextContent("Map");
+    await expect(canvas.getByRole("link", { name: `Map for ${list.rows[0].title} on Nintendo Life (opens in a new tab)` })).toBeVisible();
+  },
+};

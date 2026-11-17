@@ -24,9 +24,9 @@ export default {
         ["iRedDead · outfits", "https://www.ireddead.com/rdr/guides/outfits"],
       ],
       rows: [
-        ["scrap-army-6", ["scrap"], "U.S. Army 6 · Blackwater tailor", "After The Last Enemy That Shall Be Destroyed, buy the U.S. Military Scrap from the Blackwater tailor.", { reference: "https://www.ireddead.com/rdr/maps/us-army-uniform" }],
-        ["outfit-army", ["outfit"], "U.S. Army Uniform", "Collect the five West Elizabeth scraps and buy the final Blackwater tailor scrap after the story. Check the complete uniform in the Outfits menu.", { reference: "https://www.ireddead.com/rdr/maps/us-army-uniform" }],
-        ["outfit-marshal", ["outfit"], "U.S. Marshal Uniform", "After The Last Enemy That Shall Be Destroyed, clear five New Austin hideouts within one in-game day. Start at Pike’s Basin and ride through Twin Rocks, Fort Mercer, Tumbleweed, then Gaptooth Breach. Stock up before the first clear, ride directly between hideouts, and avoid sleeping or fast travel. Aim to finish within the window without dying. Confirm the uniform unlock after the fifth clear.", { reference: "https://www.ireddead.com/rdr/maps/us-marshal-uniform" }],
+        ["scrap-army-6", ["scrap"], "U.S. Army 6 · Blackwater tailor", "After The Last Enemy That Shall Be Destroyed, buy the U.S. Military Scrap from the Blackwater tailor.", { reference: "https://www.ireddead.com/rdr/maps/us-army-uniform", map: ["iRedDead", "https://www.ireddead.com/rdr/maps/us-army-uniform"] }],
+        ["outfit-army", ["outfit"], "U.S. Army Uniform", "Collect the five West Elizabeth scraps and buy the final Blackwater tailor scrap after the story. Check the complete uniform in the Outfits menu.", { reference: "https://www.ireddead.com/rdr/maps/us-army-uniform", map: ["iRedDead", "https://www.ireddead.com/rdr/maps/us-army-uniform"] }],
+        ["outfit-marshal", ["outfit"], "U.S. Marshal Uniform", "After The Last Enemy That Shall Be Destroyed, clear five New Austin hideouts within one in-game day. Start at Pike’s Basin and ride through Twin Rocks, Fort Mercer, Tumbleweed, then Gaptooth Breach. Stock up before the first clear, ride directly between hideouts, and avoid sleeping or fast travel. Aim to finish within the window without dying. Confirm the uniform unlock after the fifth clear.", { reference: "https://www.ireddead.com/rdr/maps/us-marshal-uniform", map: ["iRedDead", "https://www.ireddead.com/rdr/maps/us-marshal-uniform"] }],
       ],
     },
     {

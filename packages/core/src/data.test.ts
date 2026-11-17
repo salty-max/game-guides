@@ -44,6 +44,17 @@ describe("guide data", () => {
     for (const row of allRows) if (row.reference) expect(row.reference, row.id).toMatch(/^https:\/\//);
   });
 
+  it("names each map's site and links it over https, and a row's map is never its group's", () => {
+    for (const group of chapters.flatMap((chapter) => chapter.groups)) {
+      for (const [where, map] of [[group.title, group.map], ...group.rows.map((row) => [row.id, row.map] as const)] as const) {
+        if (!map) continue;
+        expect(map[0].trim(), where).not.toBe("");
+        expect(map[1], where).toMatch(/^https:\/\//);
+      }
+      for (const row of group.rows) if (row.map && group.map) expect(row.map[1], `${row.id} repeats its group's map`).not.toBe(group.map[1]);
+    }
+  });
+
   it("only flags real rows as missable, each backed by two independent https sources", () => {
     for (const item of config.missables) {
       expect(byId.has(item.id), item.id).toBe(true);

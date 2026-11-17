@@ -117,8 +117,9 @@ export default {
       sources: [
         ["iRedDead · outfits", "https://www.ireddead.com/rdr/guides/outfits"],
       ],
+      map: ["iRedDead", "https://www.ireddead.com/rdr/maps/bollard-twins-outfit"],
       rows: [
-        ["outfit-elegant", ["outfit"], "Elegant Suit", "Play poker or visit Thieves’ Landing to reveal the suit for purchase. Buy it from the tailor in Thieves’ Landing and verify it’s unlocked in the Outfits menu.", { reference: "https://www.ireddead.com/rdr/maps/elegant-suit" }],
+        ["outfit-elegant", ["outfit"], "Elegant Suit", "Play poker or visit Thieves’ Landing to reveal the suit for purchase. Buy it from the tailor in Thieves’ Landing and verify it’s unlocked in the Outfits menu.", { reference: "https://www.ireddead.com/rdr/maps/elegant-suit", map: ["iRedDead", "https://www.ireddead.com/rdr/maps/elegant-suit"] }],
         ["scrap-bollard-1", ["scrap"], "Bollard Twins 1 · Warehouse chest", "Enter the large warehouse near the southern approach to Thieves’ Landing. Go upstairs and open the chest in the back office.", { reference: "https://www.ireddead.com/rdr/maps/bollard-twins-outfit" }],
         ["scrap-bollard-2", ["scrap"], "Bollard Twins 2 · Ranch Nightwatch", "Accept the Nightwatch job at MacFarlane’s Ranch after dark. Follow the patrol dog, handle any disturbances, and finish the shift.", { reference: "https://www.ireddead.com/rdr/maps/bollard-twins-outfit" }],
         ["scrap-bollard-3", ["scrap"], "Bollard Twins 3 · Ranch Horseshoes", "Win a full game at the horseshoe pit at MacFarlane’s Ranch. Aim the middle of the shoe at the stake and release near the marked power band.", { reference: "https://www.ireddead.com/rdr/maps/bollard-twins-outfit" }],
@@ -134,6 +135,7 @@ export default {
       sources: [
         ["iRedDead · outfits", "https://www.ireddead.com/rdr/guides/outfits"],
       ],
+      map: ["iRedDead", "https://www.ireddead.com/rdr/maps/treasure-hunter-outfit"],
       rows: [
         ["scrap-treasure-1", ["scrap"], "Treasure Hunter 1 · Silent Stead chest", "At Silent Stead, look inside the small house northwest of the road junction and open the chest.", { reference: "https://www.ireddead.com/rdr/maps/treasure-hunter-outfit" }],
         ["scrap-treasure-2", ["scrap"], "Treasure Hunter 2 · California", "Complete all of Sam Odessa’s encounters in California, ending by delivering his letter to the freight station in Armadillo.", { reference: "https://www.ireddead.com/rdr/maps/treasure-hunter-outfit" }],
@@ -151,6 +153,7 @@ export default {
       sources: [
         ["iRedDead · location map", "https://www.ireddead.com/rdr/maps/towns-and-locations"],
       ],
+      map: ["iRedDead", "https://www.ireddead.com/rdr/maps/towns-and-locations"],
       rows: [
         ["location-cholla-springs", ["location"], "Cholla Springs", ""],
         ["location-armadillo", ["location"], "Armadillo", ""],
@@ -179,6 +182,7 @@ export default {
       sources: [
         ["iRedDead · location map", "https://www.ireddead.com/rdr/maps/towns-and-locations"],
       ],
+      map: ["iRedDead", "https://www.ireddead.com/rdr/maps/towns-and-locations"],
       rows: [
         ["location-rio-bravo", ["location"], "Río Bravo", ""],
         ["location-del-lobo-rock", ["location"], "Del Lobo Rock", ""],
@@ -195,6 +199,7 @@ export default {
       sources: [
         ["iRedDead · location map", "https://www.ireddead.com/rdr/maps/towns-and-locations"],
       ],
+      map: ["iRedDead", "https://www.ireddead.com/rdr/maps/towns-and-locations"],
       rows: [
         ["location-hennigans-stead", ["location"], "Hennigan’s Stead", ""],
         ["location-brittlebrush-trawl", ["location"], "Brittlebrush Trawl", ""],
@@ -216,6 +221,7 @@ export default {
       sources: [
         ["iRedDead · location map", "https://www.ireddead.com/rdr/maps/towns-and-locations"],
       ],
+      map: ["iRedDead", "https://www.ireddead.com/rdr/maps/towns-and-locations"],
       rows: [
         ["location-gaptooth-ridge", ["location"], "Gaptooth Ridge", ""],
         ["location-benedict-pass", ["location"], "Benedict Pass", ""],
@@ -315,6 +321,7 @@ export default {
       sources: [
         ["iRedDead · animal map", "https://www.ireddead.com/rdr/maps/animals"],
       ],
+      map: ["iRedDead", "https://www.ireddead.com/rdr/maps/animals"],
       rows: [
         ["hunter-1", ["challenge"], "Master Hunter 1 · Five coyote pelts", "Find packs in Cholla Springs and around Armadillo. Skin the five coyotes to register their pelts."],
         ["hunter-2", ["challenge"], "Master Hunter 2 · Five deer pelts", "Look for antlerless deer on the plains around Hennigan’s Stead. Skin five. Bucks count as a different animal."],
@@ -347,6 +354,7 @@ export default {
       sources: [
         ["iRedDead · plant map", "https://www.ireddead.com/rdr/maps/plants"],
       ],
+      map: ["iRedDead", "https://www.ireddead.com/rdr/maps/plants"],
       rows: [
         ["survivalist-1", ["challenge"], "Survivalist 1 · Six Wild Feverfew", "Pick the small pale blooms in Hennigan’s Stead or Cholla Springs. Picking the first plant opens the challenge."],
         ["survivalist-2", ["challenge"], "Survivalist 2 · Six Desert Sage", "Look for purple flowers on the low shrubs of Gaptooth Ridge."],
@@ -360,6 +368,7 @@ export default {
       sources: [
         ["PowerPyx · treasure maps", "https://www.powerpyx.com/red-dead-redemption-all-treasure-locations/"],
       ],
+      map: ["PowerPyx", "https://www.powerpyx.com/red-dead-redemption-all-treasure-locations/"],
       rows: [
         ["treasure-1", ["challenge"], "Treasure Hunter 1 · The first map", "Watch for the roadside encounter with bandits attacking a treasure hunter and his wagon. Save him and take the map he offers. If he dies, loot the map from him. Receiving it completes rank 1."],
         ["treasure-2", ["challenge"], "Treasure Hunter 2 · Rhodes’ Gold", "Go to Hanging Rock north of Armadillo. Walk between the two smaller rocks behind the main boulder and inspect the loose pile where they meet it."],
