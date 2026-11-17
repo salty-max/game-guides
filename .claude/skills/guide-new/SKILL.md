@@ -1,6 +1,6 @@
 ---
 name: guide-new
-description: "Start a new hundo guide, the fourth and after, from apps/echoes: the copied folder, brand.ts (with its hundo.quest home), the eleven-colour palette, fonts and corners, icon art, chapter data, banners and tests, then pnpm check, the browser check, and the new Vercel project's first preview. Use when the user decides to add a game to the guides."
+description: "Start a new hundo guide, the fourth and after, from apps/echoes: the copied folder, brand.ts (with its hundo.quest home), the eleven-colour palette, fonts and corners, icon art, chapter data, banners and tests, then pnpm check, the browser check, and the new Vercel project's first deployment, checked before launch. Use when the user decides to add a game to the guides."
 ---
 
 # A new guide
@@ -56,9 +56,9 @@ Do [step 4 of the doc](../../../docs/adding-a-guide.md#4-wire-it-into-the-reposi
 - The `guide-check` skill on the new guide, with `--reveal`, so every chapter is shown.
 - Review: run `bun harness/packet.ts hundo`, have the `reviewer` helper read it, fix what it finds, then `bun harness/review.ts hundo "<verdict>"`. Then commit.
 
-## 7. Vercel, up to the first preview
+## 7. Vercel, up to launch
 
-- **The API first:** the guide's `brand.id` in production's `GUIDES` before the first preview ([doc](../../../docs/deploying.md#the-api-knows-the-guide-first)). It's the doc's first way, a one-line pull request of its own deployed ahead (recommended), or the second, with the guide's own and the sync and count checks after the merge: a child sends the choice, and the merge's go, to its opener.
-- **The project:** create it only with the user's go, following [docs/deploying.md](../../../docs/deploying.md#a-new-project). That covers the name, Root Directory, outside files, Node, production branch and the hundo.quest subdomain.
-- **The first preview:** get the push go (a child sends the question to its opener), saying exactly what will be pushed, then check the preview as the `guide-deploy` skill says. It comes from Git: connect the project once the pull request is open, and its next push builds the preview if that push's last commit touches the app. Never from the CLI: on a new project with no Git link, both `vercel deploy` and `vercel deploy --target preview` made production deployments ([doc](../../../docs/deploying.md#a-new-project)).
-- **Stop there.** The first production deploy, the merge to `main`, is its own go.
+- **The API first:** the guide's `brand.id` in production's `GUIDES` before the project's first deployment ([doc](../../../docs/deploying.md#the-api-knows-the-guide-first)). It's the doc's first way, a one-line pull request of its own deployed ahead (recommended), or the second, with the guide's own and the sync and count checks after the merge: a child sends the choice, and the merge's go, to its opener.
+- **The project:** create it only with the user's go, following [docs/deploying.md](../../../docs/deploying.md#a-new-project). That covers the name, Root Directory, outside files, Node and production branch; the hundo.quest subdomain goes on only at launch.
+- **The first deployment:** get the push go (a child sends the question to its opener), saying exactly what will be pushed, then check it as the `guide-deploy` skill says. On a project with no deployments, the first deployment has gone to production each time (three times, CLI and Git alike, [doc](../../../docs/deploying.md#a-new-project)), which is why the project has no `hundo.quest` domain yet. It comes from Git once the pull request is open, with a last commit that touches the app, and is checked on `<project>.vercel.app` and, for sync and counts, on its `-git-<branch>-jellycat` address.
+- **Stop there.** Launch is its own go: the merge, then the domain once `main`'s production deployment is built ([doc](../../../docs/deploying.md#a-new-project)).

@@ -14,7 +14,7 @@ Work out which projects will build before asking for the push. The ignore step, 
 ## 2. Previews
 
 - **Push the branch**, with the user's go. A new branch with real commits builds a preview on every project whose ignore command sees a change. PR [salty-max/hundo#1](https://github.com/salty-max/hundo/pull/1) built all three this way on 2026-11-14. The pull request's checks link to each deployment.
-- **No preview built?** That happens when the branch's last commit touches none of the watched paths. The monorepo session also saw no build for a branch pushed at a commit that already existed (2026-11-14). Create the deployment through the API instead, unless the ignore step is what skipped it: an API deployment runs the same script, so with an empty watched diff it is canceled too. In that case use `vercel deploy` from a linked repository root, on a project that already has a production deployment, and read its `target` back before checking it (section 5 says why). The body goes in a file:
+- **No preview built?** That happens when the branch's last commit touches none of the watched paths. The monorepo session also saw no build for a branch pushed at a commit that already existed (2026-11-14). Create the deployment through the API instead, unless the ignore step is what skipped it: an API deployment runs the same script, so with an empty watched diff it is canceled too. In that case use `vercel deploy` from a linked repository root, on a project that has launched (never before, section 5 says why), and read its `target` back before checking it. The body goes in a file:
 
   ```json
   { "name": "<project>", "project": "<project>", "gitSource": { "type": "github", "repoId": 1458075216, "ref": "<branch>", "sha": "<full sha>" } }
@@ -76,11 +76,12 @@ Only on the user's go, with exactly what will deploy.
 
 ## 5. A new project
 
-Follow [docs/deploying.md](../../../docs/deploying.md#a-new-project), with the user's go for creating it, then do steps 2 and 3 for its first preview. Its first production deploy is a separate go.
+Follow [docs/deploying.md](../../../docs/deploying.md#a-new-project), with the user's go for creating it, then do steps 2 and 3 for its first deployment. Its launch, the merge and then the domain, is a separate go.
 
-- **Its first preview comes from Git:** connect the project (`vercel git connect`) once the guide's pull request is open, and its next push builds the preview if that push's last commit touches the app, core, `scripts` or the root workspace files (section 1). Until the merge, other branches show a failed deployment on that project.
-- **No CLI deploy to it before its first production.** On `hundo-lordran`, a new project with no Git link and no deployment, CLI 62.2 made production deployments twice on 17 Nov 2026, from a plain `vercel deploy` and from `vercel deploy --target preview`, each aliasing the guide's domain.
-- After any deploy, read the target back before anything else: `vercel api /v13/deployments/<id> --scope jellycat --raw | jq .target` must not say `production`. If it does, stop and tell the user.
+- **No custom domain until launch.** Create the project without `<sub>.hundo.quest`. On `hundo-lordran`, a project with no deployments, the first deployment went to production three times on 17 Nov 2026: from `vercel deploy`, from `vercel deploy --target preview`, and from a Git push of the pull request's branch. Each time it took the guide's domain, so the domain goes on only at launch: after the merge, once `main`'s production deployment is built (adding it earlier would most likely serve the pull request's build on the real address at once, per Vercel's docs, not tried here).
+- **Its first deployment comes from Git:** connect the project (`vercel git connect`) once the guide's pull request is open. The next push builds if its last commit touches the app, core, `scripts` or the root workspace files (section 1). Never `vercel deploy`, `redeploy`, `promote` or `alias` on it before launch.
+- **Check it** with headers.sh (section 3) and in the browser. Check sync and a visit count on its branch address, `<project>-git-<branch>-jellycat.vercel.app`, since the sync API refuses the origin `<project>.vercel.app` by design (it serves `*.hundo.quest` and `hundo-…-jellycat.vercel.app` only). That address is protected: sign in to Vercel, or send the project's bypass token as `x-vercel-protection-bypass` from a script, without `x-vercel-set-bypass-cookie` on every request (it loops POSTs in 307s), and never print the token.
+- After any deployment, read its target back before anything else (`vercel api /v13/deployments/<id> --scope jellycat --raw | jq .target`), and the project's domains (`vercel api /v9/projects/<project>/domains --scope jellycat --raw | jq -r '.domains[].name'`). A new project's first one has been production: its domains must then be `.vercel.app` names only. Any later one before launch that says `production`, or a `hundo.quest` name on the project before launch: stop and tell the user. Read domains from the project: a deployment's `alias` list kept `lordran.hundo.quest` after it was detached.
 
 ## Gotchas
 
