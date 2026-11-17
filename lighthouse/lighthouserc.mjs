@@ -2,10 +2,14 @@
 // failure). Lighthouse CI checks each URL against every assertMatrix entry whose pattern matches it, so the first entry holds every
 // page and the others add each page's own speed limits. The desktop runs are the URLs ending in #desktop.
 //
-// Accessibility, best practices and SEO take the worst of the three runs; speed takes the median run, so one slow run on a shared
-// runner doesn't fail a pull request. The speed limits come from main on GitHub's runner (16 Nov 2026, Lighthouse's CPU benchmark
-// 2,200 to 2,500, about three quarters of an M-series Mac), one set per page from the guide that does worst on it, so a lighter guide
-// has more room before it trips:
+// Accessibility, best practices and SEO take the worst of the three runs. Speed takes each metric's median over the three ("median"),
+// so one slow run on a shared runner doesn't fail a pull request. Not "median-run": that asserts every metric from the one run nearest
+// the median FCP and TTI, which can be the slow one. A page's first run in a CI job is often far slower than the other two (TBT up to
+// about 700 ms on /dashboard and over 900 on /guide/1), and main went red on 17 Nov 2026 asserting Red Dead's 329 ms on /dashboard
+// where the median was 80.
+//
+// The speed limits come from main on GitHub's runner (16 Nov 2026, Lighthouse's CPU benchmark 2,200 to 2,500, about three quarters of
+// an M-series Mac), one set per page from the guide that does worst on it, so a lighter guide has more room before it trips:
 // - performance: that guide's median less about 10 points;
 // - TBT, the number a slower machine moves most: about 1.5 times its median;
 // - LCP: the limits first set on a Mac, which leave the runner's medians 450 to 1,000 ms of room (desktop, 445 ms);
@@ -13,7 +17,7 @@
 //   0.14 on the runner); 0.15 elsewhere, where Progress shifted by 0.052 to 0.098 on the runner (Google's "poor" is 0.25).
 
 const worst = { aggregationMethod: "pessimistic" };
-const median = { aggregationMethod: "median-run" };
+const median = { aggregationMethod: "median" };
 
 const everyPage = {
   matchingUrlPattern: ".*",

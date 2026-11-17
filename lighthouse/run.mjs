@@ -1,8 +1,8 @@
 // Runs Lighthouse, through Lighthouse CI, on each guide's production build served by `vite preview`, as the pull request's lighthouse
 // job does: `pnpm lighthouse [koholint,rdr]`, with `--no-build` to audit the dist already there. Each guide's pages are audited three
 // times on a phone (Lighthouse's default), and the checklist three times more on a desktop, then held to lighthouserc.mjs's
-// assertions. The reports land in .cache/lighthouse/<guide>/report, a table of the median runs is printed (and added to the job's
-// summary on GitHub), and the exit code is 1 when an assertion fails. Nothing runs it in `pnpm check`.
+// assertions. The reports land in .cache/lighthouse/<guide>/report, a table of each page's numbers as the assertions read them is
+// printed (and added to the job's summary on GitHub), and the exit code is 1 when an assertion fails. Nothing runs it in `pnpm check`.
 import { spawn, spawnSync } from "node:child_process";
 import { appendFileSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync } from "node:fs";
 import { createServer } from "node:net";
@@ -66,6 +66,13 @@ const lhciIn = (cwd, command) => {
 const readJson = (file) => JSON.parse(readFileSync(file, "utf8"));
 const where = (url) => new URL(url).pathname + new URL(url).hash;
 const number = (value, digits = 0) => (typeof value === "number" ? value.toFixed(digits) : "–");
+/** The median as Lighthouse CI's `aggregationMethod: "median"` takes it: the middle value, or the mean of the middle two. */
+const median = (values) => {
+  if (!values.length) return undefined;
+  const sorted = [...values].sort((a, b) => a - b);
+  const middle = Math.floor((sorted.length - 1) / 2);
+  return sorted.length % 2 ? sorted[middle] : (sorted[middle] + sorted[middle + 1]) / 2;
+};
 
 const rows = [];
 const failures = [];
@@ -102,22 +109,31 @@ const audit = async (app) => {
     failures.push({ app, page: where(result.url), what: `${id}: ${result.name} ${result.operator} ${result.expected}, was ${number(result.actual, 3)}` });
   }
   if (!uploaded) throw new Error("Lighthouse CI couldn't write the reports");
-  for (const entry of readJson(join(dir, "report", "manifest.json")).filter((e) => e.isRepresentativeRun)) {
+  // Each page's runs, read as lighthouserc.mjs asserts them: speed and `cpu` as the median of the runs, the other scores as the worst.
+  const runsByUrl = new Map();
+  for (const entry of readJson(join(dir, "report", "manifest.json"))) {
     const lhr = readJson(entry.jsonPath);
     browsers.add(`Lighthouse ${lhr.lighthouseVersion}, ${/Chrome\/\d+/.exec(lhr.environment.hostUserAgent)?.[0] ?? "Chrome"}`);
-    const metric = (id) => lhr.audits[id]?.numericValue;
-    const score = (id) => number(typeof lhr.categories[id]?.score === "number" ? lhr.categories[id].score * 100 : undefined);
+    runsByUrl.set(entry.url, [...(runsByUrl.get(entry.url) ?? []), lhr]);
+  }
+  for (const [url, lhrs] of runsByUrl) {
+    const values = (read) => lhrs.map(read).filter((value) => typeof value === "number");
+    const metric = (id) => median(values((lhr) => lhr.audits[id]?.numericValue));
+    const score = (id) => values((lhr) => lhr.categories[id]?.score);
+    const percent = (value) => number(typeof value === "number" ? value * 100 : undefined);
+    // Like Lighthouse CI's "pessimistic", which fails when any run has no score: a run without one shows as "–", not as the others' worst.
+    const worst = (id) => percent(score(id).length === lhrs.length ? Math.min(...score(id)) : undefined);
     rows.push([
       app,
-      where(entry.url),
-      score("performance"),
-      score("accessibility"),
-      score("best-practices"),
-      score("seo"),
+      where(url),
+      percent(median(score("performance"))),
+      worst("accessibility"),
+      worst("best-practices"),
+      worst("seo"),
       number(metric("largest-contentful-paint")),
       number(metric("total-blocking-time")),
       number(metric("cumulative-layout-shift"), 3),
-      number(lhr.environment.benchmarkIndex),
+      number(median(values((lhr) => lhr.environment.benchmarkIndex))),
     ]);
   }
 };
@@ -140,11 +156,12 @@ const line = (cells) => cells.map((cell, i) => cell.padEnd(widths[i])).join("  "
 const verdict = failures.length
   ? `${failures.length} failed:\n${failures.map((f) => `- ${f.app} ${f.page}: ${f.what}`).join("\n")}`
   : "Every assertion passed.";
-console.log(`\nMedian runs (${[...browsers].join("; ")}):\n\n${[line(header), ...rows.map(line)].join("\n")}\n\n${verdict}`);
+const reading = "speed and cpu are the median of each page's runs; accessibility, best practices and SEO the worst run";
+console.log(`\n${[...browsers].join("; ")}: ${reading}:\n\n${[line(header), ...rows.map(line)].join("\n")}\n\n${verdict}`);
 
 if (process.env.GITHUB_STEP_SUMMARY) {
   const md = (cells) => `| ${cells.join(" | ")} |`;
   const table = [md(header), md(header.map(() => "---")), ...rows.map(md)].join("\n");
-  appendFileSync(process.env.GITHUB_STEP_SUMMARY, `### Lighthouse: ${apps.join(", ")}\n\n${[...browsers].join("; ")}\n\n${table}\n\n${verdict}\n`);
+  appendFileSync(process.env.GITHUB_STEP_SUMMARY, `### Lighthouse: ${apps.join(", ")}\n\n${[...browsers].join("; ")}: ${reading}.\n\n${table}\n\n${verdict}\n`);
 }
 process.exit(failures.length ? 1 : 0);
