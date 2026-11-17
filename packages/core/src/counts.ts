@@ -194,13 +194,13 @@ export function startCounting(now: () => number = Date.now) {
 }
 
 /**
- * The page an address shows, as a field: one of four, with a chapter by its number only, so a row's anchor or a checklist's filters
+ * The page an address shows, as a field: one of three, with a chapter by its number only, so a row's anchor or a checklist's filters
  * never leave the device. A hidden chapter isn't counted (the reader sees only that it's hidden), nor `/` and unknown addresses, which
  * move on to a chapter at once.
  */
 export function pageOf(pathname: string, data: ProgressState): string | null {
   const [view, param] = pathname.split("/").filter(Boolean);
-  if (view === "checklist" || view === "dashboard" || view === "sources") return `p:${view}`;
+  if (view === "checklist" || view === "dashboard") return `p:${view}`;
   if (view !== "guide") return null;
   const n = Number(param);
   const chapter = Number.isInteger(n) && n >= 1 && n <= CHAPTER_COUNT ? n : data.chapter;

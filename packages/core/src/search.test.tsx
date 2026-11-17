@@ -19,7 +19,7 @@ const last = chapters.length;
 const entry = chapters[0].groups[0].rows[0].id;
 
 describe("what search engines get (search.ts)", () => {
-  it("indexes the four pages, each its own canonical on the guide's address", () => {
+  it("indexes the three pages, each its own canonical on the guide's address", () => {
     for (const path of INDEXED_PATHS) expect(head(path), path).toMatchObject({ canonical: brand.home + path, noindex: false });
     expect(head("/guide/1")).toMatchObject({ title: brand.title, description: brand.description });
   });
@@ -31,6 +31,7 @@ describe("what search engines get (search.ts)", () => {
       [`/guide/1/${entry}`, "/guide/1"],
       ["/guide/99", "/guide/1"],
       ["/nope", "/guide/1"],
+      ["/sources", "/guide/1"],
       ["/checklist/all/3", "/checklist"],
       [`/checklist/${chips[0]}`, "/checklist"],
       ["/dashboard/left", "/dashboard"],

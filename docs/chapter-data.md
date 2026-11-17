@@ -52,10 +52,11 @@ export default {
 - **`text`**: the directions, in the second person, in the order the player meets things. Name the landmark, the action and the reward. Give exact counts and prices where the source gives them.
 - **`extra`** (optional):
   - `{ quantity: 3 }`: the row awards that many of the guide's `quantity` category, counted by amount.
-  - `{ reference: "https://…" }`: one page for this row alone, linked from the row. It must be https **(tested)**.
+  - `{ reference: "https://…" }`: the page this row alone was written from (see Sources: it isn't shown). It must be https **(tested)**.
 
 ## Sources
 
+- Sources are provenance: the pages the data was written from, kept so it can be checked (the tests below, the `source-checker` helper, `docs/facts-to-verify.md`). **No guide shows them**: no line under a section or a group, no link on a row, no Sources page. Readers get the directions, not the citations. Keep them complete anyway: they're how "no unverifiable claims" and the two-hosts rule for missables stay checkable.
 - Every link is https and has a label **(tested)**. That covers guide, chapter and group sources, the reassurance's sources and row references.
 - Label a source by what it settles ("Sanctum interior and roof chest"), not just by the site's name. Red Dead adds the site in front: "iRedDead · story missions".
 - Draft from the pages you link, and link the page you actually used. Where two pages disagree, note it in `docs/facts-to-verify.md`, with which one the data follows.
@@ -78,7 +79,7 @@ export const missables: Missable[] = [
 
 - An entry needs **two independent sources on different hosts** that agree on the exact condition **(tested: two hosts, https, a real row id, a `why` of more than 10 characters)**. Anything weaker goes in `docs/facts-to-verify.md`, not in the strip.
 - `why` is one line: the exact condition for losing it.
-- While nothing qualifies, export a `reassurance` instead: one honest sentence and two sources on different hosts **(tested)**. Echoes and Koholint do this. The strip then shows the sentence in place of a "Don't miss" list.
+- While nothing qualifies, export a `reassurance` instead: one honest sentence and two sources on different hosts **(tested)**. Echoes and Koholint do this. The strip then shows the sentence alone in place of a "Don't miss" list.
 
 ## Counts
 

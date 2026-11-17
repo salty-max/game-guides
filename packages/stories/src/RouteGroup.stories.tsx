@@ -19,7 +19,6 @@ const meta = {
     title: group.title,
     location: group.location,
     note: group.note,
-    sources: group.sources,
     rows: group.rows,
     open: true,
     highlightedId: "",
@@ -46,7 +45,7 @@ type Story = StoryObj<typeof meta>;
 
 const header = (canvasElement: HTMLElement) => within(within(canvasElement).getByRole("heading", { level: 3 })).getByRole("button");
 
-/** Open: the note, the bulk check, the sources and the steps. A press on the header closes it. */
+/** Open: the note, the bulk check and the steps. A press on the header closes it. */
 export const Open: Story = {
   play: async ({ canvasElement }) => {
     await expect(header(canvasElement)).toHaveAttribute("aria-expanded", "true");

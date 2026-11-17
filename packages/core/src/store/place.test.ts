@@ -20,8 +20,8 @@ describe("a place", () => {
     expect(placeOf("/guide", 3)).toBe("/guide/3");
     expect(placeOf("/dashboard/a-panel", 3)).toBe("/dashboard");
     expect(placeOf(`/checklist/${category}/1`, 3)).toBe(`/checklist/${category}/1`);
-    expect(placeOf("/sources", 3)).toBe("/sources");
-    // The start address, and one the guide doesn't know, are the chapter Home goes to.
+    // The start address, and one the guide doesn't know (the old Sources page among them), are the chapter Home goes to.
+    expect(placeOf("/sources", 3)).toBe("/guide/3");
     expect(placeOf("/", 3)).toBe("/guide/3");
     expect(placeOf("/nowhere", 3)).toBe("/guide/3");
   });
@@ -29,7 +29,8 @@ describe("a place", () => {
   it("is kept only while the guide still shows it: a page it has, and nothing the reader's settings hide", () => {
     expect(safePlace("/guide/1", fresh)).toBe("/guide/1");
     expect(safePlace("/dashboard", fresh)).toBe("/dashboard");
-    expect(safePlace("/sources", fresh)).toBe("/sources");
+    // (the Sources page is gone: a place saved on it sends the reader to the start)
+    expect(safePlace("/sources", everything)).toBeNull();
     expect(safePlace(`/checklist/${category}/1`, fresh)).toBe(`/checklist/${category}/1`);
     for (const bad of ["/guide/01", "/guide/0", "/checklist/all/0", "/guide/1/entry", "/dashboard/panel", "/checklist/no-such-category", "/nowhere", "/", 42, null]) {
       expect(safePlace(bad, everything), String(bad)).toBeNull();
@@ -79,11 +80,17 @@ describe("the place across launches", () => {
     expect(location.pathname).toBe("/");
   });
 
+  it("sends the reader to the start from the Sources page, which the guide no longer has", () => {
+    save({ path: "/sources", y: 300, kept: {} });
+    expect(restoreLaunch(fresh)).toBeNull();
+    expect(location.pathname).toBe("/");
+  });
+
   it("ignores a saved place it can't read, and an offset that isn't one", () => {
     localStorage.setItem(PLACE_KEY, "{not json");
     expect(restoreLaunch(fresh)).toBeNull();
-    save({ path: "/sources", y: "far", kept: ["no"] });
-    expect(restoreLaunch(fresh)).toBe("/sources");
-    expect(offsetOf("/sources")).toBe(0);
+    save({ path: "/dashboard", y: "far", kept: ["no"] });
+    expect(restoreLaunch(fresh)).toBe("/dashboard");
+    expect(offsetOf("/dashboard")).toBe(0);
   });
 });

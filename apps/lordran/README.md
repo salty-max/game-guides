@@ -27,12 +27,12 @@ The Vercel project `hundo-lordran` builds this folder as its Root Directory and 
 - The route is one character, offline, with no trades. New Game joins the Darkwraiths without placing the Lordvessel for Kaathe, so Frampt stays, and takes the Dark Lord ending; NG+ links the fire; NG++ stops after the third Sif soul and the last forge. Spells sold by someone who can be lost sit in that vendor's chapter, with the window stated.
 - **Checklist** searches and filters every entry. A check is shared between the walkthrough and the checklist. Each section has **Check all** / **Uncheck all**, and every change shows an **Undo** toast.
 - **Progress** counts against the guide's completion list: 41 achievements, 26 bosses, 9 covenants, 47 Knight's Honor weapons, the 24 sorceries, 19 pyromancies and 23 miracles the spell achievements count, 41 rings, 10 embers, 10 maximum reinforcements, both endings, and the expansion's 5 spells and the guide's pick of 10 pieces of its equipment. The game shows no overall percentage, so the guide doesn't either.
-- 19 entries can be lost for a playthrough, some for good. Each is flagged in its chapter and in **Don't miss**, with two sources on different sites for its condition.
+- 19 entries can be lost for a playthrough, some for good. Each is flagged in its chapter and in **Don't miss**, and its condition rests on two sources on different sites.
 - The sun or moon in the header switches the theme. **Progress saved** opens Sync devices, where a six-digit code links your other devices. Spoiler settings and the backup (export and import) are under **Change settings**, in the chapters menu (beside the page on a wide screen), and Progress has **Export progress** and **Import progress**. Progress is stored in this browser for this site address; an installed PWA can keep separate storage, so export before moving.
 
 ## Content and accuracy
 
-The chapter text was drafted from community guides (wikidot, fextralife, Gold Phantom and two Steam guides), which are linked per group and on the Sources page, then checked claim by claim against the pages it cites, twice, by passes that didn't write it. It has not been replayed in the game. [docs/facts-to-verify.md](docs/facts-to-verify.md) lists the source conflicts, the one-source warnings kept off the missables, and what would settle each.
+The chapter text was drafted from community guides (wikidot, fextralife, Gold Phantom and two Steam guides), which the data keeps per section so it can be checked (the guide doesn't show them), then checked claim by claim against the pages it cites, twice, by passes that didn't write it. It has not been replayed in the game. [docs/facts-to-verify.md](docs/facts-to-verify.md) lists the source conflicts, the one-source warnings kept off the missables, and what would settle each.
 
 ## Credits
 

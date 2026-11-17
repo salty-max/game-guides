@@ -15,7 +15,7 @@ Run `bun harness/q.ts check -- bun run check` at the root.
 
 - **A change in one guide:** that guide.
 - **A change in `packages/core`:** every guide. The first three cover both layouts, both corner presets and three palettes.
-- **Pages:** the defaults are `guide=/guide/1,checklist=/checklist,progress=/dashboard,sources=/sources`. `--pages` replaces that list, so name every page you want, such as `--pages guide=/guide/1,c3=/guide/3,run=/dashboard/deathless`.
+- **Pages:** the defaults are `guide=/guide/1,checklist=/checklist,progress=/dashboard`. `--pages` replaces that list, so name every page you want, such as `--pages guide=/guide/1,c3=/guide/3,run=/dashboard/deathless`.
 - **Hidden chapters:** a fresh visit shows only chapter 1, because spoiler protection is on. Add `--reveal` to seed a save with protection off, so `/guide/N` shows every chapter and its banner.
 
 ## 3. Shoot the change

@@ -5,7 +5,6 @@ import { Pages } from "./components/Pages";
 import { ChecklistPage } from "./pages/ChecklistPage";
 import { DashboardPage } from "./pages/DashboardPage";
 import { GuidePage } from "./pages/GuidePage";
-import { SourcesPage } from "./pages/SourcesPage";
 import { useGlobalEffects } from "./useThemeEffects";
 import { useProgress } from "./store/progress";
 import { useSync } from "./sync/engine";
@@ -31,7 +30,6 @@ const routes = (
     <Route path="/guide/:chapter?/:entry?" element={<GuidePage />} />
     <Route path="/checklist/:category?/:chapter?" element={<ChecklistPage />} />
     <Route path="/dashboard/:section?" element={<DashboardPage />} />
-    <Route path="/sources" element={<SourcesPage />} />
     <Route path="*" element={<Home />} />
   </>
 );

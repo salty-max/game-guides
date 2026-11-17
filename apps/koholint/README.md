@@ -29,13 +29,13 @@ The Vercel project `hundo-koholint` builds this folder as its Root Directory and
 - Use the sun or moon in the header to switch themes. Choose **Use device setting** under **Appearance** to follow your system. The theme is saved in this browser.
 - Open **Progress saved** for Sync devices, where a six-digit code links your other devices. Spoiler settings and the JSON backup are under **Change settings**, in the chapters menu (beside the page on a wide screen), and Progress has **Export progress** and **Import progress**. Your progress belongs to this browser and site address. Export before switching devices or clearing browser data. Backups are written in the format shared by all three guides (version 3, run log under `extra`); older backups and saves still load.
 
-The completion total covers the walkthrough and its checklists. Optional amiibo panels and deathless clears are tracked separately. The chest list includes chests tied to story dungeons, the Color Dungeon, the Dream Shrine and a mountain route chest. Dungeon shells count in both the chest and shell categories. The Island Sweep includes map and statue checks. The site links to external sources for maps and alternate routes.
+The completion total covers the walkthrough and its checklists. Optional amiibo panels and deathless clears are tracked separately. The chest list includes chests tied to story dungeons, the Color Dungeon, the Dream Shrine and a mountain route chest. Dungeon shells count in both the chest and shell categories. The Island Sweep includes map and statue checks.
 
 Directions come from published Switch remake guides and haven't been played through end to end. Open questions are in `docs/facts-to-verify.md`.
 
 ## Missable entries
 
-A "Don't miss" strip appears on a chapter when `src/guide/data/missables.ts` flags an unchecked entry there. An entry is flagged only when two independent sources agree on the exact condition. Today nothing qualifies for the Switch remake, since you can reload the clear save after the ending, so the strip says that and links the sources. Open questions are in `docs/facts-to-verify.md`.
+A "Don't miss" strip appears on a chapter when `src/guide/data/missables.ts` flags an unchecked entry there. An entry is flagged only when two independent sources agree on the exact condition. Today nothing qualifies for the Switch remake, since you can reload the clear save after the ending, so the strip says that. Open questions are in `docs/facts-to-verify.md`.
 
 ## Artwork and fonts
 

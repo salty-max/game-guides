@@ -99,9 +99,6 @@ const config: GuideConfig = {
     boardNote:
       "Spell counts are the base game’s, as the achievements count them; the five expansion spells have their own line. Knight’s Honor counts all 47 rare weapons.",
     nextUpDone: "Everything revealed is checked. Reveal the next chapter or check the totals on the Progress page.",
-    sourcesIntro: "The community guides behind each chapter. Chapters you have not revealed are left out.",
-    sourcesTitle: "Completion references",
-    allSourcesLink: "All chapters’ sources",
     backupBlurb: "Export a copy of your checks and spoiler settings.",
   },
 };

@@ -3,12 +3,12 @@ import type { Brand } from "./types";
 /*
  * What search engines get, and what they never get. A crawler keeps no storage between pages, so it always sees the guide as a first
  * visit does: chapter 1 open and every later chapter hidden. Nothing past chapter 1 is shown to it, so nothing past chapter 1 can reach
- * a result's title or snippet. These four pages are the indexed ones (the sitemap's list); a hidden chapter says noindex, and every
+ * a result's title or snippet. These three pages are the indexed ones (the sitemap's list); a hidden chapter says noindex, and every
  * other address names one of them as its canonical. Pure, so the build (seo.ts) and the page (Head.tsx) share it.
  */
 
 /** The pages a search engine is given, as the sitemap lists them. */
-export const INDEXED_PATHS = ["/guide/1", "/checklist", "/dashboard", "/sources"] as const;
+export const INDEXED_PATHS = ["/guide/1", "/checklist", "/dashboard"] as const;
 
 export interface HeadContext {
   brand: Pick<Brand, "name" | "title" | "description" | "game" | "home">;
@@ -54,13 +54,6 @@ export function headFor(pathname: string, { brand, chapterTitles, chips, savedCh
       "/dashboard",
       `${brand.game} progress tracker · ${brand.name}`,
       `Your ${brand.game} completion by chapter and category, and what's left. Progress stays in your browser, with backup and device sync.`,
-    );
-  }
-  if (view === "sources") {
-    return page(
-      "/sources",
-      `Sources and maps · ${brand.name}`,
-      `The community guides and maps ${brand.name} cites for ${brand.game}, chapter by chapter as you reveal them.`,
     );
   }
 

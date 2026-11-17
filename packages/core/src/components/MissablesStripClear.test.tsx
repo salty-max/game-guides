@@ -1,5 +1,4 @@
 import { render, screen, within } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router";
 import { chapters } from "../guide";
 import { MissablesStrip } from "./MissablesStrip";
@@ -20,8 +19,7 @@ vi.mock("virtual:guide/config", async (importOriginal) => {
 });
 
 describe("missables strip with nothing flagged", () => {
-  it("says so and, opened, links the sources behind the claim, opening safely in a new tab", async () => {
-    const user = userEvent.setup();
+  it("says so, and keeps the sources behind the claim out of the page", () => {
     render(
       <MemoryRouter>
         <MissablesStrip chapter={chapters[0]} />
@@ -30,12 +28,9 @@ describe("missables strip with nothing flagged", () => {
     const region = screen.getByRole("complementary", { name: "Missable entries" });
     expect(within(region).getByText(/Nothing is flagged as permanently missable/)).toBeInTheDocument();
     expect(within(region).getByText(/Test reassurance/)).toBeInTheDocument();
-    // Closed, the sources are in the page but hidden (until found, for find-in-page).
+    // (sources are provenance for the data, never shown: no link, nothing to open, not even hidden until found)
     expect(within(region).queryAllByRole("link")).toHaveLength(0);
-    await user.click(within(region).getByRole("button", { name: /Nothing is flagged/ }));
-    expect(within(region).getByRole("button", { name: /Nothing is flagged/ })).toHaveAttribute("aria-expanded", "true");
-    const links = within(region).getAllByRole("link");
-    expect(links).toHaveLength(2);
-    for (const link of links) expect(link).toHaveAttribute("rel", expect.stringContaining("noopener"));
+    expect(within(region).queryAllByRole("button")).toHaveLength(0);
+    expect(region.innerHTML).not.toMatch(/First source|a\.example/);
   });
 });

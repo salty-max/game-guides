@@ -1,8 +1,8 @@
 import { chapters, cats } from "@hundo/core/guide";
-import { Quantity, SourceLine, Tag } from "@hundo/core/components/ui";
+import { Quantity, Tag } from "@hundo/core/components/ui";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-// A category's label in its tone, as the rows, the article and the checklist show it; and a group's line of sources.
+// A category's label in its tone, as the rows, the article and the checklist show it.
 const row = { ...chapters[0].groups[0].rows[0], quantity: 3 };
 
 const meta = {
@@ -47,17 +47,5 @@ export const InColumn: Story = {
       <Tag tag="challenge" at="column" />
       <Tag tag="missable" at="column" />
     </div>
-  ),
-};
-
-/** A group's sources, on one line under it. */
-export const Sources: Story = {
-  render: () => (
-    <SourceLine
-      sources={[
-        ["Zelda Dungeon", "https://zeldadungeon.net/"],
-        ["Zelda Wiki", "https://zelda.fandom.com/"],
-      ]}
-    />
   ),
 };

@@ -237,7 +237,7 @@ describe("coming back to a page", () => {
         vi.spyOn(window, "matchMedia").mockImplementation(
           (query: string) => ({ matches: /max-width: (550|800)px/.test(query), media: query, addEventListener() {}, removeEventListener() {} }) as unknown as MediaQueryList,
         );
-      history.replaceState(null, "", "/sources");
+      history.replaceState(null, "", "/dashboard");
       const user = userEvent.setup();
       render(<App />);
       await screen.findByRole("heading", { level: 1 });

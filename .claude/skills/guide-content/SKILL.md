@@ -36,7 +36,7 @@ Follow [the doc's row rules](../../../docs/chapter-data.md#a-row). The calls it 
 
 ## 4. Sources, missables, facts to verify
 
-- **Sources:** per chapter and per group, as [the doc](../../../docs/chapter-data.md#sources) says. Link the page you actually used.
+- **Sources:** per chapter and per group, as [the doc](../../../docs/chapter-data.md#sources) says. Link the page you actually used. They're kept for checking the data and never shown to readers, so a row's directions must stand on their own.
 - **Missables:** flag one only on two independent sources on different hosts. Otherwise write a sourced reassurance, or say only what you can source ([the doc](../../../docs/chapter-data.md#missables)).
 - **Facts to verify:** update the app's `docs/facts-to-verify.md` in the same commit as the data. Carry over `SOURCES.md`'s disagreements, with which way the data went.
 - **Never claim more checking than happened.** No "tested", "verified" or "confirmed in game" unless someone played it and said so. `SOURCES.md` calls the Dragon Quest route "source-checked … with gameplay verification still outstanding". Keep that honesty in the README and the facts file.

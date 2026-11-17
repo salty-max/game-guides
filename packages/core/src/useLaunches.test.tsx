@@ -39,8 +39,8 @@ describe("where a launch takes an open window", () => {
   });
 
   it("to any other address of the guide as a link", () => {
-    expect(launchTarget("/sources", "/guide/1")).toEqual({ to: "/sources", restore: false });
-    expect(launchTarget("/sources", "/sources")).toBeNull();
+    expect(launchTarget("/dashboard/stats", "/guide/1")).toEqual({ to: "/dashboard/stats", restore: false });
+    expect(launchTarget("/dashboard/stats", "/dashboard/stats")).toBeNull();
   });
 });
 

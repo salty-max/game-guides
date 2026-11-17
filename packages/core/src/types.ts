@@ -1,10 +1,14 @@
 import type { ComponentType } from "react";
 import type { IconName } from "./components/Icon";
 
+/**
+ * A page the data was written from: provenance for checking it (the tests, docs/chapter-data.md), never shown to readers. Every
+ * `sources` and `reference` below is kept for that alone.
+ */
 export type SourceLink = [label: string, url: string];
 export type Checks = Record<string, true>;
 
-/** Optional per-row details: an amount that counts toward a category, or a reference page for that one row. */
+/** Optional per-row details: an amount that counts toward a category, or the page this one row was written from. */
 export interface RowExtra {
   quantity?: number;
   reference?: string;
@@ -171,11 +175,6 @@ export interface GuideText {
   boardTitle: string;
   boardNote: string;
   nextUpDone: string;
-  sourcesIntro: string;
-  /** Heading for the guide-wide sources on the Sources page, when there are any. */
-  sourcesTitle?: string;
-  /** The extra link under each chapter's sources. */
-  allSourcesLink: string;
   /** What an export holds, in the settings dialog. */
   backupBlurb: string;
 }
@@ -185,7 +184,7 @@ export interface GuideConfig {
   /** "article": prose sections with their checks in the text. "checklist": collapsible route groups with filters. */
   layout: "article" | "checklist";
   chapters: RawChapter[];
-  /** Guide-wide references; each chapter can carry its own. */
+  /** Guide-wide sources; each chapter can carry its own. */
   sources: SourceLink[];
   categories: Record<string, Category>;
   /** Category chips on the checklist page and, in the checklist layout, above the route. */
@@ -195,7 +194,7 @@ export interface GuideConfig {
   /** The category a row's `quantity` counts toward (Might Crystals by amount). */
   quantity?: string;
   missables: Missable[];
-  /** Shown while nothing is flagged as missable: why that is safe, with its sources. */
+  /** Shown while nothing is flagged as missable: why that is safe. Its sources back the claim and aren't shown. */
   reassurance?: { text: string; sources: SourceLink[] };
   /** Chapter id → banner, imported with `?banner` (core's banners.ts). */
   banners: Record<number, Banner>;

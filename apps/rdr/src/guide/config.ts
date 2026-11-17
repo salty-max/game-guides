@@ -79,9 +79,6 @@ const config: GuideConfig = {
     boardNote:
       "The estimate uses the game’s category weights. Ambient Challenges add credit at ranks 5 and 10. Outfit scraps and optional tasks are tracked separately.",
     nextUpDone: "Everything revealed is checked. Reveal the next chapter or compare with Stats → General.",
-    sourcesIntro: "These references cover the original Red Dead Redemption campaign and its modern releases. External guides may reveal later chapters.",
-    sourcesTitle: "Walkthrough references",
-    allSourcesLink: "Completion references and maps",
     backupBlurb: "Export a copy of your checks, spoiler settings and in-game percentage.",
   },
 };

@@ -89,8 +89,6 @@ const config: GuideConfig = {
     boardTitle: "Completion targets",
     boardNote: "Might Crystals count by what each entry awards. Accessories count all 28 versions, although two are replaced by upgrades on a finished save.",
     nextUpDone: "Everything revealed is checked. Reveal the next chapter or check the totals on the Progress page.",
-    sourcesIntro: "The community guides behind each chapter. Chapters you have not revealed are left out.",
-    allSourcesLink: "All chapters’ sources",
     backupBlurb: "Export a copy of your checks and spoiler settings.",
   },
 };

@@ -13,7 +13,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/** The title and its line: the checklist and the sources page. */
+/** The title and its line: the checklist and the progress page. */
 export const WithIntro: Story = {
   play: async ({ canvas }) => {
     await expect(canvas.getByRole("heading", { level: 1, name: "Completion checklist" })).toBeVisible();

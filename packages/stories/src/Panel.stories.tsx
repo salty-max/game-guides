@@ -2,7 +2,7 @@ import { TextField } from "@hundo/core/components/TextField";
 import { Button, ChipGroup, Panel, PanelActions, PanelFigure, PanelForm, PanelText, PanelTitle } from "@hundo/core/components/ui";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-// A panel on the dashboard or the sources page, or a guide's own (Koholint's deathless run, Red Dead's calibration): a title, words in
+// A panel on the dashboard, or a guide's own (Koholint's deathless run, Red Dead's calibration): a title, words in
 // three tones, a row of buttons, and the room it keeps from its neighbours.
 const meta = {
   title: "Core/Panel",

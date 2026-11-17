@@ -6,12 +6,12 @@ import { Icon } from "./Icon";
 import { BulkCheck } from "./BulkCheck";
 import { CheckBox } from "./CheckBox";
 import { rowLink } from "./TickItem";
-import { Quantity, SourceLine, Tag } from "./ui";
+import { Quantity, Tag } from "./ui";
 import { cats, config, primaryTag } from "../guide";
 import { useProgress } from "../store/progress";
 import { useUi } from "../store/ui";
 import type { IconName } from "./Icon";
-import type { Row, SourceLink } from "../types";
+import type { Row } from "../types";
 import { press, pressRow } from "./press-style";
 
 interface RowProps {
@@ -62,16 +62,10 @@ export const RouteRow = memo(function RouteRow({ row, prefix, highlighted, origi
         ))}
         {row.quantity > 0 && <Quantity row={row} at="column" />}
         {row.tags.includes("missable") && <Tag tag="missable" at="column" />}
-        {origin ? (
+        {origin && (
           <Link className={rowLink} to={`/guide/${row.chapter}/${row.id}`} aria-label={`Open “${row.title}” in chapter ${row.chapter}`}>
             Chapter {row.chapter}
           </Link>
-        ) : (
-          row.reference && (
-            <a className={rowLink} href={row.reference} target="_blank" rel="noopener noreferrer" aria-label={`Source for ${row.title} (opens in a new tab)`}>
-              Source
-            </a>
-          )
         )}
       </div>
     </div>
@@ -84,7 +78,6 @@ interface GroupProps {
   location?: string;
   icon?: IconName;
   note?: string;
-  sources?: SourceLink[];
   rows: Row[];
   open: boolean;
   highlightedId: string;
@@ -97,7 +90,7 @@ interface GroupProps {
 // The group's header is its heading, and the button inside it opens and closes the steps (a button can't hold a heading).
 const trigger = `${press} group/trigger grid min-h-[58px] w-full cursor-pointer grid-cols-[auto_minmax(0,1fr)_auto_auto] items-center gap-[11px] border-0 bg-transparent px-3.5 py-3 text-left font-sans text-base leading-[1.58] font-normal text-inherit hover:bg-raised phone:gap-2 phone:p-[9px]`;
 
-export function RouteGroup({ groupKey, title, location, icon, note, sources = [], rows, open, highlightedId, origin, fallbackFocusId, rememberToggle }: GroupProps) {
+export function RouteGroup({ groupKey, title, location, icon, note, rows, open, highlightedId, origin, fallbackFocusId, rememberToggle }: GroupProps) {
   const setGroupOpen = useUi((s) => s.setGroupOpen);
   const checks = useProgress((s) => s.data.checks);
   // `open` is what the list wants; a reader can still open or close the group by hand, and that holds until the list wants something
@@ -137,7 +130,7 @@ export function RouteGroup({ groupKey, title, location, icon, note, sources = []
       </h3>
       {/* Closed, the steps stay in the page, hidden until found: the browser's find-in-page reaches them and opens the group. */}
       <Collapsible.Panel hiddenUntilFound>
-        {(note || sources.length > 0 || tools) && (
+        {(note || tools) && (
           <div className="border-t border-line bg-paper px-3.5 py-2.5 text-[13px] text-muted">
             {note && <p>{note}</p>}
             {tools && (
@@ -145,7 +138,6 @@ export function RouteGroup({ groupKey, title, location, icon, note, sources = []
                 <BulkCheck rows={rows} label={title} />
               </div>
             )}
-            <SourceLine sources={sources} />
           </div>
         )}
         <div className="border-t border-line">

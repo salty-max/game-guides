@@ -149,7 +149,7 @@ describe("pages", () => {
     expect(pageOf("/guide/2", { ...data, spoilers: false })).toBe("p:guide/2");
     expect(pageOf("/checklist/heart/1", data)).toBe("p:checklist");
     expect(pageOf("/dashboard/what-is-left", data)).toBe("p:dashboard");
-    expect(pageOf("/sources", data)).toBe("p:sources");
+    expect(pageOf("/sources", data)).toBeNull();
     expect(pageOf("/", data)).toBeNull();
     expect(pageOf("/nowhere", data)).toBeNull();
   });
@@ -188,15 +188,15 @@ describe("pages", () => {
       return null;
     }
     render(
-      <MemoryRouter initialEntries={["/sources"]}>
+      <MemoryRouter initialEntries={["/dashboard"]}>
         <Probe />
       </MemoryRouter>,
     );
     for (let i = 0; i < 50; i++) {
       act(() => go("/checklist"));
-      act(() => go("/sources"));
+      act(() => go("/dashboard"));
     }
-    expect(sent[0]).toEqual({ "p:sources": 50, "p:checklist": 49 });
+    expect(sent[0]).toEqual({ "p:dashboard": 50, "p:checklist": 49 });
   });
 
   it("never builds a POST of more than twelve fields, which the API would refuse", () => {

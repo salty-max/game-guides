@@ -8,9 +8,8 @@ import { ChapterNav } from "../components/ChapterNav";
 import { ChecklistRoute } from "../components/ChecklistRoute";
 import { MissablesStrip } from "../components/MissablesStrip";
 import { NextUp } from "../components/NextUp";
-import { SourceLinks } from "../components/SourceLinks";
 import { Button, LinkButton, PageHeading } from "../components/ui";
-import { chapterRows, chapters, completion, config, guideAnchor, overall, readChapter, text } from "../guide";
+import { chapterRows, chapters, completion, config, guideAnchor, overall, readChapter } from "../guide";
 import { useReveal } from "../useReveal";
 import { isOpen, useProgress } from "../store/progress";
 import type { Chapter } from "../types";
@@ -64,12 +63,7 @@ function GuideView({ chapter, target }: { chapter: Chapter; target?: string }) {
     element?.scrollIntoView({ block: "start" });
   }, [target, locationKey]);
 
-  const footer = (
-    <>
-      <ChapterNav chapter={chapter.id} in={config.layout === "article" ? "article" : "route"} />
-      <SourceLinks items={[...chapter.sources, [text.allSourcesLink, "/sources"]]} />
-    </>
-  );
+  const footer = <ChapterNav chapter={chapter.id} in={config.layout === "article" ? "article" : "route"} />;
 
   return (
     <>
