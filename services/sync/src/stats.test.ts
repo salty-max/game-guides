@@ -45,10 +45,10 @@ describe("pnpm stats", () => {
   it("prints a block per guide: visits and the app's share, pages, each chapter shown, started and finished, links", async () => {
     const world = new World();
     const d = world.device();
-    await d.count({ "v:app": 3, "v:tab": 1, "p:guide/10": 1, "p:guide/2": 4, "s:2": 2, "f:2": 1, "p:checklist": 2 });
+    await d.count({ "v:app": 3, "v:tab": 1, "p:guide/10": 1, "p:guide/2": 4, "s:2": 2, "f:2": 1, "p:checklist": 2, "p:questlines": 1 });
     await d.claim((await world.device().show()).code, "x", undefined, { guide: "links-awakening" });
     const text = formatStats(await readStats(world.store, { ns: "prod", now: world.clock.now, days: 30 }), COUNT_BUDGET.prod);
-    expect(text).toContain("links-awakening\n  visits 4: installed app 3 (75%), tab 1\n  pages: checklist 2, progress 0, sources 0\n  chapter 2: shown 4, started 2, finished 1\n  chapter 10: shown 1, started 0, finished 0\n  devices linked 1");
+    expect(text).toContain("links-awakening\n  visits 4: installed app 3 (75%), tab 1\n  pages: checklist 2, progress 0, questlines 1, sources 0\n  chapter 2: shown 4, started 2, finished 1\n  chapter 10: shown 1, started 0, finished 0\n  devices linked 1");
     expect(text).toContain("echoes-of-wisdom\n  visits 0: installed app 0 (–), tab 0");
     expect(text).toMatch(/Counting has used \d+ of its 100000 commands this month/);
   });

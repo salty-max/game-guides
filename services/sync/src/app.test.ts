@@ -1138,13 +1138,13 @@ describe("visit counts", () => {
   it("adds a visit's counts to the guide's totals for the day, and keeps them 25 months", async () => {
     const world = new World();
     const d = world.device();
-    const reply = await d.count({ "v:app": 1, "p:guide/3": 2, "p:checklist": 1, "s:3": 1 });
+    const reply = await d.count({ "v:app": 1, "p:guide/3": 2, "p:checklist": 1, "p:questlines": 1, "s:3": 1 });
     expect(reply.status).toBe(200);
     expect(reply.body).toEqual({ ok: true, counted: true });
     NO_STORE(reply.headers);
     expect(reply.cookies).toEqual([]);
     await world.device().count({ "v:tab": 1, "p:guide/3": 1, "f:2": 1 });
-    expect(totals(world)).toEqual({ "v:app": "1", "v:tab": "1", "p:guide/3": "3", "p:checklist": "1", "s:3": "1", "f:2": "1" });
+    expect(totals(world)).toEqual({ "v:app": "1", "v:tab": "1", "p:guide/3": "3", "p:checklist": "1", "p:questlines": "1", "s:3": "1", "f:2": "1" });
     expect(world.store.ttl(DAY_KEY("prod"))).toBe(761 * 86_400);
   });
 
@@ -1186,6 +1186,7 @@ describe("visit counts", () => {
       ["a chapter title", { "p:guide/the-castle": 1 }],
       ["a row's anchor", { "p:guide/3/heart-well": 1 }],
       ["a checklist filter", { "p:checklist/heart/1": 1 }],
+      ["a questline's id", { "p:questlines/siegmeyer": 1 }],
       ["chapter 0", { "s:0": 1 }],
       ["the server's own field", { pair: 1 }],
       ["zero", { "v:app": 0 }],
