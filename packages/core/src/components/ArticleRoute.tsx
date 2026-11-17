@@ -31,7 +31,7 @@ export function ArticleRoute({ chapter, target, footer }: { chapter: Chapter; ta
   return (
     <div className="mt-[clamp(24px,3vw,40px)] grid grid-cols-[minmax(0,1fr)_minmax(174px,218px)] items-start gap-[clamp(24px,4vw,66px)] fold:grid-cols-[minmax(0,1fr)] fold:gap-6">
       {/* Up to 1000px wide the list of sections folds away above the article; wider, it sits beside it. */}
-      <Collapsible.Root className="hidden max-w-[72ch] rounded-small border border-line bg-surface px-3 fold:block">
+      <Collapsible.Root className="hidden max-w-article rounded-small border border-line bg-surface px-3 fold:block">
         <Collapsible.Trigger className={`${press} group/trigger flex min-h-11 w-full cursor-pointer items-center justify-between border-0 bg-transparent p-0 text-left font-sans text-[14px] leading-tight font-bold text-ink`}>
           In this chapter <Icon name="down" className="size-4 text-muted group-data-panel-open/trigger:rotate-180" />
         </Collapsible.Trigger>
@@ -41,7 +41,7 @@ export function ArticleRoute({ chapter, target, footer }: { chapter: Chapter; ta
           </nav>
         </Collapsible.Panel>
       </Collapsible.Root>
-      <article className="max-w-[72ch] min-w-0" aria-label={`${chapter.title} walkthrough`}>
+      <article className="max-w-article min-w-0" aria-label={`${chapter.title} walkthrough`}>
         {chapter.groups.map((group) => (
           <Section key={group.key} group={group} target={target} />
         ))}

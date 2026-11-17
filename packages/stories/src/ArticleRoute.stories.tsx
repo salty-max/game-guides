@@ -39,3 +39,17 @@ export const ProseAndList: Story = {
 
 /** A step reached by a link: it stands out, with the accent's bar at its start. */
 export const LinkedStep: Story = { args: { target: `entry-${linked.id}` } };
+
+/** In a wide column the article stops at its cap, 788px. It's px on purpose: a `ch` would follow each guide's font, a rem the reader's root size. */
+export const WidestColumn: Story = {
+  decorators: [
+    (Story) => (
+      <div style={{ width: 1500 }}>
+        <Story />
+      </div>
+    ),
+  ],
+  play: async ({ canvas }) => {
+    await expect(canvas.getByRole("article").getBoundingClientRect().width).toBeCloseTo(788, 1);
+  },
+};
