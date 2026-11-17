@@ -7,6 +7,7 @@ Spoiler-aware, installable completion guides for single-player games: one app pe
 | [`apps/koholint`](apps/koholint) | *Link’s Awakening* (Switch, 2019) | [koholint.hundo.quest](https://koholint.hundo.quest) | hundo-koholint |
 | [`apps/rdr`](apps/rdr) | *Red Dead Redemption* | [rdr.hundo.quest](https://rdr.hundo.quest) | hundo-rdr |
 | [`apps/echoes`](apps/echoes) | *Echoes of Wisdom* (Switch, 2024) | [echoes.hundo.quest](https://echoes.hundo.quest) | hundo-echoes |
+| [`apps/lordran`](apps/lordran) | *Dark Souls Remastered* | [lordran.hundo.quest](https://lordran.hundo.quest) | hundo-lordran |
 
 Each app's history from its old repository is kept under its folder, so `git log -- apps/koholint` goes back to the first commit.
 

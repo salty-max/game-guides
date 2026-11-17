@@ -4,6 +4,8 @@ import { brand as echoes } from "../../../apps/echoes/src/guide/brand";
 import echoesTheme from "../../../apps/echoes/src/guide/theme.css?raw";
 import { brand as koholint } from "../../../apps/koholint/src/guide/brand";
 import koholintTheme from "../../../apps/koholint/src/guide/theme.css?raw";
+import { brand as lordran } from "../../../apps/lordran/src/guide/brand";
+import lordranTheme from "../../../apps/lordran/src/guide/theme.css?raw";
 import { brand as rdr } from "../../../apps/rdr/src/guide/brand";
 import rdrTheme from "../../../apps/rdr/src/guide/theme.css?raw";
 import type { GuideId, ThemeId } from "./ids";
@@ -13,6 +15,7 @@ export const guides = {
   koholint: { brand: koholint, palette: koholintTheme },
   rdr: { brand: rdr, palette: rdrTheme },
   echoes: { brand: echoes, palette: echoesTheme },
+  lordran: { brand: lordran, palette: lordranTheme },
 } satisfies Record<GuideId, { brand: Brand; palette: string }>;
 
 /** The stylesheet the build would put in a guide's page: its palette, then its fonts. */
