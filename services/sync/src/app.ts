@@ -45,7 +45,7 @@ const KEEP_COUNTS_SECONDS = 761 * DAY;
 const MAX_COUNT_FIELDS = 12;
 const MAX_COUNT = 50;
 /** What a guide may count: a visit by where it runs, a page shown (a chapter by its number), a chapter started or finished. */
-const COUNT_FIELD = /^(?:v:(?:app|tab)|p:(?:guide\/[1-9]\d{0,2}|checklist|dashboard|sources)|[sf]:[1-9]\d{0,2})$/;
+const COUNT_FIELD = /^(?:v:(?:app|tab)|p:(?:guide\/[1-9]\d{0,2}|checklist|dashboard|questlines|sources)|[sf]:[1-9]\d{0,2})$/;
 
 const DEVICE_COOKIE = "hundo_sync";
 const LINK_COOKIE = "hundo_link";

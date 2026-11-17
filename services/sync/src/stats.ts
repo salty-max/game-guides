@@ -76,7 +76,7 @@ export function formatStats(stats: Stats, budget: number): string {
     const get = (field: string) => totals[field] ?? 0;
     const visits = get("v:app") + get("v:tab");
     lines.push(guide, `  visits ${visits}: installed app ${get("v:app")} (${share(get("v:app"), visits)}), tab ${get("v:tab")}`);
-    lines.push(`  pages: checklist ${get("p:checklist")}, progress ${get("p:dashboard")}, sources ${get("p:sources")}`);
+    lines.push(`  pages: checklist ${get("p:checklist")}, progress ${get("p:dashboard")}, questlines ${get("p:questlines")}, sources ${get("p:sources")}`);
     const chapters = Object.keys(totals)
       .map((field) => /^(?:p:guide\/|[sf]:)(\d+)$/.exec(field)?.[1])
       .filter((n): n is string => n !== undefined)
