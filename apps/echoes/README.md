@@ -26,12 +26,12 @@ The Vercel project `hundo-echoes` builds this folder as its Root Directory and s
 - **Guide** walks the story chapter by chapter as one article: a heading per section, each step's opening sentence is its checkbox, and **In this chapter** jumps between sections. Later chapters stay hidden until you reveal them. Gerudo and Jabul can be played in either order, and so can Eldin, Hebra and Faron once they open. The last chapter is a return sweep; it also holds the full Echo, Might Crystal, recipe and Slumber Dojo lists for pickups the routes don't pass, shown as compact checklists rather than prose.
 - **Checklist** searches and filters every entry. A check is shared between the walkthrough and the checklist. Each section has **Check all** / **Uncheck all**, and every change shows an **Undo** toast. **Next up** starts at the chapter you're reading and leaves the optional amiibo outfits until last.
 - **Progress** counts against the guide's completion list: 127 Echoes, 40 Pieces of Heart, 7 Heart Containers, 150 Might Crystals, 50 side quests, 25 stamps, 28 accessories, 8 outfits, 69 recipes, 6 automatons, 4 Fairy Bottles and the chests. Entries that award Might Crystals count by amount. The game does not show one overall percentage, so the guide doesn't either.
-- Nothing in the game can be permanently missed, so each chapter shows a one-line note saying so, linked to the two sources (Game8 and Console Pulse); see [docs/facts-to-verify.md](docs/facts-to-verify.md).
+- Nothing in the game can be permanently missed, so each chapter shows a one-line note saying so. The two sources behind it (Game8 and Console Pulse) are in the data and in [docs/facts-to-verify.md](docs/facts-to-verify.md).
 - The sun or moon in the header switches the theme. **Progress saved** opens Sync devices, where a six-digit code links your other devices. Spoiler settings and the backup (export and import) are under **Change settings**, in the chapters menu (beside the page on a wide screen), and Progress has **Export progress** and **Import progress**. Progress is stored in this browser for this site address; an installed PWA can keep separate storage, so export before moving. Backups are written in the format shared by all three guides (version 3); version 1 backups still load.
 
 ## Content and accuracy
 
-The chapter text was drafted from community guides, which are linked per group and on the Sources page. It has not been replayed in the game. [docs/facts-to-verify.md](docs/facts-to-verify.md) lists what is still unconfirmed.
+The chapter text was drafted from community guides, which the data keeps per chapter and group so it can be checked; the guide doesn't show them. It has not been replayed in the game. [docs/facts-to-verify.md](docs/facts-to-verify.md) lists what is still unconfirmed.
 
 ## Credits
 

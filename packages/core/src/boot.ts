@@ -47,7 +47,7 @@ export function acceptHandoff(hash: string, referrer: string, storage: Store): "
 }
 
 // Links and bookmarks from the pre-React guides used hash routes (#guide/3/heart-well).
-const legacyRoute = /^#((?:guide|checklist|dashboard|sources)(?:\/.*)?)$/.exec(location.hash);
+const legacyRoute = /^#((?:guide|checklist|dashboard)(?:\/.*)?)$/.exec(location.hash);
 if (legacyRoute) history.replaceState(null, "", `/${legacyRoute[1]}`);
 
 let target: string | null = null;

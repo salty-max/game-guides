@@ -115,7 +115,7 @@ Not set up yet. The owner verifies the domain by hand, and nothing in the build 
    - and a new guide's `https://<sub>.hundo.quest/sitemap.xml`, added when it's live
 4. With URL Inspection, inspect `https://<sub>.hundo.quest/guide/1` for each guide, and run the live test. The rendered HTML should show the guide's title, one canonical to that same address, and no `noindex`.
 5. Then watch, over the following weeks:
-   - **Pages, under Indexing.** The four sitemap pages should end up indexed. Hidden chapters show as "Excluded by 'noindex' tag", and the deep addresses as "Alternate page with proper canonical tag". Both are intended.
+   - **Pages, under Indexing.** The three sitemap pages should end up indexed. Hidden chapters show as "Excluded by 'noindex' tag", and the deep addresses as "Alternate page with proper canonical tag", as does `/sources` if a crawler still has it (the Sources page is gone and the address names `/guide/1`). All intended.
    - **`/`.** It shows chapter 1 by a change of address in the page, so Google is expected to treat it as a duplicate of `/guide/1`. If a result names the guide by its hostname rather than by its name (the WebSite block's `name`), that's the case where rendering chapter 1 at `/` itself, for a reader with no progress, would be worth doing.
    - **reddead.hundo.quest.** It's under the same Domain property. Its pages should drop out as Google follows the redirect to rdr.
 

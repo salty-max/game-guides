@@ -31,7 +31,7 @@ Every guide shares one house style. A guide chooses only its palette (`theme.css
 
 Core reaches the guide through `virtual:guide/config`, `virtual:guide/panels` and `virtual:guide/theme.css`, which `vite.ts` aliases to the app's `src/guide`. A guide reaches core through its subpath exports, such as `@hundo/core/types`.
 
-Routes are real paths (`/guide/3`, `/checklist/heart`, `/dashboard/<panel>`, `/sources`), and old `#guide/3` hash links redirect. Each app is a PWA. It precaches the shell, fonts and banners, works offline, and asks before swapping in a new version.
+Routes are real paths (`/guide/3`, `/checklist/heart`, `/dashboard/<panel>`), and old `#guide/3` hash links redirect. The Sources page is gone, so `/sources` opens the reader's chapter. Each app is a PWA. It precaches the shell, fonts and banners, works offline, and asks before swapping in a new version.
 
 ## Privacy
 

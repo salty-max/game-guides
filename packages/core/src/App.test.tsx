@@ -2,7 +2,7 @@ import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { App } from "./App";
 import { STORAGE_KEY, defaultState } from "./progress-state";
-import { brand, chapters, config } from "./guide";
+import { brand, chapterRows, chapters, config } from "./guide";
 import { panels } from "virtual:guide/panels";
 import { useProgress } from "./store/progress";
 import { useUi } from "./store/ui";
@@ -119,13 +119,31 @@ describe("App", () => {
     for (const panel of panels) expect(document.getElementById(panel.id)).toBeInTheDocument();
   });
 
-  it("lists sources with names", async () => {
+  it("sends the old Sources page's address to the reader's chapter", async () => {
     history.replaceState(null, "", "/sources");
     render(<App />);
-    expect(await screen.findByRole("heading", { level: 1, name: "Sources and maps" })).toBeInTheDocument();
-    const links = screen.getAllByRole("link").filter((link) => link.getAttribute("href")?.startsWith("https://"));
-    expect(links.length).toBeGreaterThan(0);
-    for (const link of links) expect(link).toHaveAccessibleName();
+    await screen.findByRole("heading", { level: 1 });
+    await waitFor(() => expect(location.pathname).toBe(`/guide/${useProgress.getState().data.chapter}`));
+    expect(screen.queryByText(/Sources and maps/)).not.toBeInTheDocument();
+  });
+
+  it("shows no source in a chapter: they are kept in the data for checking it, never shown", async () => {
+    history.replaceState(null, "", "/guide/1");
+    render(<App />);
+    await screen.findByRole("heading", { level: 1 });
+    const chapter = chapters[0];
+    const cited = new Set([
+      ...config.sources,
+      ...(config.reassurance?.sources ?? []),
+      ...chapter.sources,
+      ...chapter.groups.flatMap((group) => group.sources),
+    ].map(([, url]) => url));
+    for (const row of chapterRows(chapter)) if (row.reference) cited.add(row.reference);
+    for (const missable of config.missables) for (const url of missable.sources) cited.add(url);
+    const hrefs = [...document.querySelectorAll("a[href]")].map((link) => link.getAttribute("href"));
+    expect(hrefs.filter((href) => href && cited.has(href))).toEqual([]);
+    expect(hrefs).not.toContain("/sources");
+    expect(document.body.textContent).not.toMatch(/\bSources\b/);
   });
 });
 

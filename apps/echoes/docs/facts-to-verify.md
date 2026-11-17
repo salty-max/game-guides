@@ -15,12 +15,11 @@ The completion targets (`targets` in `src/guide/config.ts`) are pinned by a test
 
 Game8 ([list of missables and one-time events](https://game8.co/games/Zelda-Echoes-of-Wisdom/archives/473539)) says the game has no missables, and Console Pulse ([100% completion hub](https://consolepulse.com/nintendo/zelda/guides/zelda-echoes-of-wisdom-complete-guide-100-percent-hub)) says nothing becomes permanently missable and that a cleared save reloads before the ending. Both pages were read directly on 2026-11-14. That counts as two sources, but neither is an official statement, and a single reader report mentions missing items on a first pass, which is consistent with coming back. Game8 also lists one-time events that are not missables: chests open once, quests can't be replayed, and some rifts close after the story but hold no collectibles.
 
-`src/guide/data/missables.ts` is therefore empty, and each chapter shows a one-line note saying nothing is flagged, linked to both pages. If a real point of no return turns up with two independent sources, add it there and the "Don't miss" list replaces the note.
+`src/guide/data/missables.ts` is therefore empty, and each chapter shows a one-line note saying nothing is flagged. If a real point of no return turns up with two independent sources, add it there and the "Don't miss" list replaces the note.
 
 ## Wording and spoilers
 
 - Chapters 8 and 9 show "Late game" in the rail while hidden. Their group titles inside the chapters can still name late bosses; they were checked by eye, not by a playtester.
-- The Sources page and the group source lines link to external guides that may spoil later chapters.
 - Directions and puzzle solutions were not replayed. Some tips depend on which echoes you already have.
 
 ## Content not carried over

@@ -3,7 +3,7 @@ import { Routes, useLocation, type Location } from "react-router";
 import { Arrival, Showing, useReturning } from "../store/place";
 
 // The pages that are kept, one of each: the start address and any the guide doesn't know are the guide's (Home sends them to a chapter).
-const views = ["guide", "checklist", "dashboard", "sources"] as const;
+const views = ["guide", "checklist", "dashboard"] as const;
 type View = (typeof views)[number];
 const viewOf = (pathname: string): View => {
   const first = pathname.split("/").filter(Boolean)[0];
@@ -29,8 +29,8 @@ interface Shown {
 }
 
 /**
- * The page the address shows, among the others the reader has been on, kept as they left them. Each of the four pages (Guide, Checklist,
- * Progress, Sources) stays drawn once it has been seen, hidden by React's Activity while another is on screen, so going back to it (a tab
+ * The page the address shows, among the others the reader has been on, kept as they left them. Each of the three pages (Guide, Checklist,
+ * Progress) stays drawn once it has been seen, hidden by React's Activity while another is on screen, so going back to it (a tab
  * of the bar, Back or Forward) shows it at once, scroll and state and all, the way a phone's tab bar does, instead of building it again. A
  * new visit to a page (a link to it from another page, not a tab: store/place.ts's useReturning) builds it afresh from the address, as it
  * always did; a move within the page on screen is the page's own business (its chapter or its address, which its parts are keyed by).

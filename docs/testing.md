@@ -161,7 +161,7 @@ Open `http://localhost:<free port>` in the pane with `navigate`. A free port: `n
 
 Do each of these on desktop, on a tablet width (768) and on a phone-sized viewport, in light and dark. The pane's `mobile` preset in `resize_window` is 375×812, and the browser's device toolbar works too. Any phone width from 375 to 390 will do.
 
-1. **The page you changed**, and the guide, checklist, progress and sources pages if the change is in core.
+1. **The page you changed**, and the guide, checklist and progress pages if the change is in core.
 2. **The theme:** the sun or moon in the header switches it from 551px up (on a phone it's in Guide settings, Appearance), and the choice is saved under `<storagePrefix>.theme`. With nothing saved, the page follows the system setting.
 3. **Fonts and banner:** both fonts load (not the fallback), and the chapter banner shows with its art on the right fading towards the words, or, up to 1050px, stacked above them and fading into the card.
 4. **No sideways scroll on the phone.** `document.documentElement.scrollWidth <= innerWidth` in the console should be `true`.

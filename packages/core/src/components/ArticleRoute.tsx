@@ -5,7 +5,7 @@ import { Link } from "react-router";
 import { Icon } from "./Icon";
 import { BulkCheck } from "./BulkCheck";
 import { CheckBox } from "./CheckBox";
-import { Quantity, SourceLine, Tag } from "./ui";
+import { Quantity, Tag } from "./ui";
 import type { Chapter, Group, Row } from "../types";
 import { press, pressText } from "./press-style";
 
@@ -112,7 +112,6 @@ function Section({ group, target }: { group: Group; target?: string }) {
           </p>
         ))
       )}
-      <SourceLine sources={group.sources} space="section" />
     </section>
   );
 }

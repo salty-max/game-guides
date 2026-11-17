@@ -37,7 +37,6 @@ export function placeOf(pathname: string, chapter: number): string {
   const [view, first, second] = pathname.split("/").filter(Boolean);
   if (view === "guide") return `/guide/${readChapter(first, chapter)}`;
   if (view === "dashboard") return "/dashboard";
-  if (view === "sources") return "/sources";
   if (view === "checklist") return ["/checklist", first, second].filter(Boolean).join("/");
   return `/guide/${chapter}`;
 }
@@ -55,7 +54,7 @@ export function safePlace(path: unknown, data: ProgressState): string | null {
   const [view, first, second] = parts;
   const chapter = (value: string) => isChapter(value) && isOpen(data, Number(value));
   if (view === "guide") return parts.length === 2 && chapter(first) ? path : null;
-  if (view === "dashboard" || view === "sources") return parts.length === 1 ? path : null;
+  if (view === "dashboard") return parts.length === 1 ? path : null;
   if (view !== "checklist" || parts.length > 3) return null;
   if (first !== undefined && !(Object.hasOwn(cats, first) || (hasMissables && first === "missable") || first === "all")) return null;
   if (second !== undefined && !chapter(second)) return null;

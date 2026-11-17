@@ -3,7 +3,7 @@ import { CheckBox } from "./CheckBox";
 import type { Row } from "../types";
 import { pressRow, pressText } from "./press-style";
 
-/** A row's small link ("Jump to", "Source", "Chapter 3"), raised above the label that stretches over the row. */
+/** A row's small link ("Jump to", "Chapter 3"), raised above the label that stretches over the row. */
 export const rowLink = `${pressText} relative z-1 -mx-0.5 -my-2 px-0.5 py-2 text-[13px] whitespace-nowrap text-primary underline underline-offset-[3px]`;
 
 interface TickItemProps {

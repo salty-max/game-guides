@@ -79,9 +79,6 @@ const config: GuideConfig = {
     boardTitle: "By category",
     boardNote: "Category totals include the full guide. Optional amiibo and the deathless log sit outside overall completion.",
     nextUpDone: "Everything revealed so far is done. Reveal the next chapter or check the progress page.",
-    sourcesIntro: "These references cover the 2019 Nintendo Switch remake. The external guides may reveal later chapters.",
-    sourcesTitle: "Collectibles, systems and side quests",
-    allSourcesLink: "Heart Pieces, shells and side-quest sources",
     backupBlurb: "Export a copy of all checks, spoiler settings and run logs.",
   },
 };

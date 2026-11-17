@@ -29,7 +29,7 @@ The Vercel project `hundo-rdr` builds this folder as its Root Directory and serv
 - The sun or moon in the header switches the theme. Choose **Use device setting** under **Appearance** to follow your system.
 - Open **Progress saved** for Sync devices, where a six-digit code links your other devices. Spoiler settings and the backup (export and import your checklist) are under **Change settings**, in the chapters menu (beside the page on a wide screen), and Progress has **Export progress** and **Import progress**. Progress is stored for this browser and site address. Backups are written in the format shared by all three guides (version 3, the in-game percentage under `extra`); version 1 and 2 backups still load.
 
-The in-game percentage applies to the base campaign. *Undead Nightmare*, multiplayer, mission medals, platform trophies and optional encounters have separate completion goals. Sources and maps are linked inside the app. Directions and counts were compiled from the community guides linked in the app and have not been replayed or independently audited; see [docs/facts-to-verify.md](docs/facts-to-verify.md) for what is still unconfirmed.
+The in-game percentage applies to the base campaign. *Undead Nightmare*, multiplayer, mission medals, platform trophies and optional encounters have separate completion goals. Directions and counts were compiled from community guides, which the data keeps per route group and row so it can be checked (the guide doesn't show them), and have not been replayed or independently audited; see [docs/facts-to-verify.md](docs/facts-to-verify.md) for what is still unconfirmed.
 
 ## Artwork and fonts
 

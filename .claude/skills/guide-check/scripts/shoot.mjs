@@ -22,7 +22,7 @@ if (!args.out || args.out === true) {
 const root = resolve(args.root === true || !args.root ? "." : args.root);
 const out = resolve(args.out);
 const apps = typeof args.apps === "string" ? args.apps.split(",") : readdirSync(join(root, "apps")).filter((app) => existsSync(join(root, "apps", app, "vercel.json")));
-const pages = (typeof args.pages === "string" ? args.pages : "guide=/guide/1,checklist=/checklist,progress=/dashboard,sources=/sources").split(",").map((pair) => pair.split("="));
+const pages = (typeof args.pages === "string" ? args.pages : "guide=/guide/1,checklist=/checklist,progress=/dashboard").split(",").map((pair) => pair.split("="));
 const sizes = { desktop: { width: 1280, height: 860 }, tablet: { width: 768, height: 1024 }, phone: { width: 375, height: 812 } };
 
 const freePort = () =>

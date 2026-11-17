@@ -141,7 +141,7 @@ export function ProgressBar({ done, total, label }: { done: number; total: numbe
   );
 }
 
-// A card on the dashboard and the sources page, Next up, and a guide's own panels (Koholint's deathless run, Red Dead's calibration).
+// A card on the dashboard, Next up, and a guide's own panels (Koholint's deathless run, Red Dead's calibration).
 const panel = cva("rounded-card border border-line bg-surface", {
   variants: {
     space: { none: "", above: "mt-[13px]", "above-wide": "mt-4", below: "mb-3.5" },
@@ -250,25 +250,5 @@ export function Quantity({ row, at }: { row: Row; at?: TagAt }) {
       +{row.quantity}
       <span className="sr-only"> {tagName(tag)}</span>
     </Tag>
-  );
-}
-
-const sourceLine = cva("text-[12px] leading-[1.7] text-muted", { variants: { space: { group: "mt-2", section: "mt-4" } }, defaultVariants: { space: "group" } });
-
-/** A group's or an article section's sources, on one line under it. */
-export function SourceLine({ sources, space }: { sources: [label: string, url: string][]; space?: "group" | "section" }) {
-  if (!sources.length) return null;
-  return (
-    <p className={sourceLine({ space })}>
-      Sources:{" "}
-      {sources.map(([label, url], index) => (
-        <span key={url}>
-          {index > 0 && " · "}
-          <a className="text-primary underline underline-offset-2" href={url} target="_blank" rel="noopener noreferrer" aria-label={`${label} (opens in a new tab)`}>
-            {label}
-          </a>
-        </span>
-      ))}
-    </p>
   );
 }
