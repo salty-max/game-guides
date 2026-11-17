@@ -27,6 +27,7 @@ Core's suites run against each guide:
 - **`MissablesStrip*.test.tsx`**: the strip with and without flagged rows.
 - **`persistence.test.ts`**: storage is asked to stay on the first tick in that tab, not for another tab's tick, at most every 30 days, and never with an error ([core.md](core.md#keeping-storage)).
 - **`deploy.test.ts`**: the app's `vercel.json`, the same in every app, and core's page template, held to the pitfalls in [deploying.md](deploying.md#pitfalls), the `/api` route and its place before the catch-all, and a long cache only after the file was found, among them.
+- **`wiring.test.ts`**: every guide is listed where it has to be outside its folder: CI's lighthouse matrix, `.claude/launch.json` (a dev entry and a `-preview` entry, on its package, no two servers on one port) and the root README's apps table ([adding-a-guide.md](adding-a-guide.md#4-wire-it-into-the-repository)). The stories' `GUIDES` and the sync API's have tests of their own, in `packages/stories` and `services/sync`.
 - **`icons.test.ts`**: the icons the page links and the manifest lists are in `public` at the sizes they declare, the Apple and maskable icons are opaque, `favicon.ico` holds 16 and 32px frames, the top bar's brand tile is opaque squares at 40, 80 and 120px, and `public/icons/favicon.svg` is the guide's tab drawing ([house-style.md](house-style.md#icon)).
 - **`icon-versions.test.ts`**: a changed icon file gets a new URL and the same bytes the same one, and the page, the manifest (icons, shortcuts' icons, screenshots) and the top bar's tile name only versioned URLs, each with its file's hash ([core.md](core.md#the-installed-app)).
 - **`sync/*.test.ts`, `SyncScreen.test.tsx`**: sync, from the ledger's merge to the screen ([core.md](core.md#syncing-devices)). `cycle.test.ts` runs two simulated browsers against the real API handler on an in-memory store, so the guide and the API are tested against each other. `ledger.test.ts` holds core's ledger equal to the API's.
@@ -38,7 +39,7 @@ Each guide's own `guide.test.ts` adds its totals, its legacy saves, its extra st
 `packages/stories` holds Storybook for core's components. A story is a component in one state; every component gets stories for every state (default, hover or focus where it matters, disabled, invalid, empty, long text). A new component or a new look isn't done without them.
 
 - **See them:** `pnpm --filter hundo-stories storybook` (port 6006), or `preview_start` with `storybook` (port 6600). The toolbar's Guide and Theme switch the palette, fonts and corners, the same things a guide sets. The stories read Koholint's chapter data whichever guide is chosen: only the look changes.
-- **Test them:** `pnpm test` in `packages/stories` (and so `pnpm check`) renders every story in Chrome and runs axe on it, once for each of Koholint, Red Dead and Echoes in light and dark: six Vitest projects named `<guide>-<theme>`. A violation fails the run, colour contrast included, because the CSS is really processed. To run one: `pnpm -C packages/stories exec vitest run --project echoes-dark Button`.
+- **Test them:** `pnpm test` in `packages/stories` (and so `pnpm check`) renders every story in Chrome and runs axe on it, once for each guide in `.storybook/ids.ts`'s `GUIDES`, in light and dark: a Vitest project for each, named `<guide>-<theme>` (`koholint-light`, `echoes-dark`…). A plain Node project beside them, `guides` (`src/guides.test.ts`), fails when `GUIDES` isn't the folders in `apps/` that hold a `vercel.json`, so a new guide can't go unrun. A violation fails the run, colour contrast included, because the CSS is really processed. To run one: `pnpm -C packages/stories exec vitest run --project echoes-dark Button`.
 - **The guard:** `Foundation/Palette` fails if a project isn't really showing the guide and theme it claims (its `--primary`, the button's fill and text, the corner preset and the font). Without it the axe checks would pass on a page with no CSS.
 - **Chrome:** the tests use the system Google Chrome (`channel: "chrome"`, as `shoot.mjs` does) and don't download a browser. CI relies on the runner having one.
 - **Exempting a story** from axe takes `parameters: { a11y: { test: "todo" } }` on that story, with a comment saying why. Don't turn the check off for a whole file.
@@ -52,7 +53,7 @@ Each guide's own `guide.test.ts` adds its totals, its legacy saves, its extra st
 
 CI's `lighthouse` job audits each guide's production build with Lighthouse on every pull request and every push to `main`, beside the four checks. A regression fails the pull request, as an axe violation in the stories does.
 
-**What runs.** One job per guide, about three minutes each on GitHub's runner with the install and the build, so the three don't share a CPU and one failing doesn't stop the others. Each one builds its guide (`pnpm --filter hundo-<name> build`), serves `dist` with `vite preview` inside the runner, and runs Lighthouse CI (`@lhci/cli`, pinned at 0.16.1 in the root `package.json`, which pins Lighthouse 13.6.0) on the runner's own Google Chrome. The job prints Chrome's version, and the summary names its major version: the runner image updates it, so a jump in every number at once can be a new Chrome. `lighthouse/run.mjs` does all of it, and `pnpm lighthouse` runs that same script on a laptop.
+**What runs.** One job per guide (the `guide: [...]` matrix in `ci.yml`, which `wiring.test.ts` holds to the folders in `apps/`), about three minutes each on GitHub's runner with the install and the build, so the guides don't share a CPU and one failing doesn't stop the others. Each one builds its guide (`pnpm --filter hundo-<name> build`), serves `dist` with `vite preview` inside the runner, and runs Lighthouse CI (`@lhci/cli`, pinned at 0.16.1 in the root `package.json`, which pins Lighthouse 13.6.0) on the runner's own Google Chrome. The job prints Chrome's version, and the summary names its major version: the runner image updates it, so a jump in every number at once can be a new Chrome. `lighthouse/run.mjs` does all of it, and `pnpm lighthouse` runs that same script on a laptop.
 
 - **Pages:** `/guide/1`, `/checklist` (the heaviest page: Red Dead's has 307 rows) and `/dashboard` (Progress) on a phone, which is Lighthouse's default (a 412×823 screen, a slow 4G network and a four-times-slower CPU, all simulated), and `/checklist` again on a desktop. The desktop run's URL ends in `#desktop`: the app ignores the hash, and Lighthouse CI keeps it in the URL it groups runs by, which is how the thresholds tell the two apart.
 - **Runs:** three of each, so twelve per guide. Every run starts from an empty save: a reader with half of Red Dead ticked is never measured.
@@ -68,6 +69,8 @@ CI's `lighthouse` job audits each guide's production build with Lighthouse on ev
 | Performance, largest contentful paint, total blocking time, cumulative layout shift | each page | its own floor and limits, set from the guide that does worst on that page on GitHub's runner, with a margin for its noise (the comment at the top of `lighthouserc.mjs` gives each margin) | the median run |
 
 Every accessibility audit counts, axe's `target-size` (WCAG 2.2's 24px targets) included. It once failed on main for two reasons, both fixed in core on 16 Nov 2026: rows passing under the phone's tab bar at the fold, which axe counts as covered by the bar's links while the bar is `sticky` but not once it is `fixed` ([core.md](core.md#the-installed-app)), and What's left's 22px category links on Progress, now 24px.
+
+**A new guide** is audited from its first pull request, against limits set from the guides that did worst, so it can fail them. Run `pnpm lighthouse <name>` before asking for the push. If it fails, fix the guide (its banners' weight and its fonts' size are where to look first, and the report's diagnostics say where the time went), and never loosen a threshold to let it through: a threshold change is the user's call, through the opener.
 
 **Run it locally.** At the root:
 
@@ -99,7 +102,7 @@ The tests don't see layout, fonts, colour or how a page reads. Look at every vis
 
 | Name | What | URL |
 | --- | --- | --- |
-| `koholint`, `rdr`, `echoes` | dev server | http://localhost:5200, 5300, 5400 |
+| `koholint`, `rdr`, `echoes` (a new guide takes the next band, 5500 and 4500) | dev server | http://localhost:5200, 5300, 5400 |
 | `koholint-preview`, `rdr-preview`, `echoes-preview` | production build, then `vite preview` | http://localhost:4200, 4300, 4400 |
 
 Those are the ports when nothing holds them. Read the port from `preview_start`'s result.

@@ -2,7 +2,7 @@
 
 A guide is one folder in `apps/`. It holds its data, its look (palette, fonts, corners, icon art, banners) and its deploy settings. Everything else comes from `packages/core`, and core's shared tests then hold the new guide to the same rules as the others.
 
-Start from `apps/echoes`, the plainest of the three: article layout, no panels and no per-guide saved state. Copy Red Dead's `config.ts` instead only if the game suits a mission list with route filters (`layout: "checklist"`).
+Start from `apps/echoes`, the plainest guide: article layout, no panels and no per-guide saved state. Copy Red Dead's `config.ts` instead only if the game suits a mission list with route filters (`layout: "checklist"`).
 
 ## 1. Copy the folder
 
@@ -38,7 +38,7 @@ Delete what's Echoes' own:
 
 ### `brand.ts`
 
-- `id`: written into every backup as `guide`, so a backup from another guide is refused. It's short, for example `echoes-of-wisdom`.
+- `id`: written into every backup as `guide`, and the name the sync API stores the guide's progress and visit counts under, so a backup from another guide is refused. It's short, for example `echoes-of-wisdom`. **It never changes**, and the API has to know it before the guide's previews can sync or count (step 4, [deploying.md](deploying.md#a-new-project)), so settle it before any of that.
 - `name`: the mark and "Hundo", as in `RDR Hundo`. It's the installed app's name and the header's label.
 - `shortName`: the bare mark (`RDR`), without "Hundo", so the label under a home-screen icon isn't cut short.
 - `title`: the document and social title. The name, then enough to name the game, so a search for it finds the guide and a newcomer who doesn't know the word still knows what it is: `RDR Hundo · Red Dead Redemption 100% checklist`, or `Echoes of Wisdom Hundo · Zelda completion checklist`, where the name already holds the game's. Use the word its `description` uses for what it covers: "100%", or "completion" as in Echoes.
@@ -101,16 +101,23 @@ The full type is `GuideConfig` in `packages/core/src/types.ts`, and every field 
 
 ## 4. Wire it into the repository
 
+Every guide is listed in a few places outside its own folder. A test holds each list to the folders in `apps/` (the lockfile, to CI's frozen install), so a guide left out fails `pnpm check` and the failure names the list.
+
 - Run `pnpm install` at the root. A new workspace package changes `pnpm-lock.yaml`. Commit the lockfile with the app, or CI's and Vercel's `--frozen-lockfile` install fails.
-- `services/sync/src/app.ts`: add the guide's `brand.id` to `GUIDES`, or the sync API turns its readers away. `services/sync`'s `project.test.ts` fails until it's there.
-- Root `README.md`: add a row to the apps table. It's the one list of guides and their Vercel projects.
-- `.claude/launch.json`: copy Echoes's two entries onto the next band, 5500 and 4500 (each guide's ports sit 100 apart, [testing.md](testing.md#start-a-guide) says why). Keep `"autoPort": true`, and `--port ${PORT:-<its port>}` in the preview's shell string.
+- `services/sync/src/app.ts`: add the guide's `brand.id` to `GUIDES`, or the sync API turns its readers away (`services/sync`'s `project.test.ts` fails until it's there). **The API has to know the id before the guide's previews can sync or count**: a guide's `/api` goes to the production API, and an id it doesn't know gets a `400` (`{"error":"guide"}`, on `/api/count` and `/api/sync`, checked live on 17 Nov 2026). It's one line either way; when it lands is the choice, and [deploying.md](deploying.md#the-api-knows-the-guide-first) has the two ways.
+- `.github/workflows/ci.yml`: add the folder's name to the lighthouse job's `guide: [...]` matrix, or the guide's pull requests run no Lighthouse. `packages/core/src/wiring.test.ts` fails until it's there.
+- `packages/stories/.storybook/ids.ts`: add the folder's name to `GUIDES`, and in `guides.ts` the guide's `brand` and `theme.css?raw` imports and its entry in `guides`. The stories run axe under every guide's palette in both themes, and a guide left out is never run: `packages/stories/src/guides.test.ts` fails until `GUIDES` has it, and the typecheck until `guides.ts` does.
+- Root `README.md`: add a row to the apps table, the one list of guides and their Vercel projects (`wiring.test.ts` checks it).
+- `.claude/launch.json`: copy Echoes's two entries onto the next band, 5500 and 4500 (each guide's ports sit 100 apart, [testing.md](testing.md#start-a-guide) says why). Keep `"autoPort": true`, and `--port ${PORT:-<its port>}` in the preview's shell string. `wiring.test.ts` checks the entries, their package filter and that no two share a port.
+
+What finds the guides in `apps/` by itself and needs nothing: `pnpm lighthouse`, `pnpm screenshots` and `guide-check`'s scripts (a folder with a `vercel.json` is a guide).
 
 ## 5. Check it
 
-- Run `pnpm check` at the root. Core's shared suites run against the new guide: the data rules, the app flows for its layout, the theme's keys and contrast, the deploy settings.
+- Run `pnpm check` at the root. Core's shared suites run against the new guide: the data rules, the app flows for its layout, the theme's keys and contrast, the deploy settings and the lists of step 4.
 - Look at it in a browser on desktop and phone, in light and dark ([testing.md](testing.md#in-a-browser)).
+- Run `pnpm lighthouse <name>` at the root before asking for the push ([testing.md](testing.md#lighthouse)). CI audits the guide on its first pull request, against limits set per page from the guide that does worst, so a new guide can fail them. If it does, fix the guide (its banners' weight and its fonts' size are where to look first, and the report's diagnostics say where the time went). **Never loosen a threshold in `lighthouse/lighthouserc.mjs` to let a guide through**: moving one is the user's call, through the opener.
 
 ## 6. Deploy it
 
-Creating the Vercel project and every deploy need the user's go. The steps are in [deploying.md](deploying.md#a-new-project): root directory `apps/<name>`, a preview first, then production.
+Creating the Vercel project and every deploy need the user's go. The steps are in [deploying.md](deploying.md#a-new-project): the API knowing the guide first, root directory `apps/<name>`, a preview first, then production.

@@ -1,6 +1,6 @@
 # Every pull request and every push to main: the same four checks as `pnpm check`,
 # run from the root over every package. Vercel builds each app on its own, so this
-# is the one place that checks all three guides, and core against each of them. Beside them, Lighthouse audits
+# is the one place that checks every guide, and core against each of them. Beside them, Lighthouse audits
 # each guide's production build.
 name: CI
 
@@ -37,7 +37,7 @@ jobs:
       - run: pnpm build
 
   # Lighthouse on each guide's production build, served by `vite preview` in the runner: the same run as `pnpm lighthouse`, held to
-  # lighthouse/lighthouserc.mjs (docs/testing.md#lighthouse). One guide per job, so the three don't share a CPU, and none stops the
+  # lighthouse/lighthouserc.mjs (docs/testing.md#lighthouse). One guide per job, so the guides don't share a CPU, and none stops the
   # others when it fails.
   lighthouse:
     runs-on: ubuntu-latest

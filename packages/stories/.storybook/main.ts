@@ -6,6 +6,7 @@ import type { StorybookConfig } from "@storybook/react-vite";
 import { mergeConfig } from "vite";
 import { bannerSizes } from "@hundo/core/banners";
 import { iconUrls } from "@hundo/core/icon-versions";
+import { GUIDES } from "./ids.ts";
 
 const fromHere = (path: string) => fileURLToPath(new URL(path, import.meta.url));
 const app = (path: string) => fromHere(`../../../apps/${path}`);
@@ -31,7 +32,7 @@ const config: StorybookConfig = {
   core: { disableTelemetry: true },
   // The guides' fonts, so a story shows a guide's own type. (Koholint and Red Dead ship the same DM Sans file.)
   staticDirs: [
-    ...["koholint", "rdr", "echoes"].map((name) => ({ from: app(`${name}/public/fonts`), to: "/fonts" })),
+    ...GUIDES.map((name) => ({ from: app(`${name}/public/fonts`), to: "/fonts" })),
     // The top bar's brand tile, from the guide whose data the stories use: it stays Koholint's painting in every guide's look.
     { from: app("koholint/public/icons"), to: "/icons" },
   ],

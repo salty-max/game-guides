@@ -14,7 +14,7 @@ Run `bun harness/q.ts check -- bun run check` at the root.
 ## 2. Pick the guides and pages
 
 - **A change in one guide:** that guide.
-- **A change in `packages/core`:** all three guides. They cover both layouts, both corner presets and three palettes.
+- **A change in `packages/core`:** every guide. The first three cover both layouts, both corner presets and three palettes.
 - **Pages:** the defaults are `guide=/guide/1,checklist=/checklist,progress=/dashboard,sources=/sources`. `--pages` replaces that list, so name every page you want, such as `--pages guide=/guide/1,c3=/guide/3,run=/dashboard/deathless`.
 - **Hidden chapters:** a fresh visit shows only chapter 1, because spoiler protection is on. Add `--reveal` to seed a save with protection off, so `/guide/N` shows every chapter and its banner.
 
@@ -73,7 +73,7 @@ node .claude/skills/guide-check/scripts/page.mjs file://<scratchpad>/compare/ind
 
 Remove the base checkout afterwards with `git worktree remove <scratchpad>/base`.
 
-When the user has to choose between looks, build one page that draws every option in all three guides' palettes, fonts and art, and ask through the question tool (a child sends the options to its opener, which asks). That's how the house style was picked.
+When the user has to choose between looks, build one page that draws every option in every guide's palettes, fonts and art, and ask through the question tool (a child sends the options to its opener, which asks). That's how the house style was picked.
 
 ## 6. Speed of a page change
 

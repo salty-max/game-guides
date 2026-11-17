@@ -1,4 +1,5 @@
 import { fontCss } from "@hundo/core/fonts";
+import type { Brand } from "@hundo/core/types";
 import { brand as echoes } from "../../../apps/echoes/src/guide/brand";
 import echoesTheme from "../../../apps/echoes/src/guide/theme.css?raw";
 import { brand as koholint } from "../../../apps/koholint/src/guide/brand";
@@ -12,7 +13,7 @@ export const guides = {
   koholint: { brand: koholint, palette: koholintTheme },
   rdr: { brand: rdr, palette: rdrTheme },
   echoes: { brand: echoes, palette: echoesTheme },
-} satisfies Record<GuideId, { brand: typeof koholint | typeof rdr | typeof echoes; palette: string }>;
+} satisfies Record<GuideId, { brand: Brand; palette: string }>;
 
 /** The stylesheet the build would put in a guide's page: its palette, then its fonts. */
 export const guideCss = (guide: GuideId) => guides[guide].palette + fontCss(guides[guide].brand);

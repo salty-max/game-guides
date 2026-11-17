@@ -21,7 +21,14 @@ describe("the guides", () => {
       .filter((name) => existsSync(join(apps, name, "src/guide/brand.ts")))
       .map((name) => /^\s*id:\s*"([^"]+)"/m.exec(readFileSync(join(apps, name, "src/guide/brand.ts"), "utf8"))?.[1]);
     expect(ids.length).toBeGreaterThan(0);
-    expect([...GUIDES].sort()).toEqual(ids.sort());
+    // (an id may be listed before its guide exists: the id goes in a small pull request of its own, deployed first, so the new guide's previews
+    // are accepted by the production API. docs/deploying.md#a-new-project. So the list may hold more than the apps, never fewer.)
+    for (const id of ids) expect(GUIDES, `the guide ${id}: its brand.id in GUIDES (services/sync/src/app.ts)`).toContain(id);
+  });
+
+  it("lists each id once, as a brand id is written", () => {
+    expect(new Set(GUIDES).size).toBe(GUIDES.length);
+    for (const id of GUIDES) expect(id).toMatch(/^[a-z0-9]+(?:-[a-z0-9]+)*$/);
   });
 });
 

@@ -1280,7 +1280,8 @@ describe("links counted", () => {
 });
 
 describe("the guides", () => {
-  it("knows the three of them", () => {
-    expect([...GUIDES].sort()).toEqual(["echoes-of-wisdom", "links-awakening", "red-dead-redemption"]);
+  // (a brand.id never changes, and a guide's readers are turned away without it. A new guide's id is added to the list: project.test.ts holds it to the apps.)
+  it("keeps the ids of the first three guides", () => {
+    expect(GUIDES).toEqual(expect.arrayContaining(["echoes-of-wisdom", "links-awakening", "red-dead-redemption"]));
   });
 });
