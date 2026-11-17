@@ -55,3 +55,28 @@ export const CategoryBoard: Story = {
     await expect(canvas.getAllByRole("link")).toHaveLength(completion.board.length);
   },
 };
+
+/** In a column under 28rem (WhatsLeft's own width, not the screen's), each category's bar goes under its name and figures. */
+export const WhatsLeftNarrow: Story = {
+  decorators: [
+    (Story) => (
+      <div style={{ width: 400 }}>
+        <Story />
+      </div>
+    ),
+  ],
+  play: async ({ canvasElement }) => {
+    const row = canvasElement.querySelector("li")!;
+    const [name, bar] = [...row.children].map((part) => part.getBoundingClientRect());
+    await expect(getComputedStyle(row).gridTemplateColumns.split(" ")).toHaveLength(2);
+    await expect(bar.top).toBeGreaterThanOrEqual(name.bottom);
+  },
+};
+
+/** In a wide column each category's name, bar and figures share a line. */
+export const WhatsLeftWide: Story = {
+  play: async ({ canvasElement }) => {
+    const row = canvasElement.querySelector("li")!;
+    await expect(getComputedStyle(row).gridTemplateColumns.split(" ")).toHaveLength(3);
+  },
+};

@@ -19,8 +19,9 @@ function Bar(props: ComponentProps<typeof TopBar>) {
   return <TopBar {...props} menuToggle={menuToggle} />;
 }
 
-// The bar across the top of every page. From 800px down to 551px the menu button comes in and the pages shrink to icons over words; on a
-// phone the bar is a title bar (the Phone story, at a phone's width): the pages move to the tab bar (MainNav), and the theme toggle stays.
+// The bar across the top of every page. From 800px down to 551px the menu button comes in. When the bar is tight the pages' icons go
+// first, then the brand's name gives way; on a phone the bar is a title bar (the Phone story, at a phone's width): the pages move to the
+// tab bar (MainNav), and the theme toggle stays.
 const meta = {
   title: "Core/TopBar",
   component: TopBar,
@@ -174,16 +175,38 @@ const largeTextLongName = () => {
   };
 };
 
+/** How many of the pages' icons show: one that wrapped away sits under its link, which clips it. */
+const iconsShown = (nav: HTMLElement) =>
+  [...nav.querySelectorAll("a")].filter((link) => {
+    const box = link.getBoundingClientRect();
+    const icon = link.querySelector("svg")!.getBoundingClientRect();
+    return icon.width > 0 && icon.top >= box.top && icon.bottom <= box.bottom;
+  }).length;
+
 /**
- * A small tablet with large text, where the bar is tightest: the brand is the part that gives way, its name ellipsizing, and the pages keep
- * their words and never cover it. (Echoes' name once ran under the Guide link here, and with large text every guide's did.)
+ * A small tablet with large text, where the bar is tightest: the pages' icons go first, all four, then the brand gives way, its name
+ * ellipsizing, and the pages keep their words and never cover it. (Echoes' name once ran under the Guide link here, and with large text
+ * every guide's did.)
  */
 export const SmallTabletLargeText: Story = {
   globals: { viewport: { value: "smallTablet", isRotated: false } },
   beforeEach: largeTextLongName,
   play: async ({ canvas }) => {
-    await expect(canvas.getByRole("navigation", { name: "Main navigation" })).toBeVisible();
+    const nav = canvas.getByRole("navigation", { name: "Main navigation" });
+    await expect(nav).toBeVisible();
     await nothingOverlaps(canvas.getByRole("banner"));
+    await expect(iconsShown(nav)).toBe(0);
+  },
+};
+
+/** A wide screen: room for the whole brand and the pages' icons, with no width named for them (they show wherever they fit). */
+export const IconsWithRoom: Story = {
+  play: async ({ canvas }) => {
+    const bar = canvas.getByRole("banner");
+    bar.getBoundingClientRect();
+    await document.fonts.ready;
+    await expect(iconsShown(canvas.getByRole("navigation", { name: "Main navigation" }))).toBe(4);
+    await nothingOverlaps(bar);
   },
 };
 

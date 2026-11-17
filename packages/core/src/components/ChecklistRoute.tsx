@@ -40,7 +40,8 @@ export function ChecklistRoute({ chapter, target, footer }: { chapter: Chapter; 
     <section id="route" aria-labelledby="route-title">
       <div className="mb-[13px] flex items-end justify-between gap-[13px] phone:flex-wrap phone:items-start phone:gap-1">
         <div>
-          <h2 id="route-title" className="m-0 font-display text-[32px] leading-[1.17] font-bold tracking-[-0.015em] phone:text-[27px]">
+          {/* (27px in a phone's column, 32px from a column of 416px: `cqi` is the page column's width) */}
+          <h2 id="route-title" className="m-0 font-display text-[clamp(1.6875rem,7.7cqi,2rem)] leading-[1.17] font-bold tracking-[-0.015em]">
             Chapter route
           </h2>
           <p className="mt-[5px] mb-0 text-[14px] text-muted">

@@ -32,10 +32,16 @@ const list = cva("", { variants: { place: { top: "flex gap-2 drawer:gap-0.5", bo
 
 // The page the reader is on: a tint behind its words in the top bar, and behind its icon in the bottom bar, in the guide's own button
 // corners. A press tints the whole cell.
+// In the top bar a link's icon gives way before anything else does. The link is one line as tall as itself (the `/10` line height on its
+// text) that may wrap, laid out from its end (`flex-row-reverse`) with the icon ordered after the words, so the icon is what wraps, onto a
+// second line that the link's height clips. Its narrowest is then its words alone, which is the least the pages' column takes (TopBar): the
+// brand gets its whole width before the links get room for their icons, and with less than all four need, every link narrows a little and
+// all four icons go together. So the icons show exactly when the bar has room for them, in every guide's fonts and at any text size, with
+// no width named for it.
 const link = cva(`${press} group/page font-bold whitespace-nowrap text-muted`, {
   variants: {
     place: {
-      top: "flex min-h-10 items-center gap-2 rounded-button px-3.5 py-2.5 text-[14px] leading-[1.2] hover:bg-raised hover:text-ink drawer:gap-1 drawer:p-2 [&[aria-current=page]:not(:hover)]:bg-soft [&[aria-current=page]:not(:hover)]:text-soft-ink",
+      top: "flex h-10 flex-row-reverse flex-wrap content-start items-center justify-center gap-x-2 overflow-clip rounded-button px-3.5 text-[14px]/10 hover:bg-raised hover:text-ink drawer:gap-x-1 drawer:px-2 [&[aria-current=page]:not(:hover)]:bg-soft [&[aria-current=page]:not(:hover)]:text-soft-ink",
       bottom: "grid h-full content-center justify-items-center gap-[3px] text-[11px] leading-none aria-[current=page]:text-soft-ink",
     },
   },
@@ -44,9 +50,8 @@ const link = cva(`${press} group/page font-bold whitespace-nowrap text-muted`, {
 const icon = cva("", {
   variants: {
     place: {
-      // Four pages' words and icons don't leave the brand its room beside the rail, or fit a small tablet with large text: up to 1040px
-      // the top bar's links are their words alone. The tab bar keeps its icons.
-      top: "size-4 mid:hidden",
+      // (after the words, so it is the part that wraps away: `link` above. The tab bar keeps its icons.)
+      top: "order-1 size-4",
       bottom: `${pressPart} box-content size-[22px] rounded-button px-4 py-[3px] group-aria-[current=page]/page:bg-soft`,
     },
   },

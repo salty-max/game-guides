@@ -38,11 +38,26 @@ export const EmptyList: Story = {
   render: () => <Empty>Nothing matches. Try changing a filter or search term.</Empty>,
 };
 
-/** On a phone: a compact title, as a large title is. */
+/** On a phone: a compact title, as a large title is (30px, the floor of the title's clamp). */
 export const Phone: Story = {
   globals: { viewport: { value: "phone", isRotated: false } },
   play: async ({ canvas }) => {
     const title = canvas.getByRole("heading", { level: 1, name: "Completion checklist" });
     await expect(getComputedStyle(title).fontSize).toBe("30px");
+  },
+};
+
+/** In a page column of 800px: the title is 6% of the column it lives in (`cqi`), whatever the screen, between 30 and 58px. */
+export const InAPageColumn: Story = {
+  decorators: [
+    (Story) => (
+      <div style={{ containerType: "inline-size", width: 800 }}>
+        <Story />
+      </div>
+    ),
+  ],
+  play: async ({ canvas }) => {
+    const title = canvas.getByRole("heading", { level: 1, name: "Completion checklist" });
+    await expect(parseFloat(getComputedStyle(title).fontSize)).toBeCloseTo(48, 0);
   },
 };

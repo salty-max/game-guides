@@ -167,9 +167,11 @@ export function Layout({ children }: { children: ReactNode }) {
           ref={mainRef}
           // --gutter is the page's side padding, --pad-end the room under it (and both get the notch and the home indicator on top, but on a
           // phone the tab bar covers the home indicator, so the room under the page is --pad-end alone).
+          // The gutter is one clamp from a phone's 12px up, in vw: it is the frame's own padding, not a part's. <main> is also the page's
+          // container (`/page`), so what lives in the page column (a page's title) can size itself by the column, in `cqi`.
           // The page is at most 1460px wide, centred. In the installed app <main> is what scrolls, so it takes the whole width (the
           // scrollbar and the wheel then belong to the window's edges) and --center is the margin that centring would have made.
-          className="mx-auto w-full max-w-[1460px] min-w-0 pt-6 pr-[calc(var(--gutter)+var(--center,0px)+var(--safe-right))] pb-[calc(var(--pad-end)+var(--safe-bottom))] pl-[calc(var(--gutter)+var(--center,0px))] outline-none [--gutter:clamp(23px,3.25vw,53px)] [--pad-end:50px] standalone:max-w-none standalone:scroll-pt-6 standalone:overflow-y-auto standalone:overscroll-contain standalone:[--center:max(0px,calc((100%-1460px)/2))] drawer:pt-[18px] drawer:pl-[calc(var(--gutter)+var(--safe-left))] drawer:[--gutter:18px] drawer:[--pad-end:30px] phone:pt-[13px] phone:pb-(--pad-end) phone:[--gutter:12px] phone:[--pad-end:25px]"
+          className="@container/page mx-auto w-full max-w-[1460px] min-w-0 pt-6 pr-[calc(var(--gutter)+var(--center,0px)+var(--safe-right))] pb-[calc(var(--pad-end)+var(--safe-bottom))] pl-[calc(var(--gutter)+var(--center,0px))] outline-none [--gutter:clamp(0.75rem,3.25vw,3.3125rem)] [--pad-end:50px] standalone:max-w-none standalone:scroll-pt-6 standalone:overflow-y-auto standalone:overscroll-contain standalone:[--center:max(0px,calc((100%-1460px)/2))] drawer:pt-[18px] drawer:pl-[calc(var(--gutter)+var(--safe-left))] drawer:[--pad-end:30px] phone:pt-[13px] phone:pb-(--pad-end) phone:[--pad-end:25px]"
         >
           {children}
         </main>

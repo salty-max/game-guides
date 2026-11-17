@@ -27,7 +27,8 @@ export function DashboardPage() {
   return (
     <>
       <PageHeading title="Your progress" intro={text.dashboardIntro} stat={overallLine(data.checks)} />
-      <div className="mb-3.5 grid grid-cols-[1.1fr_1fr] items-start gap-[13px] phone:grid-cols-1">
+      {/* Two columns where both get 22rem, one where they don't, whatever the screen: the chapter list's bars and the backup's buttons need it. */}
+      <div className="mb-3.5 grid grid-cols-[repeat(auto-fit,minmax(min(100%,22rem),1fr))] items-start gap-[13px]">
         <Panel>
           <PanelTitle>Chapter progress</PanelTitle>
           <PanelText>Open a revealed chapter.</PanelText>
@@ -77,7 +78,8 @@ export function DashboardPage() {
       <Panel>
         <PanelTitle>{text.boardTitle}</PanelTitle>
         <PanelText>{text.boardNote}</PanelText>
-        <div className="mt-[13px] grid grid-cols-3 gap-2.5 mid:grid-cols-2">
+        {/* As many columns of at least 14rem as fit, three at most, as the board has always had on a wide screen: wider stats would only spread a figure and a bar further apart. */}
+        <div className="mt-[13px] grid grid-cols-[repeat(auto-fill,minmax(min(100%,max(14rem,calc((100%-2*0.625rem)/3))),1fr))] gap-2.5">
           {completion.board.map(({ tag, goal }) => (
             <Stat key={tag} tag={tag} goal={goal} />
           ))}

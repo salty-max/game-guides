@@ -29,14 +29,14 @@
    browser tab stays an ordinary website. It matches the root element as well as what's inside it. */
 @custom-variant standalone (&:where([data-standalone], [data-standalone] *));
 
-/* The widths the layout changes at, named for what changes there. They are inclusive (`max-width: 800px` matches an 800px screen),
+/* The widths the frame changes at, named for what changes there. They are inclusive (`max-width: 800px` matches an 800px screen),
    which Tailwind's own `max-*` variants are not, and they are declared widest first so that the narrower one wins. The matching
    tokens (--bar-h, --rail-w) change at the same widths, in tokens.css. A media query written in brackets in a class sorts after all of
-   these whatever its width, so a width gets a name here as soon as a class needs one. `stack`: a chapter's hero puts its art above its
-   words. `fold`: an article's list of sections folds away above it instead of standing beside it. */
-@custom-variant stack (@media (max-width: 1050px));
+   these whatever its width, so a width gets a name here as soon as a class needs one. These are the screen's decisions: the rail
+   narrowing and becoming a drawer, the tab bar, a phone's tighter spacing. How a part lays itself out (a chapter's hero putting its art
+   above its words, an article folding its contents away, the Progress page's columns) follows the part's own width instead, with a
+   container query (docs/core.md). */
 @custom-variant mid (@media (max-width: 1040px));
-@custom-variant fold (@media (max-width: 1000px));
 @custom-variant drawer (@media (max-width: 800px));
 @custom-variant phone (@media (max-width: 550px));
 @custom-variant slim (@media (max-width: 405px));
