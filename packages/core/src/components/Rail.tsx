@@ -14,7 +14,7 @@ import { press, pressPart, pressText } from "./press-style";
 // A chapter in the rail: a link to it, or, while spoiler protection hides it, a button that reveals it (and says what it's hidden by).
 // A locked one keeps its muted colour when it's hovered; an open one darkens.
 const chapterLink = cva(
-  `${press} group/chapter grid min-h-12 w-full cursor-pointer grid-cols-[30px_minmax(0,1fr)_17px] items-center gap-2.5 rounded-small border border-transparent bg-transparent p-2 text-left font-sans font-bold no-underline hover:bg-rail-hover aria-[current=page]:border-soft-line aria-[current=page]:text-ink [&_svg]:size-3.5 [&_svg]:text-muted [&[aria-current=page]:not(:hover)]:bg-soft`,
+  `${press} group/chapter grid min-h-12 w-full cursor-pointer grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2.5 rounded-small border border-transparent bg-transparent p-2 text-left font-sans font-bold no-underline hover:bg-rail-hover aria-[current=page]:border-soft-line aria-[current=page]:text-ink [&_svg]:size-3.5 [&_svg]:text-muted [&[aria-current=page]:not(:hover)]:bg-soft`,
   { variants: { locked: { true: "text-[13px] text-muted", false: "text-[14px] text-inherit hover:text-ink" } } },
 );
 
@@ -76,7 +76,7 @@ export function RailContent({ activeChapter, view, heading }: RailProps & { head
         </nav>
       </div>
       <div className="mt-auto grid gap-[13px] px-0.5">
-        <div className="grid grid-cols-[23px_1fr] gap-[9px] rounded-card border border-line bg-surface px-2.5 pt-[13px] pb-3">
+        <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-3.5 rounded-card border border-line bg-surface px-2.5 pt-[13px] pb-3">
           <Icon name={data.spoilers ? "lock" : "unlock"} className="mt-0.5 size-[18px] text-primary" />
           <div>
             <strong className="text-[13px]">Spoiler protection {data.spoilers ? "on" : "off"}</strong>

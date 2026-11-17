@@ -22,7 +22,7 @@ interface TickItemProps {
 export function TickItem({ row, prefix, ticked, detail, jumpLabel, onToggle }: TickItemProps) {
   const id = `${prefix}-${row.id}`;
   return (
-    <li className="relative grid grid-cols-[28px_minmax(0,1fr)_auto] items-center gap-3 border-t border-line-soft py-2.5 first:border-t-0 phone:gap-2.5">
+    <li className="relative grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 border-t border-line-soft py-2.5 first:border-t-0 phone:gap-2.5">
       <CheckBox id={id} labelId={`${id}-label`} row={row} onToggle={onToggle} />
       {/* The label stretches over the whole item, so the item is the tap target; the link sits above it. */}
       <label id={`${id}-label`} className={`${pressRow} grid cursor-pointer gap-0.5 leading-[1.3] after:absolute after:inset-0`} htmlFor={id}>

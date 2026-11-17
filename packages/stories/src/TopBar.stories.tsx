@@ -1,4 +1,5 @@
 import { TopBar } from "@hundo/core/components/TopBar";
+import { brand } from "@hundo/core/guide";
 import { useProgress } from "@hundo/core/store/progress";
 import { useSyncStatus } from "@hundo/core/store/sync";
 import { useUi } from "@hundo/core/store/ui";
@@ -129,5 +130,91 @@ export const Phone: Story = {
     await expect(bar.scrollWidth).toBeLessThanOrEqual(bar.clientWidth);
     await expect(canvas.getByRole("link", { name: /home$/ }).querySelector("img")!.getBoundingClientRect().width).toBe(34);
     await expect(canvas.getByRole("button", { name: "Open chapters" }).getBoundingClientRect().height).toBe(44);
+  },
+};
+
+/** Whether any of the box shows: it has a size, and the link around it (which clips a name with no room) doesn't cut it all away. */
+const drawn = (part: HTMLElement) => {
+  const box = part.getBoundingClientRect();
+  const clip = part.closest("a")?.getBoundingClientRect();
+  return box.width > 0 && box.height > 0 && (!clip || (box.top < clip.bottom && box.left < clip.right));
+};
+
+/** The top bar's parts left to right, as drawn: the menu button, the brand's tile and name, the pages and the buttons at the end. */
+const barParts = (bar: HTMLElement) =>
+  [...bar.querySelectorAll<HTMLElement>("button, img, strong, nav a")]
+    .filter(drawn)
+    .map((part) => part.getBoundingClientRect())
+    .sort((a, b) => a.left - b.left);
+
+/** Nothing in the bar over anything else, nothing past its edges, and the page doesn't scroll sideways. */
+const nothingOverlaps = async (bar: HTMLElement) => {
+  // (measured in the guide's own fonts: a fallback is narrower, and the brand's name in it can fit where the real one doesn't; a layout
+  // first, so the fonts the bar uses have been asked for before waiting on them)
+  bar.getBoundingClientRect();
+  await document.fonts.ready;
+  const parts = barParts(bar);
+  for (let i = 1; i < parts.length; i++) await expect(parts[i - 1].right).toBeLessThanOrEqual(parts[i].left + 0.5);
+  await expect(parts[0].left).toBeGreaterThanOrEqual(0);
+  await expect(parts.at(-1)!.right).toBeLessThanOrEqual(bar.clientWidth + 0.5);
+  await expect(document.documentElement.scrollWidth).toBeLessThanOrEqual(document.documentElement.clientWidth);
+};
+
+/**
+ * A reader's larger default text (Chrome's "Large", a 20px root), which grows everything sized in rem around the bar's px words, with the
+ * longest name a guide has (the stories draw Koholint's brand in every guide's look, and Echoes' name is twice as long).
+ */
+const largeTextLongName = () => {
+  const { mark, name } = brand;
+  Object.assign(brand, { mark: "Echoes of Wisdom", name: "Echoes of Wisdom Hundo" });
+  document.documentElement.style.fontSize = "20px";
+  return () => {
+    Object.assign(brand, { mark, name });
+    document.documentElement.style.fontSize = "";
+  };
+};
+
+/**
+ * A small tablet with large text, where the bar is tightest: the brand is the part that gives way, its name ellipsizing, and the pages keep
+ * their words and never cover it. (Echoes' name once ran under the Guide link here, and with large text every guide's did.)
+ */
+export const SmallTabletLargeText: Story = {
+  globals: { viewport: { value: "smallTablet", isRotated: false } },
+  beforeEach: largeTextLongName,
+  play: async ({ canvas }) => {
+    await expect(canvas.getByRole("navigation", { name: "Main navigation" })).toBeVisible();
+    await nothingOverlaps(canvas.getByRole("banner"));
+  },
+};
+
+/**
+ * Just past 800px with large text, the rail beside the page: the brand's columns grow past the rail's width when the brand needs it, and
+ * still give way before the pages do.
+ */
+export const NarrowLaptopLargeText: Story = {
+  globals: { viewport: { value: "narrowLaptop", isRotated: false } },
+  beforeEach: largeTextLongName,
+  play: async ({ canvas }) => {
+    await expect(canvas.queryByRole("button", { name: "Open chapters" })).toBeNull();
+    await nothingOverlaps(canvas.getByRole("banner"));
+  },
+};
+
+/**
+ * Beside the rail, with room to spare: the brand's columns are as wide as the rail, so the pages start over the page, and the pages are
+ * centred in what the brand and the buttons leave.
+ */
+export const BesideTheRail: Story = {
+  globals: { viewport: { value: "narrowLaptop", isRotated: false } },
+  play: async ({ canvas }) => {
+    const bar = canvas.getByRole("banner");
+    bar.getBoundingClientRect();
+    await document.fonts.ready;
+    const brandCell = canvas.getByRole("link", { name: /home$/ }).parentElement!.getBoundingClientRect();
+    const buttons = bar.lastElementChild!.getBoundingClientRect();
+    const pages = canvas.getByRole("navigation", { name: "Main navigation" }).getBoundingClientRect();
+    await expect(brandCell.width).toBeCloseTo(parseFloat(getComputedStyle(bar).getPropertyValue("--rail-w")), 0);
+    await expect(pages.left + pages.width / 2).toBeCloseTo((brandCell.right + buttons.left) / 2, 0);
+    await nothingOverlaps(bar);
   },
 };

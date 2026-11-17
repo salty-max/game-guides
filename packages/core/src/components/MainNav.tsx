@@ -17,7 +17,9 @@ import { useProgress } from "../store/progress";
 const root = cva("", {
   variants: {
     place: {
-      top: "ml-[-42px] justify-self-center drawer:ml-0",
+      // Centred in what the brand and the buttons leave (TopBar): its column is never narrower than it, margins included, so a tight bar
+      // still keeps a gap on either side of the links.
+      top: "mx-2 justify-self-center",
       bottom:
         "fixed inset-x-0 bottom-0 z-10 h-(--tabs) border-t border-line bg-surface pr-(--safe-right) pb-(--safe-bottom) pl-(--safe-left) text-ink pointer-coarse:in-[body:has(input:not([type=checkbox],[type=radio]):focus)]:hidden standalone:relative standalone:flex-none standalone:select-none standalone:[-webkit-touch-callout:none]",
     },
