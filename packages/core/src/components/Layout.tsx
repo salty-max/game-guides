@@ -8,6 +8,7 @@ import { TopBar } from "./TopBar";
 import { ToastHost } from "./ToastHost";
 import { TooltipHost } from "./TooltipHost";
 import { guideAnchor, readChapter } from "../guide";
+import { lineById } from "../questlines";
 import { panels } from "virtual:guide/panels";
 import { useLoadable, whenIdle } from "../loadable";
 import { isOpen, useProgress } from "../store/progress";
@@ -70,7 +71,12 @@ export function Layout({ children }: { children: ReactNode }) {
   const activeChapter = readChapter(param, chapter);
   const guideTarget = view === "guide" && guideAnchor(activeChapter, entry);
   const targetedGuide = useProgress((s) => Boolean(guideTarget && isOpen(s.data, activeChapter)));
-  const targeted = targetedGuide || (view === "dashboard" && panels.some((panel) => panel.id === param));
+  // A line on the Questlines page is something to scroll to only while it's listed, its first step revealed (questlines.ts).
+  const targetedLine = useProgress((s) => {
+    const line = view === "questlines" ? lineById(param) : undefined;
+    return Boolean(line && isOpen(s.data, line.rows[0].chapter));
+  });
+  const targeted = targetedGuide || targetedLine || (view === "dashboard" && panels.some((panel) => panel.id === param));
   const place = placeOf(pathname, chapter);
   const returning = useReturning();
 
@@ -98,7 +104,7 @@ export function Layout({ children }: { children: ReactNode }) {
 
   // Moving to a new page: back to where the reader left it if they are coming back to it (Back or Forward to that very entry, a tab of the
   // bar, a launch that reopens the last place), its top otherwise, and the focus in <main>. An address that points at something to scroll
-  // to (a guide section or entry, or a dashboard panel) is left to the page, unless Back returns to it, where it was left wins. A layout
+  // to (a guide section or entry, a questline, or a dashboard panel) is left to the page, unless Back returns to it, where it was left wins. A layout
   // effect, so the page is where it belongs before it is shown. It runs after the page's own effects, so it has the last word.
   const pop = useNavigationType() === "POP";
   useLayoutEffect(() => {

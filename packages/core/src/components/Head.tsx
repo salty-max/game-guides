@@ -6,6 +6,7 @@ import { isOpen, useProgress } from "../store/progress";
 
 const chapterTitles = chapters.map((chapter) => chapter.title);
 const chips = config.chips.checklist.map(([, label]) => label);
+const questlines = config.questlines.title;
 
 /** The `<head>` element matching `selector`, made from `attributes` when the shell has none. */
 const tag = (selector: string, name: string, attributes: Record<string, string>) => {
@@ -28,7 +29,7 @@ export function Head() {
   const data = useProgress((s) => s.data);
 
   useEffect(() => {
-    const head = headFor(pathname, { brand, chapterTitles, chips, savedChapter: data.chapter, open: (n) => isOpen(data, n) });
+    const head = headFor(pathname, { brand, chapterTitles, chips, questlines, savedChapter: data.chapter, open: (n) => isOpen(data, n) });
     document.title = head.title;
     tag('meta[name="description"]', "meta", { name: "description" }).setAttribute("content", head.description);
     tag('link[rel="canonical"]', "link", { rel: "canonical" }).setAttribute("href", head.canonical);

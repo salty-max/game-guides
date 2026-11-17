@@ -149,6 +149,9 @@ describe("pages", () => {
     expect(pageOf("/guide/2", { ...data, spoilers: false })).toBe("p:guide/2");
     expect(pageOf("/checklist/heart/1", data)).toBe("p:checklist");
     expect(pageOf("/dashboard/what-is-left", data)).toBe("p:dashboard");
+    // A line's id never leaves the device: every line is the one page.
+    expect(pageOf("/questlines", data)).toBe("p:questlines");
+    expect(pageOf("/questlines/some-line", data)).toBe("p:questlines");
     expect(pageOf("/sources", data)).toBeNull();
     expect(pageOf("/", data)).toBeNull();
     expect(pageOf("/nowhere", data)).toBeNull();

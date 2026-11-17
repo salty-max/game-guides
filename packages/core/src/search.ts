@@ -15,6 +15,8 @@ export interface HeadContext {
   chapterTitles: string[];
   /** The checklist's category chip labels, in order. */
   chips: string[];
+  /** The Questlines page's title. */
+  questlines: string;
   /** The chapter `/` and `/guide` open at (the reader's last one). */
   savedChapter: number;
   /** Whether a chapter is revealed. */
@@ -32,7 +34,7 @@ export interface Head {
 const list = (items: string[]) => (items.length > 1 ? `${items.slice(0, -1).join(", ")} and ${items.at(-1)}` : (items[0] ?? ""));
 
 /** The title, description, canonical and robots rule for an address. */
-export function headFor(pathname: string, { brand, chapterTitles, chips, savedChapter, open }: HeadContext): Head {
+export function headFor(pathname: string, { brand, chapterTitles, chips, questlines, savedChapter, open }: HeadContext): Head {
   const [view, param] = pathname.split("/").filter(Boolean);
   const page = (path: string, title: string, description: string): Head => ({
     title,
@@ -48,6 +50,10 @@ export function headFor(pathname: string, { brand, chapterTitles, chips, savedCh
       `${brand.game} checklist · ${brand.name}`,
       `Search every ${brand.game} entry by item, location or activity: ${named}. Later chapters stay hidden until revealed.`,
     );
+  }
+  // Not indexed: a crawler sees chapter 1 alone, so the page would hold what /guide/1 does, and a line's own address names the page.
+  if (view === "questlines") {
+    return { ...page("/questlines", `${questlines} · ${brand.name}`, `${brand.game}: ${questlines.toLowerCase()} step by step, as far as you have revealed.`), noindex: true };
   }
   if (view === "dashboard") {
     return page(

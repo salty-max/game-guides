@@ -15,6 +15,7 @@ import chapter11 from "./data/chapter-11";
 import chapter12 from "./data/chapter-12";
 import chapter13 from "./data/chapter-13";
 import { missables } from "./data/missables";
+import { questlines } from "./data/questlines";
 import { sources } from "./data/sources";
 
 const banners = byChapter(import.meta.glob<Banner>("./banners/chapter-*.webp", { eager: true, query: "?banner", import: "default" }));
@@ -92,6 +93,7 @@ const config: GuideConfig = {
     ],
   },
   missables,
+  questlines,
   banners,
   completion: { board: targets },
   state: {},

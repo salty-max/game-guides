@@ -51,7 +51,7 @@ What the server keeps ([services/sync](services/sync/README.md#what-it-keeps) ha
 Each guide counts visits, with no cookie and no id, to learn which guides and chapters get used, how far readers get, and how much reading happens in the installed app. When the page goes to the background, the guide sends its own `/api` (the sync API) a few numbers:
 
 - whether it ran as the installed app or in a browser tab, once a page load and again after half an hour away;
-- which pages it showed: a chapter by its number only, a hidden chapter not at all, and no row, filter or search;
+- which pages it showed: a chapter by its number only, a hidden chapter not at all, and no row, questline, filter or search;
 - which chapters a tick on this device started (the first row checked) or finished (the last one), at most once each a page load. Ticks from sync, from another tab or from a backup don't count, though two devices that haven't caught up with each other can each count the same start, so these numbers are indicative.
 
 The request carries no cookie and nothing that names the device. The server adds the numbers to that guide's totals for the day and keeps nothing else: no address, no browser, no time of day. The totals are per day, so on a quiet day with a single visit they are that one visit's numbers. The sync server also adds one to those totals for each new link between devices, and the stats script reads the sync groups' records to count how many hold how many devices; the records hold the device labels, and it prints none.

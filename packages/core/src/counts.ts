@@ -200,7 +200,8 @@ export function startCounting(now: () => number = Date.now) {
  */
 export function pageOf(pathname: string, data: ProgressState): string | null {
   const [view, param] = pathname.split("/").filter(Boolean);
-  if (view === "checklist" || view === "dashboard") return `p:${view}`;
+  // A line on the Questlines page isn't a page of its own, and its id never leaves the device.
+  if (view === "checklist" || view === "dashboard" || view === "questlines") return `p:${view}`;
   if (view !== "guide") return null;
   const n = Number(param);
   const chapter = Number.isInteger(n) && n >= 1 && n <= CHAPTER_COUNT ? n : data.chapter;

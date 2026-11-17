@@ -6,7 +6,7 @@ import { use } from "react";
 import { MemoryRouter, Route, Routes, useLocation } from "react-router";
 import { expect, within } from "storybook/test";
 
-// Guide, Checklist and Progress. From 551px up they are links in the top bar (TopBar's stories show them there); on a phone, a tab bar
+// Guide, Checklist, the guide's Questlines page and Progress. From 551px up they are links in the top bar (TopBar's stories show them there); on a phone, a tab bar
 // across the bottom of the screen, each page's icon over its name, the current one tinted in the guide's own corners. Each link goes back
 // to its page as the reader left it (store/place.ts).
 const meta = {
@@ -50,7 +50,7 @@ export const Bottom: Story = {
     const nav = canvas.getByRole("navigation", { name: "Main navigation" });
     await expect(nav).toBeVisible();
     await expect(within(nav).getByRole("link", { name: "Checklist" })).toHaveAttribute("aria-current", "page");
-    await expect(within(nav).getAllByRole("link")).toHaveLength(3);
+    await expect(within(nav).getAllByRole("link")).toHaveLength(4);
     // The rule that takes the bar away while a field you type in has the focus on a touch screen: a story's pointer isn't coarse, so
     // this checks the stylesheet has it, keyed on the body's focused input, rather than seeing it work.
     // (the utilities are inside a layer, so the walk goes into every grouping rule)
