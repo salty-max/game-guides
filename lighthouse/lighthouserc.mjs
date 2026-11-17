@@ -20,8 +20,7 @@ const everyPage = {
   assertions: {
     "categories:accessibility": ["error", { minScore: 1, ...worst }],
     "categories:best-practices": ["error", { minScore: 1, ...worst }],
-    // 92 until the guides serve a robots.txt (the SEO wave): every page fails robots-txt today, here and in production.
-    "categories:seo": ["error", { minScore: 0.92, ...worst }],
+    "categories:seo": ["error", { minScore: 1, ...worst }],
   },
 };
 

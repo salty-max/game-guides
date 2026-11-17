@@ -16,7 +16,7 @@ type Store = Pick<Storage, "getItem" | "setItem">;
 
 /** Where to send this reader, or null to stay: only an old address of a guide that moved redirects. */
 export function handoffTarget(place: Place, storage: Pick<Storage, "getItem">): string | null {
-  if (!brand.home || !brand.movedFrom?.includes(place.hostname)) return null;
+  if (!brand.movedFrom?.includes(place.hostname)) return null;
   const progress = storage.getItem(STORAGE_KEY);
   const theme = storage.getItem(THEME_KEY);
   const fragment = progress || theme ? MARK + encodeURIComponent(JSON.stringify({ progress, theme })) : "";

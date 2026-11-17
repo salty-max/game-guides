@@ -124,8 +124,8 @@ export interface Brand {
   publisher: string;
   /** "narrow": soft square corners. "normal": round buttons, chips and tags. */
   corners: "narrow" | "normal";
-  /** The guide's own address, such as "https://koholint.hundo.quest". */
-  home?: string;
+  /** The guide's own address, such as "https://koholint.hundo.quest": every canonical, the sitemap and the link preview are on it. */
+  home: string;
   /** Hostnames the guide used to live on. They hand readers and their progress over to `home`. */
   movedFrom?: string[];
   fonts: { display: FontFace; sans: FontFace };

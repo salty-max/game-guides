@@ -51,7 +51,8 @@ export function RailContent({ activeChapter, view, heading }: RailProps & { head
               return (
                 <BaseButton key={chapter.id} className={chapterLink({ locked: true })} onClick={() => reveal(chapter.id)}>
                   <span className={number}>{n}</span>
-                  <span>{chapter.teaser ?? `Chapter ${n}`}</span>
+                  {/* A hidden chapter's place name stays out of search snippets (search.ts). */}
+                  <span data-nosnippet="">{chapter.teaser ?? `Chapter ${n}`}</span>
                   <Icon name="lock" />
                   <span className="sr-only"> · hidden by spoiler protection. Reveal chapter {chapter.id}</span>
                 </BaseButton>

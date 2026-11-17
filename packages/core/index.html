@@ -14,8 +14,16 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="%GUIDE_SHORT_NAME%">
   <meta property="og:type" content="website">
+  <meta property="og:site_name" content="%GUIDE_NAME%">
+  <meta property="og:url" content="%GUIDE_HOME%/">
   <meta property="og:title" content="%GUIDE_TITLE%">
   <meta property="og:description" content="%GUIDE_DESCRIPTION%">
+  <meta property="og:image" content="%GUIDE_OG_IMAGE%">
+  <meta property="og:image:width" content="%GUIDE_OG_WIDTH%">
+  <meta property="og:image:height" content="%GUIDE_OG_HEIGHT%">
+  <meta property="og:image:alt" content="%GUIDE_OG_ALT%">
+  <meta name="twitter:card" content="summary_large_image">
+  <script type="application/ld+json">%GUIDE_JSONLD%</script>
   <title>%GUIDE_TITLE%</title>
   %GUIDE_FONT_PRELOADS%
   <style>%GUIDE_FONTS%</style>
@@ -23,7 +31,13 @@
 </head>
 <body>
   <div id="root"></div>
-  <noscript><p class="p-[15px]">Enable JavaScript to open the guide and save checklist progress.</p></noscript>
+  <noscript>
+    <div class="p-[15px]">
+      <h1>%GUIDE_NAME%</h1>
+      <p>%GUIDE_DESCRIPTION%</p>
+      <p>Enable JavaScript to open the guide and save checklist progress.</p>
+    </div>
+  </noscript>
   <script type="module" src="/@core/main.tsx"></script>
 </body>
 </html>

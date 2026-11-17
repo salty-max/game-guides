@@ -136,6 +136,11 @@ describe("deploy settings", () => {
     const scripts = [...page.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/g)];
     expect(scripts.length).toBeGreaterThan(0);
     for (const [tag, attributes, body] of scripts) {
+      // The one exception is the WebSite block (seo.ts): a JSON-LD data block, which a browser never runs and the CSP doesn't cover.
+      if (attributes === ' type="application/ld+json"') {
+        expect(body, tag).toBe("%GUIDE_JSONLD%");
+        continue;
+      }
       expect(attributes, tag).toMatch(/\bsrc="/);
       expect(body.trim(), tag).toBe("");
     }

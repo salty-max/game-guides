@@ -48,7 +48,7 @@ Delete what's Echoes' own:
 - `mark`: the word in the header, above "HUNDO".
 - `game` (the game's full name, which the `title` and `description` must contain: no page shows it on its own, and `data.test.ts` checks it) and `publisher` (named in the rail's small print: "Unofficial fan guide, not affiliated with …").
 - `corners` and `fonts`: [house-style.md](house-style.md#fonts-and-corners).
-- `home`: the guide's address, `https://<sub>.hundo.quest`. The subdomain is chosen per guide, and the folder and package follow it (`apps/rdr`, `hundo-rdr`, `rdr.hundo.quest`). `movedFrom` stays out of a new guide; it's only for a guide that changes address ([deploying.md](deploying.md#pitfalls)).
+- `home` (required): the guide's address, `https://<sub>.hundo.quest`. Every canonical, the sitemap and the link preview are on it ([core.md](core.md#search-engines-and-link-previews)). The subdomain is chosen per guide, and the folder and package follow it (`apps/rdr`, `hundo-rdr`, `rdr.hundo.quest`). `movedFrom` stays out of a new guide; it's only for a guide that changes address ([deploying.md](deploying.md#pitfalls)).
 
 ### `config.ts`
 

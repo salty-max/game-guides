@@ -64,7 +64,7 @@ CI's `lighthouse` job audits each guide's production build with Lighthouse on ev
 | --- | --- | --- | --- |
 | Accessibility | all | 100 | the worst of three |
 | Best practices | all | 100 | the worst |
-| SEO | all | 92, until the guides serve a `robots.txt` | the worst |
+| SEO | all | 100 | the worst |
 | Performance, largest contentful paint, total blocking time, cumulative layout shift | each page | its own floor and limits, set from the guide that does worst on that page on GitHub's runner, with a margin for its noise (the comment at the top of `lighthouserc.mjs` gives each margin) | the median run |
 
 Every accessibility audit counts, axe's `target-size` (WCAG 2.2's 24px targets) included. It once failed on main for two reasons, both fixed in core on 16 Nov 2026: rows passing under the phone's tab bar at the fold, which axe counts as covered by the bar's links while the bar is `sticky` but not once it is `fixed` ([core.md](core.md#the-installed-app)), and What's left's 22px category links on Progress, now 24px.
