@@ -18,7 +18,7 @@ export interface Deps {
 }
 
 /** The brand.id of every guide. A test holds this list to the apps' own brands. */
-export const GUIDES = ["echoes-of-wisdom", "links-awakening", "red-dead-redemption"];
+export const GUIDES = ["dark-souls-remastered", "echoes-of-wisdom", "links-awakening", "red-dead-redemption"];
 
 const PROTOCOL = 1;
 const DAY = 86_400;
