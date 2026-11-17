@@ -1,6 +1,6 @@
 # Changing core
 
-`packages/core` is the app: its pages, components, stores, styles, the page shell and the build config. Every guide ships it, so a core change reaches all three sites. All three Vercel projects rebuild on it, because their ignore commands watch `packages/core`.
+`packages/core` is the app: its pages, components, stores, styles, the page shell and the build config. Every guide ships it, so a core change reaches every guide's site. Every guide's Vercel project rebuilds on it, because their ignore commands watch `packages/core`.
 
 ## How core and a guide meet
 
@@ -113,7 +113,7 @@ A guide added to the home screen (or installed from a browser) is meant to behav
 - A colour that the contrast test checks has to be a hex value or exactly `color-mix(in srgb,var(--a) N%,var(--b))`, with no spaces after the commas. Anything else makes the theme test throw "not a colour this test can resolve". The test reads `tokens.css`, and also fails if any stylesheet in `packages/core/src` uses a `var(--…)` that neither the palette nor core defines.
 - The build now writes an `@supports (color:color-mix(…))` fallback block for each `color-mix()` token, which the build before Tailwind didn't (about 0.7 KB gzipped more CSS per guide). `tailwindcss({ optimize: false })` doesn't change it, and which build pass adds them isn't verified. Every browser the guides support has `color-mix`, so the fallbacks never apply.
 - Tailwind's `@tailwindcss/vite` plugin is left out of the jsdom tests, which never process CSS.
-- After a style change, check all three guides in the browser. They differ in palette, fonts, corners, layout and the length of their text ([testing.md](testing.md#in-a-browser)).
+- After a style change, check every guide in the browser. They differ in palette, fonts, corners, layout and the length of their text ([testing.md](testing.md#in-a-browser)).
 
 ## Loaded on use
 
@@ -150,6 +150,6 @@ Gzipped JS in `dist/assets` after `pnpm build`, with the 2.3 KB `workbox-window`
 
 ## Before you commit
 
-- `pnpm check` at the root runs lint, typecheck, tests and build for every package. Each app's typecheck includes core's source, so core is checked against all three real configs. A change to `GuideConfig` or `Brand` fails until every guide follows it.
+- `pnpm check` at the root runs lint, typecheck, tests and build for every package. Each app's typecheck includes core's source, so core is checked against every real config. A change to `GuideConfig` or `Brand` fails until every guide follows it.
 - Check the change in a browser in at least one article guide (Koholint or Echoes) and Red Dead's checklist layout, on desktop and phone, in light and dark.
-- Remember that all three sites deploy from this one change. Check each preview before production ([deploying.md](deploying.md)).
+- Remember that every guide's site deploys from this one change. Check each preview before production ([deploying.md](deploying.md)).
