@@ -1,4 +1,4 @@
-import { allRows, chapters, rowsByTag, tally } from "@hundo/core/guide";
+import { allRows, chapters, rowsByTag, tally, whatsLeft } from "@hundo/core/guide";
 import { STORAGE_KEY, validateState } from "@hundo/core/progress-state";
 import { targets } from "./config";
 import { missables } from "./data/missables";
@@ -23,6 +23,12 @@ describe("Dark Souls Remastered completion", () => {
 
   it("reaches every target of the guide's completion list", () => {
     for (const { tag, goal } of targets) if (goal !== undefined) expect(tally(tag, {}).total, tag).toBe(goal);
+  });
+
+  // The game gives no total for NPC quests: their arcs end in deaths, hollowing and choices, so a goal would invent one.
+  it("counts the NPC quests with no goal, and keeps them out of What's left", () => {
+    expect(targets.find((target) => target.tag === "quest")).toEqual({ tag: "quest", optional: true });
+    expect(whatsLeft({}).some((item) => item.tag === "quest")).toBe(false);
   });
 
   it("counts the base game's spells apart from the expansion's, as the achievements do", () => {

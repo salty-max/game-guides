@@ -4,7 +4,7 @@ What this guide claims that nobody has confirmed in the game. Nothing here was r
 
 ## Counts
 
-Each game count in `targets` (`src/guide/config.ts`) rests on two independent hosts, except the expansion spells, below. The expansion equipment is the guide's own selection, so it has no goal and the board counts its rows. The tagged rows match these lists name for name.
+Each game count in `targets` (`src/guide/config.ts`) rests on two independent hosts, except the expansion spells, below. The expansion equipment and the NPC quests are the guide's own rows, so they have no goal and the board counts their rows. The tagged rows match these lists name for name.
 
 | List | Count | Source 1 | Source 2 | Notes |
 | --- | ---: | --- | --- | --- |
@@ -21,6 +21,7 @@ Each game count in `targets` (`src/guide/config.ts`) rests on two independent ho
 | Endings | 2 | Steam | wikidot achievements | |
 | Expansion spells | 5 | wikidot spell lists | fextralife spell lists | The four expansion sorceries and Black Flame |
 | Expansion equipment | 10 rows, no goal | | | The guide’s own selection, not a game count: eight weapons and catalysts, the Silver Pendant and the Cleansing Greatshield |
+| NPC quests | 61 rows, no goal | | | The guide’s own steps, not a game count: the game gives no total, and a quest can end in a death, a hollowing or a choice. They show on the board but are `optional`, so What’s left leaves them out. The seven NPC invasion rows (`invasion`) are fights and have no line |
 
 ## Route decisions
 
