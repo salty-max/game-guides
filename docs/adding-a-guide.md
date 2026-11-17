@@ -120,4 +120,4 @@ What finds the guides in `apps/` by itself and needs nothing: `pnpm lighthouse`,
 
 ## 6. Deploy it
 
-Creating the Vercel project and every deploy need the user's go. The steps are in [deploying.md](deploying.md#a-new-project): the API knowing the guide first, root directory `apps/<name>`, a preview first, then production.
+Creating the Vercel project and every deploy need the user's go. The steps are in [deploying.md](deploying.md#a-new-project): the API knowing the guide first, root directory `apps/<name>`, no `hundo.quest` domain until launch, the first deployment checked on its Vercel addresses, then the launch: the merge, then the domain.
