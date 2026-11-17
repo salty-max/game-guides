@@ -1,0 +1,60 @@
+import type { RawChapter } from "@hundo/core/types";
+
+export default {
+  id: 7,
+  title: "The Duke’s Archives and Crystal Cave",
+  region: "The Duke’s Archives · Crystal Cave",
+  teaser: "The Duke’s Archives",
+  intro: "Open the prison and rotate the library staircases. Collect the Archives spells and get the tail from the final encounter before finishing the fight.",
+  sources: [["Archives keys, mimics and staircases", "https://darksouls.wikidot.com/the-duke-s-archives"], ["Crystal Cave invisible paths", "https://darksouls.wikidot.com/crystal-cave"], ["Logan’s dialogue and final encounter", "https://darksouls.wikidot.com/big-hat-logan"]],
+  groups: [
+    {
+      title: "The prison and the library",
+      location: "The Duke’s Archives",
+      sources: [
+        ["Broken Pendant from the foyer golem", "https://darksouls.wikidot.com/broken-pendant"],
+        ["Seath’s first encounter and the Purging Stone", "https://darksouls.wikidot.com/seath-the-scaleless"],
+        ["Crystal sorceries sold only by Logan", "https://darksouls.wikidot.com/sorceries"],
+        ["Fire Keeper Soul in the giant cell", "https://darksouls.wikidot.com/fire-keeper-soul"],
+        ["Crystal Ember goes to the Giant Blacksmith", "https://darksouls.wikidot.com/embers"],
+        ["Channeler’s Trident drop rate and farm", "https://darksouls.wikidot.com/channeler-s-trident"],
+        ["Item discovery from humanity and rings", "https://darksouls.wikidot.com/item-discovery"],
+        ["Sieglinde’s golem and Firelink visits", "https://darksouls.wikidot.com/sieglinde-of-catarina"],
+      ],
+      rows: [
+        ["pickup-broken-pendant", ["pickup"], "Collect the Broken Pendant at the Archives entrance", "Once Dusk is free, ride the first lift up into the Archives and kill the Crystal Golem in the foyer before the library. It drops the pendant. Killed it before freeing her? It comes back, and drops the pendant once she’s rescued. Save the pendant for chapter 10.", {"reference": "https://darksouls.wikidot.com/broken-pendant"}],
+        ["route-seath-intro", ["route"], "Survive the transition into the Archives prison", "Climb the library and take the lifts to the fog gate at the top. Seath heals every wound here, and only dying moves you on. He waits if you stand still by the fog, so you can step back out and spend your souls, or wear a Rare Ring of Sacrifice to keep souls and humanity. Carry a Purging Stone in case he curses you.", {"reference": "https://darksouls.wikidot.com/seath-the-scaleless"}],
+        ["route-archive-jail", ["route"], "Escape the prison tower and pick up its rewards", "Kill the guard through the bars and take the cell key. Descend the spiral stair to its foot and climb the ladder in view for the Archive Tower Giant Door Key, beside the siren lever. On the way back, kill the crying Pisaca for Bountiful Sunlight and Soothing Sunlight. Then climb back up and open the big door.", {"reference": "https://darksouls.wikidot.com/the-duke-s-archives"}],
+        ["miracle-bountiful-sunlight", ["miracle"], "Collect Bountiful Sunlight", "Kill the crying Pisaca at the bottom of the prison tower. It drops this miracle together with Soothing Sunlight.", {"reference": "https://darksouls.wikidot.com/the-duke-s-archives"}],
+        ["miracle-soothing-sunlight", ["miracle"], "Collect Soothing Sunlight", "Comes from the same crying Pisaca as Bountiful Sunlight, at the bottom of the prison tower.", {"reference": "https://darksouls.wikidot.com/the-duke-s-archives"}],
+        ["quest-logans-cell", ["quest"], "Free Logan from the Archives prison", "The Archive Tower Giant Cell Key is in the library’s hidden chest room, in the chest closest to the lever that lowers the stairs. Take it back down to the giant cell behind the Pisacas at the foot of the prison tower, open it and speak to Logan. He moves to the small library room with the Blue Titanite Chunk chest, near the tall ladder and its shortcut lever.", {"reference": "https://darksouls.wikidot.com/big-hat-logan"}],
+        ["sorcery-crystal-soul-spear", ["sorcery", "base-sorcery"], "Learn Crystal Soul Spear", "Only Logan sells it, in the Archives book room once you’ve freed him. Buy it before his story moves on after Seath.", {"reference": "https://darksouls.wikidot.com/big-hat-logan"}],
+        ["sorcery-crystal-magic-weapon", ["sorcery", "base-sorcery"], "Learn Crystal Magic Weapon", "Only Logan sells it, in the Archives book room. No Intelligence requirement there.", {"reference": "https://darksouls.wikidot.com/big-hat-logan"}],
+        ["sorcery-homing-crystal-soulmass", ["sorcery", "base-sorcery"], "Learn Homing Crystal Soulmass", "Only Logan sells it, in the Archives book room.", {"reference": "https://darksouls.wikidot.com/big-hat-logan"}],
+        ["estus-archives-soul", ["estus"], "Collect the Archives Fire Keeper Soul", "Open the giant cell at the foot of the prison tower with the Archive Tower Giant Cell Key from the library’s hidden chest room. The body at the far end of the cell holds a Fire Keeper Soul, one of the four that lie on corpses.", {"reference": "https://darksouls.wikidot.com/fire-keeper-soul"}],
+        ["route-archive-stairs", ["route"], "Turn the staircases and open the garden route", "Back in the library, turn the wheel halfway up a staircase to swing it to new balconies. Take the stairs down to the bonfire on a balcony at the bottom and light it. Later, drop through a gap in the railing onto the stairs to the upper channeler, turn them to face the bright doorway, and slide down the ladder. The lever at its foot opens a secret door. In the room beyond, the lever in its far left corner lowers a stair to a white-light door. Past it, climb down the ladder on your left into the garden of Crystal Golems.", {"reference": "https://darksouls.wikidot.com/the-duke-s-archives"}],
+        ["ember-archives-crystal", ["ember"], "Take the Crystal Ember", "In the hidden room past the ladder’s lever, four chests sit together. The one behind a bookshelf holds the Crystal Ember, and one of the others is a mimic holding an Enchanted Falchion. Take the ember to the Giant Blacksmith.", {"reference": "https://darksouls.wikidot.com/the-duke-s-archives"}],
+        ["rare-weapon-channeler", ["rare-weapon"], "Farm the Channeler’s Trident in the Archives", "Two Channelers stand by the rotating stairs up the ladder from the balcony bonfire. Each kill has a 1% chance of the trident. Hold 10 humanity (more adds nothing) and wear the Covetous Gold Serpent Ring or the Symbol of Avarice (they don’t stack), then run short loops from that bonfire.", {"reference": "https://darksouls.wikidot.com/channeler-s-trident"}],
+        ["quest-sieg-linda", ["quest"], "Free Sieglinde in the Archives garden", "Once Siegmeyer has left Firelink for Blighttown, his daughter is the golden Crystal Golem in the garden before the Crystal Cave. Kill it and talk to her: either answer sends her to Firelink. Find her by the bonfire there and say Yes when she asks again. She comes back to Firelink once more after you’ve helped her father in chapter 9.", {"reference": "https://darksouls.wikidot.com/sieglinde-of-catarina"}],
+      ],
+    },
+    {
+      title: "Crystal Cave and Logan’s final stock",
+      sources: [
+        ["Seath’s tail, crystal and curse", "https://darksouls.wikidot.com/seath-the-scaleless"],
+        ["Bequeathed Lord Soul Shard into the Lordvessel", "https://darksouls.wikidot.com/bequeathed-lord-soul-shard"],
+        ["Logan’s Catalyst chest, every spell bought", "https://darksouls.wiki.fextralife.com/Logan%27s+Catalyst"],
+        ["Large Magic Ember goes to Rickert", "https://darksouls.wikidot.com/embers"],
+      ],
+      rows: [
+        ["forge-blue-slab-cave", ["forge"], "Collect the Crystal Cave Blue Titanite Slab", "Past the second invisible path, walk the long horizontal crystal pylon to its end, where a butterfly perches. Drop through the small gap in the jagged crystals onto the third invisible path. Turn round into the cavern with three Crystal Lizards and keep going: the slab sits at the end of a twisting invisible path, so mark it with Prism Stones or arrows.", {"reference": "https://darksouls.wikidot.com/crystal-cave"}],
+        ["rare-weapon-seath-tail", ["rare-weapon"], "Cut Seath’s middle tail for the Moonlight Greatsword", "Wait by the Primordial Crystal for his breath: it shatters the crystal and stuns him. Run behind him on his left and slash the tip of the middle tail at his back. Only the tip comes off, never the base or middle. The Moonlight Greatsword lands in your inventory.", {"reference": "https://darksouls.wikidot.com/seath-the-scaleless"}],
+        ["boss-seath", ["boss", "achievement"], "Defeat Seath the Scaleless", "Break the Primordial Crystal on the far side of the arena, or he keeps healing. His breath and his crystal wave curse, so step off the crystals his breath leaves before they shatter. Once you have the tail, finish him for the Bequeathed Lord Soul Shard, which goes into the Lordvessel.", {"reference": "https://darksouls.wikidot.com/seath-the-scaleless"}],
+        ["quest-logan-finish", ["quest"], "Buy Logan’s whole stock, then collect White Dragon Breath", "After Seath, buy every spell Logan sells in the Archives, even ones you know, then talk to him until he raves and reload. He moves to Seath’s first room. Don’t kill him until he’s there and attacks you: an earlier kill means the chest with Logan’s Catalyst never appears. Defeat him for White Dragon Breath, the Big Hat and the Tin Crystallization Catalyst.", {"reference": "https://darksouls.wikidot.com/big-hat-logan"}],
+        ["sorcery-white-dragon-breath", ["sorcery", "base-sorcery"], "Collect White Dragon Breath", "Once Seath is dead and you’ve bought Logan’s whole stock, talk to him until he’s clearly gone mad, then go through a loading screen. Defeat him in the room where you first met Seath for this spell.", {"reference": "https://darksouls.wikidot.com/big-hat-logan"}],
+        ["quest-logan-study", ["quest"], "Return to Logan’s Archives study for his final chest", "After meeting Logan in Seath’s first room, reload and revisit his library study to loot the chest with Logan’s Catalyst and his remaining armor. He drops White Dragon Breath, the Big Hat and Tin Crystallization Catalyst in the first room.", {"reference": "https://darksouls.wikidot.com/big-hat-logan"}],
+        ["ember-large-magic", ["ember"], "Collect the Large Magic Ember after Seath", "Back in the Archives after Seath, the room where you first met him holds a chest with the Large Magic Ember. Give it to Rickert of Vinheim for Magic +6 through +10.", {"reference": "https://darksouls.wikidot.com/the-duke-s-archives"}],
+      ],
+    },
+  ],
+} satisfies RawChapter;

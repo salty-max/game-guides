@@ -1,0 +1,9 @@
+/* Lordran's palette. Everything else, from borders to the banner tint, derives from it in packages/core/src/tokens.css. */
+:root{
+  --paper:#f1efeb;--surface:#fcfbf8;--raised:#ebe7e1;--ink:#221e1b;--muted:#5d5650;--line:#ddd7cf;
+  --primary:#a2410f;--on-primary:#fff;--accent:#f2b544;--on-accent:#3a2208;--focus:#c0561a;
+}
+:root[data-theme="dark"]{
+  --paper:#121110;--surface:#1b1917;--raised:#252220;--ink:#f1ebe3;--muted:#c4bab0;--line:#3a3430;
+  --primary:#ffa463;--on-primary:#2a1405;--accent:#f2b544;--on-accent:#3a2208;--focus:#f2b544;
+}
