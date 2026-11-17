@@ -36,4 +36,4 @@ The chapter text was drafted from community guides (wikidot, fextralife, Gold Ph
 
 ## Credits
 
-Cinzel and Source Sans 3 are bundled with their SIL OFL licenses in `public/fonts`. The bonfire app icon is an original generated illustration, with its master in [scripts/icon-master.webp](scripts/icon-master.webp). The chapter banners in `src/guide/banners` are original AI-generated illustrations of the game's places: ten were composed with gameplay screenshots as references, and three (chapters 2, 4 and 8) from text prompts alone. *Dark Souls* belongs to Bandai Namco and FromSoftware; this is an unofficial fan guide.
+Cinzel and Source Sans 3 are bundled with their SIL OFL licenses in `public/fonts`. The bonfire app icon is an original generated illustration, with its master in [scripts/icon-master.webp](scripts/icon-master.webp). The chapter banners in `src/guide/banners` are original AI-generated illustrations of the game's places, made from text prompts alone. *Dark Souls* belongs to Bandai Namco and FromSoftware; this is an unofficial fan guide.

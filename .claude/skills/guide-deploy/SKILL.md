@@ -14,7 +14,7 @@ Work out which projects will build before asking for the push. The ignore step, 
 ## 2. Previews
 
 - **Push the branch**, with the user's go. A new branch with real commits builds a preview on every project whose ignore command sees a change. PR [salty-max/hundo#1](https://github.com/salty-max/hundo/pull/1) built all three this way on 2026-11-14. The pull request's checks link to each deployment.
-- **No preview built?** That happens when the branch's last commit touches none of the watched paths. The monorepo session also saw no build for a branch pushed at a commit that already existed (2026-11-14). Create the deployment through the API instead, unless the ignore step is what skipped it: an API deployment runs the same script, so with an empty watched diff it is canceled too. In that case use `vercel deploy` from a linked repository root. The body goes in a file:
+- **No preview built?** That happens when the branch's last commit touches none of the watched paths. The monorepo session also saw no build for a branch pushed at a commit that already existed (2026-11-14). Create the deployment through the API instead, unless the ignore step is what skipped it: an API deployment runs the same script, so with an empty watched diff it is canceled too. In that case use `vercel deploy` from a linked repository root, on a project that already has a production deployment, and read its `target` back before checking it (section 5 says why). The body goes in a file:
 
   ```json
   { "name": "<project>", "project": "<project>", "gitSource": { "type": "github", "repoId": 1458075216, "ref": "<branch>", "sha": "<full sha>" } }
@@ -77,6 +77,10 @@ Only on the user's go, with exactly what will deploy.
 ## 5. A new project
 
 Follow [docs/deploying.md](../../../docs/deploying.md#a-new-project), with the user's go for creating it, then do steps 2 and 3 for its first preview. Its first production deploy is a separate go.
+
+- **Its first preview comes from Git:** connect the project (`vercel git connect`) once the guide's pull request is open, and its next push builds the preview if that push's last commit touches the app, core, `scripts` or the root workspace files (section 1). Until the merge, other branches show a failed deployment on that project.
+- **No CLI deploy to it before its first production.** On `hundo-lordran`, a new project with no Git link and no deployment, CLI 62.2 made production deployments twice on 17 Nov 2026, from a plain `vercel deploy` and from `vercel deploy --target preview`, each aliasing the guide's domain.
+- After any deploy, read the target back before anything else: `vercel api /v13/deployments/<id> --scope jellycat --raw | jq .target` must not say `production`. If it does, stop and tell the user.
 
 ## Gotchas
 
