@@ -6,12 +6,19 @@ import type { IconName } from "./components/Icon";
  * `sources` and `reference` below is kept for that alone.
  */
 export type SourceLink = [label: string, url: string];
+/**
+ * A page that shows readers where something is, named by its site ("Map on iRedDead"): a map image or an interactive map, opened in a
+ * new tab. Kept apart from `sources` and `reference`, which are never shown, so a citation can't come back into view as a map.
+ */
+export type MapLink = [site: string, url: string];
 export type Checks = Record<string, true>;
 
-/** Optional per-row details: an amount that counts toward a category, or the page this one row was written from. */
+/** Optional per-row details: an amount that counts toward a category, the page this one row was written from, or its own map. */
 export interface RowExtra {
   quantity?: number;
   reference?: string;
+  /** Only when it differs from the group's map (data.test.ts refuses a repeat). */
+  map?: MapLink;
 }
 
 /** [id, tags (the first one is the primary label), title, text, extra] */
@@ -23,6 +30,8 @@ export interface RawGroup {
   icon?: IconName;
   note?: string;
   sources?: SourceLink[];
+  /** One map for every row in the group. */
+  map?: MapLink;
   /** A catalogue list: the article layout renders its rows as a compact checklist instead of prose. */
   compact?: boolean;
   rows: RawRow[];
@@ -50,6 +59,7 @@ export interface Row {
   tags: string[];
   quantity: number;
   reference?: string;
+  map?: MapLink;
 }
 
 export interface Group {
@@ -59,6 +69,7 @@ export interface Group {
   icon?: IconName;
   note?: string;
   sources: SourceLink[];
+  map?: MapLink;
   compact: boolean;
   rows: Row[];
 }

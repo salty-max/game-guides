@@ -35,6 +35,7 @@ export const paths = {
   right: '<path d="m9 6 6 6-6 6"/>',
   left: '<path d="m15 6-6 6 6 6"/>',
   arrow: '<path d="M3 12h17m-6-6 6 6-6 6"/>',
+  out: '<path d="M7 17 17 7M9 7h8v8"/>',
   play: '<path d="m8 5 11 7-11 7V5Z"/>',
   menu: '<path d="M4 6h16M4 12h16M4 18h16"/>',
   x: '<path d="m6 6 12 12M18 6 6 18"/>',

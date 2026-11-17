@@ -82,6 +82,7 @@ export function ChecklistRoute({ chapter, target, footer }: { chapter: Chapter; 
             location={group.location}
             icon={group.icon}
             note={group.note}
+            map={group.map}
             rows={group.shown}
             open={groupOpen(group.key, index, group.shown.map((row) => row.id))}
             highlightedId={highlighted}

@@ -88,3 +88,18 @@ export const OnTheChecklist: Story = {
     await expect(within(canvasElement).getAllByRole("link", { name: new RegExp(`in chapter ${row.chapter}`) })[0]).toHaveAttribute("href", `/guide/${row.chapter}/${row.id}`);
   },
 };
+
+const groupMap: [string, string] = ["iRedDead", "https://www.ireddead.com/rdr/maps/us-army-uniform"];
+const rowMap: [string, string] = ["iRedDead", "https://www.ireddead.com/rdr/maps/us-marshal-uniform"];
+
+/** Maps: the group's, named by its site, above the steps; a step's own, where it differs, in the step's column. Both open in a new tab. */
+export const WithMaps: Story = {
+  args: { map: groupMap, rows: [group.rows[0], { ...group.rows[1], map: rowMap }] },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const ofGroup = canvas.getByRole("link", { name: `Map on iRedDead for ${group.title} (opens in a new tab)` });
+    await expect(ofGroup).toHaveTextContent("Map on iRedDead");
+    await expect(ofGroup).toHaveAttribute("target", "_blank");
+    await expect(canvas.getByRole("link", { name: `Map for ${group.rows[1].title} on iRedDead (opens in a new tab)` })).toHaveAttribute("href", rowMap[1]);
+  },
+};
