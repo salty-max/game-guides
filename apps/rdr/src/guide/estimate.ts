@@ -28,8 +28,8 @@ export const weights: Record<string, number> = {
 // Ambient challenge ranks 5 and 10 are the only ones that add credit.
 export const weightOf = (row: Row) => (row.tags[0] === "challenge" && /-(5|10)$/.test(row.id) ? 1 : (weights[row.tags[0]] ?? 0));
 
-/** Scraps feed the outfits and optional tasks sit outside the stat, so neither counts. */
-export const countsTowardStat = (row: Row) => !["optional", "scrap"].includes(row.tags[0]);
+/** Scraps feed the outfits, optional tasks sit outside the stat, and a Stranger task counts by its last step alone, so none of those counts. */
+export const countsTowardStat = (row: Row) => !["optional", "scrap", "stranger-step"].includes(row.tags[0]);
 
 /** The in-game completion estimate, rounded down to a tenth like the game's stat. */
 export const estimate = (checks: Checks, rows: Row[]) =>

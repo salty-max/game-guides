@@ -16,6 +16,8 @@ const banners = byChapter(import.meta.glob<Banner>("./banners/chapter-*.webp", {
 const categories: GuideConfig["categories"] = {
   mission: ["Story Missions", "Mission", "book", "rose"],
   stranger: ["Stranger Tasks", "Stranger", "compass"],
+  // Every step of a Stranger task: the earlier ones as their first tag, the last one (tagged `stranger`, which the board counts) as its second.
+  "stranger-step": ["Stranger Steps", "Stranger step", "compass"],
   location: ["Map Locations", "Location", "pin", "violet"],
   bounty: ["Bounty Locations", "Bounty", "star", "amber"],
   challenge: ["Ambient Challenges", "Challenge", "grid", "sky"],
@@ -41,7 +43,7 @@ const config: GuideConfig = {
   chips: {
     checklist: [
       ["mission", "Story"],
-      ["stranger", "Strangers"],
+      ["stranger-step", "Strangers"],
       ["location", "Map locations"],
       ["bounty", "Bounties"],
       ["challenge", "Challenges"],
@@ -49,7 +51,7 @@ const config: GuideConfig = {
     ],
     route: [
       ["mission", "Story"],
-      ["stranger", "Strangers"],
+      ["stranger-step", "Strangers"],
       ["location", "Map"],
       ["challenge", "Challenges"],
       ["bounty", "Bounties"],
@@ -63,7 +65,10 @@ const config: GuideConfig = {
   completion: {
     isCore: countsTowardStat,
     overall: { label: "estimated in-game completion", percent: estimate },
-    board: Object.keys(categories).map((tag) => ({ tag })),
+    // Stranger Tasks counts each task once, by its last step: the steps before it get no tile of their own.
+    board: Object.keys(categories)
+      .filter((tag) => tag !== "stranger-step")
+      .map((tag) => ({ tag })),
     left: pointsLeft,
     unit: "points",
   },
@@ -79,7 +84,7 @@ const config: GuideConfig = {
     dashboardIntro: "Compare the estimate with Stats → General in your game.",
     boardTitle: "By category",
     boardNote:
-      "The estimate uses the game’s category weights. Ambient Challenges add credit at ranks 5 and 10. Outfit scraps and optional tasks are tracked separately.",
+      "The estimate uses the game’s category weights. Ambient Challenges add credit at ranks 5 and 10. A Stranger task counts once its last step is checked. Outfit scraps and optional tasks are tracked separately.",
     nextUpDone: "Everything revealed is checked. Reveal the next chapter or compare with Stats → General.",
     backupBlurb: "Export a copy of your checks, spoiler settings and in-game percentage.",
   },
