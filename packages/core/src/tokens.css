@@ -11,6 +11,11 @@
      screen (the media queries below). */
   --safe-top:env(safe-area-inset-top,0px);--safe-right:env(safe-area-inset-right,0px);--safe-bottom:env(safe-area-inset-bottom,0px);--safe-left:env(safe-area-inset-left,0px);
   --bar:calc(var(--bar-h) + var(--safe-top));--rail-col:calc(var(--rail-w) + var(--safe-left));
+  /* The frame: the rail and the page side by side, at most --frame-max wide and centred as one block on a wider screen (Layout), with
+     the top bar's columns on the same frame (TopBar). The page's column is what's left of it beside the rail. This width is what bounds
+     a line of the article's prose on a wide screen, since the card and its text fill their column: at 1280px a line runs 79, 83 and 89
+     characters at the median in Koholint, Echoes and Lordran (docs/core.md, One frame on a wide screen). */
+  --frame-max:1280px;--page-max:calc(var(--frame-max) - var(--rail-col));
   /* The tab bar's height, the home indicator included: 0 where there is no tab bar (over 550px), so the page and the toasts keep clear
      of the bar only where it is (MainNav.tsx, Layout). */
   --tabs:0px;

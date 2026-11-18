@@ -234,10 +234,34 @@ export const BesideTheRail: Story = {
     bar.getBoundingClientRect();
     await document.fonts.ready;
     const brandCell = canvas.getByRole("link", { name: /home$/ }).parentElement!.getBoundingClientRect();
-    const buttons = bar.lastElementChild!.getBoundingClientRect();
+    const buttons = canvas.getByRole("button", { name: /Open sync devices$/ }).parentElement!.getBoundingClientRect();
     const pages = canvas.getByRole("navigation", { name: "Main navigation" }).getBoundingClientRect();
     await expect(brandCell.width).toBeCloseTo(parseFloat(getComputedStyle(bar).getPropertyValue("--rail-w")), 0);
     await expect(pages.left + pages.width / 2).toBeCloseTo((brandCell.right + buttons.left) / 2, 0);
+    await nothingOverlaps(bar);
+  },
+};
+
+/**
+ * A screen wider than the frame (--frame-max): the bar's contents sit on the frame the rail and the page share (Layout), centred, so the
+ * brand's column starts where the rail does and is as wide, and the buttons end the frame's width further on, less their margin.
+ */
+export const OnTheFrame: Story = {
+  globals: { viewport: { value: "wide", isRotated: false } },
+  play: async ({ canvas }) => {
+    const bar = canvas.getByRole("banner");
+    bar.getBoundingClientRect();
+    await document.fonts.ready;
+    const style = getComputedStyle(bar);
+    const frame = parseFloat(style.getPropertyValue("--frame-max"));
+    const railWidth = parseFloat(style.getPropertyValue("--rail-w"));
+    const start = (bar.clientWidth - frame) / 2;
+    await expect(start).toBeGreaterThan(0);
+    const brandCell = canvas.getByRole("link", { name: /home$/ }).parentElement!.getBoundingClientRect();
+    const buttons = canvas.getByRole("button", { name: /Open sync devices$/ }).parentElement!;
+    await expect(brandCell.left).toBeCloseTo(start, 0);
+    await expect(brandCell.width).toBeCloseTo(railWidth, 0);
+    await expect(buttons.getBoundingClientRect().right + parseFloat(getComputedStyle(buttons).marginRight)).toBeCloseTo(start + frame, 0);
     await nothingOverlaps(bar);
   },
 };

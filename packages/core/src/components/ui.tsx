@@ -215,7 +215,7 @@ export function Callout({ icon, children }: { icon: IconName; children: ReactNod
 
 /**
  * A page's title, the line under it, and a figure in a pill under that (the dashboard's overall count). The title scales with the page
- * column (`cqi` of `<main>`, the screen's width where there is no container), down to 30px on a phone; its spacing is compact there.
+ * column (`cqi` of the page's container in `<main>`, Layout; the screen's width where there is no container), down to 30px on a phone; its spacing is compact there.
  */
 export function PageHeading({ title, intro, stat }: { title: string; intro?: ReactNode; stat?: ReactNode }) {
   return (

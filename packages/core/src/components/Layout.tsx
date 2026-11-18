@@ -137,8 +137,12 @@ export function Layout({ children }: { children: ReactNode }) {
         Skip to content
       </a>
       <TopBar chapter={chapter} view={view} menuOpen={menuOpen} onToggleMenu={() => setMenuOpen(!menuOpen)} menuToggle={menuToggle} />
-      {/* The bottom margin is the room the phone's fixed tab bar covers in a browser tab (MainNav); --tabs is 0 from 551px up. */}
-      <div className="mb-(--tabs) grid min-h-[calc(100dvh-var(--bar)-var(--tabs))] grid-cols-[var(--rail-col)_minmax(0,1fr)] standalone:mb-0 standalone:min-h-0 standalone:flex-1 standalone:grid-rows-[minmax(0,1fr)] drawer:block standalone:drawer:grid standalone:drawer:grid-cols-[minmax(0,1fr)]">
+      {/* The bottom margin is the room the phone's fixed tab bar covers in a browser tab (MainNav); --tabs is 0 from 551px up.
+          The frame (tokens.css): the rail's column and the page's, centred together between two bands that share whatever the screen has
+          past --frame-max, so on a wide screen the rail and the page stay side by side and the spare width is split on either side of
+          them. The left band is drawn in the rail's tint (the `before:`), so the rail runs to the screen's edge; the right one is <main>'s,
+          which runs to the edge too: in the installed app it is what scrolls, so the scrollbar and the wheel belong to the window's edge. */}
+      <div className="mb-(--tabs) grid min-h-[calc(100dvh-var(--bar)-var(--tabs))] grid-cols-[minmax(0,1fr)_var(--rail-col)_minmax(0,var(--page-max))_minmax(0,1fr)] before:col-start-1 before:row-start-1 before:bg-rail before:content-[''] standalone:mb-0 standalone:min-h-0 standalone:flex-1 standalone:grid-rows-[minmax(0,1fr)] drawer:block drawer:before:hidden standalone:drawer:grid standalone:drawer:grid-cols-[minmax(0,1fr)]">
         {/* The drawer stays mounted (closed, it renders nothing) so that widening past 800px closes it the ordinary way, focus and all. */}
         {drawer && (
           <drawer.RailDrawer
@@ -165,15 +169,16 @@ export function Layout({ children }: { children: ReactNode }) {
           id="main"
           tabIndex={-1}
           ref={mainRef}
-          // --gutter is the page's side padding, --pad-end the room under it (and both get the notch and the home indicator on top, but on a
-          // phone the tab bar covers the home indicator, so the room under the page is --pad-end alone).
-          // The gutter is one clamp from a phone's 12px up, in vw: it is the frame's own padding, not a part's. <main> is also the page's
-          // container (`/page`), so what lives in the page column (a page's title) can size itself by the column, in `cqi`.
-          // The page is at most 1460px wide, centred. In the installed app <main> is what scrolls, so it takes the whole width (the
-          // scrollbar and the wheel then belong to the window's edges) and --center is the margin that centring would have made.
-          className="@container/page mx-auto w-full max-w-[1460px] min-w-0 pt-6 pr-[calc(var(--gutter)+var(--center,0px)+var(--safe-right))] pb-[calc(var(--pad-end)+var(--safe-bottom))] pl-[calc(var(--gutter)+var(--center,0px))] outline-none [--gutter:clamp(0.75rem,3.25vw,3.3125rem)] [--pad-end:50px] standalone:max-w-none standalone:scroll-pt-6 standalone:overflow-y-auto standalone:overscroll-contain standalone:[--center:max(0px,calc((100%-1460px)/2))] drawer:pt-[18px] drawer:pl-[calc(var(--gutter)+var(--safe-left))] drawer:[--pad-end:30px] phone:pt-[13px] phone:pb-(--pad-end) phone:[--pad-end:25px]"
+          // From the page's column to the screen's edge (the frame above), in the grid's one row: placed there, not left to auto-placement,
+          // so in the installed app it is always the row the frame bounds, and so a scroller. Its padding is the room above and under the
+          // page (--pad-end, and the home indicator under that, but on a phone the tab bar covers the home indicator, so the room under the
+          // page is --pad-end alone) and the notch's insets.
+          className="col-[3/-1] row-start-1 min-w-0 pt-6 pr-(--safe-right) pb-[calc(var(--pad-end)+var(--safe-bottom))] outline-none [--pad-end:50px] standalone:scroll-pt-6 standalone:overflow-y-auto standalone:overscroll-contain drawer:col-auto drawer:pt-[18px] drawer:pl-(--safe-left) drawer:[--pad-end:30px] phone:pt-[13px] phone:pb-(--pad-end) phone:[--pad-end:25px]"
         >
-          {children}
+          {/* The page itself: the page's column of the frame, at most --page-max, its side padding --gutter. The gutter is one clamp from a
+              phone's 12px up, in vw: it is the frame's own padding, not a part's. This is also the page's container (`/page`), so what
+              lives in the page column (a page's title) can size itself by the column, in `cqi`. */}
+          <div className="@container/page max-w-(--page-max) px-(--gutter) [--gutter:clamp(0.75rem,3.25vw,3.3125rem)]">{children}</div>
         </main>
       </div>
       {phone && <MainNav chapter={chapter} view={view} place="bottom" />}

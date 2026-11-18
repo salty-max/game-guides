@@ -40,8 +40,14 @@ const config: StorybookConfig = {
     mergeConfig(base, {
       // The tile's versioned URLs (virtual:icon-urls), for the same guide's icons staticDirs serves, and the banners as the guides import them.
       plugins: [tailwindcss(), iconUrls(app("koholint/public")), bannerSizes()],
-      // Core reads a guide's config through virtual:guide/…. Stories use one fixed guide's data; only the look switches.
-      resolve: { alias: [{ find: /^virtual:guide\//, replacement: app("koholint/src/guide/") }] },
+      // Core reads a guide's config through virtual:guide/…. Stories use one fixed guide's data; only the look switches. The service
+      // worker's hook is a stand-in (pwa-register.ts), for the stories that draw the whole frame.
+      resolve: {
+        alias: [
+          { find: /^virtual:guide\//, replacement: app("koholint/src/guide/") },
+          { find: "virtual:pwa-register/react", replacement: fromHere("./pwa-register.ts") },
+        ],
+      },
       optimizeDeps: { include: baseUiParts() },
     }),
 };
