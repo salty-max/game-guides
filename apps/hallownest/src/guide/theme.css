@@ -4,6 +4,6 @@
   --primary:#2b4d7e;--on-primary:#fff;--accent:#f0c35a;--on-accent:#33240a;--focus:#9a6c12;
 }
 :root[data-theme="dark"]{
-  --paper:#0d121c;--surface:#141b28;--raised:#1c2535;--ink:#eeeadf;--muted:#b6b8bd;--line:#2b3548;
+  --paper:#0d121c;--surface:#141d2c;--raised:#1c2535;--ink:#eeeadf;--muted:#b6b8bd;--line:#2b3548;
   --primary:#a8c3ee;--on-primary:#0f1a2e;--accent:#f0c35a;--on-accent:#33240a;--focus:#f0c35a;
 }
