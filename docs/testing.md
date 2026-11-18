@@ -171,6 +171,10 @@ Do each of these on desktop, on a tablet width (768) and on a phone-sized viewpo
 
 For a core change, do this in an article guide (Koholint or Echoes) and in Red Dead, the checklist layout. For a visual change, take before and after screenshots of the same pages and compare them side by side.
 
+**A larger default text size.** A change to sizes, the type scale or the frame's widths gets a look at a 20px default too (Chrome's and Brave's "Large"). Emulate it with CDP, `Page.setFontSizes({ fontSizes: { standard: 20 } })` (Playwright: `context.newCDPSession(page)`), which moves rem sizes and em media queries both, as the setting does. `html { font-size: 20px }` moves only the rem sizes, not the widths ([core.md](core.md#styles), sizes in rem).
+
+**A change meant to look the same** (a refactor of sizes or class names) is checked pixel for pixel: production builds before and after, full-page shots compared exactly, and a dump of every element's computed size, position and spacing compared line for line, with a dialog, the drawer, the sheet, a select and a tooltip opened as well as the pages. Chrome's raster isn't the same twice by default: gradients over the banner and rounded corners came out differently between two runs of the same build. These launch flags made 36 shots identical across runs: `--disable-gpu --disable-gpu-rasterization --disable-partial-raster --disable-skia-runtime-opts --force-color-profile=srgb --disable-lcd-text --num-raster-threads=1`. Shoot the same build twice first, to be sure any difference is the change's.
+
 ### Clean up
 
 Testing writes to the guide's localStorage on `localhost`. When you're done, remove what you added (`localStorage.removeItem("<storagePrefix>.v1")`, and `.theme` and `.persist`), so the next check starts blank.

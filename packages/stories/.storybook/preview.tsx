@@ -52,12 +52,16 @@ const preview: Preview = {
     // A phone's screen, for the stories of what changes at 550px and under (a story asks for it with its viewport global). The test
     // runner sizes its page to it too (addon-vitest), so the media queries and usePhone see a phone.
     // The two in between are where the top bar is tightest: a small tablet's (the menu button and the pages, no rail), and just past
-    // 800px (the rail beside the page). The wide one is past the frame's width (--frame-max), where the bar's contents sit on the frame.
+    // 800px (the rail beside the page). Their "large" twins are the same places for a reader whose default text is 20px: the widths are
+    // em, so that reader reaches them at 1.25 times the width (700 and 1025px), and a story that sets a 20px root there sees what they
+    // see. The wide one is past the frame's width (--frame-max), where the bar's contents sit on the frame.
     viewport: {
       options: {
         phone: { name: "Phone", styles: { width: "375px", height: "812px" }, type: "mobile" },
         smallTablet: { name: "Small tablet", styles: { width: "560px", height: "800px" }, type: "tablet" },
         narrowLaptop: { name: "Narrow laptop", styles: { width: "820px", height: "800px" }, type: "desktop" },
+        smallTabletLarge: { name: "Small tablet, 20px text", styles: { width: "700px", height: "800px" }, type: "tablet" },
+        narrowLaptopLarge: { name: "Narrow laptop, 20px text", styles: { width: "1025px", height: "800px" }, type: "desktop" },
         wide: { name: "Wide monitor", styles: { width: "2000px", height: "900px" }, type: "desktop" },
       },
     },

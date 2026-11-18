@@ -24,7 +24,7 @@ const caret = "size-4 flex-none text-muted group-data-panel-open/trigger:rotate-
 
 function Reassurance({ text }: NonNullable<typeof config.reassurance>) {
   return (
-    <aside className={`${frame({ tone: "clear" })} px-4 py-2.5 text-[14px] leading-normal text-muted phone:px-3`} aria-label="Missable entries">
+    <aside className={`${frame({ tone: "clear" })} px-4 py-2.5 text-14/normal text-muted phone:px-3`} aria-label="Missable entries">
       <strong className="font-extrabold text-ink">Nothing is flagged as permanently missable.</strong> {text}
     </aside>
   );
@@ -37,9 +37,9 @@ function MissablesList({ chapter }: { chapter: Chapter }) {
   const left = rows.filter((row) => checks[row.id] !== true).length;
   return (
     <Collapsible.Root render={<aside />} defaultOpen className={frame({ tone: "flagged" })} aria-label="Missable entries">
-      <Collapsible.Trigger className={`${press} group/trigger flex min-h-12 w-full cursor-pointer items-center justify-between gap-2.5 border-0 bg-transparent px-4 py-3 text-left font-sans text-base text-inherit phone:px-3`}>
-        <strong className="font-display text-[24px] leading-[1.2] font-bold tracking-[-0.015em]">Don’t miss before moving on</strong>
-        <span className="ml-auto flex items-center gap-2.5 text-[12px] whitespace-nowrap text-muted tabular-nums">
+      <Collapsible.Trigger className={`${press} group/trigger flex min-h-12 w-full cursor-pointer items-center justify-between gap-2.5 border-0 bg-transparent px-4 py-3 text-left font-sans text-16/normal text-inherit phone:px-3`}>
+        <strong className="font-display text-24 leading-[1.2] font-bold tracking-[-0.015em]">Don’t miss before moving on</strong>
+        <span className="ml-auto flex items-center gap-2.5 text-12 whitespace-nowrap text-muted tabular-nums">
           {left} left
           <Icon name="down" className={caret} />
         </span>

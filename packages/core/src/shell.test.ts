@@ -92,7 +92,7 @@ describe("the installed app in app.css", () => {
   });
 
   it("makes every text field 16px on a touch screen, above the base layer", () => {
-    expect(/@layer components \{[\s\S]*pointer-coarse:text-base/.test(app)).toBe(true);
+    expect(/@layer components \{[\s\S]*pointer-coarse:text-16 pointer-coarse:leading-normal/.test(app)).toBe(true);
   });
 
   it("never turns zoom off: pinch zoom stays", () => {

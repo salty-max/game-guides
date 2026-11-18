@@ -23,12 +23,12 @@ const backdrop =
 // home indicator are its padding. `touch-none` keeps a finger on the dimmed page, or on the dialog's frame, from dragging anything: the
 // body scrolls on its own (touch-action stops at an element that scrolls), and the page behind is inert.
 const viewport =
-  "fixed top-[var(--vv-top,0px)] left-0 z-50 flex h-[var(--vv-height,100dvh)] w-full touch-none items-center justify-center overflow-hidden pt-[calc(15px+var(--safe-top))] pr-[calc(13px+var(--safe-right))] pb-[calc(15px+var(--safe-bottom))] pl-[calc(13px+var(--safe-left))]";
+  "fixed top-[var(--vv-top,0px)] left-0 z-50 flex h-[var(--vv-height,100dvh)] w-full touch-none items-center justify-center overflow-hidden pt-[calc(0.9375rem+var(--safe-top))] pr-[calc(0.8125rem+var(--safe-right))] pb-[calc(0.9375rem+var(--safe-bottom))] pl-[calc(0.8125rem+var(--safe-left))]";
 
 const popup = cva(
   "relative flex max-h-full min-h-0 w-full flex-col rounded-card border border-control-line bg-surface p-5 text-ink shadow-[0_18px_85px_var(--shadow)] outline-hidden transition-[opacity,scale] duration-100 data-ending-style:scale-95 data-ending-style:opacity-0 data-starting-style:scale-95 data-starting-style:opacity-0 motion-reduce:transition-none",
   {
-    variants: { size: { default: "max-w-[530px]", wide: "max-w-[720px]" } },
+    variants: { size: { default: "max-w-132.5", wide: "max-w-180" } },
     defaultVariants: { size: "default" },
   },
 );
@@ -117,7 +117,7 @@ function Frame({ alert }: { alert: boolean }) {
                 return field && lastInput() === "touch" && !takesText(field) ? (popupRef.current ?? true) : (field ?? true);
               }}
             >
-              <Dialog.Title className="pr-11 font-display text-[25px] leading-[1.2] font-bold tracking-[-0.015em]">{screen.title(shown)}</Dialog.Title>
+              <Dialog.Title className="pr-11 font-display text-25 leading-[1.2] font-bold tracking-[-0.015em]">{screen.title(shown)}</Dialog.Title>
               <div className="absolute top-3 right-3.25">
                 <IconButton label="Close dialog" icon="x" onClick={closeDialog} />
               </div>

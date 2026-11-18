@@ -54,7 +54,7 @@ function SaveStatus() {
   // chapters menu's "Change settings" (the rail beside the page on a wide screen) and the Progress page's Import progress.
   return (
     <BaseButton
-      className={`${press} flex min-h-10 items-center gap-2 rounded-control border border-control-line bg-transparent px-3 py-1.5 text-[12px] font-bold whitespace-nowrap text-muted hover:bg-raised drawer:h-(--icon-h,2.5rem) drawer:w-(--icon-w,2.5rem) drawer:justify-center drawer:gap-0 drawer:p-0 drawer:text-[0px]`}
+      className={`${press} flex min-h-10 items-center gap-2 rounded-control border border-control-line bg-transparent px-3 py-1.5 text-12 font-bold whitespace-nowrap text-muted hover:bg-raised drawer:h-(--icon-h,2.5rem) drawer:w-(--icon-w,2.5rem) drawer:justify-center drawer:gap-0 drawer:p-0 drawer:text-[0px]`}
       data-error={error || ["offline", "paused", "error"].includes(phase) ? "" : undefined}
       aria-label={`${words.join(". ")}. Open sync devices`}
       onClick={() => openDialog({ kind: "sync" })}
@@ -70,12 +70,12 @@ function SaveStatus() {
 // clips: the tile shows alone rather than a cut letter. Clipped, not hidden, so find in page can't scroll the link to the name. Under 361px
 // only the tile shows.
 const brandLink = cva(
-  `${press} flex h-10 min-w-0 flex-wrap content-start items-center gap-x-[11px] overflow-clip px-6 mid:pl-[17px] drawer:h-[34px] drawer:gap-x-[7px] drawer:px-2.5`,
+  `${press} flex h-10 min-w-0 flex-wrap content-start items-center gap-x-2.75 overflow-clip px-6 mid:pl-4.25 drawer:h-8.5 drawer:gap-x-1.75 drawer:px-2.5`,
 );
 
 // The guide's painting, its square the dark surface: a hairline in the guide's line keeps the cornered tile on a dark bar.
 // (an outline inset over the edge, not a border, so the painting draws at the size it was written for)
-const brandTile = cva("size-10 shrink-0 rounded-control outline-1 -outline-offset-1 outline-line drawer:size-[34px]");
+const brandTile = cva("size-10 shrink-0 rounded-control outline-1 -outline-offset-1 outline-line drawer:size-8.5");
 
 interface TopBarProps {
   /** The chapter the Guide link opens. */
@@ -103,7 +103,7 @@ export function TopBar({ chapter, view, menuOpen, onToggleMenu, menuToggle }: To
           anything over its minimum only after the brand has all its width. */}
       <div className="mx-auto grid h-full max-w-(--frame-max) grid-cols-[minmax(0,var(--rail-w))_minmax(0,auto)_1fr] items-center drawer:grid-cols-[auto_minmax(0,auto)_1fr] phone:grid-cols-[auto_minmax(0,1fr)_auto]">
         {/* Shown only under 800px: `hidden` is the class's own, and `drawer:block` brings it back. */}
-        <div className="ml-[11px] hidden drawer:block tiny:ml-[7px]">
+        <div className="ml-2.75 hidden drawer:block tiny:ml-1.75">
           <IconButton
             ref={menuToggle}
             icon="menu"
@@ -124,11 +124,11 @@ export function TopBar({ chapter, view, menuOpen, onToggleMenu, menuToggle }: To
             {/* The guide's own painting, as the home screen shows it (pnpm icons writes the sizes). The link carries the name. */}
             <img src={iconUrl(tileSrc(tileSizes[0]))} srcSet={tileSrcSet(iconUrl)} alt="" width={40} height={40} className={brandTile()} />
             {/* (wraps away, rather than ellipsizing, when there isn't room for 5ch of the body text, or all of the name if it's shorter; then grows to all of it) */}
-            <span className="grid max-w-max min-w-0 grow basis-[5ch] gap-[3px] leading-[1.1] tiny:hidden">
-              <strong className="truncate font-display text-[21px] leading-[1.05] font-bold tracking-[-0.01em] drawer:text-[17px]">{brand.mark}</strong>
+            <span className="grid max-w-max min-w-0 grow basis-[5ch] gap-0.75 leading-[1.1] tiny:hidden">
+              <strong className="truncate font-display text-21 leading-[1.05] font-bold tracking-[-0.01em] drawer:text-17">{brand.mark}</strong>
               {/* The space isn't drawn (it's a grid), but without it the link's visible text reads "KoholintHundo", which its name, "Koholint Hundo home", doesn't contain. */}
               {" "}
-              <small className="text-[11px] font-extrabold tracking-[0.2em] text-primary uppercase drawer:hidden">Hundo</small>
+              <small className="text-11 font-extrabold tracking-[0.2em] text-primary uppercase drawer:hidden">Hundo</small>
             </span>
           </Link>
         </div>
@@ -140,7 +140,7 @@ export function TopBar({ chapter, view, menuOpen, onToggleMenu, menuToggle }: To
             centred in what the brand and the buttons leave. */}
         <div className="grid grid-cols-[1fr_auto_1fr] items-center before:content-[''] drawer:grid-cols-[1fr_auto] drawer:before:hidden phone:flex">
           {!phone && <MainNav chapter={chapter} view={view} place="top" />}
-          <div className="mr-[25px] flex items-center gap-[9px] justify-self-end drawer:mr-[11px] drawer:gap-1.5 tiny:mr-[7px] tiny:gap-1">
+          <div className="mr-6.25 flex items-center gap-2.25 justify-self-end drawer:mr-2.75 drawer:gap-1.5 tiny:mr-1.75 tiny:gap-1">
             <ThemeToggle />
             <SaveStatus />
           </div>

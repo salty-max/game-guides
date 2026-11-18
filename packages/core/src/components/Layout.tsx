@@ -127,7 +127,7 @@ export function Layout({ children }: { children: ReactNode }) {
     <>
       <a
         // Out of sight until it takes the focus, then in the top corner.
-        className="absolute -top-96 left-3 z-30 rounded-small bg-surface px-3 py-2 whitespace-nowrap focus:fixed focus:top-[calc(12px+var(--safe-top))] focus:left-[calc(12px+var(--safe-left))]"
+        className="absolute -top-96 left-3 z-30 rounded-small bg-surface px-3 py-2 whitespace-nowrap focus:fixed focus:top-[calc(0.75rem+var(--safe-top))] focus:left-[calc(0.75rem+var(--safe-left))]"
         href="#main"
         onClick={(event) => {
           event.preventDefault();
@@ -173,7 +173,7 @@ export function Layout({ children }: { children: ReactNode }) {
           // so in the installed app it is always the row the frame bounds, and so a scroller. Its padding is the room above and under the
           // page (--pad-end, and the home indicator under that, but on a phone the tab bar covers the home indicator, so the room under the
           // page is --pad-end alone) and the notch's insets.
-          className="col-[3/-1] row-start-1 min-w-0 pt-6 pr-(--safe-right) pb-[calc(var(--pad-end)+var(--safe-bottom))] outline-none [--pad-end:50px] standalone:scroll-pt-6 standalone:overflow-y-auto standalone:overscroll-contain drawer:col-auto drawer:pt-[18px] drawer:pl-(--safe-left) drawer:[--pad-end:30px] phone:pt-[13px] phone:pb-(--pad-end) phone:[--pad-end:25px]"
+          className="col-[3/-1] row-start-1 min-w-0 pt-6 pr-(--safe-right) pb-[calc(var(--pad-end)+var(--safe-bottom))] outline-none [--pad-end:3.125rem] standalone:scroll-pt-(--sticky-gap) standalone:overflow-y-auto standalone:overscroll-contain drawer:col-auto drawer:pt-4.5 drawer:pl-(--safe-left) drawer:[--pad-end:1.875rem] phone:pt-3.25 phone:pb-(--pad-end) phone:[--pad-end:1.5625rem]"
         >
           {/* The page itself: the page's column of the frame, at most --page-max, its side padding --gutter. The gutter is one clamp from a
               phone's 12px up, in vw: it is the frame's own padding, not a part's. This is also the page's container (`/page`), so what

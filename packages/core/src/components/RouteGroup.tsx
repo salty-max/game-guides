@@ -50,11 +50,11 @@ export const RouteRow = memo(function RouteRow({ row, prefix, highlighted, origi
         <label
           id={labelId}
           htmlFor={boxId}
-          className={`${pressRow} inline-block cursor-pointer text-[15px] leading-[1.3] font-extrabold after:absolute after:inset-0 after:cursor-pointer`}
+          className={`${pressRow} inline-block cursor-pointer text-15 leading-[1.3] font-extrabold after:absolute after:inset-0 after:cursor-pointer`}
         >
           {row.title}
         </label>
-        {row.text && <p className="mt-[3px] text-[15px] leading-[1.6] text-muted">{row.text}</p>}
+        {row.text && <p className="mt-0.75 text-15 leading-[1.6] text-muted">{row.text}</p>}
       </div>
       {/* On a phone a long tag wraps under the next instead of pushing the row wider. */}
       <div className="flex flex-col items-end gap-1 leading-[1.1]">
@@ -96,7 +96,7 @@ interface GroupProps {
 }
 
 // The group's header is its heading, and the button inside it opens and closes the steps (a button can't hold a heading).
-const trigger = `${press} group/trigger grid min-h-[58px] w-full cursor-pointer grid-cols-[auto_minmax(0,1fr)_auto_auto] items-center gap-[11px] border-0 bg-transparent px-3.5 py-3 text-left font-sans text-base leading-[1.58] font-normal text-inherit hover:bg-raised phone:gap-2 phone:p-[9px]`;
+const trigger = `${press} group/trigger grid min-h-14.5 w-full cursor-pointer grid-cols-[auto_minmax(0,1fr)_auto_auto] items-center gap-2.75 border-0 bg-transparent px-3.5 py-3 text-left font-sans text-16 leading-[1.58] font-normal text-inherit hover:bg-raised phone:gap-2 phone:p-2.25`;
 
 export function RouteGroup({ groupKey, title, location, icon, note, map, rows, open, highlightedId, origin, fallbackFocusId, rememberToggle }: GroupProps) {
   const setGroupOpen = useUi((s) => s.setGroupOpen);
@@ -123,14 +123,14 @@ export function RouteGroup({ groupKey, title, location, icon, note, map, rows, o
     >
       <h3 className="m-0">
         <Collapsible.Trigger className={trigger}>
-          <span className="grid size-[34px] place-items-center rounded-small bg-soft text-soft-ink phone:size-7 [&_svg]:size-[17px]">
+          <span className="grid size-8.5 place-items-center rounded-small bg-soft text-soft-ink phone:size-7 [&_svg]:size-4.25">
             <Icon name={graphic} />
           </span>
           <span className="grid">
-            <span className="text-[15px] leading-[1.2] font-extrabold">{title}</span>
-            <small className="text-[12px] text-muted">{location ?? kinds}</small>
+            <span className="text-15 leading-[1.2] font-extrabold">{title}</span>
+            <small className="text-12 text-muted">{location ?? kinds}</small>
           </span>
-          <span className="text-[12px] whitespace-nowrap text-muted tabular-nums">
+          <span className="text-12 whitespace-nowrap text-muted tabular-nums">
             {done} / {rows.length}
           </span>
           <Icon name="down" className="size-4 text-muted group-data-panel-open/trigger:rotate-180" />
@@ -139,7 +139,7 @@ export function RouteGroup({ groupKey, title, location, icon, note, map, rows, o
       {/* Closed, the steps stay in the page, hidden until found: the browser's find-in-page reaches them and opens the group. */}
       <Collapsible.Panel hiddenUntilFound>
         {(note || map || tools) && (
-          <div className="border-t border-line bg-paper px-3.5 py-2.5 text-[13px] text-muted">
+          <div className="border-t border-line bg-paper px-3.5 py-2.5 text-13 text-muted">
             {note && <p>{note}</p>}
             {(map || tools) && (
               <div className="flex flex-wrap items-center gap-x-4 gap-y-2 [p+&]:mt-2">

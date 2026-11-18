@@ -15,11 +15,11 @@ import { press, pressText } from "./press-style";
 export function ArticleRoute({ chapter, target, footer }: { chapter: Chapter; target?: string; footer: ReactNode }) {
   const current = chapter.groups.find((group) => group.key === target || group.rows.some((row) => `entry-${row.id}` === target))?.key;
   const links = (
-    <ul className="m-0 grid list-none gap-[3px] p-0">
+    <ul className="m-0 grid list-none gap-0.75 p-0">
       {chapter.groups.map((group) => (
         <li key={group.key}>
           <Link
-            className={`${press} block rounded-tag px-1.5 py-2 text-[14px] leading-[1.4] text-muted no-underline hover:bg-surface hover:text-primary aria-[current=location]:bg-surface aria-[current=location]:font-bold aria-[current=location]:text-primary`}
+            className={`${press} block rounded-tag px-1.5 py-2 text-14 leading-[1.4] text-muted no-underline hover:bg-surface hover:text-primary aria-[current=location]:bg-surface aria-[current=location]:font-bold aria-[current=location]:text-primary`}
             to={`/guide/${chapter.id}/${group.key}`}
             aria-current={current === group.key ? "location" : undefined}
           >
@@ -34,9 +34,9 @@ export function ArticleRoute({ chapter, target, footer }: { chapter: Chapter; ta
     // The route's own width decides (`/chapter`, the wrapper's: a container can't query itself): under 52rem the list of sections folds
     // away above the article, so it stands beside the article only where the prose keeps a column of its own (about 570px at the least).
     <div className="@container/chapter mt-[clamp(1.5rem,4cqi,2.5rem)]">
-      <div className="grid grid-cols-[minmax(0,1fr)_minmax(174px,218px)] items-start gap-[clamp(1.5rem,5.4cqi,4.125rem)] @max-[52rem]/chapter:grid-cols-[minmax(0,1fr)] @max-[52rem]/chapter:gap-6">
+      <div className="grid grid-cols-[minmax(0,1fr)_minmax(10.875rem,13.625rem)] items-start gap-[clamp(1.5rem,5.4cqi,4.125rem)] @max-[52rem]/chapter:grid-cols-[minmax(0,1fr)] @max-[52rem]/chapter:gap-6">
         <Collapsible.Root className="hidden rounded-small border border-line bg-surface px-3 @max-[52rem]/chapter:block">
-          <Collapsible.Trigger className={`${press} group/trigger flex min-h-11 w-full cursor-pointer items-center justify-between border-0 bg-transparent p-0 text-left font-sans text-[14px] leading-tight font-bold text-ink`}>
+          <Collapsible.Trigger className={`${press} group/trigger flex min-h-11 w-full cursor-pointer items-center justify-between border-0 bg-transparent p-0 text-left font-sans text-14/tight font-bold text-ink`}>
             In this chapter <Icon name="down" className="size-4 text-muted group-data-panel-open/trigger:rotate-180" />
           </Collapsible.Trigger>
           <Collapsible.Panel hiddenUntilFound>
@@ -53,10 +53,10 @@ export function ArticleRoute({ chapter, target, footer }: { chapter: Chapter; ta
           {footer}
         </article>
         <nav
-          className="sticky top-[calc(var(--bar)+24px)] max-h-[calc(100dvh-var(--bar)-44px)] scrollbar-thin overflow-auto border-s border-line pt-1 pr-1.5 pb-[5px] pl-[17px] @max-[52rem]/chapter:hidden standalone:top-6"
+          className="sticky top-[calc(var(--bar)+var(--sticky-gap))] max-h-[calc(100dvh-var(--bar)-var(--sticky-gap)-1.25rem)] scrollbar-thin overflow-auto border-s border-line pt-1 pr-1.5 pb-1.25 pl-4.25 @max-[52rem]/chapter:hidden standalone:top-(--sticky-gap)"
           aria-label="In this chapter"
         >
-          <h2 className="mt-0 mb-[0.6rem] text-[14px] leading-tight font-bold text-ink">In this chapter</h2>
+          <h2 className="mt-0 mb-[0.6rem] text-14/tight font-bold text-ink">In this chapter</h2>
           {links}
         </nav>
       </div>
@@ -74,7 +74,7 @@ const entry = cva("scroll-mt-4", {
   variants: {
     in: {
       prose: "leading-[1.8] [&+&]:mt-[.85rem]",
-      list: "flex flex-wrap items-center gap-x-2 gap-y-0.5 border-t border-line-soft py-[9px] first:border-t-0",
+      list: "flex flex-wrap items-center gap-x-2 gap-y-0.5 border-t border-line-soft py-2.25 first:border-t-0",
     },
     linked: { true: "rounded-[3px] bg-paper [box-shadow:-3px_0_var(--accent)]", false: "" },
   },
@@ -89,8 +89,8 @@ function Section({ group, target }: { group: Group; target?: string }) {
         <h2 id={group.key} tabIndex={-1} className="font-display text-[clamp(1.5625rem,5.4cqi,2.3125rem)] leading-[1.18] font-bold tracking-[-0.015em]">
           {group.title}
         </h2>
-        {group.location && <p className="mt-[.35rem] text-[14px] font-semibold text-muted">{group.location}</p>}
-        {group.note && <p className="mt-[.35rem] text-[14px] text-muted">{group.note}</p>}
+        {group.location && <p className="mt-[.35rem] text-14 font-semibold text-muted">{group.location}</p>}
+        {group.note && <p className="mt-[.35rem] text-14 text-muted">{group.note}</p>}
         {group.map && (
           <p className="mt-[.35rem]">
             <MapLink map={group.map} of={group.title} at="group" />
@@ -110,7 +110,7 @@ function Section({ group, target }: { group: Group; target?: string }) {
               {row.map && <MapLink map={row.map} of={row.title} at="row" />}
               <LineChips row={row} at="prose" />
               {/* Under the step's words, not under its box. */}
-              {row.text && <span className="basis-full ps-check-indent text-[14px] leading-normal text-muted">{row.text}</span>}
+              {row.text && <span className="basis-full ps-check-indent text-14/normal text-muted">{row.text}</span>}
             </li>
           ))}
         </ul>

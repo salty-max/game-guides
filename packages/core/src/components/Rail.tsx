@@ -15,11 +15,11 @@ import { press, pressPart, pressText } from "./press-style";
 // A locked one keeps its muted colour when it's hovered; an open one darkens.
 const chapterLink = cva(
   `${press} group/chapter grid min-h-12 w-full cursor-pointer grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2.5 rounded-small border border-transparent bg-transparent p-2 text-left font-sans font-bold no-underline hover:bg-rail-hover aria-[current=page]:border-soft-line aria-[current=page]:text-ink [&_svg]:size-3.5 [&_svg]:text-muted [&[aria-current=page]:not(:hover)]:bg-soft`,
-  { variants: { locked: { true: "text-[13px] text-muted", false: "text-[14px] text-inherit hover:text-ink" } } },
+  { variants: { locked: { true: "text-13 text-muted", false: "text-14 text-inherit hover:text-ink" } } },
 );
 
 const number =
-  `${pressPart} grid size-7 place-items-center rounded-small border border-soft-line text-[12px] text-muted tabular-nums group-aria-[current=page]/chapter:border-primary group-aria-[current=page]/chapter:bg-primary group-aria-[current=page]/chapter:text-on-primary`;
+  `${pressPart} grid size-7 place-items-center rounded-small border border-soft-line text-12 text-muted tabular-nums group-aria-[current=page]/chapter:border-primary group-aria-[current=page]/chapter:bg-primary group-aria-[current=page]/chapter:text-on-primary`;
 
 interface RailProps {
   activeChapter: number;
@@ -44,7 +44,7 @@ export function RailContent({ activeChapter, view, heading }: RailProps & { head
     <>
       <div>
         {heading ?? <div className={railHeading}>Walkthrough</div>}
-        <nav className="grid gap-[3px]" aria-label="Walkthrough chapters">
+        <nav className="grid gap-0.75" aria-label="Walkthrough chapters">
           {chapters.map((chapter) => {
             const n = two(chapter.id);
             if (!isOpen(data, chapter.id)) {
@@ -67,7 +67,7 @@ export function RailContent({ activeChapter, view, heading }: RailProps & { head
                 <span className={number}>{n}</span>
                 <span className="grid gap-px leading-tight">
                   {chapter.title}
-                  <small className="text-[12px] font-semibold text-muted">{complete ? "Complete" : `${pct(done, rows.length)}% done`}</small>
+                  <small className="text-12 font-semibold text-muted">{complete ? "Complete" : `${pct(done, rows.length)}% done`}</small>
                 </span>
                 <Icon name={complete ? "check" : "right"} />
               </Link>
@@ -75,21 +75,21 @@ export function RailContent({ activeChapter, view, heading }: RailProps & { head
           })}
         </nav>
       </div>
-      <div className="mt-auto grid gap-[13px] px-0.5">
-        <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-3.5 rounded-card border border-line bg-surface px-2.5 pt-[13px] pb-3">
-          <Icon name={data.spoilers ? "lock" : "unlock"} className="mt-0.5 size-[18px] text-primary" />
+      <div className="mt-auto grid gap-3.25 px-0.5">
+        <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-3.5 rounded-card border border-line bg-surface px-2.5 pt-3.25 pb-3">
+          <Icon name={data.spoilers ? "lock" : "unlock"} className="mt-0.5 size-4.5 text-primary" />
           <div>
-            <strong className="text-[13px]">Spoiler protection {data.spoilers ? "on" : "off"}</strong>
-            <p className="mt-0.5 mb-[5px] text-[12px] leading-[1.46] text-muted">{data.spoilers ? `Chapters past ${data.ceiling} are hidden.` : "All chapters are visible."}</p>
+            <strong className="text-13">Spoiler protection {data.spoilers ? "on" : "off"}</strong>
+            <p className="mt-0.5 mb-1.25 text-12 leading-[1.46] text-muted">{data.spoilers ? `Chapters past ${data.ceiling} are hidden.` : "All chapters are visible."}</p>
             <BaseButton
-              className={`${pressText} inline-flex min-h-8 cursor-pointer items-center border-0 bg-transparent px-0 py-1 text-left font-sans text-[12px] font-bold text-primary underline underline-offset-[3px]`}
+              className={`${pressText} inline-flex min-h-8 cursor-pointer items-center border-0 bg-transparent px-0 py-1 text-left font-sans text-12 font-bold text-primary underline underline-offset-3`}
               onClick={() => openDialog({ kind: "settings" })}
             >
               Change settings
             </BaseButton>
           </div>
         </div>
-        <small className="grid gap-0.5 px-1 text-[12px] leading-[1.4] text-pretty text-muted">
+        <small className="grid gap-0.5 px-1 text-12 leading-[1.4] text-pretty text-muted">
           <span>© 2026 Hundo</span>
           <span>Unofficial fan guide, not affiliated with {brand.publisher}.</span>
         </small>

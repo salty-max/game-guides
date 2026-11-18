@@ -26,7 +26,7 @@ export function WhatsLeft() {
           {/* Its own width decides (`/left`): under 28rem a category's bar goes under its name and figures, so the bar keeps a length worth reading. */}
           <ul className="@container/left mt-3 mb-0 grid list-none gap-2.5 p-0">
             {items.map((item) => (
-              <li key={item.tag} className="grid grid-cols-[minmax(120px,190px)_1fr_auto] items-center gap-3 text-[14px] @max-[28rem]/left:grid-cols-[1fr_auto]">
+              <li key={item.tag} className="grid grid-cols-[minmax(7.5rem,11.875rem)_1fr_auto] items-center gap-3 text-14 @max-[28rem]/left:grid-cols-[1fr_auto]">
                 {/* At least 24px tall, the smallest target WCAG 2.2's target size allows, where its line alone is 22px. */}
                 <Link className={`${pressText} flex min-h-6 items-center hover:text-primary hover:underline hover:underline-offset-3`} to={`/checklist/${item.tag}`}>
                   {cats[item.tag][0]}
@@ -38,7 +38,7 @@ export function WhatsLeft() {
                   </span>
                 </span>
                 <span className="font-extrabold whitespace-nowrap tabular-nums">
-                  {figure(item.left)} <small className="text-[12px] font-bold text-muted">of {figure(item.total)} {inPoints ? "pts " : ""}left</small>
+                  {figure(item.left)} <small className="text-12 font-bold text-muted">of {figure(item.total)} {inPoints ? "pts " : ""}left</small>
                 </span>
               </li>
             ))}

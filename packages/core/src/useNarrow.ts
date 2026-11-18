@@ -9,10 +9,10 @@ const watch = (query: string) => ({
   now: () => window.matchMedia(query).matches,
 });
 
-// The width under which the chapter rail is a drawer: the `drawer:` variant's, inclusive (app.css).
-const narrow = watch("(max-width: 800px)");
+// The width under which the chapter rail is a drawer (800px at the default 16px): the `drawer:` variant's, inclusive (app.css).
+const narrow = watch("(max-width: 50em)");
 // The width under which the pages are a tab bar at the bottom and the checklist's filters are in a sheet: the `phone:` variant's.
-const phone = watch("(max-width: 550px)");
+const phone = watch("(max-width: 34.375em)");
 
 /** Whether the screen is narrow enough for the chapter rail to be a drawer (800px and under), now. */
 export const isNarrow = narrow.now;

@@ -7,10 +7,10 @@ import type { ReactNode } from "react";
 // (screens.tsx) supplies its body from these. Like Button, none of them takes a className or a style.
 
 const text = cva("my-2.5", {
-  variants: { size: { default: "text-sm", small: "text-[13px]" }, tone: { quiet: "text-muted", error: "text-error" } },
+  variants: { size: { default: "text-14/sm", small: "text-13" }, tone: { quiet: "text-muted", error: "text-error" } },
 });
 
-const status = cva("my-2.5 min-h-5 text-sm", { variants: { tone: { quiet: "text-muted", error: "text-error" } } });
+const status = cva("my-2.5 min-h-5 text-14/sm", { variants: { tone: { quiet: "text-muted", error: "text-error" } } });
 
 /**
  * The middle of a dialog: a tall screen scrolls here, so the title and the close button stay in view on a phone. A scrolling box clips

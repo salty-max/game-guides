@@ -44,7 +44,7 @@ export function SelectImpl({
                   <BaseSelect.Item
                     key={item.value}
                     value={item.value}
-                    className="grid min-h-11 cursor-pointer grid-cols-[1rem_1fr] items-center gap-2 rounded-small px-2.5 text-sm font-semibold outline-hidden select-none data-highlighted:bg-soft data-highlighted:text-soft-ink data-selected:font-extrabold"
+                    className="grid min-h-11 cursor-pointer grid-cols-[1rem_1fr] items-center gap-2 rounded-small px-2.5 text-14/sm font-semibold outline-hidden select-none data-highlighted:bg-soft data-highlighted:text-soft-ink data-selected:font-extrabold"
                   >
                     <BaseSelect.ItemIndicator className="col-start-1">
                       <Icon name="check" className="size-4" />

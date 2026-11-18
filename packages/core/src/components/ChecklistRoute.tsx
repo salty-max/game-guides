@@ -38,13 +38,13 @@ export function ChecklistRoute({ chapter, target, footer }: { chapter: Chapter; 
 
   return (
     <section id="route" aria-labelledby="route-title">
-      <div className="mb-[13px] flex items-end justify-between gap-[13px] phone:flex-wrap phone:items-start phone:gap-1">
+      <div className="mb-3.25 flex items-end justify-between gap-3.25 phone:flex-wrap phone:items-start phone:gap-1">
         <div>
           {/* (27px in a phone's column, 32px from a column of 416px: `cqi` is the page column's width) */}
           <h2 id="route-title" className="m-0 font-display text-[clamp(1.6875rem,7.7cqi,2rem)] leading-[1.17] font-bold tracking-[-0.015em]">
             Chapter route
           </h2>
-          <p className="mt-[5px] mb-0 text-[14px] text-muted">
+          <p className="mt-1.25 mb-0 text-14 text-muted">
             {done} of {rows.length} steps complete
           </p>
         </div>
@@ -52,7 +52,7 @@ export function ChecklistRoute({ chapter, target, footer }: { chapter: Chapter; 
           {allOpen ? "Collapse all" : "Expand all"}
         </Button>
       </div>
-      <div className="mb-[15px] flex flex-wrap items-center justify-between gap-[11px]">
+      <div className="mb-3.75 flex flex-wrap items-center justify-between gap-2.75">
         <ChipGroup
           label="Route categories"
           choices={labels}

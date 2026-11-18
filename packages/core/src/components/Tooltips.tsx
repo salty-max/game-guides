@@ -12,7 +12,7 @@ export function Tooltips() {
       {({ payload }) => (
         <Tooltip.Portal>
           <Tooltip.Positioner sideOffset={6} className="z-50">
-            <Tooltip.Popup className="origin-(--transform-origin) rounded-small bg-ink px-2 py-1 text-[12px] leading-[1.3] font-bold text-paper shadow-[0_6px_20px_var(--shadow)] transition-[scale,opacity] duration-100 data-ending-style:scale-95 data-ending-style:opacity-0 data-instant:transition-none data-starting-style:scale-95 data-starting-style:opacity-0 motion-reduce:transition-none">
+            <Tooltip.Popup className="origin-(--transform-origin) rounded-small bg-ink px-2 py-1 text-12 leading-[1.3] font-bold text-paper shadow-[0_6px_20px_var(--shadow)] transition-[scale,opacity] duration-100 data-ending-style:scale-95 data-ending-style:opacity-0 data-instant:transition-none data-starting-style:scale-95 data-starting-style:opacity-0 motion-reduce:transition-none">
               {payload}
             </Tooltip.Popup>
           </Tooltip.Positioner>

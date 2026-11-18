@@ -149,8 +149,8 @@ function ChecklistView() {
       ) : (
         <>
           <ChipGroup label="Checklist categories" choices={topFilters} value={filter} onChange={setFilter} />
-          <div className="my-3 flex flex-wrap items-end gap-[9px]">
-            <div className="min-w-[185px] flex-1">{search}</div>
+          <div className="my-3 flex flex-wrap items-end gap-2.25">
+            <div className="min-w-46.25 flex-1">{search}</div>
             {selects}
             <Button onClick={() => clear()}>Clear</Button>
           </div>
@@ -174,11 +174,11 @@ function ChecklistView() {
           {phone && <div className="grid gap-4">{selects}</div>}
         </sheet.Sheet>
       )}
-      <div className="mb-[13px] flex items-end justify-between gap-[13px] text-[14px] text-muted phone:flex-wrap phone:items-start phone:gap-1">
-        <p id="results-count" className="mt-[5px]" role="status">
+      <div className="mb-3.25 flex items-end justify-between gap-3.25 text-14 text-muted phone:flex-wrap phone:items-start phone:gap-1">
+        <p id="results-count" className="mt-1.25" role="status">
           {matchesLine}
         </p>
-        <p className="mt-[5px]">
+        <p className="mt-1.25">
           {checked} of {visible.length} revealed entries checked
         </p>
       </div>

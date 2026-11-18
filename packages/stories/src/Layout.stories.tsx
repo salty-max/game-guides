@@ -34,8 +34,9 @@ export const WideFrame: Story = {
   globals: { viewport: { value: "wide", isRotated: false } },
   play: async ({ canvasElement }) => {
     await document.fonts.ready;
+    // (the token is rem, tokens.css: the root's font size turns it into px)
     const root = getComputedStyle(document.documentElement);
-    const frame = parseFloat(root.getPropertyValue("--frame-max"));
+    const frame = parseFloat(root.getPropertyValue("--frame-max")) * parseFloat(root.fontSize);
     const width = document.documentElement.clientWidth;
     const start = (width - frame) / 2;
     await expect(start).toBeGreaterThan(0);

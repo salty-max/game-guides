@@ -75,11 +75,11 @@ export function QuestlinesPage() {
             onChange={(next) => setFilter(isFilter(next) ? next : "all")}
           />
           {shown.length === 0 ? (
-            <div className="mt-[13px]">
+            <div className="mt-3.25">
               <Empty>No questline here yet.</Empty>
             </div>
           ) : (
-            <div className="mt-[13px] grid grid-cols-[repeat(auto-fill,minmax(min(100%,22rem),1fr))] items-start gap-[13px] phone:gap-2.5">
+            <div className="mt-3.25 grid grid-cols-[repeat(auto-fill,minmax(min(100%,22rem),1fr))] items-start gap-3.25 phone:gap-2.5">
               {shown.map((view) => (
                 <LineCard key={view.line.id} view={view} doneWord={doneWord} hiddenPast={everything ? undefined : data.ceiling} opened={view.line.id === targeted} />
               ))}
@@ -91,7 +91,7 @@ export function QuestlinesPage() {
   );
 }
 
-const tile = cva("grid size-[34px] flex-none place-items-center rounded-small [&_svg]:size-4", { variants: { tone: tones }, defaultVariants: { tone: "none" } });
+const tile = cva("grid size-8.5 flex-none place-items-center rounded-small [&_svg]:size-4", { variants: { tone: tones }, defaultVariants: { tone: "none" } });
 const caret = "size-4 flex-none text-muted group-data-panel-open/trigger:rotate-180";
 
 interface LineCardProps {
@@ -122,13 +122,13 @@ function LineCard({ view, doneWord, hiddenPast, opened }: LineCardProps) {
           <Icon name={icon} />
         </span>
         <span className="grid gap-1">
-          <strong id={`line-${line.id}-name`} className="text-[16px] leading-tight">
+          <strong id={`line-${line.id}-name`} className="text-16/tight">
             {line.name}
           </strong>
-          <span className="flex items-center gap-2 text-[12.5px] text-muted">
+          <span className="flex items-center gap-2 text-12.5 text-muted">
             {status !== "done" && (
               // The words beside it say the same, and inside the trigger the bar's own name would be said twice over.
-              <span className="w-[70px] flex-none" aria-hidden="true">
+              <span className="w-17.5 flex-none" aria-hidden="true">
                 <ProgressBar done={done} total={shown.length} label={`${line.name}: ${done} of ${shown.length} revealed steps`} />
               </span>
             )}
@@ -150,7 +150,7 @@ function LineCard({ view, doneWord, hiddenPast, opened }: LineCardProps) {
           ))}
         </ol>
         {hiddenPast !== undefined && (
-          <p className="m-0 flex items-center gap-2 border-t border-line-soft bg-raised px-4 py-2.5 text-[12.5px] text-muted phone:px-3 [&_svg]:size-3.5">
+          <p className="m-0 flex items-center gap-2 border-t border-line-soft bg-raised px-4 py-2.5 text-12.5 text-muted phone:px-3 [&_svg]:size-3.5">
             <Icon name="lock" />
             Anything past chapter {hiddenPast} stays hidden.
           </p>
@@ -187,17 +187,17 @@ function Step({ line, row, prefix, next = false, label }: StepProps) {
       <CheckBox id={id} labelId={`${id}-label`} row={row} />
       <div className="grid gap-1">
         <label id={`${id}-label`} className={`${pressRow} cursor-pointer leading-[1.3] after:absolute after:inset-0`} htmlFor={id}>
-          {label && <small className="mb-0.5 block text-[10.5px] font-extrabold tracking-widest text-primary uppercase">{label}</small>}
-          <strong className={checked ? "text-[15px] font-semibold text-muted" : "text-[15px]"}>{row.title}</strong>
+          {label && <small className="mb-0.5 block text-10.5 font-extrabold tracking-widest text-primary uppercase">{label}</small>}
+          <strong className={checked ? "text-15 font-semibold text-muted" : "text-15"}>{row.title}</strong>
           {next && (
             <>
               {" "}
-              <span className="ml-1 inline-block rounded-tag bg-accent px-2 py-0.5 align-[1px] text-[10.5px] font-extrabold tracking-[0.08em] text-on-accent uppercase">Next</span>
+              <span className="ml-1 inline-block rounded-tag bg-accent px-2 py-0.5 align-[0.0625rem] text-10.5 font-extrabold tracking-[0.08em] text-on-accent uppercase">Next</span>
             </>
           )}
         </label>
         {why && (
-          <p className="m-0 flex items-start gap-2 text-[12.5px] leading-[1.4] text-muted">
+          <p className="m-0 flex items-start gap-2 text-12.5 leading-[1.4] text-muted">
             <Tag tag="missable" />
             <span>{why}</span>
           </p>

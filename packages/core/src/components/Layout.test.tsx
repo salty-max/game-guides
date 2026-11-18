@@ -235,7 +235,7 @@ describe("coming back to a page", () => {
     it(`never has two of an id in the page while pages are kept (${width})`, async () => {
       if (width === "phone")
         vi.spyOn(window, "matchMedia").mockImplementation(
-          (query: string) => ({ matches: /max-width: (550|800)px/.test(query), media: query, addEventListener() {}, removeEventListener() {} }) as unknown as MediaQueryList,
+          (query: string) => ({ matches: /max-width: (34.375|50)em/.test(query), media: query, addEventListener() {}, removeEventListener() {} }) as unknown as MediaQueryList,
         );
       history.replaceState(null, "", "/dashboard");
       const user = userEvent.setup();
@@ -286,11 +286,11 @@ describe("the chapter drawer under 800px", () => {
       (query: string) =>
         ({
           get matches() {
-            return query.includes("800px") ? narrow : false;
+            return query.includes("50em") ? narrow : false;
           },
           media: query,
           addEventListener: (_: string, listener: () => void) => {
-            if (query.includes("800px")) changed = listener;
+            if (query.includes("50em")) changed = listener;
           },
           removeEventListener() {},
         }) as unknown as MediaQueryList,
@@ -413,7 +413,7 @@ describe("on a phone", () => {
   const topBar = () => screen.getAllByRole("banner")[0];
   const phone = () =>
     vi.spyOn(window, "matchMedia").mockImplementation(
-      (query: string) => ({ matches: /max-width: (550|800)px/.test(query), media: query, addEventListener() {}, removeEventListener() {} }) as unknown as MediaQueryList,
+      (query: string) => ({ matches: /max-width: (34.375|50)em/.test(query), media: query, addEventListener() {}, removeEventListener() {} }) as unknown as MediaQueryList,
     );
 
   it("has the pages in one bar after the page, and the theme button in the top bar", async () => {
@@ -510,7 +510,7 @@ describe("on a phone", () => {
       (query: string) =>
         ({
           get matches() {
-            return !wide && /max-width: (550|800)px/.test(query);
+            return !wide && /max-width: (34.375|50)em/.test(query);
           },
           media: query,
           addEventListener: (_: string, listener: () => void) => listeners.add(listener),
