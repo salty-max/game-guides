@@ -19,7 +19,7 @@ pnpm icons      # regenerate public/icons and public/favicon.ico from scripts/ic
 
 ## Deploy
 
-The Vercel project `hundo-hallownest` builds this folder as its Root Directory and serves [hallownest.hundo.quest](https://hallownest.hundo.quest), a domain it takes only at launch: before the merge, its deployments live on `hundo-hallownest.vercel.app` and the branch addresses, as [a new project](../../docs/deploying.md#a-new-project) says. `vercel.json` here sets the install, build, ignore command, rewrites, CSP and cache rules; [docs/deploying.md](../../docs/deploying.md) explains them.
+The Vercel project `hundo-hallownest` builds this folder as its Root Directory and serves [hallownest.hundo.quest](https://hallownest.hundo.quest), a domain it takes only at launch: before the merge, its deployments live on `hundo-hallownest.vercel.app` and the branch addresses, as [a new project](../../docs/deploying.md#a-new-project) says. The project was created on 18 Nov 2026 through Vercel's API and connected to the repository while this guide's pull request was open, so its first deployment came from a push of that branch. `vercel.json` here sets the install, build, ignore command, rewrites, CSP and cache rules; [docs/deploying.md](../../docs/deploying.md) explains them.
 
 ## Use the guide
 
