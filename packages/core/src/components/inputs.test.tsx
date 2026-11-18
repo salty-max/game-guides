@@ -2,6 +2,7 @@ import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { useState } from "react";
 import { CodeField } from "./controls";
+import { SearchField } from "./SearchField";
 import { TextField } from "./TextField";
 import { ItemList, ItemRow } from "./list";
 import { Button } from "./ui";
@@ -112,6 +113,102 @@ describe("TextField", () => {
     expect(screen.getByRole("textbox")).toHaveAttribute("autocomplete", "off");
     expect(screen.getByRole("textbox")).toHaveAttribute("maxlength", "5");
     expect(screen.getByRole("textbox")).toHaveAttribute("name", "reported");
+  });
+});
+
+describe("text fields on a touch screen", () => {
+  // iOS zooms the page when a field under 16px takes the focus. app.css sizes every field 16px on touch, in the `components` layer, which a
+  // text size on the field itself (a utility, so a later layer) beats whatever its specificity: a field that sets its own size under 16px
+  // has to carry a `pointer-coarse:text-16` of its own. jsdom has no layout to measure, so this reads the classes the fields really render
+  // with, and only for the fields rendered below: a field added to one of the files the last test lists has to be rendered here too.
+  // (Base UI's hidden input beside the code's boxes is aria-hidden and takes no focus.)
+  const TEXT_ENTRY =
+    "input:not([type=checkbox], [type=radio], [type=file], [type=hidden], [type=range], [type=button], [type=submit], [aria-hidden=true]), textarea:not([aria-hidden=true])";
+
+  /** A class that sets a font size: the variants before it, whether it is `!important`, and its size in px (0 when the class names one that can't be read). */
+  const sizeClass = (token: string) => {
+    // The variants end at the last colon outside brackets (`text-[length:14px]` has one inside).
+    let depth = 0;
+    let cut = -1;
+    for (const [at, char] of [...token].entries()) {
+      if (char === "[" || char === "(") depth++;
+      else if (char === "]" || char === ")") depth--;
+      else if (char === ":" && depth === 0) cut = at;
+    }
+    const variants = token.slice(0, cut + 1);
+    const important = /^!|!$/.test(token.slice(cut + 1));
+    const utility = token.slice(cut + 1).replace(/^!|!$/g, "");
+    const step = /^text-(\d+(?:\.\d+)?)(?:\/.+)?$/.exec(utility);
+    if (step) return { variants, important, px: Number(step[1]) };
+    const arbitrary = /^text-\[(?:length:)?(\d*\.?\d+)(px|rem|em)\](?:\/.+)?$/.exec(utility);
+    if (arbitrary) return { variants, important, px: Number(arbitrary[1]) * (arbitrary[2] === "px" ? 1 : 16) };
+    if (/^text-\(length:[^)]+\)(?:\/.+)?$/.test(utility) || /^text-\[length:[^\]]+\](?:\/.+)?$/.test(utility)) return { variants, important, px: 0 };
+    return null;
+  };
+
+  /**
+   * Whether a field would be under 16px on a touch screen: any size under 16 that the touch size doesn't beat. Only a plain size is beaten
+   * by `pointer-coarse:text-16` (the variant sorts after it); one behind another variant (`phone:text-13`, which sorts after the touch
+   * one) or marked `!` isn't, and nor is a touch size that is itself under 16.
+   */
+  const zoomsOnFocus = (field: Element) => {
+    const sizes = field.className.split(/\s+/).map(sizeClass).filter((size) => size !== null);
+    const touch = sizes.some((size) => size.variants === "pointer-coarse:" && !size.important && size.px >= 16);
+    return sizes.some((size) => size.px < 16 && !(size.variants === "" && !size.important && touch));
+  };
+
+  const rendered = () => {
+    const { container } = render(
+      <>
+        <TextField id="a" label="Full" value="" onChange={() => {}} />
+        <TextField id="b" label="Short" width="short" value="" onChange={() => {}} />
+        <SearchField id="c" label="Search" value="" onChange={() => {}} />
+        <Code />
+      </>,
+    );
+    return [...container.querySelectorAll(TEXT_ENTRY)];
+  };
+
+  it("holds every text field core renders to 16px, or leaves its size to app.css", () => {
+    const fields = rendered();
+    // TextField's two widths, the search box and the code's six boxes.
+    expect(fields).toHaveLength(9);
+    expect(fields.filter(zoomsOnFocus).map((field) => field.id || field.getAttribute("aria-label"))).toEqual([]);
+  });
+
+  it("knows a field that would zoom", () => {
+    const zooms = (classes: string) => {
+      const field = document.createElement("input");
+      field.className = classes;
+      return zoomsOnFocus(field);
+    };
+    // Its own size under 16px, with no touch size, or one under 16.
+    expect(zooms("px-2 text-14/sm font-bold")).toBe(true);
+    expect(zooms("text-[15px] pointer-coarse:text-14")).toBe(true);
+    expect(zooms("text-[0.875rem]/5")).toBe(true);
+    expect(zooms("text-[length:14px]")).toBe(true);
+    expect(zooms("text-(length:--size)")).toBe(true);
+    // A touch size that a later one beats: a size behind another variant, or an important one.
+    expect(zooms("text-14/sm pointer-coarse:text-16/normal phone:text-13")).toBe(true);
+    expect(zooms("text-14! pointer-coarse:text-16/normal")).toBe(true);
+    expect(zooms("!text-14 pointer-coarse:text-16/normal")).toBe(true);
+    expect(zooms("text-14/sm pointer-coarse:text-16/normal")).toBe(false);
+    expect(zooms("text-14/sm pointer-coarse:text-16 pointer-coarse:leading-normal")).toBe(false);
+    expect(zooms("text-14/sm pointer-coarse:text-18/lg")).toBe(false);
+    expect(zooms("text-18/lg font-bold")).toBe(false);
+    expect(zooms("text-[1rem] tiny:text-[1.125rem]")).toBe(false);
+    expect(zooms("border-0 p-0.5 text-muted placeholder:text-muted")).toBe(false);
+  });
+
+  it("is told of a new file that draws a field, so it renders it above", () => {
+    const sources = import.meta.glob("../**/*.tsx", { query: "?raw", import: "default", eager: true });
+    // A text input, a textarea, or any of Base UI's: its parts (`Field.Control`, `OTPField.Input`) or a field imported under another name.
+    const drawsAField = /<(?:input|textarea)\b|<\w*Input\b|\.(?:Input|Control)\b|@base-ui\/react\/(?:input|field|otp-field|number-field|combobox|autocomplete)\b/;
+    const files = Object.entries(sources)
+      .filter(([file, source]) => !/\.(?:test|stories)\.tsx$/.test(file) && drawsAField.test(source as string))
+      .map(([file]) => file.replace(/^.*\//, ""))
+      .sort();
+    expect(files).toEqual(["SearchField.tsx", "TextField.tsx", "controls.tsx"]);
   });
 });
 
