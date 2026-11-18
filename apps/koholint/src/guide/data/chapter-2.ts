@@ -24,17 +24,17 @@ export default {
       title: "Jumping detours",
       location: "Koholint Prairie · Tabahl Wasteland · Forest",
       rows: [
-        ["heart-prairie", ["heart"], "Piece of Heart · Pit ring", "Just north of the Witch’s Hut, use Roc’s Feather to jump into the center of the ring of holes and jump out the same way."],
-        ["heart-tabahl", ["heart"], "Piece of Heart · Tabahl Wasteland", "Jump the pits east of the Witch’s Hut to reach the graveyard and continue north into the wasteland. Jump the narrow crossing to the heart piece on the far side of the pits."],
+        ["heart-prairie", ["heart"], "Piece of Heart · Pit ring", "Just north of the Witch’s Hut, use Roc’s Feather to jump into the center of the ring of holes and jump out the same way.", { map: ["Nintendo Life", "https://www.nintendolife.com/guides/zelda-links-awakening-all-heart-pieces-map-and-locations#heart-piece-6-jump-the-circle-of-pits-koholint-prairie"] }],
+        ["heart-tabahl", ["heart"], "Piece of Heart · Tabahl Wasteland", "Jump the pits east of the Witch’s Hut to reach the graveyard and continue north into the wasteland. Jump the narrow crossing to the heart piece on the far side of the pits.", { map: ["Nintendo Life", "https://www.nintendolife.com/guides/zelda-links-awakening-all-heart-pieces-map-and-locations#heart-piece-7-jump-a-line-of-pits-tabahl-wasteland"] }],
       ],
     },
     {
       title: "Forest and wasteland shells",
       location: "Mysterious Forest · Goponga Swamp · Tabahl Wasteland",
       rows: [
-        ["shell-northforest", ["shell"], "Secret Seashell · North forest exit", "Leave the forest by the path north of the Toadstool clearing. Dig beside the tree on the west side of the path, just below the exit."],
-        ["shell-write", ["shell"], "Secret Seashell · Mr. Write’s telephone booth", "Follow the path east from Mr. Write’s house to the telephone booth. Go north of it, slash the southernmost bush in that patch, and dig the tile underneath."],
-        ["shell-tabahl", ["shell"], "Secret Seashell · Tabahl Wasteland", "Dig the bare dirt among the grass and dead trees in the northeast corner of the wasteland."],
+        ["shell-northforest", ["shell"], "Secret Seashell · North forest exit", "Leave the forest by the path north of the Toadstool clearing. Dig beside the tree on the west side of the path, just below the exit.", { map: ["Nintendo Life", "https://www.nintendolife.com/guides/zelda-links-awakening-all-secret-seashells-map-and-locations#shell-8-dig-near-a-tree-at-northern-exit-mysterious-forest"] }],
+        ["shell-write", ["shell"], "Secret Seashell · Mr. Write’s telephone booth", "Follow the path east from Mr. Write’s house to the telephone booth. Go north of it, slash the southernmost bush in that patch, and dig the tile underneath.", { map: ["Nintendo Life", "https://www.nintendolife.com/guides/zelda-links-awakening-all-secret-seashells-map-and-locations#shell-9-dig-near-the-cliffs-west-of-goponga-swamp"] }],
+        ["shell-tabahl", ["shell"], "Secret Seashell · Tabahl Wasteland", "Dig the bare dirt among the grass and dead trees in the northeast corner of the wasteland.", { map: ["Nintendo Life", "https://www.nintendolife.com/guides/zelda-links-awakening-all-secret-seashells-map-and-locations#shell-10-digging-in-a-patch-of-grass-tabahl-wasteland"] }],
       ],
     },
     {
