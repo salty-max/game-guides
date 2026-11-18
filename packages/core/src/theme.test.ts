@@ -61,7 +61,7 @@ const contrast = (a: Rgb, b: Rgb) => {
   return (hi + 0.05) / (lo + 0.05);
 };
 
-// [foreground, background, minimum]: 4.5 for text, 3 for checkbox edges, the ticked fill and the focus ring.
+// [foreground, background, minimum]: 4.5 for text, 3 for checkbox edges, the ticked fill, a progress bar's fill on its track and the focus ring.
 const PAIRS: [string, string, number][] = [
   ...["--paper", "--surface", "--raised", "--rail", "--hero-from", "--hero-to"].map((bg): [string, string, number] => ["--ink", bg, 4.5]),
   ...["--paper", "--surface", "--raised", "--rail"].map((bg): [string, string, number] => ["--muted", bg, 4.5]),
@@ -73,6 +73,7 @@ const PAIRS: [string, string, number][] = [
   ["--paper", "--ink", 4.5],
   ["--edge", "--surface", 3],
   ["--primary", "--surface", 3],
+  ["--primary", "--bar-track", 3],
   ["--focus", "--paper", 3],
   ["--focus", "--surface", 3],
 ];

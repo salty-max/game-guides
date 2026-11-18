@@ -1,5 +1,6 @@
 export const two = (value: number) => String(value).padStart(2, "0");
-export const pct = (done: number, total: number) => (total ? Math.floor((done / total) * 100) : 0);
+// Multiplied before dividing: (29 / 50) * 100 is 57.99… in floating point, and would round down to 57.
+export const pct = (done: number, total: number) => (total ? Math.floor((done * 100) / total) : 0);
 
 /** Chapter id → what an eager `import.meta.glob` of `chapter-<n>.<ext>` files gives for each. */
 export const byChapter = <T>(files: Record<string, T>): Record<number, T> =>

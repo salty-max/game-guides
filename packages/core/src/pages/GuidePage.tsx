@@ -9,7 +9,7 @@ import { ChecklistRoute } from "../components/ChecklistRoute";
 import { MissablesStrip } from "../components/MissablesStrip";
 import { NextUp } from "../components/NextUp";
 import { Button, LinkButton, PageHeading } from "../components/ui";
-import { chapterRows, chapters, completion, config, guideAnchor, overall, readChapter } from "../guide";
+import { chapterRows, chapters, config, guideAnchor, overall, readChapter } from "../guide";
 import { useReveal } from "../useReveal";
 import { isOpen, useProgress } from "../store/progress";
 import type { Chapter } from "../types";
@@ -105,14 +105,11 @@ const figure = "text-18 tabular-nums";
 
 function SummaryFigure() {
   const checks = useProgress((s) => s.data.checks);
-  const { done, total, percent } = overall(checks);
-  return percent === null ? (
-    <span>
-      <strong className={figure}>{done}</strong> of {total} entries checked
-    </span>
-  ) : (
-    <span>
-      <strong className={figure}>{percent}%</strong> {completion.overall!.label}
+  const { percent, label } = overall(checks);
+  // (kept out of search snippets, as the bar is: a first visit's figure is 0%)
+  return (
+    <span data-nosnippet="">
+      <strong className={figure}>{percent}%</strong> {label}
     </span>
   );
 }

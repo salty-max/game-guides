@@ -2,8 +2,9 @@ import { useLayoutEffect } from "react";
 import { Link, useParams } from "react-router";
 import { Stat } from "../components/Stats";
 import { WhatsLeft } from "../components/WhatsLeft";
+import { Overall } from "../components/Overall";
 import { Button, PageHeading, Panel, PanelActions, PanelText, PanelTitle, ProgressBar } from "../components/ui";
-import { CHAPTER_COUNT, chapterRows, chapters, completion, overallLine, text } from "../guide";
+import { CHAPTER_COUNT, chapterRows, chapters, completion, text } from "../guide";
 import { two } from "../format";
 import { exportProgress } from "../backup";
 import { installed, usePersistence } from "../persistence";
@@ -26,7 +27,10 @@ export function DashboardPage() {
 
   return (
     <>
-      <PageHeading title="Your progress" intro={text.dashboardIntro} stat={overallLine(data.checks)} />
+      <PageHeading title="Your progress" intro={text.dashboardIntro} />
+      <Panel space="below">
+        <Overall place="page" />
+      </Panel>
       {/* Two columns where both get 22rem, one where they don't, whatever the screen: the chapter list's bars and the backup's buttons need it. */}
       <div className="mb-3.5 grid grid-cols-[repeat(auto-fit,minmax(min(100%,22rem),1fr))] items-start gap-3.25">
         <Panel>

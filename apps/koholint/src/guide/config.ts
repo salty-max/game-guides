@@ -63,8 +63,6 @@ const config: GuideConfig = {
   banners,
   defer: (row) => row.tags.includes("amiibo"),
   completion: {
-    isCore: (row) => !row.tags.includes("amiibo"),
-    overall: { label: "complete" },
     board: Object.keys(categories)
       .filter((tag) => tag !== "story")
       .map((tag) => ({ tag, optional: tag === "amiibo" })),
