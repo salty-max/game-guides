@@ -73,7 +73,7 @@ export function RailDrawer({ open, onOpenChange, activeChapter, view, returnFocu
                 activeChapter={activeChapter}
                 view={view}
                 heading={
-                  <div className="-mt-2.5 mb-1 flex items-center justify-between">
+                  <div className="-mt-2.5 flex items-center justify-between">
                     <div className={railHeading}>Walkthrough</div>
                     <Drawer.Close render={<IconButton label="Close chapters" icon="x" />} />
                   </div>

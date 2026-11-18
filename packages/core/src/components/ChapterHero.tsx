@@ -25,7 +25,7 @@ export function ChapterHero({ chapter, banner, children }: { chapter: Chapter; b
   // The hero's own width is the container its parts read (`/hero`), the wrapper's: a container can't query itself, and the section changes.
   return (
     <div className="@container/hero">
-      <section className="relative isolate flex min-h-61.25 items-center overflow-hidden rounded-hero border border-line bg-[linear-gradient(120deg,var(--hero-from),var(--hero-to))] px-[clamp(1.4375rem,5cqi,3.0625rem)] py-5.5 @max-[40rem]/hero:block @max-[40rem]/hero:min-h-0 @max-[40rem]/hero:p-0 phone:rounded-card">
+      <section className="relative isolate flex min-h-61.25 items-center overflow-hidden rounded-hero border border-line bg-[linear-gradient(120deg,var(--hero-from),var(--hero-to))] px-[clamp(1.5rem,5cqi,3rem)] py-6 @max-[40rem]/hero:block @max-[40rem]/hero:min-h-0 @max-[40rem]/hero:p-0 phone:rounded-card">
         {banner && (
           <img
             className="absolute top-0 right-0 -z-1 h-full w-[68%] mask-[linear-gradient(to_right,transparent_9%,#000_66%)] object-cover object-[76%_center] @max-[40rem]/hero:static @max-[40rem]/hero:block @max-[40rem]/hero:aspect-3/1 @max-[40rem]/hero:h-auto @max-[40rem]/hero:w-full @max-[40rem]/hero:mask-[linear-gradient(to_top,transparent_4%,#000_62%)]"
@@ -38,7 +38,7 @@ export function ChapterHero({ chapter, banner, children }: { chapter: Chapter; b
             fetchPriority="high"
           />
         )}
-        <div className="w-[59%] max-w-140 @max-[40rem]/hero:w-full @max-[40rem]/hero:max-w-none @max-[40rem]/hero:px-[clamp(1.125rem,5cqi,2.375rem)] @max-[40rem]/hero:py-5 phone:px-3.5 phone:py-4">
+        <div className="w-[59%] max-w-140 @max-[40rem]/hero:w-full @max-[40rem]/hero:max-w-none @max-[40rem]/hero:px-[clamp(1.25rem,5cqi,2.5rem)] @max-[40rem]/hero:py-5 phone:px-3.5 phone:py-4">
           <div className="mb-2 flex flex-wrap items-center gap-2.5 text-13 font-bold">
             <span className="rounded-tag bg-ink px-2.5 py-1 text-11 font-extrabold tracking-[0.14em] text-paper uppercase">
               Chapter {two(chapter.id)} / {two(CHAPTER_COUNT)}

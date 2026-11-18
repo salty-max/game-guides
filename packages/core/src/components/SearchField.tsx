@@ -21,7 +21,7 @@ export function SearchField({ id, label, placeholder, value, onChange }: SearchF
     <BaseField.Root>
       <BaseField.Label
         htmlFor={id}
-        className="flex min-h-11 items-center gap-1.75 rounded-control border border-control-line bg-surface px-2.5 py-1.5 text-14/sm focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-focus"
+        className="flex min-h-11 items-center gap-2 rounded-control border border-control-line bg-surface px-2.5 py-1.5 text-14/sm focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-focus"
       >
         <Icon name="search" className="size-4 text-muted" />
         <span className="sr-only">{label}</span>

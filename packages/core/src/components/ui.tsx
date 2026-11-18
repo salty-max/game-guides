@@ -69,10 +69,9 @@ export function IconButton({ label, icon, tooltip = false, ...rest }: IconButton
 // keeps room above and below for the focus ring, which a line that scrolls would otherwise cut off.
 const chipGroup = cva("flex gap-1.5", {
   variants: {
-    space: { none: "", above: "mt-2.5" },
     flow: { wrap: "flex-wrap", scroll: "-mx-(--gutter) -my-1.5 scrollbar-none overflow-x-auto overscroll-x-contain px-(--gutter) py-1.5 *:shrink-0" },
   },
-  defaultVariants: { space: "none", flow: "wrap" },
+  defaultVariants: { flow: "wrap" },
 });
 
 interface ChipGroupProps {
@@ -81,8 +80,6 @@ interface ChipGroupProps {
   choices: [key: string, label: string][];
   value: string;
   onChange: (value: string) => void;
-  /** Room above, for a group under a panel's title. */
-  space?: "none" | "above";
   /** Wrap onto more lines (the default), or keep to one line that scrolls sideways. */
   flow?: "wrap" | "scroll";
 }
@@ -92,7 +89,7 @@ interface ChipGroupProps {
  * the arrow keys move between chips without pressing them; Enter or Space presses one. Pressing the pressed chip again keeps it pressed,
  * so something is always chosen, and tells the page again. A value that isn't among the chips (a filter the page's select set) leaves none pressed.
  */
-export function ChipGroup({ label, choices, value, onChange, space, flow }: ChipGroupProps) {
+export function ChipGroup({ label, choices, value, onChange, flow }: ChipGroupProps) {
   return (
     <ToggleGroup
       aria-label={label}
@@ -101,13 +98,13 @@ export function ChipGroup({ label, choices, value, onChange, space, flow }: Chip
         // Pressing the pressed chip lets go of it in Base UI; here it stays pressed, and the page still hears it (the route clears a highlight).
         onChange(next[0] ?? value);
       }}
-      className={chipGroup({ space, flow })}
+      className={chipGroup({ flow })}
     >
       {choices.map(([key, text]) => (
         <Toggle
           key={key}
           value={key}
-          className={`${press} min-h-10 rounded-button border border-line bg-surface px-3.5 py-2 text-13 leading-[1.4] font-bold text-muted hover:border-control-line data-pressed:border-soft-line data-pressed:bg-soft data-pressed:text-soft-ink phone:px-2.75`}
+          className={`${press} min-h-10 rounded-button border border-line bg-surface px-3.5 py-2 text-13 leading-[1.4] font-bold text-muted hover:border-control-line data-pressed:border-soft-line data-pressed:bg-soft data-pressed:text-soft-ink phone:px-2.5`}
         >
           {text}
         </Toggle>
@@ -133,7 +130,7 @@ export function ActiveFilter({ label, onRemove }: { label: string; onRemove: () 
 /** How much of something is done, as a thin bar: Base UI's progress, named by `label` and read as a percentage. It is as wide as what holds it. */
 export function ProgressBar({ done, total, label }: { done: number; total: number; label: string }) {
   return (
-    <Progress.Root value={pct(done, total)} aria-label={label} className="mt-0.75">
+    <Progress.Root value={pct(done, total)} aria-label={label}>
       <Progress.Track className="h-1.5 overflow-hidden rounded-[20px] bg-bar-track">
         <Progress.Indicator className="block h-full rounded-[inherit] bg-primary" />
       </Progress.Track>
@@ -141,23 +138,23 @@ export function ProgressBar({ done, total, label }: { done: number; total: numbe
   );
 }
 
-// A card on the dashboard, Next up, and a guide's own panels (Koholint's deathless run, Red Dead's calibration).
-const panel = cva("rounded-card border border-line bg-surface", {
+// A card on the dashboard, Next up, and a guide's own panels (Koholint's deathless run, Red Dead's calibration). It holds the room
+// between its parts, which carry no margin of their own: the room inside it and between its parts go together, so they can't be mixed.
+const panel = cva("flex flex-col rounded-card border border-line bg-surface", {
   variants: {
-    space: { none: "", above: "mt-3.25", "above-wide": "mt-4", below: "mb-3.5" },
-    pad: { roomy: "px-4.5 py-4.25", snug: "px-4 py-3.5 phone:px-3" },
+    pad: { roomy: "gap-3 px-5 py-4 phone:px-4", snug: "gap-2 px-4 py-3.5 phone:px-3" },
   },
-  defaultVariants: { space: "none", pad: "roomy" },
+  defaultVariants: { pad: "roomy" },
 });
 
 type SectionProps = Omit<ComponentPropsWithRef<"section">, "className" | "style">;
 
 /**
- * A panel: its title, its words and its actions are the Panel parts below; `space` is the room it keeps from what's next to it, and `pad`
- * the room inside it (snug for a short list that sits between other parts of a page).
+ * A panel: its title, its words and its actions are the Panel parts below, one under the other. `pad` is the room inside it and between
+ * its parts (snug for a short list that sits between other parts of a page). What holds the panel keeps the room around it.
  */
-export function Panel({ space, pad, ...rest }: SectionProps & { space?: "none" | "above" | "above-wide" | "below"; pad?: "roomy" | "snug" }) {
-  return <section className={panel({ space, pad })} {...rest} />;
+export function Panel({ pad, ...rest }: SectionProps & { pad?: "roomy" | "snug" }) {
+  return <section className={panel({ pad })} {...rest} />;
 }
 
 export function PanelTitle({ id, children }: { id?: string; children: ReactNode }) {
@@ -168,8 +165,13 @@ export function PanelTitle({ id, children }: { id?: string; children: ReactNode 
   );
 }
 
+/** A panel's title and the words that open it, kept closer to each other than to the rest of the panel. */
+export function PanelHead({ children }: { children: ReactNode }) {
+  return <div className="flex flex-col gap-1.5">{children}</div>;
+}
+
 // What a panel says: muted as a rule, in ink for a result the reader asked for, in the error colour for what went wrong.
-const panelText = cva("mt-1.75 mb-0 text-14", {
+const panelText = cva("text-14", {
   variants: { tone: { muted: "text-muted", ink: "text-ink", error: "text-error" } },
   defaultVariants: { tone: "muted" },
 });
@@ -180,13 +182,13 @@ export function PanelText({ tone, ...rest }: Omit<ComponentPropsWithRef<"p">, "c
 
 /** A form in a panel, under its words: the fields and their buttons. The panel's code checks the values, so the browser's own checks are off. */
 export function PanelForm(props: Omit<ComponentPropsWithRef<"form">, "className" | "style">) {
-  return <form noValidate className="mt-3" {...props} />;
+  return <form noValidate {...props} />;
 }
 
 /** A panel's one big number, with what it counts beside it: a run's deaths. */
 export function PanelFigure({ value, unit }: { value: number; unit: string }) {
   return (
-    <p className="mt-3 mb-0 text-38 leading-none font-extrabold tabular-nums">
+    <p className="text-38 leading-none font-extrabold tabular-nums">
       {value}
       <small className="ml-1.5 text-14 text-muted">{unit}</small>
     </p>
@@ -195,18 +197,18 @@ export function PanelFigure({ value, unit }: { value: number; unit: string }) {
 
 /** A row of buttons in a panel. */
 export function PanelActions(props: Omit<ComponentPropsWithRef<"div">, "className" | "style">) {
-  return <div className="mt-3.25 flex flex-wrap items-center gap-2" {...props} />;
+  return <div className="flex flex-wrap items-center gap-2" {...props} />;
 }
 
 /** What a list says in place of its rows when it has none. */
 export const Empty = ({ children }: { children: ReactNode }) => (
-  <div className="rounded-card border border-dashed border-control-line bg-raised px-3.75 py-5.25 text-14 text-muted">{children}</div>
+  <div className="rounded-card border border-dashed border-control-line bg-raised px-4 py-5 text-14 text-muted">{children}</div>
 );
 
 /** A note above a page's content, with an icon: what the page leaves out, and why. */
 export function Callout({ icon, children }: { icon: IconName; children: ReactNode }) {
   return (
-    <div className="mb-3.25 flex items-start gap-2.25 rounded-small border border-line bg-soft px-3 py-2.5 text-13 text-soft-ink [&_svg]:mt-px [&_svg]:size-4">
+    <div className="flex items-start gap-2 rounded-small border border-line bg-soft px-3 py-2.5 text-13 text-soft-ink [&_svg]:mt-px [&_svg]:size-4">
       <Icon name={icon} />
       <span>{children}</span>
     </div>
@@ -219,11 +221,24 @@ export function Callout({ icon, children }: { icon: IconName; children: ReactNod
  */
 export function PageHeading({ title, intro, stat }: { title: string; intro?: ReactNode; stat?: ReactNode }) {
   return (
-    <header className="mt-1.75 mb-5 phone:mt-0 phone:mb-3.5">
+    <header>
       <h1 className="font-display text-[clamp(1.875rem,6cqi,3.625rem)] leading-[1.17] font-bold tracking-[-0.015em] phone:leading-[1.15]">{title}</h1>
-      {intro && <p className="mt-1.25 text-14 text-muted phone:mt-1 phone:text-13 phone:leading-[1.45]">{intro}</p>}
-      {stat && <span className="mt-2.25 inline-block rounded-tag bg-soft px-3 py-0.75 text-12 font-extrabold text-soft-ink">{stat}</span>}
+      {intro && <p className="mt-1.5 text-14 text-muted phone:mt-1 phone:text-13 phone:leading-[1.45]">{intro}</p>}
+      {stat && <span className="mt-2 inline-block rounded-tag bg-soft px-3 py-1 text-12 font-extrabold text-soft-ink">{stat}</span>}
     </header>
+  );
+}
+
+/**
+ * A page that opens with a heading: the heading, then the page's parts one under the other. The page keeps the room between them, more
+ * under the heading than between the parts, so a part carries no margin of its own and one that renders nothing leaves no gap.
+ */
+export function HeadedPage({ title, intro, stat, children }: { title: string; intro?: ReactNode; stat?: ReactNode; children: ReactNode }) {
+  return (
+    <div className="flex flex-col gap-5 phone:gap-3.5">
+      <PageHeading title={title} intro={intro} stat={stat} />
+      <div className="flex flex-col gap-3">{children}</div>
+    </div>
   );
 }
 

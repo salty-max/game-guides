@@ -8,7 +8,7 @@ import { ChapterNav } from "../components/ChapterNav";
 import { ChecklistRoute } from "../components/ChecklistRoute";
 import { MissablesStrip } from "../components/MissablesStrip";
 import { NextUp } from "../components/NextUp";
-import { Button, LinkButton, PageHeading } from "../components/ui";
+import { Button, HeadedPage, LinkButton } from "../components/ui";
 import { chapterRows, chapters, config, guideAnchor, overall, readChapter } from "../guide";
 import { useReveal } from "../useReveal";
 import { isOpen, useProgress } from "../store/progress";
@@ -31,19 +31,24 @@ export function GuidePage() {
 
   if (!open) {
     return (
-      <>
-        <PageHeading title={`Chapter ${chapterId} is hidden`} intro="Revealing it also reveals every chapter before it." />
-        <Button look="" icon="unlock" onClick={() => reveal(chapterId, target ? entry : undefined)}>
-          Reveal chapter
-        </Button>{" "}
-        <LinkButton to={`/guide/${ceiling}`}>Back to your guide</LinkButton>
-      </>
+      <HeadedPage title={`Chapter ${chapterId} is hidden`} intro="Revealing it also reveals every chapter before it.">
+        <div className="flex flex-wrap gap-2">
+          <Button look="" icon="unlock" onClick={() => reveal(chapterId, target ? entry : undefined)}>
+            Reveal chapter
+          </Button>
+          <LinkButton to={`/guide/${ceiling}`}>Back to your guide</LinkButton>
+        </div>
+      </HeadedPage>
     );
   }
 
   // Re-mount per chapter so held lists and filters never leak into the next one.
   return <GuideView key={chapterId} chapter={chapters[chapterId - 1]} target={target} />;
 }
+
+// The chapter's top (the hero, Next up, the missables, the overall figure), then its route. An article opens with a padded card and a
+// checklist route with a heading, so an article gets more room above it, and more again as the page column widens (`cqi` of `/page`).
+const routeGap = config.layout === "article" ? "gap-[clamp(1.5rem,4cqi,2.5rem)]" : "gap-6";
 
 function GuideView({ chapter, target }: { chapter: Chapter; target?: string }) {
   const { key: locationKey } = useLocation();
@@ -66,38 +71,40 @@ function GuideView({ chapter, target }: { chapter: Chapter; target?: string }) {
   const footer = <ChapterNav chapter={chapter.id} in={config.layout === "article" ? "article" : "route"} />;
 
   return (
-    <>
-      <ChapterHero chapter={chapter} banner={config.banners[chapter.id]}>
-        {config.layout === "article" ? (
-          <LinkButton to={`${path}/${chapter.groups[0].key}`} look="accent" icon="down">
-            Read walkthrough
+    <div className={`flex flex-col ${routeGap}`}>
+      <div className="flex flex-col gap-4">
+        <ChapterHero chapter={chapter} banner={config.banners[chapter.id]}>
+          {config.layout === "article" ? (
+            <LinkButton to={`${path}/${chapter.groups[0].key}`} look="accent" icon="down">
+              Read walkthrough
+            </LinkButton>
+          ) : (
+            <LinkButton to={`${path}/${firstLeft?.id ?? chapter.groups[0].key}`} look="accent" icon="play">
+              {started ? "Resume route" : "Start walkthrough"}
+            </LinkButton>
+          )}
+          <LinkButton to={`/checklist/all/${chapter.id}`} icon="checkList">
+            Chapter checklist
           </LinkButton>
-        ) : (
-          <LinkButton to={`${path}/${firstLeft?.id ?? chapter.groups[0].key}`} look="accent" icon="play">
-            {started ? "Resume route" : "Start walkthrough"}
-          </LinkButton>
-        )}
-        <LinkButton to={`/checklist/all/${chapter.id}`} icon="checkList">
-          Chapter checklist
-        </LinkButton>
-      </ChapterHero>
-      <NextUp chapter={chapter.id} />
-      <MissablesStrip chapter={chapter} />
-      <Link
-        className={`${press} mt-3.5 mb-6.5 flex min-h-11 items-center justify-between gap-3 rounded-card border border-line bg-surface px-4 py-1.5 text-14 hover:border-control-line`}
-        to="/dashboard"
-      >
-        <SummaryFigure />
-        <span className={buttonClass("link", "default")}>
-          Progress <Icon name="right" />
-        </span>
-      </Link>
+        </ChapterHero>
+        <NextUp chapter={chapter.id} />
+        <MissablesStrip chapter={chapter} />
+        <Link
+          className={`${press} flex min-h-11 items-center justify-between gap-3 rounded-card border border-line bg-surface px-4 py-1.5 text-14 hover:border-control-line`}
+          to="/dashboard"
+        >
+          <SummaryFigure />
+          <span className={buttonClass("link", "default")}>
+            Progress <Icon name="right" />
+          </span>
+        </Link>
+      </div>
       {config.layout === "article" ? (
         <ArticleRoute chapter={chapter} target={target} footer={footer} />
       ) : (
         <ChecklistRoute key={target ?? ""} chapter={chapter} target={target} footer={footer} />
       )}
-    </>
+    </div>
   );
 }
 

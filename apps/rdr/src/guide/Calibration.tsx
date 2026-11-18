@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { TextField } from "@hundo/core/components/TextField";
-import { Button, Panel, PanelForm, PanelText, PanelTitle } from "@hundo/core/components/ui";
+import { Button, Panel, PanelForm, PanelHead, PanelText, PanelTitle } from "@hundo/core/components/ui";
 import { coreRows } from "@hundo/core/guide";
 import { useProgress } from "@hundo/core/store/progress";
 import { useUi } from "@hundo/core/store/ui";
@@ -38,8 +38,10 @@ export function Calibration() {
   const delta = reported === null ? null : calibrationDelta(estimated, reported);
   return (
     <Panel id="calibration" aria-labelledby="calibration-title">
-      <PanelTitle id="calibration-title">Check against the game</PanelTitle>
-      <PanelText>Enter the completion percentage from Stats → General to see how far this guide’s estimate is off.</PanelText>
+      <PanelHead>
+        <PanelTitle id="calibration-title">Check against the game</PanelTitle>
+        <PanelText>Enter the completion percentage from Stats → General to see how far this guide’s estimate is off.</PanelText>
+      </PanelHead>
       <PanelForm onSubmit={submit}>
         <TextField
           id="reported"

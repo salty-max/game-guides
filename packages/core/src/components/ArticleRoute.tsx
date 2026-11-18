@@ -15,7 +15,7 @@ import { press, pressText } from "./press-style";
 export function ArticleRoute({ chapter, target, footer }: { chapter: Chapter; target?: string; footer: ReactNode }) {
   const current = chapter.groups.find((group) => group.key === target || group.rows.some((row) => `entry-${row.id}` === target))?.key;
   const links = (
-    <ul className="m-0 grid list-none gap-0.75 p-0">
+    <ul className="m-0 grid list-none gap-1 p-0">
       {chapter.groups.map((group) => (
         <li key={group.key}>
           <Link
@@ -33,8 +33,8 @@ export function ArticleRoute({ chapter, target, footer }: { chapter: Chapter; ta
   return (
     // The route's own width decides (`/chapter`, the wrapper's: a container can't query itself): under 52rem the list of sections folds
     // away above the article, so it stands beside the article only where the prose keeps a column of its own (about 570px at the least).
-    <div className="@container/chapter mt-[clamp(1.5rem,4cqi,2.5rem)]">
-      <div className="grid grid-cols-[minmax(0,1fr)_minmax(10.875rem,13.625rem)] items-start gap-[clamp(1.5rem,5.4cqi,4.125rem)] @max-[52rem]/chapter:grid-cols-[minmax(0,1fr)] @max-[52rem]/chapter:gap-6">
+    <div className="@container/chapter">
+      <div className="grid grid-cols-[minmax(0,1fr)_minmax(10.875rem,13.625rem)] items-start gap-[clamp(1.5rem,5.4cqi,4rem)] @max-[52rem]/chapter:grid-cols-[minmax(0,1fr)] @max-[52rem]/chapter:gap-6">
         <Collapsible.Root className="hidden rounded-small border border-line bg-surface px-3 @max-[52rem]/chapter:block">
           <Collapsible.Trigger className={`${press} group/trigger flex min-h-11 w-full cursor-pointer items-center justify-between border-0 bg-transparent p-0 text-left font-sans text-14/tight font-bold text-ink`}>
             In this chapter <Icon name="down" className="size-4 text-muted group-data-panel-open/trigger:rotate-180" />
@@ -46,17 +46,19 @@ export function ArticleRoute({ chapter, target, footer }: { chapter: Chapter; ta
           </Collapsible.Panel>
         </Collapsible.Root>
         {/* A container too (`/article`), so a section's padding and title follow the column the article has, folded or not. */}
-        <article className="@container/article min-w-0" aria-label={`${chapter.title} walkthrough`}>
-          {chapter.groups.map((group) => (
-            <Section key={group.key} group={group} target={target} />
-          ))}
+        <article className="@container/article flex min-w-0 flex-col gap-8" aria-label={`${chapter.title} walkthrough`}>
+          <div className="flex flex-col gap-4">
+            {chapter.groups.map((group) => (
+              <Section key={group.key} group={group} target={target} />
+            ))}
+          </div>
           {footer}
         </article>
         <nav
-          className="sticky top-[calc(var(--bar)+var(--sticky-gap))] max-h-[calc(100dvh-var(--bar)-var(--sticky-gap)-1.25rem)] scrollbar-thin overflow-auto border-s border-line pt-1 pr-1.5 pb-1.25 pl-4.25 @max-[52rem]/chapter:hidden standalone:top-(--sticky-gap)"
+          className="sticky top-[calc(var(--bar)+var(--sticky-gap))] max-h-[calc(100dvh-var(--bar)-var(--sticky-gap)-1.25rem)] scrollbar-thin overflow-auto border-s border-line py-1 pr-1.5 pl-4 @max-[52rem]/chapter:hidden standalone:top-(--sticky-gap)"
           aria-label="In this chapter"
         >
-          <h2 className="mt-0 mb-[0.6rem] text-14/tight font-bold text-ink">In this chapter</h2>
+          <h2 className="mt-0 mb-2.5 text-14/tight font-bold text-ink">In this chapter</h2>
           {links}
         </nav>
       </div>
@@ -73,30 +75,32 @@ const check = cva(`${pressText} cursor-pointer font-extrabold hover:text-primary
 const entry = cva("scroll-mt-4", {
   variants: {
     in: {
-      prose: "leading-[1.8] [&+&]:mt-[.85rem]",
-      list: "flex flex-wrap items-center gap-x-2 gap-y-0.5 border-t border-line-soft py-2.25 first:border-t-0",
+      prose: "leading-[1.8]",
+      list: "flex flex-wrap items-center gap-x-2 gap-y-0.5 border-t border-line-soft py-2 first:border-t-0",
     },
     linked: { true: "rounded-[3px] bg-paper [box-shadow:-3px_0_var(--accent)]", false: "" },
   },
 });
 
 // Its padding and title are in `cqi`, which is the nearest container's width, whatever its name: the article's, as long as no container
-// is put between the two.
+// is put between the two. One room parts the header from the first step and each step from the next.
 function Section({ group, target }: { group: Group; target?: string }) {
   return (
-    <section className="rounded-card border border-line bg-surface p-[clamp(0.875rem,3.75cqi,1.625rem)] [&+&]:mt-4" aria-labelledby={group.key}>
-      <header className="mb-[.85rem]">
-        <h2 id={group.key} tabIndex={-1} className="font-display text-[clamp(1.5625rem,5.4cqi,2.3125rem)] leading-[1.18] font-bold tracking-[-0.015em]">
-          {group.title}
-        </h2>
-        {group.location && <p className="mt-[.35rem] text-14 font-semibold text-muted">{group.location}</p>}
-        {group.note && <p className="mt-[.35rem] text-14 text-muted">{group.note}</p>}
-        {group.map && (
-          <p className="mt-[.35rem]">
-            <MapLink map={group.map} of={group.title} at="group" />
-          </p>
-        )}
-        <BulkCheck rows={group.rows} label={group.title} space="above" />
+    <section className="flex flex-col gap-3.5 rounded-card border border-line bg-surface p-[clamp(0.875rem,3.75cqi,1.5rem)]" aria-labelledby={group.key}>
+      <header className="flex flex-col gap-2.5">
+        <div className="flex flex-col gap-1.5">
+          <h2 id={group.key} tabIndex={-1} className="font-display text-[clamp(1.5625rem,5.4cqi,2.3125rem)] leading-[1.18] font-bold tracking-[-0.015em]">
+            {group.title}
+          </h2>
+          {group.location && <p className="text-14 font-semibold text-muted">{group.location}</p>}
+          {group.note && <p className="text-14 text-muted">{group.note}</p>}
+          {group.map && (
+            <p>
+              <MapLink map={group.map} of={group.title} at="group" />
+            </p>
+          )}
+        </div>
+        <BulkCheck rows={group.rows} label={group.title} ownLine />
       </header>
       {group.compact ? (
         <ul className="m-0 list-none p-0">

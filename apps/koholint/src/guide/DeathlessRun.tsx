@@ -31,7 +31,6 @@ export function DeathlessRun() {
         choices={Object.entries(modeNames)}
         value={mode}
         onChange={(value) => value !== mode && setExtra((current) => ({ ...current, mode: value as RunMode }))}
-        space="above"
       />
       <PanelFigure value={run.deaths} unit={run.deaths === 1 ? "death" : "deaths"} />
       <PanelText>{message}</PanelText>

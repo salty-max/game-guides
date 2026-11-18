@@ -70,7 +70,7 @@ function SaveStatus() {
 // clips: the tile shows alone rather than a cut letter. Clipped, not hidden, so find in page can't scroll the link to the name. Under 361px
 // only the tile shows.
 const brandLink = cva(
-  `${press} flex h-10 min-w-0 flex-wrap content-start items-center gap-x-2.75 overflow-clip px-6 mid:pl-4.25 drawer:h-8.5 drawer:gap-x-1.75 drawer:px-2.5`,
+  `${press} flex h-10 min-w-0 flex-wrap content-start items-center gap-x-3 overflow-clip px-6 mid:pl-4 drawer:h-8.5 drawer:gap-x-2 drawer:px-2`,
 );
 
 // The guide's painting, its square the dark surface: a hairline in the guide's line keeps the cornered tile on a dark bar.
@@ -103,7 +103,7 @@ export function TopBar({ chapter, view, menuOpen, onToggleMenu, menuToggle }: To
           anything over its minimum only after the brand has all its width. */}
       <div className="mx-auto grid h-full max-w-(--frame-max) grid-cols-[minmax(0,var(--rail-w))_minmax(0,auto)_1fr] items-center drawer:grid-cols-[auto_minmax(0,auto)_1fr] phone:grid-cols-[auto_minmax(0,1fr)_auto]">
         {/* Shown only under 800px: `hidden` is the class's own, and `drawer:block` brings it back. */}
-        <div className="ml-2.75 hidden drawer:block tiny:ml-1.75">
+        <div className="ml-3 hidden drawer:block tiny:ml-2">
           <IconButton
             ref={menuToggle}
             icon="menu"
@@ -124,7 +124,7 @@ export function TopBar({ chapter, view, menuOpen, onToggleMenu, menuToggle }: To
             {/* The guide's own painting, as the home screen shows it (pnpm icons writes the sizes). The link carries the name. */}
             <img src={iconUrl(tileSrc(tileSizes[0]))} srcSet={tileSrcSet(iconUrl)} alt="" width={40} height={40} className={brandTile()} />
             {/* (wraps away, rather than ellipsizing, when there isn't room for 5ch of the body text, or all of the name if it's shorter; then grows to all of it) */}
-            <span className="grid max-w-max min-w-0 grow basis-[5ch] gap-0.75 leading-[1.1] tiny:hidden">
+            <span className="grid max-w-max min-w-0 grow basis-[5ch] gap-1 leading-[1.1] tiny:hidden">
               <strong className="truncate font-display text-21 leading-[1.05] font-bold tracking-[-0.01em] drawer:text-17">{brand.mark}</strong>
               {/* The space isn't drawn (it's a grid), but without it the link's visible text reads "KoholintHundo", which its name, "Koholint Hundo home", doesn't contain. */}
               {" "}
@@ -140,7 +140,7 @@ export function TopBar({ chapter, view, menuOpen, onToggleMenu, menuToggle }: To
             centred in what the brand and the buttons leave. */}
         <div className="grid grid-cols-[1fr_auto_1fr] items-center before:content-[''] drawer:grid-cols-[1fr_auto] drawer:before:hidden phone:flex">
           {!phone && <MainNav chapter={chapter} view={view} place="top" />}
-          <div className="mr-6.25 flex items-center gap-2.25 justify-self-end drawer:mr-2.75 drawer:gap-1.5 tiny:mr-1.75 tiny:gap-1">
+          <div className="mr-6 flex items-center gap-2 justify-self-end drawer:mr-3 drawer:gap-1.5 tiny:mr-2 tiny:gap-1">
             <ThemeToggle />
             <SaveStatus />
           </div>

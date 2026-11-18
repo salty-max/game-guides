@@ -1,6 +1,6 @@
 import { DialogHost } from "@hundo/core/components/DialogHost";
 import { useCounts } from "@hundo/core/counts";
-import { Button, PageHeading } from "@hundo/core/components/ui";
+import { Button, HeadedPage } from "@hundo/core/components/ui";
 import { useInstall, type InstallOffer } from "@hundo/core/store/install";
 import { useProgress } from "@hundo/core/store/progress";
 import { useSyncStatus } from "@hundo/core/store/sync";
@@ -16,10 +16,13 @@ function Page({ dialog }: { dialog: Opened }) {
   const openDialog = useUi((s) => s.openDialog);
   return (
     <>
-      <PageHeading title="The page behind" />
-      <Button look="" onClick={() => openDialog(dialog)}>
-        Open
-      </Button>
+      <HeadedPage title="The page behind">
+        <div>
+          <Button look="" onClick={() => openDialog(dialog)}>
+            Open
+          </Button>
+        </div>
+      </HeadedPage>
       <DialogHost />
     </>
   );

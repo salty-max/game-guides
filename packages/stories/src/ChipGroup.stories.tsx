@@ -36,9 +36,9 @@ export const OtherPressed: Story = { args: { value: "shell" } };
 /** A value the chips don't offer (a category the page's select chose): none is pressed. */
 export const NonePressed: Story = { args: { value: "photo" } };
 
-/** Two chips, as Koholint's run mode shows them, with the room it keeps under a panel's title. */
+/** Two chips, as Koholint's run mode shows them. */
 export const RunMode: Story = {
-  args: { label: "Run mode", choices: [["normal", "Normal"], ["hero", "Hero"]], value: "normal", space: "above" },
+  args: { label: "Run mode", choices: [["normal", "Normal"], ["hero", "Hero"]], value: "normal" },
 };
 
 /** A click presses a chip and lets go of the last; clicking the pressed one again keeps it pressed. */

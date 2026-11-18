@@ -1,4 +1,4 @@
-import { Callout, Empty, PageHeading } from "@hundo/core/components/ui";
+import { Callout, Empty, HeadedPage, PageHeading } from "@hundo/core/components/ui";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect } from "storybook/test";
 
@@ -36,6 +36,26 @@ export const SpoilerCallout: Story = {
 /** What a list says when its filters leave nothing. */
 export const EmptyList: Story = {
   render: () => <Empty>Nothing matches. Try changing a filter or search term.</Empty>,
+};
+
+/**
+ * A page under its heading (HeadedPage): the page keeps the room between the heading and its parts, 20px (14px on a phone), and 12px
+ * between the parts, which carry no margin of their own.
+ */
+export const OnAPage: Story = {
+  render: (args) => (
+    <HeadedPage {...args}>
+      <Callout icon="lock">Showing chapters 1–2 only. Later entries unlock as you reveal chapters.</Callout>
+      <Empty>Nothing matches. Try changing a filter or search term.</Empty>
+    </HeadedPage>
+  ),
+  play: async ({ canvas }) => {
+    const heading = canvas.getByRole("heading", { level: 1 }).closest("header")!;
+    const callout = canvas.getByText(/Showing chapters/).parentElement!;
+    const empty = canvas.getByText(/Nothing matches/);
+    await expect(callout.getBoundingClientRect().top - heading.getBoundingClientRect().bottom).toBe(20);
+    await expect(empty.getBoundingClientRect().top - callout.getBoundingClientRect().bottom).toBe(12);
+  },
 };
 
 /** On a phone: a compact title, as a large title is (30px, the floor of the title's clamp). */

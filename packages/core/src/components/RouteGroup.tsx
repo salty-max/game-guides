@@ -54,7 +54,7 @@ export const RouteRow = memo(function RouteRow({ row, prefix, highlighted, origi
         >
           {row.title}
         </label>
-        {row.text && <p className="mt-0.75 text-15 leading-[1.6] text-muted">{row.text}</p>}
+        {row.text && <p className="mt-1 text-15 leading-[1.6] text-muted">{row.text}</p>}
       </div>
       {/* On a phone a long tag wraps under the next instead of pushing the row wider. */}
       <div className="flex flex-col items-end gap-1 leading-[1.1]">
@@ -96,7 +96,7 @@ interface GroupProps {
 }
 
 // The group's header is its heading, and the button inside it opens and closes the steps (a button can't hold a heading).
-const trigger = `${press} group/trigger grid min-h-14.5 w-full cursor-pointer grid-cols-[auto_minmax(0,1fr)_auto_auto] items-center gap-2.75 border-0 bg-transparent px-3.5 py-3 text-left font-sans text-16 leading-[1.58] font-normal text-inherit hover:bg-raised phone:gap-2 phone:p-2.25`;
+const trigger = `${press} group/trigger grid min-h-14.5 w-full cursor-pointer grid-cols-[auto_minmax(0,1fr)_auto_auto] items-center gap-3 border-0 bg-transparent px-3.5 py-3 text-left font-sans text-16 leading-[1.58] font-normal text-inherit hover:bg-raised phone:gap-2 phone:p-2.5`;
 
 export function RouteGroup({ groupKey, title, location, icon, note, map, rows, open, highlightedId, origin, fallbackFocusId, rememberToggle }: GroupProps) {
   const setGroupOpen = useUi((s) => s.setGroupOpen);
@@ -113,7 +113,7 @@ export function RouteGroup({ groupKey, title, location, icon, note, map, rows, o
 
   return (
     <Collapsible.Root
-      className="mb-3 overflow-clip rounded-card border border-line bg-surface"
+      className="overflow-clip rounded-card border border-line bg-surface"
       id={origin ? undefined : groupKey}
       open={isOpen}
       onOpenChange={(next) => {
