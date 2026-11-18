@@ -1,6 +1,6 @@
 import { Select as BaseSelect } from "@base-ui/react/select";
 import { Icon } from "./Icon";
-import { selectField, selectTrigger, type SelectProps } from "./select-style";
+import { selectFieldClasses, selectTriggerClasses, type SelectProps } from "./select-style";
 
 // The select itself, on Base UI. Pages never import this: they use the Select shell (Select.tsx), which loads it when it's needed.
 // The settings screen is in the dialog's chunk already and uses this directly.
@@ -19,7 +19,7 @@ export function SelectImpl({
 }: SelectProps & { defaultOpen?: boolean; autoFocus?: boolean }) {
   const items = choices.map(([key, text]) => ({ value: String(key), label: text }));
   return (
-    <div className={selectField}>
+    <div className={selectFieldClasses}>
       <label htmlFor={id} className={bare ? "sr-only" : undefined}>
         {label}
       </label>
@@ -30,7 +30,7 @@ export function SelectImpl({
         defaultOpen={defaultOpen}
         onValueChange={(next) => next !== null && onChange(next)}
       >
-        <BaseSelect.Trigger id={id} autoFocus={autoFocus} className={selectTrigger}>
+        <BaseSelect.Trigger id={id} autoFocus={autoFocus} className={selectTriggerClasses}>
           <BaseSelect.Value />
           <BaseSelect.Icon className="text-muted">
             <Icon name="down" className="size-4" />

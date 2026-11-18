@@ -11,7 +11,7 @@ import { installed, usePersistence } from "../persistence";
 import { panels } from "virtual:guide/panels";
 import { isOpen, useProgress } from "../store/progress";
 import { useUi } from "../store/ui";
-import { press } from "../components/press-style";
+import { pressClasses } from "../components/press-style";
 
 export function DashboardPage() {
   const { section } = useParams();
@@ -43,7 +43,7 @@ export function DashboardPage() {
               const rows = chapterRows(chapter);
               const count = rows.filter((row) => data.checks[row.id] === true).length;
               return (
-                <Link key={chapter.id} className={`${press} flex items-center gap-2 border-b border-line-soft py-2 text-14 last-of-type:border-b-0`} to={`/guide/${chapter.id}`}>
+                <Link key={chapter.id} className={`${pressClasses} flex items-center gap-2 border-b border-line-soft py-2 text-14 last-of-type:border-b-0`} to={`/guide/${chapter.id}`}>
                   <small className="text-12 whitespace-nowrap text-muted tabular-nums">{two(chapter.id)}</small>
                   <strong className="flex-1">{chapter.title}</strong>
                   <div className="min-w-7.5 flex-[0_0_17%]">

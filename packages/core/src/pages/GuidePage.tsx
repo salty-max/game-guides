@@ -13,7 +13,7 @@ import { chapterRows, chapters, config, guideAnchor, overall, readChapter } from
 import { useReveal } from "../useReveal";
 import { isOpen, useProgress } from "../store/progress";
 import type { Chapter } from "../types";
-import { press } from "../components/press-style";
+import { pressClasses } from "../components/press-style";
 
 export function GuidePage() {
   const { chapter: param, entry } = useParams();
@@ -90,7 +90,7 @@ function GuideView({ chapter, target }: { chapter: Chapter; target?: string }) {
         <NextUp chapter={chapter.id} />
         <MissablesStrip chapter={chapter} />
         <Link
-          className={`${press} flex min-h-11 items-center justify-between gap-3 rounded-card border border-line bg-surface px-4 py-1.5 text-14 hover:border-control-line`}
+          className={`${pressClasses} flex min-h-11 items-center justify-between gap-3 rounded-card border border-line bg-surface px-4 py-1.5 text-14 hover:border-control-line`}
           to="/dashboard"
         >
           <SummaryFigure />
@@ -108,7 +108,7 @@ function GuideView({ chapter, target }: { chapter: Chapter; target?: string }) {
   );
 }
 
-const figure = "text-18 tabular-nums";
+const figureClasses = "text-18 tabular-nums";
 
 function SummaryFigure() {
   const checks = useProgress((s) => s.data.checks);
@@ -116,7 +116,7 @@ function SummaryFigure() {
   // (kept out of search snippets, as the bar is: a first visit's figure is 0%)
   return (
     <span data-nosnippet="">
-      <strong className={figure}>{percent}%</strong> {label}
+      <strong className={figureClasses}>{percent}%</strong> {label}
     </span>
   );
 }

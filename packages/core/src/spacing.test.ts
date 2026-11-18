@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 // Every spacing in core is on one scale (docs/core.md, Spacing): Tailwind's whole steps (4px apart at the default 16px), the half steps
 // 0.5 to 3.5 (2, 6, 10 and 14px) and `px` for a hairline. A step inside a calc(), a clamp() or a variable's fallback is written in rem,
 // and is one of those too, and so is a variable that holds a spacing. This reads core's source and stylesheets as text rather than leaving
-// it to lint: better-tailwindcss reads class attributes and cva calls, not a class list kept in a constant (`trigger` in RouteGroup).
+// it to lint: lint here checks no scale, and it never sees a stylesheet, a spacing variable or a length inside a calc() or a clamp().
 const sources = import.meta.glob(["./**/*.{ts,tsx,css}", "!./**/*.test.{ts,tsx}"], { query: "?raw", import: "default", eager: true }) as Record<string, string>;
 
 // A utility that takes a spacing, after any variants (`phone:`, `[&_svg]:`), with its value.

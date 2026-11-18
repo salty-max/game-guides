@@ -5,10 +5,10 @@ import { RadioGroup as BaseRadioGroup } from "@base-ui/react/radio-group";
 import { Switch as BaseSwitch } from "@base-ui/react/switch";
 import { useId, useState } from "react";
 import { buttonClass } from "./buttonStyle";
-import { checkBox, checkIcon, checkMark } from "./check-style";
+import { checkBox, checkIconClasses, checkMarkClasses } from "./check-style";
 import { Icon } from "./Icon";
-import { field } from "./select-style";
-import { press } from "./press-style";
+import { fieldClasses } from "./select-style";
+import { pressClasses } from "./press-style";
 
 // Core's form controls: Base UI's headless parts, styled from the guide's palette through the tokens in tokens.css. Like Button, none of
 // them takes a className or a style: a guide gets the look it's given. The parts follow shadcn's Base UI components, adapted to the house tokens.
@@ -30,8 +30,8 @@ export function Checkbox({ label, checked, onChange, disabled = false }: Checkbo
         onCheckedChange={onChange}
         className={checkBox()}
       >
-        <BaseCheckbox.Indicator className={checkMark}>
-          <Icon name="check" className={checkIcon} />
+        <BaseCheckbox.Indicator className={checkMarkClasses}>
+          <Icon name="check" className={checkIconClasses} />
         </BaseCheckbox.Indicator>
       </BaseCheckbox.Root>
       {label}
@@ -58,7 +58,7 @@ export function Switch({ label, checked, onChange, disabled = false }: SwitchPro
         checked={checked}
         disabled={disabled}
         onCheckedChange={onChange}
-        className={`${press} relative inline-flex h-7 w-12 shrink-0 items-center rounded-button border-2 border-edge bg-surface p-0.5 data-checked:border-primary data-checked:bg-primary`}
+        className={`${pressClasses} relative inline-flex h-7 w-12 shrink-0 items-center rounded-button border-2 border-edge bg-surface p-0.5 data-checked:border-primary data-checked:bg-primary`}
       >
         <BaseSwitch.Thumb className="size-5 rounded-button bg-edge transition-[translate,background-color] duration-150 ease-out in-data-theme-switch:transition-none data-checked:translate-x-5 data-checked:bg-on-primary" />
       </BaseSwitch.Root>
@@ -77,13 +77,13 @@ interface RadioGroupProps {
 export function RadioGroup({ label, choices, value, onChange }: RadioGroupProps) {
   const labelId = useId();
   return (
-    <div className={field}>
+    <div className={fieldClasses}>
       <span id={labelId}>{label}</span>
       <BaseRadioGroup aria-labelledby={labelId} value={value} onValueChange={(next) => onChange(String(next))} className="grid auto-cols-fr grid-flow-col gap-2">
         {choices.map(([key, text]) => (
           <label
             key={key}
-            className={`${press} flex min-h-11 cursor-pointer items-center justify-center rounded-control border border-control-line bg-surface px-3 text-center text-14/sm font-bold text-muted select-none not-has-data-checked:hover:bg-raised has-focus-visible:outline-3 has-focus-visible:outline-offset-3 has-focus-visible:outline-focus has-data-checked:border-soft-line has-data-checked:bg-soft has-data-checked:text-soft-ink`}
+            className={`${pressClasses} flex min-h-11 cursor-pointer items-center justify-center rounded-control border border-control-line bg-surface px-3 text-center text-14/sm font-bold text-muted select-none not-has-data-checked:hover:bg-raised has-focus-visible:outline-3 has-focus-visible:outline-offset-3 has-focus-visible:outline-focus has-data-checked:border-soft-line has-data-checked:bg-soft has-data-checked:text-soft-ink`}
           >
             <Radio.Root value={key} className="sr-only" />
             {text}
@@ -109,7 +109,7 @@ interface FileFieldProps {
 export function FileField({ id, label, accept, onChange }: FileFieldProps) {
   const [name, setName] = useState("");
   return (
-    <div className={field}>
+    <div className={fieldClasses}>
       <span id={`${id}-label`}>{label}</span>
       <div className="flex flex-wrap items-center gap-2.5">
         <label className={`cursor-pointer has-focus-visible:outline-3 has-focus-visible:outline-offset-3 has-focus-visible:outline-focus ${buttonClass("outline", "default")}`}>
@@ -159,7 +159,7 @@ interface CodeFieldProps {
 export function CodeField({ id, label, length = 6, value, onChange, onComplete, description, invalid = false, disabled = false, alphanumeric = false, autoFocus = false }: CodeFieldProps) {
   const descriptionId = `${id}-description`;
   return (
-    <div className={field}>
+    <div className={fieldClasses}>
       <label htmlFor={id}>{label}</label>
       <BaseOTPField.Root
         id={id}

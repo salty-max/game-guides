@@ -2,7 +2,7 @@ import { Button } from "@base-ui/react/button";
 import { useEffect, useState } from "react";
 import { chunks, loadFailed } from "./chunks";
 import { Icon } from "./Icon";
-import { selectField, selectTrigger, type SelectProps } from "./select-style";
+import { selectFieldClasses, selectTriggerClasses, type SelectProps } from "./select-style";
 import { useLoadable, whenIdle } from "../loadable";
 
 /**
@@ -25,7 +25,7 @@ export function Select(props: SelectProps) {
   };
   const current = choices.find(([key]) => String(key) === String(value))?.[1];
   return (
-    <div className={selectField}>
+    <div className={selectFieldClasses}>
       <label htmlFor={id} className={bare ? "sr-only" : undefined}>
         {label}
       </label>
@@ -33,7 +33,7 @@ export function Select(props: SelectProps) {
         id={id}
         aria-haspopup="listbox"
         disabled={disabled}
-        className={selectTrigger}
+        className={selectTriggerClasses}
         onClick={want}
         onKeyDown={(event) => {
           // The real trigger opens on the arrow keys as well.

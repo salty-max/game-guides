@@ -25,10 +25,10 @@ const updateWords: Record<UpdateNotice, string> = {
 
 // Bottom right, clear of the notch and the home indicator; the width of the screen on a phone, above its tab bar. The toasts stack in the flow (there are
 // two at most), so none of Base UI's overlapping-stack variables are used, only the swipe's.
-const viewport =
+const viewportClasses =
   "pointer-events-none fixed right-[calc(1rem+var(--safe-right))] bottom-[calc(1rem+var(--safe-bottom))] z-40 grid max-w-[min(23.75rem,calc(100%-2rem))] gap-2.5 outline-none standalone:select-none standalone:[-webkit-touch-callout:none] phone:right-[calc(0.75rem+var(--safe-right))] phone:bottom-[calc(0.75rem+var(--tabs))] phone:left-[calc(0.75rem+var(--safe-left))] phone:max-w-none";
 
-const root =
+const rootClasses =
   "pointer-events-auto translate-x-(--toast-swipe-movement-x) translate-y-(--toast-swipe-movement-y) rounded-card border border-control-line bg-surface px-4 py-3.5 text-ink shadow-[0_12px_40px_var(--shadow)] transition-[opacity,translate] duration-200 data-ending-style:opacity-0 data-starting-style:translate-y-4 data-starting-style:opacity-0 data-swiping:transition-none motion-reduce:transition-none";
 
 /**
@@ -41,7 +41,7 @@ export function Toasts(props: ToastsProps) {
     <Toast.Provider>
       <Feed {...props} />
       <Toast.Portal>
-        <Toast.Viewport className={viewport}>
+        <Toast.Viewport className={viewportClasses}>
           <List reload={props.reload} />
         </Toast.Viewport>
       </Toast.Portal>
@@ -107,7 +107,7 @@ function List({ reload }: { reload: () => void }) {
   return toasts.map((toast) => {
     const undo = toast.data?.undo;
     return (
-      <Toast.Root key={toast.id} toast={toast} className={root}>
+      <Toast.Root key={toast.id} toast={toast} className={rootClasses}>
         <Toast.Title render={<p />} className="mt-0 mb-2.5 text-14" />
         <div className="flex flex-wrap gap-2">
           {undo && (

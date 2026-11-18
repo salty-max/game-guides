@@ -1,7 +1,7 @@
 import { Field as BaseField } from "@base-ui/react/field";
 import { cva } from "class-variance-authority";
 import type { ReactNode } from "react";
-import { field } from "./select-style";
+import { fieldClasses } from "./select-style";
 
 // A file of its own, not controls.tsx: a guide's panel on the dashboard (Red Dead's calibration) shows it, and a page that imported
 // controls.tsx would take the dialog's controls into the first download with it (docs/core.md, "One file per control").
@@ -58,7 +58,7 @@ export function TextField({ id, label, value, onChange, description, error, disa
     />
   );
   return (
-    <BaseField.Root className={field} invalid={Boolean(error)} disabled={disabled}>
+    <BaseField.Root className={fieldClasses} invalid={Boolean(error)} disabled={disabled}>
       <BaseField.Label htmlFor={id}>{label}</BaseField.Label>
       {actions ? (
         <div className="flex flex-wrap items-center gap-2">

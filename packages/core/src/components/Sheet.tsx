@@ -8,16 +8,16 @@ import { useBeforeBack } from "../beforeBack";
 // Base UI's drawer layers, as in RailDrawer.tsx, from the bottom of the screen. The backdrop dims the whole screen, bars included, and is
 // placed the way the dialog's is (DialogFrames.tsx): against the screen in a browser tab, against the fixed body in the installed app on
 // iOS. The viewport takes no touch, so a finger on the dimmed page drags nothing behind it, and a tap there closes the sheet.
-const backdrop =
-  "fixed inset-0 z-50 min-h-dvh bg-backdrop opacity-[calc(1-var(--drawer-swipe-progress,0))] transition-opacity duration-200 standalone:supports-[-webkit-touch-callout:none]:absolute data-ending-style:opacity-0 data-starting-style:opacity-0 data-swiping:duration-0 motion-reduce:transition-none";
+const backdropClasses =
+  "fixed inset-0 z-50 min-h-dvh bg-backdrop opacity-[calc(1-var(--drawer-swipe-progress,0))] transition-opacity duration-200 data-ending-style:opacity-0 data-starting-style:opacity-0 data-swiping:duration-0 motion-reduce:transition-none standalone:supports-[-webkit-touch-callout:none]:absolute";
 
-const viewport = "fixed inset-0 z-50 touch-none";
+const viewportClasses = "fixed inset-0 z-50 touch-none";
 
 // The sheet follows the finger as it's swiped down: Base UI moves it while the finger is down and leaves where it got to in
 // --drawer-swipe-movement-y for the release (the pattern of Base UI's own drawer page). Its top corners are the guide's hero corners, and
 // its foot clears the home indicator.
-const popup =
-  "absolute inset-x-0 bottom-0 flex max-h-[85dvh] flex-col rounded-t-hero border-t border-control-line bg-surface pr-(--safe-right) pb-[calc(0.875rem+var(--safe-bottom))] pl-(--safe-left) text-ink shadow-[0_-12px_60px_var(--shadow)] outline-none [transform:translateY(var(--drawer-swipe-movement-y,0px))] transition-transform duration-200 ease-[cubic-bezier(0.32,0.72,0,1)] data-ending-style:[transform:translateY(100%)] data-ending-style:duration-[calc(var(--drawer-swipe-strength,1)*200ms)] data-starting-style:[transform:translateY(100%)] data-swiping:duration-0 data-swiping:select-none motion-reduce:transition-none";
+const popupClasses =
+  "absolute inset-x-0 bottom-0 flex max-h-[85dvh] transform-[translateY(var(--drawer-swipe-movement-y,0px))] flex-col rounded-t-hero border-t border-control-line bg-surface pr-(--safe-right) pb-[calc(0.875rem+var(--safe-bottom))] pl-(--safe-left) text-ink shadow-[0_-12px_60px_var(--shadow)] transition-transform duration-200 ease-[cubic-bezier(0.32,0.72,0,1)] outline-none data-ending-style:transform-[translateY(100%)] data-ending-style:duration-[calc(var(--drawer-swipe-strength,1)*200ms)] data-starting-style:transform-[translateY(100%)] data-swiping:duration-0 data-swiping:select-none motion-reduce:transition-none";
 
 interface SheetProps {
   open: boolean;
@@ -58,11 +58,11 @@ export function Sheet({ open, onOpenChange, title, children, footer, returnFocus
       swipeDirection="down"
     >
       <Drawer.Portal>
-        <Drawer.Backdrop className={backdrop} />
-        <Drawer.Viewport className={viewport}>
+        <Drawer.Backdrop className={backdropClasses} />
+        <Drawer.Viewport className={viewportClasses}>
           <Drawer.Popup
             ref={popupRef}
-            className={popup}
+            className={popupClasses}
             // Opened by a touch, the sheet itself takes the focus (it is named), not a control nobody pressed (see DialogFrames).
             initialFocus={() => (lastInput() === "touch" ? (popupRef.current ?? true) : true)}
             finalFocus={returnFocus}

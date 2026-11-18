@@ -1,7 +1,7 @@
 import { Drawer } from "@base-ui/react/drawer";
 import { useRef } from "react";
 import { RailContent } from "./Rail";
-import { railHeading, railPanel } from "./rail-style";
+import { railHeadingClasses, railPanel } from "./rail-style";
 import { IconButton } from "./ui";
 import { lastInput } from "../lastInput";
 
@@ -10,16 +10,16 @@ import { lastInput } from "../lastInput";
 // is a press outside the drawer, which closes it, so the bar's menu button still reads as a toggle. The backdrop and the drawer start
 // under the bar, which stays as it is. The backdrop is placed the way the dialog's is (DialogFrames.tsx): against the screen in a browser
 // tab, against the fixed body in the installed app on iOS.
-const backdrop =
-  "fixed inset-x-0 top-(--bar) bottom-0 z-20 bg-backdrop opacity-[calc(1-var(--drawer-swipe-progress,0))] transition-opacity duration-200 standalone:supports-[-webkit-touch-callout:none]:absolute data-ending-style:opacity-0 data-starting-style:opacity-0 data-swiping:duration-0 motion-reduce:transition-none";
+const backdropClasses =
+  "fixed inset-x-0 top-(--bar) bottom-0 z-20 bg-backdrop opacity-[calc(1-var(--drawer-swipe-progress,0))] transition-opacity duration-200 data-ending-style:opacity-0 data-starting-style:opacity-0 data-swiping:duration-0 motion-reduce:transition-none standalone:supports-[-webkit-touch-callout:none]:absolute";
 
-const viewport = "fixed inset-0 z-20 touch-none";
+const viewportClasses = "fixed inset-0 z-20 touch-none";
 
 // The drawer scrolls on its own (a finger's touch-action is decided where something scrolls). It follows the finger as it's swiped shut to
 // the left: Base UI moves it itself while the finger is down, and leaves where it got to in --drawer-swipe-movement-x for the release, so
 // the slide out (or back, for a swipe too short to close it) starts from there. This is the pattern of Base UI's own drawer page.
-const popup =
-  "absolute top-(--bar) bottom-0 left-0 w-[min(var(--rail-col),calc(100%-1.875rem))] [transform:translateX(var(--drawer-swipe-movement-x,0px))] scrollbar-thin [scrollbar-color:var(--edge)_var(--rail)] overflow-y-auto border-r border-line bg-rail touch-auto overscroll-contain outline-none transition-transform duration-200 ease-[cubic-bezier(0.32,0.72,0,1)] data-ending-style:[transform:translateX(-100%)] data-ending-style:duration-[calc(var(--drawer-swipe-strength,1)*200ms)] data-starting-style:[transform:translateX(-100%)] data-swiping:duration-0 data-swiping:select-none motion-reduce:transition-none";
+const popupClasses =
+  "absolute top-(--bar) bottom-0 left-0 w-[min(var(--rail-col),calc(100%-1.875rem))] transform-[translateX(var(--drawer-swipe-movement-x,0px))] touch-auto scrollbar-thin [scrollbar-color:var(--edge)_var(--rail)] overflow-y-auto overscroll-contain border-r border-line bg-rail transition-transform duration-200 ease-[cubic-bezier(0.32,0.72,0,1)] outline-none data-ending-style:transform-[translateX(-100%)] data-ending-style:duration-[calc(var(--drawer-swipe-strength,1)*200ms)] data-starting-style:transform-[translateX(-100%)] data-swiping:duration-0 data-swiping:select-none motion-reduce:transition-none";
 
 interface RailDrawerProps {
   open: boolean;
@@ -42,12 +42,12 @@ export function RailDrawer({ open, onOpenChange, activeChapter, view, returnFocu
   return (
     <Drawer.Root open={open} onOpenChange={onOpenChange} swipeDirection="left">
       <Drawer.Portal>
-        <Drawer.Backdrop className={backdrop} />
-        <Drawer.Viewport className={viewport}>
+        <Drawer.Backdrop className={backdropClasses} />
+        <Drawer.Viewport className={viewportClasses}>
           <Drawer.Popup
             ref={popupRef}
             id="chapter-rail"
-            className={popup}
+            className={popupClasses}
             initialFocus={() => {
               const rail = popupRef.current;
               // Opened by a touch, the drawer itself takes the focus (it is named), not a link round which nobody pressed (see DialogFrames).
@@ -74,7 +74,7 @@ export function RailDrawer({ open, onOpenChange, activeChapter, view, returnFocu
                 view={view}
                 heading={
                   <div className="-mt-2.5 flex items-center justify-between">
-                    <div className={railHeading}>Walkthrough</div>
+                    <div className={railHeadingClasses}>Walkthrough</div>
                     <Drawer.Close render={<IconButton label="Close chapters" icon="x" />} />
                   </div>
                 }

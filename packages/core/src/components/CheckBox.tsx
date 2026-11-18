@@ -2,7 +2,7 @@ import { Checkbox } from "@base-ui/react/checkbox";
 import { changeChecks } from "../actions";
 import { useProgress } from "../store/progress";
 import type { Row } from "../types";
-import { checkBox, checkIcon, checkMark } from "./check-style";
+import { checkBox, checkIconClasses, checkMarkClasses } from "./check-style";
 import { Icon } from "./Icon";
 
 interface CheckBoxProps {
@@ -41,8 +41,8 @@ export function CheckBox({ id, labelId, row, prose = false, fallbackFocusId, onT
         }
       }}
     >
-      <Checkbox.Indicator className={checkMark}>
-        <Icon name="check" className={checkIcon} />
+      <Checkbox.Indicator className={checkMarkClasses}>
+        <Icon name="check" className={checkIconClasses} />
       </Checkbox.Indicator>
     </Checkbox.Root>
   );

@@ -15,15 +15,15 @@ import { useUi } from "../store/ui";
 // absolute backdrop is probably placed at the top of the document and scrolled out of sight: a tab on an iPhone (iOS 18.7) showed no dim at
 // all, though the iOS 27.2 Simulator dimmed the same tab, so the cause isn't settled.
 // (Tailwind reads class names out of comments too: don't write the utility's own name here.)
-const backdrop =
-  "fixed inset-0 z-50 min-h-dvh bg-backdrop transition-opacity duration-100 standalone:supports-[-webkit-touch-callout:none]:absolute data-ending-style:opacity-0 data-starting-style:opacity-0 motion-reduce:transition-none";
+const backdropClasses =
+  "fixed inset-0 z-50 min-h-dvh bg-backdrop transition-opacity duration-100 data-ending-style:opacity-0 data-starting-style:opacity-0 motion-reduce:transition-none standalone:supports-[-webkit-touch-callout:none]:absolute";
 
 // The viewport is the part of the screen the reader can see: --vv-top and --vv-height are the visual viewport's (followVisualViewport),
 // which an on-screen keyboard shrinks, and fall back to the layout viewport where there is no visual viewport to ask. The notch and the
 // home indicator are its padding. `touch-none` keeps a finger on the dimmed page, or on the dialog's frame, from dragging anything: the
 // body scrolls on its own (touch-action stops at an element that scrolls), and the page behind is inert.
-const viewport =
-  "fixed top-[var(--vv-top,0px)] left-0 z-50 flex h-[var(--vv-height,100dvh)] w-full touch-none items-center justify-center overflow-hidden pt-[calc(1rem+var(--safe-top))] pr-[calc(0.75rem+var(--safe-right))] pb-[calc(1rem+var(--safe-bottom))] pl-[calc(0.75rem+var(--safe-left))]";
+const viewportClasses =
+  "fixed top-(--vv-top,0px) left-0 z-50 flex h-(--vv-height,100dvh) w-full touch-none items-center justify-center overflow-hidden pt-[calc(1rem+var(--safe-top))] pr-[calc(0.75rem+var(--safe-right))] pb-[calc(1rem+var(--safe-bottom))] pl-[calc(0.75rem+var(--safe-left))]";
 
 const popup = cva(
   "relative flex max-h-full min-h-0 w-full flex-col rounded-card border border-control-line bg-surface p-5 text-ink shadow-[0_18px_85px_var(--shadow)] outline-hidden transition-[opacity,scale] duration-100 data-ending-style:scale-95 data-ending-style:opacity-0 data-starting-style:scale-95 data-starting-style:opacity-0 motion-reduce:transition-none",
@@ -105,8 +105,8 @@ function Frame({ alert }: { alert: boolean }) {
     >
       {shown && screen && (
         <Dialog.Portal>
-          <Dialog.Backdrop className={backdrop} />
-          <Dialog.Viewport ref={followVisualViewport} className={viewport}>
+          <Dialog.Backdrop className={backdropClasses} />
+          <Dialog.Viewport ref={followVisualViewport} className={viewportClasses}>
             <Dialog.Popup
               ref={popupRef}
               className={popup({ size: screen.size })}

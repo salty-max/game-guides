@@ -8,12 +8,12 @@ import type { ComponentPropsWithRef, ReactNode } from "react";
 import { Link } from "react-router";
 import { buttonClass, type ButtonSize, type ButtonStyle } from "./buttonStyle";
 import { Icon, type IconName } from "./Icon";
-import { tones } from "./tone";
+import { toneClasses } from "./tone";
 import { tooltip as tooltipHandle } from "./tooltip-handle";
 import { cats, config, tagName } from "../guide";
 import type { Row } from "../types";
 import { pct } from "../format";
-import { press } from "./press-style";
+import { pressClasses } from "./press-style";
 
 interface ButtonProps extends Omit<ComponentPropsWithRef<"button">, "style" | "className"> {
   look?: ButtonStyle;
@@ -47,7 +47,7 @@ export function LinkButton({ to, look = "outline", size = "default", icon, child
 }
 
 // The top bar sets --icon-w and --icon-h where its buttons are a different size (a phone's title bar), so no class is needed on one.
-const iconButton = `${press} grid h-(--icon-h,2.5rem) w-(--icon-w,2.5rem) place-items-center rounded-control border border-control-line bg-transparent p-0 text-inherit not-disabled:hover:bg-raised disabled:cursor-not-allowed disabled:opacity-[.46] [&_svg]:size-4.5`;
+const iconButtonClasses = `${pressClasses} grid h-(--icon-h,2.5rem) w-(--icon-w,2.5rem) place-items-center rounded-control border border-control-line bg-transparent p-0 text-inherit not-disabled:hover:bg-raised disabled:cursor-not-allowed disabled:opacity-[.46] [&_svg]:size-4.5`;
 
 type IconButtonProps = { label: string; icon: IconName; tooltip?: boolean } & Omit<ComponentPropsWithRef<"button">, "className" | "style">;
 
@@ -57,7 +57,7 @@ type IconButtonProps = { label: string; icon: IconName; tooltip?: boolean } & Om
  */
 export function IconButton({ label, icon, tooltip = false, ...rest }: IconButtonProps) {
   const button = (
-    <BaseButton type="button" className={iconButton} aria-label={label} {...rest}>
+    <BaseButton type="button" className={iconButtonClasses} aria-label={label} {...rest}>
       <Icon name={icon} />
     </BaseButton>
   );
@@ -104,7 +104,7 @@ export function ChipGroup({ label, choices, value, onChange, flow }: ChipGroupPr
         <Toggle
           key={key}
           value={key}
-          className={`${press} min-h-10 rounded-button border border-line bg-surface px-3.5 py-2 text-13 leading-[1.4] font-bold text-muted hover:border-control-line data-pressed:border-soft-line data-pressed:bg-soft data-pressed:text-soft-ink phone:px-2.5`}
+          className={`${pressClasses} min-h-10 rounded-button border border-line bg-surface px-3.5 py-2 text-13 leading-[1.4] font-bold text-muted hover:border-control-line data-pressed:border-soft-line data-pressed:bg-soft data-pressed:text-soft-ink phone:px-2.5`}
         >
           {text}
         </Toggle>
@@ -117,7 +117,7 @@ export function ChipGroup({ label, choices, value, onChange, flow }: ChipGroupPr
 export function ActiveFilter({ label, onRemove }: { label: string; onRemove: () => void }) {
   return (
     <BaseButton
-      className={`${press} flex min-h-8 items-center gap-1 rounded-button border border-soft-line bg-soft px-2.5 text-12 font-bold text-soft-ink [&_svg]:size-3.5`}
+      className={`${pressClasses} flex min-h-8 items-center gap-1 rounded-button border border-soft-line bg-soft px-2.5 text-12 font-bold text-soft-ink [&_svg]:size-3.5`}
       aria-label={`Remove filter: ${label}`}
       onClick={onRemove}
     >
@@ -245,7 +245,7 @@ export function HeadedPage({ title, intro, stat, children }: { title: string; in
 // A category's label. In prose it sits a little above the baseline, level with the words' middle; in a row's column of tags, on a phone, a
 // long one wraps under itself instead of pushing the row wider.
 const tag = cva("rounded-tag px-2 py-1 text-11 font-extrabold tracking-[0.02em] whitespace-nowrap", {
-  variants: { tone: tones, at: { line: "", prose: "align-[0.125rem]", column: "phone:max-w-21 phone:text-right phone:whitespace-normal" } },
+  variants: { tone: toneClasses, at: { line: "", prose: "align-[0.125rem]", column: "phone:max-w-21 phone:text-right phone:whitespace-normal" } },
   defaultVariants: { tone: "none", at: "line" },
 });
 

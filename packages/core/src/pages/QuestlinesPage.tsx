@@ -4,9 +4,9 @@ import { useLayoutEffect, useState } from "react";
 import { Link, useParams } from "react-router";
 import { CheckBox } from "../components/CheckBox";
 import { Icon } from "../components/Icon";
-import { rowLink } from "../components/TickItem";
-import { tones } from "../components/tone";
-import { press, pressRow } from "../components/press-style";
+import { rowLinkClasses } from "../components/TickItem";
+import { toneClasses } from "../components/tone";
+import { pressClasses, pressRowClasses } from "../components/press-style";
 import { Callout, ChipGroup, Empty, HeadedPage, ProgressBar, Tag } from "../components/ui";
 import { config, missableWhy } from "../guide";
 import { two } from "../format";
@@ -87,8 +87,8 @@ export function QuestlinesPage() {
   );
 }
 
-const tile = cva("grid size-8.5 flex-none place-items-center rounded-small [&_svg]:size-4", { variants: { tone: tones }, defaultVariants: { tone: "none" } });
-const caret = "size-4 flex-none text-muted group-data-panel-open/trigger:rotate-180";
+const tile = cva("grid size-8.5 flex-none place-items-center rounded-small [&_svg]:size-4", { variants: { tone: toneClasses }, defaultVariants: { tone: "none" } });
+const caretClasses = "size-4 flex-none text-muted group-data-panel-open/trigger:rotate-180";
 
 interface LineCardProps {
   view: LineView;
@@ -113,7 +113,7 @@ function LineCard({ view, doneWord, hiddenPast, opened }: LineCardProps) {
       render={<section id={`line-${line.id}`} aria-labelledby={`line-${line.id}-name`} />}
       className="scroll-mt-4 overflow-hidden rounded-card border border-line bg-surface"
     >
-      <Collapsible.Trigger className={`${press} group/trigger grid min-h-12 w-full cursor-pointer grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 border-0 bg-transparent px-4 py-3 text-left font-sans text-inherit phone:px-3`}>
+      <Collapsible.Trigger className={`${pressClasses} group/trigger grid min-h-12 w-full cursor-pointer grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 border-0 bg-transparent px-4 py-3 text-left font-sans text-inherit phone:px-3`}>
         <span className={tile({ tone })} aria-hidden="true">
           <Icon name={icon} />
         </span>
@@ -132,7 +132,7 @@ function LineCard({ view, doneWord, hiddenPast, opened }: LineCardProps) {
             <span className={status === "done" ? "font-bold text-ink" : ""}>{summary}</span>
           </span>
         </span>
-        <Icon name="down" className={caret} />
+        <Icon name="down" className={caretClasses} />
       </Collapsible.Trigger>
       {!open && ahead && (
         <ol className="m-0 list-none border-t border-line-soft p-0">
@@ -182,7 +182,7 @@ function Step({ line, row, prefix, next = false, label }: StepProps) {
     <li className={step({ next })}>
       <CheckBox id={id} labelId={`${id}-label`} row={row} />
       <div className="grid gap-1">
-        <label id={`${id}-label`} className={`${pressRow} cursor-pointer leading-[1.3] after:absolute after:inset-0`} htmlFor={id}>
+        <label id={`${id}-label`} className={`${pressRowClasses} cursor-pointer leading-[1.3] after:absolute after:inset-0`} htmlFor={id}>
           {label && <small className="mb-0.5 block text-10.5 font-extrabold tracking-widest text-primary uppercase">{label}</small>}
           <strong className={checked ? "text-15 font-semibold text-muted" : "text-15"}>{row.title}</strong>
           {next && (
@@ -200,7 +200,7 @@ function Step({ line, row, prefix, next = false, label }: StepProps) {
         )}
       </div>
       {/* Its name starts with what it shows ("Ch 05"), so a reader who says what they see reaches it. */}
-      <Link className={rowLink} to={`/guide/${row.chapter}/${row.id}`}>
+      <Link className={rowLinkClasses} to={`/guide/${row.chapter}/${row.id}`}>
         Ch {two(row.chapter)}
         <span className="sr-only">, {row.title}</span>
       </Link>

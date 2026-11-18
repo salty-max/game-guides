@@ -1,7 +1,7 @@
 import { cva } from "class-variance-authority";
 
 /** The rail's "Walkthrough" heading: a plain line beside the page, the drawer's title under 800px. */
-export const railHeading = "px-2 text-12 font-extrabold tracking-[0.16em] text-muted uppercase";
+export const railHeadingClasses = "px-2 text-12 font-extrabold tracking-[0.16em] text-muted uppercase";
 
 // The rail's column: beside the page it scrolls on its own under the sticky top bar (in the installed app, the frame's row holds it);
 // in the drawer it fills the drawer, which is what scrolls.
