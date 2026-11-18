@@ -30,8 +30,10 @@ interface TextFieldProps {
   alertError?: boolean;
 }
 
+// `pointer-coarse:text-16/normal` is app.css's touch rule repeated: this input sets its own size, a utility, and a utility beats app.css's
+// rule (the `components` layer) whatever its specificity. Without it iOS zooms the page when the field takes the focus.
 const textInput = cva(
-  "min-h-11 rounded-control border border-control-line bg-surface px-2.5 py-1.5 text-14/sm font-bold text-ink placeholder:font-normal placeholder:text-muted disabled:cursor-not-allowed disabled:opacity-[.46] data-invalid:border-2 data-invalid:border-error",
+  "min-h-11 rounded-control border border-control-line bg-surface px-2.5 py-1.5 text-14/sm font-bold text-ink placeholder:font-normal placeholder:text-muted disabled:cursor-not-allowed disabled:opacity-[.46] data-invalid:border-2 data-invalid:border-error pointer-coarse:text-16/normal",
   { variants: { width: { full: "w-full", short: "w-40" } }, defaultVariants: { width: "full" } },
 );
 

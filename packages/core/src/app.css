@@ -113,8 +113,10 @@
 }
 
 @layer components {
-  /* iOS zooms the page when a field under 16px takes the focus, in a browser tab as much as in an app, so every text field on a
-     touch screen is 16px. This is in `components`, above the base layer. */
+  /* iOS zooms the page when a field under 16px takes the focus, in a browser tab as much as in an app, so a text field on a touch
+     screen is 16px. This rule is in `components`, above the base layer and below `utilities`: it sizes a field that sets no size of its
+     own, and loses to one that does (`text-14`), which must carry a `pointer-coarse:text-16` of its own (`pointer-coarse:text-16/normal`).
+     inputs.test.tsx holds core's fields to that. */
   input:not([type="checkbox"], [type="radio"], [type="file"], [type="hidden"], [type="range"]),
   textarea {
     @apply pointer-coarse:text-16 pointer-coarse:leading-normal;
