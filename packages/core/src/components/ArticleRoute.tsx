@@ -1,68 +1,31 @@
-import { Collapsible } from "@base-ui/react/collapsible";
 import { cva } from "class-variance-authority";
 import type { ReactNode } from "react";
-import { Link } from "react-router";
-import { Icon } from "./Icon";
 import { BulkCheck } from "./BulkCheck";
+import { Contents } from "./Contents";
 import { CheckBox } from "./CheckBox";
 import { LineChips } from "./LineChip";
 import { MapLink } from "./MapLink";
 import { Quantity, Tag } from "./ui";
 import type { Chapter, Group, Row } from "../types";
-import { pressClasses, pressTextClasses } from "./press-style";
+import { pressTextClasses } from "./press-style";
 
-/** The chapter as prose: one section per group, each step's opening sentence is its checkbox. */
+/** The chapter as prose: one section per group, each step's opening sentence is its checkbox, with its sections listed beside it (Contents). */
 export function ArticleRoute({ chapter, target, footer }: { chapter: Chapter; target?: string; footer: ReactNode }) {
   const current = chapter.groups.find((group) => group.key === target || group.rows.some((row) => `entry-${row.id}` === target))?.key;
-  const links = (
-    <ul className="m-0 grid list-none gap-1 p-0">
-      {chapter.groups.map((group) => (
-        <li key={group.key}>
-          <Link
-            className={`${pressClasses} block rounded-tag px-1.5 py-2 text-14 leading-[1.4] text-muted no-underline hover:bg-surface hover:text-primary aria-[current=location]:bg-surface aria-[current=location]:font-bold aria-[current=location]:text-primary`}
-            to={`/guide/${chapter.id}/${group.key}`}
-            aria-current={current === group.key ? "location" : undefined}
-          >
-            {group.title}
-          </Link>
-        </li>
-      ))}
-    </ul>
-  );
+  const links = chapter.groups.map((group) => ({ key: group.key, title: group.title, to: `/guide/${chapter.id}/${group.key}` }));
 
   return (
-    // The route's own width decides (`/chapter`, the wrapper's: a container can't query itself): under 52rem the list of sections folds
-    // away above the article, so it stands beside the article only where the prose keeps a column of its own (about 570px at the least).
-    <div className="@container/chapter">
-      <div className="grid grid-cols-[minmax(0,1fr)_minmax(10.875rem,13.625rem)] items-start gap-[clamp(1.5rem,5.4cqi,4rem)] @max-[52rem]/chapter:grid-cols-[minmax(0,1fr)] @max-[52rem]/chapter:gap-6">
-        <Collapsible.Root className="hidden rounded-small border border-line bg-surface px-3 @max-[52rem]/chapter:block">
-          <Collapsible.Trigger className={`${pressClasses} group/trigger flex min-h-11 w-full cursor-pointer items-center justify-between border-0 bg-transparent p-0 text-left font-sans text-14/tight font-bold text-ink`}>
-            In this chapter <Icon name="down" className="size-4 text-muted group-data-panel-open/trigger:rotate-180" />
-          </Collapsible.Trigger>
-          <Collapsible.Panel hiddenUntilFound>
-            <nav className="mb-2" aria-label="In this chapter">
-              {links}
-            </nav>
-          </Collapsible.Panel>
-        </Collapsible.Root>
-        {/* A container too (`/article`), so a section's padding and title follow the column the article has, folded or not. */}
-        <article className="@container/article flex min-w-0 flex-col gap-8" aria-label={`${chapter.title} walkthrough`}>
-          <div className="flex flex-col gap-4">
-            {chapter.groups.map((group) => (
-              <Section key={group.key} group={group} target={target} />
-            ))}
-          </div>
-          {footer}
-        </article>
-        <nav
-          className="sticky top-[calc(var(--bar)+var(--sticky-gap))] max-h-[calc(100dvh-var(--bar)-var(--sticky-gap)-1.25rem)] scrollbar-thin overflow-auto border-s border-line py-1 pr-1.5 pl-4 @max-[52rem]/chapter:hidden standalone:top-(--sticky-gap)"
-          aria-label="In this chapter"
-        >
-          <h2 className="mt-0 mb-2.5 text-14/tight font-bold text-ink">In this chapter</h2>
-          {links}
-        </nav>
-      </div>
-    </div>
+    <Contents label="In this chapter" links={links} current={current}>
+      {/* A container too (`/article`), so a section's padding and title follow the column the article has, folded or not. */}
+      <article className="@container/article flex min-w-0 flex-col gap-8" aria-label={`${chapter.title} walkthrough`}>
+        <div className="flex flex-col gap-4">
+          {chapter.groups.map((group) => (
+            <Section key={group.key} group={group} target={target} />
+          ))}
+        </div>
+        {footer}
+      </article>
+    </Contents>
   );
 }
 

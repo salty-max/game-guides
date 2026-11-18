@@ -157,9 +157,10 @@ export function Panel({ pad, ...rest }: SectionProps & { pad?: "roomy" | "snug" 
   return <section className={panel({ pad })} {...rest} />;
 }
 
+/** A panel's title. It can take the focus (not by Tab), so an address that names its panel (the Progress page's) can move the focus to it. */
 export function PanelTitle({ id, children }: { id?: string; children: ReactNode }) {
   return (
-    <h2 id={id} className="m-0 font-display text-24 leading-[1.2] font-bold tracking-[-0.015em]">
+    <h2 id={id} tabIndex={-1} className="m-0 font-display text-24 leading-[1.2] font-bold tracking-[-0.015em]">
       {children}
     </h2>
   );
@@ -243,12 +244,11 @@ export function HeadedPage({ title, intro, stat, children }: { title: string; in
 }
 
 /**
- * Two columns where both get 22rem, one where they don't, whatever the screen: the Progress page's cards (the chapter list's bars and the
- * backup's buttons need the room) and the Questlines page's. Its parts are Stacks, so nothing lines up across the columns: a row of a grid
- * is as tall as its tallest card, and a shorter card beside it would leave a hole under it. In one column the second stack goes under the
- * first, so the page reads, and the keyboard goes, down the first and then the second, as it does side by side.
+ * Two columns where both get 22rem, one where they don't, whatever the screen: the Questlines page's cards (Stacks, below). Its parts are
+ * Stacks, so nothing lines up across the columns: a row of a grid is as tall as its tallest card, and a shorter card beside it would leave
+ * a hole under it.
  */
-export function Columns({ ref, children }: { ref?: Ref<HTMLDivElement>; children: ReactNode }) {
+function Columns({ ref, children }: { ref?: Ref<HTMLDivElement>; children: ReactNode }) {
   return (
     <div ref={ref} className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,22rem),1fr))] gap-3">
       {children}
@@ -257,7 +257,7 @@ export function Columns({ ref, children }: { ref?: Ref<HTMLDivElement>; children
 }
 
 /** Cards one under the other, each as tall as its own content, with the room between them the page keeps between its parts. */
-export function Stack({ children }: { children: ReactNode }) {
+function Stack({ children }: { children: ReactNode }) {
   return <div className="flex flex-col gap-3">{children}</div>;
 }
 

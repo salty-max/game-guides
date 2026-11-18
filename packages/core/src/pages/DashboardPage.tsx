@@ -1,10 +1,12 @@
-import { useLayoutEffect } from "react";
-import { Link, useParams } from "react-router";
+import { useLayoutEffect, useRef } from "react";
+import { Link, useLocation, useParams } from "react-router";
+import { Contents } from "../components/Contents";
 import { Stat } from "../components/Stats";
 import { WhatsLeft } from "../components/WhatsLeft";
 import { Overall } from "../components/Overall";
-import { Button, Columns, HeadedPage, Panel, PanelActions, PanelHead, PanelText, PanelTitle, ProgressBar, Stack } from "../components/ui";
+import { Button, HeadedPage, Panel, PanelActions, PanelHead, PanelText, PanelTitle, ProgressBar } from "../components/ui";
 import { CHAPTER_COUNT, chapterRows, chapters, completion, text } from "../guide";
+import { dashboardSections, isDashboardSection } from "../dashboard";
 import { two } from "../format";
 import { exportProgress } from "../backup";
 import { installed, usePersistence } from "../persistence";
@@ -15,28 +17,37 @@ import { pressClasses } from "../components/press-style";
 
 export function DashboardPage() {
   const { section } = useParams();
+  const { key } = useLocation();
   const data = useProgress((s) => s.data);
   const openDialog = useUi((s) => s.openDialog);
   const persisted = usePersistence((s) => s.persisted);
   const visible = chapters.filter((chapter) => isOpen(data, chapter.id));
+  const column = useRef<HTMLDivElement>(null);
+  const target = isDashboardSection(section) ? section : undefined;
+  const links = dashboardSections.map(({ id, title }) => ({ key: id, title, to: `/dashboard/${id}` }));
 
-  // A layout effect, so the panel is in view before the page is shown (Layout); it runs again as a kept page comes back (Pages).
+  // Arrive at the part the address names, its title focused, every time a link to it is followed (its key). Looked up in this page's own
+  // column, not the document: a kept page hidden beside it (Pages) can hold the same id, as a chapter's hand-written section keys are ids.
+  // A layout effect, so the part is in view before the page is shown (Layout); it runs again as a kept page comes back (Pages), where
+  // Layout's own effect, after it, has the last word.
   useLayoutEffect(() => {
-    if (section && panels.some((panel) => panel.id === section)) document.getElementById(section)?.scrollIntoView({ block: "start" });
-  }, [section]);
+    if (!target) return;
+    const part = column.current?.querySelector<HTMLElement>(`[id="${target}"]`);
+    part?.querySelector<HTMLElement>("h2")?.focus({ preventScroll: true });
+    part?.scrollIntoView({ block: "start" });
+  }, [target, key]);
 
   return (
     <HeadedPage title="Your progress" intro={text.dashboardIntro}>
       <Panel>
         <Overall place="page" />
       </Panel>
-      {/* The chapters, what keeps the progress and the guide's own panels down one column, and what's left in each category down the
-          other: the tallest card by far, so the two columns end near each other. In one column, in that order. */}
-      <Columns>
-        <Stack>
-          <Panel>
+      {/* One column, every part full width, so none ends beside a longer one and leaves a hole; the list jumps to each (dashboard.ts). */}
+      <Contents label="On this page" links={links} current={target}>
+        <div ref={column} className="flex min-w-0 flex-col gap-3">
+          <Panel id="chapters" aria-labelledby="chapters-title">
             <PanelHead>
-              <PanelTitle>Chapter progress</PanelTitle>
+              <PanelTitle id="chapters-title">Chapter progress</PanelTitle>
               <PanelText>Open a revealed chapter.</PanelText>
             </PanelHead>
             {/* One list, its rows parted by rules rather than by the panel's room. */}
@@ -60,9 +71,9 @@ export function DashboardPage() {
             </div>
             {data.spoilers && data.ceiling < CHAPTER_COUNT && <PanelText>{CHAPTER_COUNT - data.ceiling} chapters hidden by spoiler protection.</PanelText>}
           </Panel>
-          <Panel>
+          <Panel id="backup" aria-labelledby="backup-title">
             <PanelHead>
-              <PanelTitle>Progress backup</PanelTitle>
+              <PanelTitle id="backup-title">Progress backup</PanelTitle>
               <PanelText>Progress lives in this browser. Export a backup to move it to another device or keep a copy.</PanelText>
             </PanelHead>
             {persisted === false && (
@@ -83,23 +94,21 @@ export function DashboardPage() {
           {panels.map(({ id, Component }) => (
             <Component key={id} />
           ))}
-        </Stack>
-        <Stack>
           <WhatsLeft />
-        </Stack>
-      </Columns>
-      <Panel>
-        <PanelHead>
-          <PanelTitle>{text.boardTitle}</PanelTitle>
-          <PanelText>{text.boardNote}</PanelText>
-        </PanelHead>
-        {/* As many columns of at least 14rem as fit, three at most, as the board has always had on a wide screen: wider stats would only spread a figure and a bar further apart. */}
-        <div className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,max(14rem,calc((100%-2*0.625rem)/3))),1fr))] gap-2.5">
-          {completion.board.map(({ tag, goal }) => (
-            <Stat key={tag} tag={tag} goal={goal} />
-          ))}
+          <Panel id="categories" aria-labelledby="categories-title">
+            <PanelHead>
+              <PanelTitle id="categories-title">{text.boardTitle}</PanelTitle>
+              <PanelText>{text.boardNote}</PanelText>
+            </PanelHead>
+            {/* As many columns of at least 14rem as fit, three at most, as the board has always had on a wide screen: wider stats would only spread a figure and a bar further apart. */}
+            <div className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,max(14rem,calc((100%-2*0.625rem)/3))),1fr))] gap-2.5">
+              {completion.board.map(({ tag, goal }) => (
+                <Stat key={tag} tag={tag} goal={goal} />
+              ))}
+            </div>
+          </Panel>
         </div>
-      </Panel>
+      </Contents>
     </HeadedPage>
   );
 }

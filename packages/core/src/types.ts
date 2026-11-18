@@ -250,8 +250,12 @@ export interface GuideConfig {
   text: GuideText;
 }
 
-/** An opt-in panel on the Progress page; `/dashboard/<id>` scrolls to it. */
+/**
+ * An opt-in panel on the Progress page; `/dashboard/<id>` scrolls to it. Its component draws a Panel with this `id` and a PanelTitle
+ * reading `title`, which is how the page's "On this page" names it (core's tests hold the two together in every guide).
+ */
 export interface Panel {
   id: string;
+  title: string;
   Component: ComponentType;
 }
