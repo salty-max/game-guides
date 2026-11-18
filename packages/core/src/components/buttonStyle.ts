@@ -19,15 +19,15 @@ const button = cva(
         danger: "border-transparent bg-danger text-on-danger",
       },
       size: {
-        default: "min-h-11 px-(--button-px,18px) py-2.25 text-sm",
-        compact: "min-h-10 px-(--button-px,14px) py-1.5 text-[13px]",
+        default: "min-h-11 px-(--button-px,1.125rem) py-2.25 text-14",
+        compact: "min-h-10 px-(--button-px,0.875rem) py-1.5 text-13",
       },
     },
   },
 );
 
 // Its own classes, not a look of the box above: it shares none of the box's padding, height, corners or edge.
-const link = `${pressText} inline-flex min-h-8 items-center gap-1.5 border-0 bg-transparent px-0 py-1.5 text-[13px] font-extrabold whitespace-nowrap text-primary underline-offset-3 hover:underline disabled:cursor-not-allowed disabled:opacity-[.46] [&_svg]:size-4`;
+const link = `${pressText} inline-flex min-h-8 items-center gap-1.5 border-0 bg-transparent px-0 py-1.5 text-13 font-extrabold whitespace-nowrap text-primary underline-offset-3 hover:underline disabled:cursor-not-allowed disabled:opacity-[.46] [&_svg]:size-4`;
 
 /** The classes of a button of this look and size: for Button and LinkButton, and for a control that has to look like one. */
 export const buttonClass = (look: ButtonStyle, size: ButtonSize) => (look === "link" ? link : button({ look: look || "primary", size }));

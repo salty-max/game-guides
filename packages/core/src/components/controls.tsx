@@ -23,7 +23,7 @@ interface CheckboxProps {
 /** A labelled tick box: the house 26px box, and the whole line (44px tall) is the target. */
 export function Checkbox({ label, checked, onChange, disabled = false }: CheckboxProps) {
   return (
-    <label className="flex min-h-11 cursor-pointer items-center gap-2.5 text-sm font-bold has-data-disabled:cursor-not-allowed has-data-disabled:opacity-[.46]">
+    <label className="flex min-h-11 cursor-pointer items-center gap-2.5 text-14/sm font-bold has-data-disabled:cursor-not-allowed has-data-disabled:opacity-[.46]">
       <BaseCheckbox.Root
         checked={checked}
         disabled={disabled}
@@ -52,7 +52,7 @@ interface SwitchProps {
  */
 export function Switch({ label, checked, onChange, disabled = false }: SwitchProps) {
   return (
-    <label className="flex min-h-11 cursor-pointer items-center justify-between gap-2.5 text-sm font-bold has-data-disabled:cursor-not-allowed has-data-disabled:opacity-[.46]">
+    <label className="flex min-h-11 cursor-pointer items-center justify-between gap-2.5 text-14/sm font-bold has-data-disabled:cursor-not-allowed has-data-disabled:opacity-[.46]">
       {label}
       <BaseSwitch.Root
         checked={checked}
@@ -83,7 +83,7 @@ export function RadioGroup({ label, choices, value, onChange }: RadioGroupProps)
         {choices.map(([key, text]) => (
           <label
             key={key}
-            className={`${press} flex min-h-11 cursor-pointer items-center justify-center rounded-control border border-control-line bg-surface px-3 text-center text-sm font-bold text-muted select-none not-has-data-checked:hover:bg-raised has-focus-visible:outline-3 has-focus-visible:outline-offset-3 has-focus-visible:outline-focus has-data-checked:border-soft-line has-data-checked:bg-soft has-data-checked:text-soft-ink`}
+            className={`${press} flex min-h-11 cursor-pointer items-center justify-center rounded-control border border-control-line bg-surface px-3 text-center text-14/sm font-bold text-muted select-none not-has-data-checked:hover:bg-raised has-focus-visible:outline-3 has-focus-visible:outline-offset-3 has-focus-visible:outline-focus has-data-checked:border-soft-line has-data-checked:bg-soft has-data-checked:text-soft-ink`}
           >
             <Radio.Root value={key} className="sr-only" />
             {text}
@@ -127,7 +127,7 @@ export function FileField({ id, label, accept, onChange }: FileFieldProps) {
           />
           <span id={`${id}-button`}>Choose file</span>
         </label>
-        <span className="text-sm font-semibold text-muted">{name || "No file chosen"}</span>
+        <span className="text-14/sm font-semibold text-muted">{name || "No file chosen"}</span>
       </div>
     </div>
   );
@@ -178,12 +178,12 @@ export function CodeField({ id, label, length = 6, value, onChange, onComplete, 
             aria-describedby={description ? descriptionId : undefined}
             aria-invalid={(invalid && !disabled) || undefined}
             data-autofocus={autoFocus && index === 0 ? "" : undefined}
-            className="h-11 min-w-0 flex-1 rounded-control border border-control-line bg-surface p-0 text-center text-lg font-bold text-ink disabled:cursor-not-allowed disabled:opacity-[.46] aria-invalid:border-2 aria-invalid:border-error"
+            className="h-11 min-w-0 flex-1 rounded-control border border-control-line bg-surface p-0 text-center text-18/lg font-bold text-ink disabled:cursor-not-allowed disabled:opacity-[.46] aria-invalid:border-2 aria-invalid:border-error"
           />
         ))}
       </BaseOTPField.Root>
       {description && (
-        <p id={descriptionId} className="text-[13px] font-semibold text-muted">
+        <p id={descriptionId} className="text-13 font-semibold text-muted">
           {description}
         </p>
       )}

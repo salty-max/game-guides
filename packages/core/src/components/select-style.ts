@@ -16,10 +16,10 @@ export interface SelectProps {
   disabled?: boolean;
 }
 
-export const selectTrigger = `${press} flex min-h-11 w-full items-center justify-between gap-2 rounded-control border border-control-line bg-surface px-2.5 py-1.5 text-start text-sm font-bold text-ink select-none not-data-disabled:hover:bg-raised data-disabled:cursor-not-allowed data-disabled:opacity-[.46] data-popup-open:bg-raised`;
+export const selectTrigger = `${press} flex min-h-11 w-full items-center justify-between gap-2 rounded-control border border-control-line bg-surface px-2.5 py-1.5 text-start text-14 leading-sm font-bold text-ink select-none not-data-disabled:hover:bg-raised data-disabled:cursor-not-allowed data-disabled:opacity-[.46] data-popup-open:bg-raised`;
 
 /** A labelled control's frame: the label over the control, with a line of description or error under it. */
-export const field = "grid gap-1 text-[13px] font-bold";
+export const field = "grid gap-1 text-13 font-bold";
 
 /** The select's frame: a field at least 100px wide, so a row of filters doesn't squeeze one to nothing. */
 export const selectField = `${field} min-w-25`;

@@ -84,7 +84,7 @@ function GuideView({ chapter, target }: { chapter: Chapter; target?: string }) {
       <NextUp chapter={chapter.id} />
       <MissablesStrip chapter={chapter} />
       <Link
-        className={`${press} mt-3.5 mb-[26px] flex min-h-11 items-center justify-between gap-3 rounded-card border border-line bg-surface px-4 py-1.5 text-[14px] hover:border-control-line`}
+        className={`${press} mt-3.5 mb-6.5 flex min-h-11 items-center justify-between gap-3 rounded-card border border-line bg-surface px-4 py-1.5 text-14 hover:border-control-line`}
         to="/dashboard"
       >
         <SummaryFigure />
@@ -101,7 +101,7 @@ function GuideView({ chapter, target }: { chapter: Chapter; target?: string }) {
   );
 }
 
-const figure = "text-[18px] tabular-nums";
+const figure = "text-18 tabular-nums";
 
 function SummaryFigure() {
   const checks = useProgress((s) => s.data.checks);

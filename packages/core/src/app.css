@@ -29,24 +29,26 @@
    browser tab stays an ordinary website. It matches the root element as well as what's inside it. */
 @custom-variant standalone (&:where([data-standalone], [data-standalone] *));
 
-/* The widths the frame changes at, named for what changes there. They are inclusive (`max-width: 800px` matches an 800px screen),
-   which Tailwind's own `max-*` variants are not, and they are declared widest first so that the narrower one wins. The matching
+/* The widths the frame changes at, named for what changes there: 1040, 800, 550, 405 and 360px at the browser's default 16px, written
+   in em (px ÷ 16), so a reader who sets a larger default size gets the narrower layout sooner, as their text needs (in a media query
+   1em is that default size, not the page's). They are inclusive (`max-width: 50em` matches an 800px screen), which Tailwind's own
+   `max-*` variants are not, and they are declared widest first so that the narrower one wins. The matching
    tokens (--bar-h, --rail-w) change at the same widths, in tokens.css. A media query written in brackets in a class sorts after all of
    these whatever its width, so a width gets a name here as soon as a class needs one. These are the screen's decisions: the rail
    narrowing and becoming a drawer, the tab bar, a phone's tighter spacing. How a part lays itself out (a chapter's hero putting its art
    above its words, an article folding its contents away, the Progress page's columns) follows the part's own width instead, with a
    container query (docs/core.md). */
-@custom-variant mid (@media (max-width: 1040px));
-@custom-variant drawer (@media (max-width: 800px));
-@custom-variant phone (@media (max-width: 550px));
-@custom-variant slim (@media (max-width: 405px));
-@custom-variant tiny (@media (max-width: 360px));
+@custom-variant mid (@media (max-width: 65em));
+@custom-variant drawer (@media (max-width: 50em));
+@custom-variant phone (@media (max-width: 34.375em));
+@custom-variant slim (@media (max-width: 25.3125em));
+@custom-variant tiny (@media (max-width: 22.5em));
 
 @layer base {
   /* A link or a "jump to" that scrolls the page lands clear of the top bar, and so does a row the focus moves to. On a phone the same goes
      for the tab bar at the bottom, which covers the page in a browser tab (in the app it is outside the area that scrolls). */
   html {
-    @apply scroll-pt-[calc(var(--bar)+24px)] scroll-pb-(--tabs);
+    @apply scroll-pt-[calc(var(--bar)+var(--sticky-gap))] scroll-pb-(--tabs);
   }
 
   /* The app is a fixed frame: the top bar and the rail stay put and only the content area scrolls (Layout), so the page behind
@@ -80,7 +82,7 @@
     @apply accent-primary [scrollbar-color:var(--edge)_var(--paper)];
   }
   body {
-    @apply bg-paper font-sans text-[16px]/[1.58] text-ink standalone:bg-surface;
+    @apply bg-paper font-sans text-16/[1.58] text-ink standalone:bg-surface;
   }
   button {
     @apply cursor-pointer;
@@ -115,6 +117,6 @@
      touch screen is 16px. This is in `components`, above the base layer. */
   input:not([type="checkbox"], [type="radio"], [type="file"], [type="hidden"], [type="range"]),
   textarea {
-    @apply pointer-coarse:text-base;
+    @apply pointer-coarse:text-16 pointer-coarse:leading-normal;
   }
 }

@@ -17,7 +17,7 @@ const viewport = "fixed inset-0 z-50 touch-none";
 // --drawer-swipe-movement-y for the release (the pattern of Base UI's own drawer page). Its top corners are the guide's hero corners, and
 // its foot clears the home indicator.
 const popup =
-  "absolute inset-x-0 bottom-0 flex max-h-[85dvh] flex-col rounded-t-hero border-t border-control-line bg-surface pr-(--safe-right) pb-[calc(14px+var(--safe-bottom))] pl-(--safe-left) text-ink shadow-[0_-12px_60px_var(--shadow)] outline-none [transform:translateY(var(--drawer-swipe-movement-y,0px))] transition-transform duration-200 ease-[cubic-bezier(0.32,0.72,0,1)] data-ending-style:[transform:translateY(100%)] data-ending-style:duration-[calc(var(--drawer-swipe-strength,1)*200ms)] data-starting-style:[transform:translateY(100%)] data-swiping:duration-0 data-swiping:select-none motion-reduce:transition-none";
+  "absolute inset-x-0 bottom-0 flex max-h-[85dvh] flex-col rounded-t-hero border-t border-control-line bg-surface pr-(--safe-right) pb-[calc(0.875rem+var(--safe-bottom))] pl-(--safe-left) text-ink shadow-[0_-12px_60px_var(--shadow)] outline-none [transform:translateY(var(--drawer-swipe-movement-y,0px))] transition-transform duration-200 ease-[cubic-bezier(0.32,0.72,0,1)] data-ending-style:[transform:translateY(100%)] data-ending-style:duration-[calc(var(--drawer-swipe-strength,1)*200ms)] data-starting-style:[transform:translateY(100%)] data-swiping:duration-0 data-swiping:select-none motion-reduce:transition-none";
 
 interface SheetProps {
   open: boolean;
@@ -68,9 +68,9 @@ export function Sheet({ open, onOpenChange, title, children, footer, returnFocus
             finalFocus={returnFocus}
           >
             {/* The handle says the sheet can be swiped; the close button is the way that doesn't need a swipe. */}
-            <div aria-hidden="true" className="mx-auto mt-2 h-[5px] w-9 shrink-0 rounded-full bg-control-line" />
+            <div aria-hidden="true" className="mx-auto mt-2 h-1.25 w-9 shrink-0 rounded-full bg-control-line" />
             <div className="flex shrink-0 items-center justify-between gap-3 px-4 py-1">
-              <Drawer.Title className="font-display text-[22px] leading-[1.2] font-bold tracking-[-0.015em]">{title}</Drawer.Title>
+              <Drawer.Title className="font-display text-22 leading-[1.2] font-bold tracking-[-0.015em]">{title}</Drawer.Title>
               <Drawer.Close render={<IconButton label="Close" icon="x" />} />
             </div>
             <Drawer.Content className="min-h-0 touch-auto overflow-y-auto overscroll-contain px-4 pt-2 pb-4">{children}</Drawer.Content>

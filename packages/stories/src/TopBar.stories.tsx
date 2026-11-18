@@ -148,6 +148,10 @@ const barParts = (bar: HTMLElement) =>
     .map((part) => part.getBoundingClientRect())
     .sort((a, b) => a.left - b.left);
 
+// A size token in px: core's sizes are rem (tokens.css), so the token's own text is in rem and the root's font size turns it into px.
+const tokenPx = (element: Element, name: string) =>
+  parseFloat(getComputedStyle(element).getPropertyValue(name)) * parseFloat(getComputedStyle(document.documentElement).fontSize);
+
 /** Nothing in the bar over anything else, nothing past its edges, and the page doesn't scroll sideways. */
 const nothingOverlaps = async (bar: HTMLElement) => {
   // (measured in the guide's own fonts: a fallback is narrower, and the brand's name in it can fit where the real one doesn't; a layout
@@ -162,8 +166,9 @@ const nothingOverlaps = async (bar: HTMLElement) => {
 };
 
 /**
- * A reader's larger default text (Chrome's "Large", a 20px root), which grows everything sized in rem around the bar's px words, with the
- * longest name a guide has (the stories draw Koholint's brand in every guide's look, and Echoes' name is twice as long).
+ * A reader's larger default text (Chrome's "Large", a 20px root), with the longest name a guide has (the stories draw Koholint's brand in
+ * every guide's look, and Echoes' name is twice as long). A root size moves the rem sizes but not the em widths, so the stories that use
+ * it take the "large" viewports (preview.tsx), where the widths fall as they do for that reader.
  */
 const largeTextLongName = () => {
   const { mark, name } = brand;
@@ -184,12 +189,12 @@ const iconsShown = (nav: HTMLElement) =>
   }).length;
 
 /**
- * A small tablet with large text, where the bar is tightest: the pages' icons go first, all four, then the brand gives way, its name
+ * A small tablet with large text (700px at a 20px default, as 560 is at 16), where the bar is tightest: the pages' icons go first, all four, then the brand gives way, its name
  * ellipsizing, and the pages keep their words and never cover it. (Echoes' name once ran under the Guide link here, and with large text
  * every guide's did.)
  */
 export const SmallTabletLargeText: Story = {
-  globals: { viewport: { value: "smallTablet", isRotated: false } },
+  globals: { viewport: { value: "smallTabletLarge", isRotated: false } },
   beforeEach: largeTextLongName,
   play: async ({ canvas }) => {
     const nav = canvas.getByRole("navigation", { name: "Main navigation" });
@@ -211,11 +216,11 @@ export const IconsWithRoom: Story = {
 };
 
 /**
- * Just past 800px with large text, the rail beside the page: the brand's columns grow past the rail's width when the brand needs it, and
+ * Just past the drawer with large text (1025px at a 20px default, as 820 is at 16), the rail beside the page: the brand's columns grow past the rail's width when the brand needs it, and
  * still give way before the pages do. The brand fills first, so while its name is cut short the pages show no icons.
  */
 export const NarrowLaptopLargeText: Story = {
-  globals: { viewport: { value: "narrowLaptop", isRotated: false } },
+  globals: { viewport: { value: "narrowLaptopLarge", isRotated: false } },
   beforeEach: largeTextLongName,
   play: async ({ canvas }) => {
     await expect(canvas.queryByRole("button", { name: "Open chapters" })).toBeNull();
@@ -240,7 +245,7 @@ export const BesideTheRail: Story = {
     const brandCell = canvas.getByRole("link", { name: /home$/ }).parentElement!.getBoundingClientRect();
     const buttons = canvas.getByRole("button", { name: /Open sync devices$/ }).parentElement!.getBoundingClientRect();
     const nav = canvas.getByRole("navigation", { name: "Main navigation" });
-    await expect(brandCell.width).toBeCloseTo(parseFloat(getComputedStyle(bar).getPropertyValue("--rail-w")), 0);
+    await expect(brandCell.width).toBeCloseTo(tokenPx(bar, "--rail-w"), 0);
     await expect(nav.getBoundingClientRect().right + parseFloat(getComputedStyle(nav).marginRight)).toBeCloseTo(buttons.left, 0);
     await nothingOverlaps(bar);
   },
@@ -257,9 +262,8 @@ export const OnTheFrame: Story = {
     const bar = canvas.getByRole("banner");
     bar.getBoundingClientRect();
     await document.fonts.ready;
-    const style = getComputedStyle(bar);
-    const frame = parseFloat(style.getPropertyValue("--frame-max"));
-    const railWidth = parseFloat(style.getPropertyValue("--rail-w"));
+    const frame = tokenPx(bar, "--frame-max");
+    const railWidth = tokenPx(bar, "--rail-w");
     const start = (bar.clientWidth - frame) / 2;
     await expect(start).toBeGreaterThan(0);
     const brandCell = canvas.getByRole("link", { name: /home$/ }).parentElement!.getBoundingClientRect();

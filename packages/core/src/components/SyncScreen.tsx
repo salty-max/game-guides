@@ -174,7 +174,7 @@ function ShowCode({ shown, onLinked, onNewCode, onBack, problem }: { shown: { co
   return (
     <View>
       <DialogDescription>Type this code on your other device, in any Hundo guide: Sync, then Enter a code.</DialogDescription>
-      <p tabIndex={-1} data-autofocus="" className="my-4 text-center font-display text-[44px] leading-none font-bold tracking-[0.12em] tabular-nums outline-hidden">
+      <p tabIndex={-1} data-autofocus="" className="my-4 text-center font-display text-44 leading-none font-bold tracking-[0.12em] tabular-nums outline-hidden">
         <span aria-hidden="true">
           {shown.code.slice(0, 3)}&nbsp;{shown.code.slice(3)}
         </span>

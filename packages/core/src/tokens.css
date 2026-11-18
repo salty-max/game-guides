@@ -4,21 +4,24 @@
    unlayered, they would win over every other layer. theme.test.ts reads this file as text. */
 @layer theme {
 :root{
-  color-scheme:light;--bar-h:69px;--rail-w:249px;
+  color-scheme:light;--bar-h:4.3125rem;--rail-w:15.5625rem;
   /* The parts of the screen a notch, the status bar or the home indicator covers (0 where there are none; viewport-fit=cover in
      index.html is what lets the page reach them). The top bar is --bar-h tall below them, so --bar, which is what everything under
      it is offset by, includes them; the rail column does the same on its left. --bar-h and --rail-w change with the width of the
-     screen (the media queries below). */
+     screen (the media queries below). The sizes here are rem and the widths em, so a reader's larger default size grows the bars
+     and the rail with the text and moves the widths with it (docs/core.md, Sizes in rem); the comments give them in px at 16px. */
   --safe-top:env(safe-area-inset-top,0px);--safe-right:env(safe-area-inset-right,0px);--safe-bottom:env(safe-area-inset-bottom,0px);--safe-left:env(safe-area-inset-left,0px);
   --bar:calc(var(--bar-h) + var(--safe-top));--rail-col:calc(var(--rail-w) + var(--safe-left));
-  /* The frame: the rail and the page side by side, at most --frame-max wide and centred as one block on a wider screen (Layout), with
+  /* The frame: the rail and the page side by side, at most --frame-max wide (1280px at 16px) and centred as one block on a wider screen (Layout), with
      the top bar's columns on the same frame (TopBar). The page's column is what's left of it beside the rail. This width is what bounds
      a line of the article's prose on a wide screen, since the card and its text fill their column: at 1280px a line runs 79, 83 and 89
      characters at the median in Koholint, Echoes and Lordran (docs/core.md, One frame on a wide screen). */
-  --frame-max:1280px;--page-max:calc(var(--frame-max) - var(--rail-col));
+  --frame-max:80rem;--page-max:calc(var(--frame-max) - var(--rail-col));
   /* The tab bar's height, the home indicator included: 0 where there is no tab bar (over 550px), so the page and the toasts keep clear
      of the bar only where it is (MainNav.tsx, Layout). */
   --tabs:0px;
+  /* The room a sticky part keeps under the top bar (the article's contents list), and what a jump scrolls a target clear of it by. */
+  --sticky-gap:1.5rem;
   --line-soft:color-mix(in srgb,var(--line) 55%,var(--surface));
   --control-line:color-mix(in srgb,var(--ink) 20%,var(--surface));
   /* checkbox edges and other boundaries that must stand out at 3:1 */
@@ -55,16 +58,17 @@
   --shadow:#0009;--backdrop:color-mix(in srgb,var(--paper) 86%,transparent);
 }
 /* The rail narrows from 1040px. From 800px it is a drawer rather than a column, and the top bar is shorter. */
-@media (max-width:1040px){:root{--rail-w:224px}}
-@media (max-width:800px){:root{--bar-h:60px;--rail-w:250px}}
+@media (max-width:65em){:root{--rail-w:14rem}}
+@media (max-width:50em){:root{--bar-h:3.75rem;--rail-w:15.625rem}}
 /* From 550px the pages move into a bar across the bottom, and the top bar, now a title bar, is a little shorter. */
-@media (max-width:550px){:root{--bar-h:56px;--tabs:calc(58px + var(--safe-bottom))}}
+@media (max-width:34.375em){:root{--bar-h:3.5rem;--tabs:calc(3.625rem + var(--safe-bottom))}}
 }
 
-/* Tailwind keeps its spacing, type scale, weights, breakpoints and motion. Its colours, radii, shadows and fonts are cleared, so
-   `bg-red-500` or `rounded-lg` don't exist: only the house tokens below do. */
+/* Tailwind keeps its spacing, weights, line heights, breakpoints and motion. Its colours, radii, shadows, fonts and type scale are
+   cleared, so `bg-red-500`, `rounded-lg` or `text-sm` don't exist: only the house tokens below do. */
 @theme {
   --color-*: initial;
+  --text-*: initial;
   --radius-*: initial;
   --shadow-*: initial;
   --font-*: initial;
@@ -76,6 +80,32 @@
   --spacing-check: 1.625rem;
   --spacing-check-gap: 0.5rem;
   --spacing-check-indent: calc(var(--spacing-check) + var(--spacing-check-gap));
+}
+
+/* The type scale, in rem so that a reader's own default size scales the text along with everything else (docs/core.md, Sizes in
+   rem). A step is named after its size in px at the browser's default 16px, like Tailwind's spacing: `text-14` is 0.875rem. A step
+   sets the size only, never the line height, which the text inherits or gets from `leading-*` or a `/` (`text-16/[1.58]`).
+   `leading-sm` and `leading-lg` are the line heights that come with a control's 14px and a code box's 18px, kept as numbers so
+   they scale with the text too. */
+@theme {
+  --text-10\.5: 0.65625rem;
+  --text-11: 0.6875rem;
+  --text-12: 0.75rem;
+  --text-12\.5: 0.78125rem;
+  --text-13: 0.8125rem;
+  --text-14: 0.875rem;
+  --text-15: 0.9375rem;
+  --text-16: 1rem;
+  --text-17: 1.0625rem;
+  --text-18: 1.125rem;
+  --text-21: 1.3125rem;
+  --text-22: 1.375rem;
+  --text-24: 1.5rem;
+  --text-25: 1.5625rem;
+  --text-38: 2.375rem;
+  --text-44: 2.75rem;
+  --leading-sm: calc(1.25 / 0.875);
+  --leading-lg: calc(1.75 / 1.125);
 }
 
 /* `inline` writes `var(--paper)` itself into each utility instead of a copy, so the guide's own value (and the dark theme) applies. */

@@ -41,8 +41,8 @@ const list = cva("", { variants: { place: { top: "flex gap-2 drawer:gap-0.5", bo
 const link = cva(`${press} group/page font-bold whitespace-nowrap text-muted`, {
   variants: {
     place: {
-      top: "flex h-10 flex-row-reverse flex-wrap content-start items-center justify-center gap-x-2 overflow-clip rounded-button px-3.5 text-[14px]/10 hover:bg-raised hover:text-ink drawer:gap-x-1 drawer:px-2 [&[aria-current=page]:not(:hover)]:bg-soft [&[aria-current=page]:not(:hover)]:text-soft-ink",
-      bottom: "grid h-full content-center justify-items-center gap-[3px] text-[11px] leading-none aria-[current=page]:text-soft-ink",
+      top: "flex h-10 flex-row-reverse flex-wrap content-start items-center justify-center gap-x-2 overflow-clip rounded-button px-3.5 text-14/10 hover:bg-raised hover:text-ink drawer:gap-x-1 drawer:px-2 [&[aria-current=page]:not(:hover)]:bg-soft [&[aria-current=page]:not(:hover)]:text-soft-ink",
+      bottom: "grid h-full content-center justify-items-center gap-0.75 text-11 leading-none aria-[current=page]:text-soft-ink",
     },
   },
 });
@@ -52,7 +52,7 @@ const icon = cva("", {
     place: {
       // (after the words, so it is the part that wraps away: `link` above. The tab bar keeps its icons.)
       top: "order-1 size-4",
-      bottom: `${pressPart} box-content size-[22px] rounded-button px-4 py-[3px] group-aria-[current=page]/page:bg-soft`,
+      bottom: `${pressPart} box-content size-5.5 rounded-button px-4 py-0.75 group-aria-[current=page]/page:bg-soft`,
     },
   },
 });

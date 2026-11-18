@@ -36,6 +36,9 @@ export default tseslint.config(
       ...tailwind.configs["recommended-error"].rules,
       // No formatter wraps this repo's lines, so a class list stays on one line.
       "better-tailwindcss/enforce-consistent-line-wrapping": "off",
+      // The tick box's sizes are spacing tokens (tokens.css), so the rule would call any 26px or 34px length `check` or `check-indent`.
+      // A badge or a margin that happens to be that long isn't the tick box: it stays a quarter step.
+      "better-tailwindcss/enforce-canonical-classes": ["error", { ignore: ["^(?:.+:)?-?[a-z-]+-(?:6\\.5|8\\.5)$"] }],
     },
   },
   {

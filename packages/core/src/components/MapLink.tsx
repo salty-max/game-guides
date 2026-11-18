@@ -17,7 +17,7 @@ interface MapLinkProps {
 export function MapLink({ map: [site, url], of, at }: MapLinkProps) {
   return (
     <a
-      className={`${rowLink} inline-flex items-center gap-1 font-semibold [&_svg]:size-[15px]`}
+      className={`${rowLink} inline-flex items-center gap-1 font-semibold [&_svg]:size-3.75`}
       href={url}
       target="_blank"
       rel="noopener noreferrer"

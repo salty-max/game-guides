@@ -19,7 +19,7 @@ const viewport = "fixed inset-0 z-20 touch-none";
 // the left: Base UI moves it itself while the finger is down, and leaves where it got to in --drawer-swipe-movement-x for the release, so
 // the slide out (or back, for a swipe too short to close it) starts from there. This is the pattern of Base UI's own drawer page.
 const popup =
-  "absolute top-(--bar) bottom-0 left-0 w-[min(var(--rail-col),calc(100%-30px))] [transform:translateX(var(--drawer-swipe-movement-x,0px))] scrollbar-thin [scrollbar-color:var(--edge)_var(--rail)] overflow-y-auto border-r border-line bg-rail touch-auto overscroll-contain outline-none transition-transform duration-200 ease-[cubic-bezier(0.32,0.72,0,1)] data-ending-style:[transform:translateX(-100%)] data-ending-style:duration-[calc(var(--drawer-swipe-strength,1)*200ms)] data-starting-style:[transform:translateX(-100%)] data-swiping:duration-0 data-swiping:select-none motion-reduce:transition-none";
+  "absolute top-(--bar) bottom-0 left-0 w-[min(var(--rail-col),calc(100%-1.875rem))] [transform:translateX(var(--drawer-swipe-movement-x,0px))] scrollbar-thin [scrollbar-color:var(--edge)_var(--rail)] overflow-y-auto border-r border-line bg-rail touch-auto overscroll-contain outline-none transition-transform duration-200 ease-[cubic-bezier(0.32,0.72,0,1)] data-ending-style:[transform:translateX(-100%)] data-ending-style:duration-[calc(var(--drawer-swipe-strength,1)*200ms)] data-starting-style:[transform:translateX(-100%)] data-swiping:duration-0 data-swiping:select-none motion-reduce:transition-none";
 
 interface RailDrawerProps {
   open: boolean;

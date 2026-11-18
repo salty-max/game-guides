@@ -31,7 +31,7 @@ interface TextFieldProps {
 }
 
 const textInput = cva(
-  "min-h-11 rounded-control border border-control-line bg-surface px-2.5 py-1.5 text-sm font-bold text-ink placeholder:font-normal placeholder:text-muted disabled:cursor-not-allowed disabled:opacity-[.46] data-invalid:border-2 data-invalid:border-error",
+  "min-h-11 rounded-control border border-control-line bg-surface px-2.5 py-1.5 text-14/sm font-bold text-ink placeholder:font-normal placeholder:text-muted disabled:cursor-not-allowed disabled:opacity-[.46] data-invalid:border-2 data-invalid:border-error",
   { variants: { width: { full: "w-full", short: "w-40" } }, defaultVariants: { width: "full" } },
 );
 
@@ -66,9 +66,9 @@ export function TextField({ id, label, value, onChange, description, error, disa
       ) : (
         control
       )}
-      {description && <BaseField.Description className="text-[13px] font-semibold text-muted">{description}</BaseField.Description>}
+      {description && <BaseField.Description className="text-13 font-semibold text-muted">{description}</BaseField.Description>}
       {error && (
-        <BaseField.Error match role={alertError ? "alert" : undefined} className="text-[13px] font-bold text-error">
+        <BaseField.Error match role={alertError ? "alert" : undefined} className="text-13 font-bold text-error">
           {error}
         </BaseField.Error>
       )}
