@@ -98,9 +98,10 @@ export function TopBar({ chapter, view, menuOpen, onToggleMenu, menuToggle }: To
     // way, so on a wide screen the brand stays over the rail and the buttons end over the page's edge.
     <header className="sticky top-0 z-10 h-(--bar) border-b border-line bg-surface pt-(--safe-top) pr-(--safe-right) pl-(--safe-left) text-ink standalone:relative standalone:flex-none standalone:select-none standalone:[-webkit-touch-callout:none] phone:[--icon-h:2.75rem] phone:[--icon-w:2.75rem]">
       {/* Beside the rail the brand's columns come to the rail's width or the brand's, whichever is wider, so the pages start over the page
-          when there's room. The pages' column is `1fr`, whose minimum is the pages' words (their icons wrap away first, MainNav), so they
-          never shrink past their words: the brand's columns give way. It gets anything over that only after the brand has all its width. */}
-      <div className="mx-auto grid h-full max-w-(--frame-max) grid-cols-[minmax(0,var(--rail-w))_minmax(0,auto)_1fr_auto] items-center drawer:grid-cols-[auto_minmax(0,auto)_1fr_auto] phone:grid-cols-[auto_minmax(0,1fr)_auto]">
+          when there's room. The pages and the buttons share the last column, `1fr`, whose minimum is the pages' words (their icons wrap
+          away first, MainNav) and the buttons, so the pages never shrink past their words: the brand's columns give way. That column gets
+          anything over its minimum only after the brand has all its width. */}
+      <div className="mx-auto grid h-full max-w-(--frame-max) grid-cols-[minmax(0,var(--rail-w))_minmax(0,auto)_1fr] items-center drawer:grid-cols-[auto_minmax(0,auto)_1fr] phone:grid-cols-[auto_minmax(0,1fr)_auto]">
         {/* Shown only under 800px: `hidden` is the class's own, and `drawer:block` brings it back. */}
         <div className="ml-[11px] hidden drawer:block tiny:ml-[7px]">
           <IconButton
@@ -131,10 +132,18 @@ export function TopBar({ chapter, view, menuOpen, onToggleMenu, menuToggle }: To
             </span>
           </Link>
         </div>
-        {!phone && <MainNav chapter={chapter} view={view} place="top" />}
-        <div className="mr-[25px] flex items-center gap-[9px] drawer:mr-[11px] drawer:gap-1.5 tiny:mr-[7px] tiny:gap-1">
-          <ThemeToggle />
-          <SaveStatus />
+        {/* The pages and the buttons. Beside the rail the pages sit between two equal sides, the buttons at the end of the second (the
+            `before:` is the first), so with room on both sides they're centred over the page's column (over what's right of the brand,
+            where a long name runs past the rail). The buttons' side is never narrower than the buttons, so with less room the pages move
+            towards the brand rather than over the buttons. This is a grid of its own so that the brand's columns still fill first: the
+            pages' icons and the centring only get what the brand leaves. Under 800px there's no rail to line up with, and the pages are
+            centred in what the brand and the buttons leave. */}
+        <div className="grid grid-cols-[1fr_auto_1fr] items-center before:content-[''] drawer:grid-cols-[1fr_auto] drawer:before:hidden phone:flex">
+          {!phone && <MainNav chapter={chapter} view={view} place="top" />}
+          <div className="mr-[25px] flex items-center gap-[9px] justify-self-end drawer:mr-[11px] drawer:gap-1.5 tiny:mr-[7px] tiny:gap-1">
+            <ThemeToggle />
+            <SaveStatus />
+          </div>
         </div>
       </div>
     </header>
