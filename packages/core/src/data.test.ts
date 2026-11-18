@@ -1,5 +1,5 @@
 // @vitest-environment node
-import { allRows, brand, byId, cats, chapterRows, chapters, CHAPTER_COUNT, completion, config, guideAnchor, hasMissables, isCategory, missablesLeft, nextUp, readChapter, tally, whatsLeft } from "./guide";
+import { allRows, brand, byId, cats, chapterRows, chapters, CHAPTER_COUNT, completion, config, guideAnchor, hasMissables, isCategory, missablesLeft, nextUp, readChapter, rowsByTag, tally, whatsLeft } from "./guide";
 
 const everything = Object.fromEntries(allRows.map((row) => [row.id, true as const]));
 const hosts = (urls: string[]) => new Set(urls.map((url) => new URL(url).host));
@@ -26,8 +26,17 @@ describe("guide data", () => {
       for (const tag of row.tags) expect(isCategory(tag) || tag === "missable", `${row.id}: ${tag}`).toBe(true);
     }
     const configured = [...config.chips.checklist, ...(config.chips.route ?? [])].map(([id]) => id);
-    for (const tag of [...configured, ...completion.board.map((item) => item.tag), ...(config.quantity ? [config.quantity] : [])]) {
+    const board = completion.board.flatMap((item) => (item.opens ? [item.tag, item.opens] : [item.tag]));
+    for (const tag of [...configured, ...board, ...(config.quantity ? [config.quantity] : [])]) {
       expect(isCategory(tag), tag).toBe(true);
+    }
+  });
+
+  it("opens each board target on a checklist that lists every row it counts, and more", () => {
+    for (const { tag, opens } of completion.board) {
+      if (!opens) continue;
+      for (const row of rowsByTag(tag)) expect(row.tags, `${tag} → ${opens}: ${row.id}`).toContain(opens);
+      expect(rowsByTag(opens).length, `${tag} → ${opens}`).toBeGreaterThan(rowsByTag(tag).length);
     }
   });
 

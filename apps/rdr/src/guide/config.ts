@@ -17,7 +17,8 @@ const categories: GuideConfig["categories"] = {
   mission: ["Story Missions", "Mission", "book", "rose"],
   stranger: ["Stranger Tasks", "Stranger", "compass"],
   // Every step of a Stranger task: the earlier ones as their first tag, the last one (tagged `stranger`, which the board counts) as its second.
-  "stranger-step": ["Stranger Steps", "Stranger step", "compass"],
+  // Named after the tasks, so the Category select reads it as the whole of "Stranger Tasks", the board's tile, which opens it.
+  "stranger-step": ["Stranger Tasks, every step", "Stranger step", "compass"],
   location: ["Map Locations", "Location", "pin", "violet"],
   bounty: ["Bounty Locations", "Bounty", "star", "amber"],
   challenge: ["Ambient Challenges", "Challenge", "grid", "sky"],
@@ -65,10 +66,10 @@ const config: GuideConfig = {
   completion: {
     isCore: countsTowardStat,
     overall: { label: "estimated in-game completion", percent: estimate },
-    // Stranger Tasks counts each task once, by its last step: the steps before it get no tile of their own.
+    // Stranger Tasks counts each task once, by its last step: the steps before it get no tile of their own, and the tile opens every step.
     board: Object.keys(categories)
       .filter((tag) => tag !== "stranger-step")
-      .map((tag) => ({ tag })),
+      .map((tag) => (tag === "stranger" ? { tag, opens: "stranger-step" } : { tag })),
     left: pointsLeft,
     unit: "points",
   },

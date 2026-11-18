@@ -177,6 +177,11 @@ export interface BoardItem {
   goal?: number;
   /** Shown on the board but left out of "What's left". */
   optional?: boolean;
+  /**
+   * The category its tile and its line in "What's left" open on the checklist, when that isn't the tag it counts: one that holds every
+   * row the tag does and more (data.test.ts). Red Dead counts a Stranger task by its last step and opens every step.
+   */
+  opens?: string;
 }
 
 export interface LeftItem {

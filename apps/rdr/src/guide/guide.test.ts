@@ -1,4 +1,4 @@
-import { allRows, byId, chapters, coreRows, missablesLeft, rowsByTag, tally } from "@hundo/core/guide";
+import { allRows, byId, cats, chapters, checklistOf, config, coreRows, missablesLeft, rowsByTag, tally } from "@hundo/core/guide";
 import { STORAGE_KEY, defaultState, validateState } from "@hundo/core/progress-state";
 import { calibrationDelta, estimate, pointsLeft, readPercent } from "./estimate";
 import { THEME_KEY } from "@hundo/core/store/theme";
@@ -59,6 +59,24 @@ describe("Stranger tasks", () => {
       }
       expect(tagsOf(line.steps.at(-1)!), line.id).toEqual(["stranger", "stranger-step"]);
       for (const id of line.steps.slice(0, -1)) expect(tagsOf(id), id).toEqual(["stranger-step"]);
+    }
+  });
+
+  it("opens every step from the board's tile and What's left, where the Strangers chip goes", () => {
+    expect(checklistOf("stranger")).toBe("/checklist/stranger-step");
+    expect(config.chips.checklist).toContainEqual(["stranger-step", "Strangers"]);
+    // (named so the Category select reads it as the whole of the tile's Stranger Tasks)
+    expect(cats["stranger-step"][0]).toBe(`${cats.stranger[0]}, every step`);
+    const steps = new Set(rowsByTag("stranger-step").map((row) => row.id));
+    const lines = questlines.lines.filter((line) => line.id !== "i-know-you");
+    expect(steps.size).toBeGreaterThan(rowsByTag("stranger").length);
+    for (const id of lines.flatMap((line) => line.steps)) expect(steps.has(id), id).toBe(true);
+  });
+
+  it("names the place of every group with Stranger steps in it", () => {
+    // Without one, a group's line lists its rows' categories, here "Stranger Tasks · Stranger Tasks, every step".
+    for (const group of chapters.flatMap((chapter) => chapter.groups)) {
+      if (group.rows.some((row) => row.tags.includes("stranger-step"))) expect(group.location, group.title).toBeTruthy();
     }
   });
 });
