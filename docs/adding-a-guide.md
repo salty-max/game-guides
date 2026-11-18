@@ -65,7 +65,7 @@ The full type is `GuideConfig` in `packages/core/src/types.ts`, and every field 
 - **`banners`**: `byChapter(import.meta.glob<Banner>("./banners/chapter-*.webp", { eager: true, query: "?banner", import: "default" }))`, as Echoes has it (`?banner` adds the phone-sized copies, [house-style.md](house-style.md#banners)).
 - **`defer`** (optional): rows Next up holds back until nothing else is left, such as optional amiibo outfits.
 - **`completion`**:
-  - `board`: the counts on the Progress page. Give a `goal` where the game has a fixed total.
+  - `board`: the counts on the Progress page. Give a `goal` where the game has a fixed total. A tile, and What's left's line for the same tag, opens the checklist on its own category. Give `opens` a wider category only when the tag counts a task by one of its rows, as Red Dead's Stranger Tasks counts each task by its last step and opens `stranger-step`, every step. `data.test.ts` checks that every counted row is in that category.
   - The overall figure needs nothing: it is the board's targets that aren't `optional`, each counted as the board counts it and up to its `goal`, rounded down, and it reads "complete" ([core.md](core.md#overall-completion)). So a target that isn't part of the game's 100% must be `optional`.
   - `overall` (optional): only for a game that keeps a percentage of its own. A `percent` function replaces the figure with a model of it, read over the core rows and rounded down as the game rounds, and `label` its words, like Red Dead's estimate ("estimated in-game completion").
   - `isCore` (optional): the rows that `percent` reads, and counts as entries beside it. The default is every row.

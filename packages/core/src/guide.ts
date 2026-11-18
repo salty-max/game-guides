@@ -92,6 +92,10 @@ export function tally(tag: string, checks: Checks) {
   return { done, total };
 }
 
+const opens = new Map(completion.board.map((item) => [item.tag, item.opens ?? item.tag]));
+/** The checklist a target's tile and its line in What's left open: its category, or the one it names (`BoardItem.opens`). */
+export const checklistOf = (tag: string) => `/checklist/${opens.get(tag) ?? tag}`;
+
 const listed = completion.board.filter((item) => !item.optional);
 
 /**

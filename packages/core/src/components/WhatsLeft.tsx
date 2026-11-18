@@ -1,6 +1,6 @@
 import { Link } from "react-router";
 import { Panel, PanelHead, PanelText, PanelTitle } from "./ui";
-import { cats, completion, whatsLeft } from "../guide";
+import { cats, checklistOf, completion, whatsLeft } from "../guide";
 import { useProgress } from "../store/progress";
 import { pressTextClasses } from "./press-style";
 
@@ -32,7 +32,7 @@ export function WhatsLeft() {
             {items.map((item) => (
               <li key={item.tag} className="grid grid-cols-[minmax(7.5rem,11.875rem)_1fr_auto] items-center gap-3 text-14 @max-[28rem]/left:grid-cols-[1fr_auto]">
                 {/* At least 24px tall, the smallest target WCAG 2.2's target size allows, where its line alone is 22px. */}
-                <Link className={`${pressTextClasses} flex min-h-6 items-center hover:text-primary hover:underline hover:underline-offset-3`} to={`/checklist/${item.tag}`}>
+                <Link className={`${pressTextClasses} flex min-h-6 items-center hover:text-primary hover:underline hover:underline-offset-3`} to={checklistOf(item.tag)}>
                   {cats[item.tag][0]}
                 </Link>
                 {/* Decoration: the numbers beside it say the same. Its length is the category's share of the biggest, and the darker part is what's done. */}
