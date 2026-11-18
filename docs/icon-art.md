@@ -31,6 +31,14 @@ Recolor this existing Hundo Red Dead Redemption square app icon to match its rea
 
 </details>
 
+## Hallownest
+
+[Master](../apps/hallownest/scripts/icon-master.webp) · [Home-screen icon](../apps/hallownest/public/icons/icon-512.png)
+
+Made with GPT's draft of the guide, and kept by the user's choice (18 Nov 2026): it paints the Knight's own mask, where the other guides paint an object.
+
+Create an original square 1:1 home-screen icon for a Hollow Knight guide in the Hundo family. Centered stylized ivory-white Hollow Knight mask head, two tall curving horn tips, two large black oval eyes and no mouth, clearly from the original Hollow Knight. Simple painted dimensional shading and cool pale blue highlights. The head and horns fill roughly 65% of the canvas within a single centered circular field of foggy slate blue. A dark abyssal navy #141d2c background extending square and opaque to every edge. The circular field ends clearly before the corners. Keep a powerful silhouette and preserve the thin tips at 32 pixels. No particles beyond a faint mist, no body, sword, characters, locks, text, symbols, logo, borders, transparent pixels or pre-rounded edge.
+
 ## Tab drawings
 
 A painting shrunk to 16px loses its subject, so each guide also has a hand-drawn tab icon, `scripts/favicon.svg`: a 32-unit tile with 7-unit corners in the guide's light `--primary`, with a flat version of the painting's subject.
@@ -38,3 +46,4 @@ A painting shrunk to 16px loses its subject, so each guide also has a hand-drawn
 - **Koholint**: a cream egg (the light `--paper`) with three raspberry spots.
 - **Echoes of Wisdom**: the Tri Rod as one honey-gold stroke, triangle head and handle.
 - **Red Dead Redemption**: the hat in peach (the dark-theme `--primary`) with a brown band.
+- **Hallownest**: the mask in ivory with its two dark eyes.
