@@ -26,8 +26,8 @@ export default {
       title: "Western mountain detours",
       location: "Tal Tal Mountains · Turtle Rock",
       rows: [
-        ["heart-west-cave", ["heart"], "Piece of Heart · Mountain bomb wall", "Hookshot west across the broken Hen House bridge. In the first cave, bomb the cracked wall in the lower recess and take the right-hand route inside."],
-        ["heart-west-path", ["heart"], "Piece of Heart · Mountain side path", "On the stone field before the cave with the fire jet, take the southwest path to the heart piece. Use care near the drop to the swamp."],
+        ["heart-west-cave", ["heart"], "Piece of Heart · Mountain bomb wall", "Hookshot west across the broken Hen House bridge. In the first cave, bomb the cracked wall in the lower recess and take the right-hand route inside.", { map: ["Nintendo Life", "https://www.nintendolife.com/guides/zelda-links-awakening-all-heart-pieces-map-and-locations#heart-piece-30-bomb-a-cracked-wall-western-tal-tal-mountain-range"] }],
+        ["heart-west-path", ["heart"], "Piece of Heart · Mountain side path", "On the stone field before the cave with the fire jet, take the southwest path to the heart piece. Use care near the drop to the swamp.", { map: ["Nintendo Life", "https://www.nintendolife.com/guides/zelda-links-awakening-all-heart-pieces-map-and-locations#heart-piece-31-head-down-a-sidepath-western-tal-tal-mountain-range"] }],
       ],
     },
     {
@@ -84,7 +84,7 @@ export default {
       title: "Turtle Rock’s roof",
       location: "Turtle Rock · exterior",
       rows: [
-        ["heart-turtle-roof", ["heart"], "Piece of Heart · Turtle Rock roof", "Take the stairs in the northwestern part of Turtle Rock to the surface and pick up the heart piece on the grass. Register the warp while you’re there."],
+        ["heart-turtle-roof", ["heart"], "Piece of Heart · Turtle Rock roof", "Take the stairs in the northwestern part of Turtle Rock to the surface and pick up the heart piece on the grass. Register the warp while you’re there.", { map: ["Nintendo Life", "https://www.nintendolife.com/guides/zelda-links-awakening-all-heart-pieces-map-and-locations#heart-piece-32-step-outside-of-the-dungeon-to-cool-off-turtle-rock"] }],
       ],
     },
     {
@@ -120,8 +120,8 @@ export default {
       title: "Mountain shells and the final Mansion reward",
       location: "Western Tal Tal Mountains · Seashell Mansion",
       rows: [
-        ["shell-rockslide", ["shell"], "Secret Seashell · Above the rockslide", "Climb past the rolling boulders and lift the loose rock on the plateau at the top."],
-        ["shell-west-cross", ["shell"], "Secret Seashell · Western mountain stone cross", "After using the Mirror Shield to pass the fire jet, walk west of the Western Tal Tal Mountains warp. Dig in the center of the cross-shaped pebble pattern at the south edge."],
+        ["shell-rockslide", ["shell"], "Secret Seashell · Above the rockslide", "Climb past the rolling boulders and lift the loose rock on the plateau at the top.", { map: ["Nintendo Life", "https://www.nintendolife.com/guides/zelda-links-awakening-all-secret-seashells-map-and-locations#shell-49-lift-up-a-rock-western-tal-tal-mountain-range"] }],
+        ["shell-west-cross", ["shell"], "Secret Seashell · Western mountain stone cross", "After using the Mirror Shield to pass the fire jet, walk west of the Western Tal Tal Mountains warp. Dig in the center of the cross-shaped pebble pattern at the south edge.", { map: ["Nintendo Life", "https://www.nintendolife.com/guides/zelda-links-awakening-all-secret-seashells-map-and-locations#shell-50-dig-between-the-stones-western-tal-tal-mountains"] }],
         ["stone-mansion50", ["stone","effect"], "Chamber Stone · 50 shells", "With all 50 shells, collect the final reward at Seashell Mansion and bring it to Dampé for the +Rupees Effect."],
       ],
     },

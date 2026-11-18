@@ -27,3 +27,7 @@ Game8 ([list of missables and one-time events](https://game8.co/games/Zelda-Echo
 - The original chapter checklists duplicated the guide steps, so they were not ported as separate lists; the same steps are the entries.
 - Five minigame bullets in the completion list (Slumber Dojo, Mango Rush, Flag Race, Acorn Gathering, Goron Race and gliding) repeat entries that already exist as route or sweep steps, so they were not added again.
 - Completion-list items derivable from other entries (all Echoes, all hearts, waypoints, chests, Fairy Bottles, accessory slots, final 25 crystals) were not duplicated; two upgrade lines matched existing steps.
+
+## Map links
+
+Each stamp row links to its own "Stamp Stand #n" heading on Nintendo Life's stamp page, read from its HTML on 2026-11-18. The page describes each stand in a line and the rows were written from other pages, so six rows were matched to their heading by region and by elimination among that region's stands: Gerudo's northwest plateau (#8), the islet south of Hebra (#9), the southwest corner of Zora River (#13), the snowy ledge west of the Moblin camp (#20), the ledge above the paired torches (#24) and the far east Eldin glide (#4). Check them in the game if a reader reports one that lands on the wrong stand. The page's own numbers move if it is edited.

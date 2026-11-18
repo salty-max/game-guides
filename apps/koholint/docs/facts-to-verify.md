@@ -11,3 +11,12 @@ The "Don't miss" strip (`src/guide/data/missables.ts`) lists an entry only when 
 | Fishing pond Blooper and Cheep Cheep | They appear only on sparkly spots and can be retried, so not missable. | n/a, listed so nobody flags them by mistake. |
 
 The ghost-house Secret Seashell already says you can return after the escort, so it is not missable either.
+
+## Map links
+
+Each Heart Piece and Secret Seashell row links to its own heading on Nintendo Life's heart piece and seashell pages, matched by place and method and read from the pages' own HTML on 2026-11-18. Open judgement calls:
+
+- "Fill Up Your Hearts" (`chamber-hearts`) carries both the heart and the shell tag but a row has one map, so it links to Heart Piece 14. Shell 22 (any four arrangements) is the same row and has no link of its own. Piece 14's anchor is the page's own garbled id (`…-complete-lfill-up-your-heartsr-challenge-…`): it works, and it breaks if the page is edited.
+- The "40-inch catch" shell (`shell-large-fish`) links to Shell 44, the page's second Mabe fishing prize, a Blooper, listed after Face Shrine. The row says a fish over 40 inches after Catfish's Maw. The page gives neither the 40 inches nor that timing, so the link follows the reward, not the row's wording.
+- The first Cheep Cheep shell (`shell-cheep`) says it opens after Angler's Tunnel, and its page heading (Shell 37) says to finish Catfish's Maw first. The row's text is older than the link and unchanged; nothing settles which is right short of a playthrough.
+- Anchors move when the page is edited, and a moved one only lands at the top of the page. Reopen the links if a reader says one is off.

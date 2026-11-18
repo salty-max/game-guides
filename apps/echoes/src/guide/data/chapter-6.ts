@@ -19,7 +19,7 @@ export default {
       title: "Lower Hebra and Condé",
       rows: [
         ["chest-hebra-approach-peppers", ["chest"], "Open the warm-pepper chest in the mountain approach cave", "Enter the cave north of Hyrule Castle. Build to the climbing wall, ride the lifts and use Bombfish on the cracked wall on the left for nine Warm Peppers. Move the boulder off the upper cracked blocks, then break the blocks and climb outside."],
-        ["stamp-hebra-south-entrance", ["stamp"], "Stamp the stand just south of the cave exit", "Follow the snowy path south before heading around the mountain. Use a chill-proof smoothie if the storm is taking hearts."],
+        ["stamp-hebra-south-entrance", ["stamp"], "Stamp the stand just south of the cave exit", "Follow the snowy path south before heading around the mountain. Use a chill-proof smoothie if the storm is taking hearts.", { map: ["Nintendo Life", "https://www.nintendolife.com/guides/zelda-echoes-of-wisdom-stamp-locations-and-map#stamp-stand-19"] }],
         ["echo-ice-keese", ["echo"], "Learn Ice Keese on lower Hebra", "Use a fire or ranged echo on an Ice Keese as you follow the snowfield. Keep it for the later fire-element boss phase."],
         ["echo-snomaul", ["echo"], "Learn Snomaul on the snowfield", "Defeat one of the walking snow enemies and collect the remnant."],
         ["echo-leever", ["echo"], "Learn Leever on the lower trail", "Wait for it to rise out of the snow and hit it with an echo before it burrows again."],
@@ -32,7 +32,7 @@ export default {
     {
       title: "The icy lake and summit",
       rows: [
-        ["stamp-hebra-southeast", ["stamp"], "Stamp the snowy ledge west of the southeast Moblin camp", "From the area near Condé's house, go toward the snowy camp and build past the trees west of it."],
+        ["stamp-hebra-southeast", ["stamp"], "Stamp the snowy ledge west of the southeast Moblin camp", "From the area near Condé's house, go toward the snowy camp and build past the trees west of it.", { map: ["Nintendo Life", "https://www.nintendolife.com/guides/zelda-echoes-of-wisdom-stamp-locations-and-map#stamp-stand-20"] }],
         ["chest-hebra-cave-stone", ["chest"], "Open the Monster Stone chest in the first ascent shaft", "Take the ladder up the mountain after the cave rift. Melt ice as needed and watch the rolling snowballs near the upper chest."],
         ["waypoint-hebra-lake", ["waypoint"], "Activate the Waypoint near the frozen lake", "Climb out of the shaft by its right ladder and touch the stone. The eastern route has a Wizzrobe and a buried chest."],
         ["echo-ice-wizzrobe", ["echo"], "Learn Ice Wizzrobe east of the lake Waypoint", "Use a fast fire echo or ranged attack as it reappears, then learn it."],
