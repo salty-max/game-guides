@@ -2,14 +2,13 @@ import type { Missable } from "@hundo/core/types";
 
 const steam = "https://steamcommunity.com/sharedfiles/filedetails/?id=3005043947";
 const fextralifeTroupe = "https://hollowknight.wiki.fextralife.com/The+Grimm+Troupe+(Quest)";
-const slashkeys = "https://slashkeys.com/guides/hollow-knight/walkthrough";
 
 /** What can be lost for good, in route order. None of it costs a percent of the game's completion. */
 export const missables: Missable[] = [
   {
     id: "quest-zote-greenpath",
     why: "Free Zote from the Vengefly King on this visit: once you have the movement ability after the cloak, he dies in the trap and his later steps go with him.",
-    sources: ["https://hollowknight.wiki/w/Zote_the_Mighty", slashkeys],
+    sources: ["https://hollowknight.wiki/w/Zote_the_Mighty", "https://hollowknight.wiki.fextralife.com/Zote+the+Mighty"],
   },
   {
     id: "quest-quirrel-station",
@@ -38,17 +37,17 @@ export const missables: Missable[] = [
   },
   {
     id: "troupe-finale-grimm-finale",
-    why: "For Banishment, break the lantern once Brumm has spoken: leave the room first and only Nightmare King Grimm is left.",
+    why: "For Banishment, break the Nightmare Lantern’s brazier once Brumm has spoken: leave the room first and only Nightmare King Grimm is left.",
     sources: ["https://hollowknight.wiki/w/Brumm", fextralifeTroupe],
   },
   {
     id: "quest-nailsmith-sheo",
     why: "When the Nailsmith asks you to cut him down after the Pure Nail, walk away: striking him ends his story before he can join Sheo.",
-    sources: ["https://hollowknight.wiki/w/Nailsmith", slashkeys],
+    sources: ["https://hollowknight.wiki/w/Nailsmith", "https://hollowknight.wiki.fextralife.com/Nailsmith"],
   },
   {
     id: "ending-embrace-void",
     why: "Beat the Pantheon of Hallownest before you give the Godseeker a Delicate Flower: after that, the fight ends in the flower’s version.",
-    sources: ["https://hollowknight.wiki/w/Endings_(Hollow_Knight)", slashkeys],
+    sources: ["https://hollowknight.wiki/w/Endings_(Hollow_Knight)", "https://hollowknight.wiki.fextralife.com/Endings"],
   },
 ];
