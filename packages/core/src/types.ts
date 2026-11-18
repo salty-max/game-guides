@@ -186,13 +186,15 @@ export interface LeftItem {
 }
 
 export interface Completion {
-  /** Rows that count toward the overall figure. Default: every row. */
+  /** Rows a weighted `overall.percent` reads, and the entries it counts beside it. Default: every row. */
   isCore?: (row: Row) => boolean;
   /**
-   * The overall percentage and the words after it ("complete", "estimated in-game completion"). The default
-   * percentage is the share of core rows checked. Leave it out for a game with no overall figure: counts show instead.
+   * The overall figure is the board's targets that aren't optional, each counted as the board counts it and up to its goal (core's
+   * `listedPercent`), followed by "complete". `label` changes those words; `percent` replaces the figure with a model of the game's own
+   * percentage, read over the core rows (Red Dead's estimate, "estimated in-game completion"). Round it down, as the game does: the
+   * bar shows it as given.
    */
-  overall?: { label: string; percent?: (checks: Checks, rows: Row[]) => number };
+  overall?: { label?: string; percent?: (checks: Checks, rows: Row[]) => number };
   board: BoardItem[];
   /** A custom "What's left". Default: each board total minus what is checked. */
   left?: (checks: Checks, rows: Row[]) => LeftItem[];

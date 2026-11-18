@@ -2,7 +2,7 @@ import { Callout, Empty, PageHeading } from "@hundo/core/components/ui";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect } from "storybook/test";
 
-// The top of a page: its title, the line under it, and the dashboard's figure in a pill. Then the two notes a page
+// The top of a page: its title, the line under it, and the Questlines page's figure in a pill. Then the two notes a page
 // can show above or in place of its content: the spoiler callout and the empty list.
 const meta = {
   title: "Core/PageHeading",
@@ -20,9 +20,9 @@ export const WithIntro: Story = {
   },
 };
 
-/** The dashboard's, with the overall count in a pill under the line. */
+/** The Questlines page's, with its count in a pill under the line. */
 export const WithStat: Story = {
-  args: { title: "Your progress", intro: "Track completion across the island.", stat: "42 of 310 entries checked · 14%" },
+  args: { title: "Questlines", intro: "Chained side quests, step by step.", stat: "2 under way · 3 done · 7 not started" },
 };
 
 /** A hidden chapter's: the title and what revealing it does. */

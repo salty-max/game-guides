@@ -76,7 +76,7 @@ export function nextUp(checks: Checks, isChapterOpen: (chapter: number) => boole
 export const missablesLeft = (chapter: Chapter, checks: Checks) =>
   chapterRows(chapter).filter((row) => missableIds.has(row.id) && checks[row.id] !== true);
 
-/** Rows that count toward the overall figure. */
+/** Rows a weighted overall figure reads (`completion.overall.percent`, Red Dead's estimate). Default: every row. */
 export const coreRows = completion.isCore ? allRows.filter(completion.isCore) : allRows;
 
 /** How much one entry adds toward a category: the configured quantity category by amount, everything else by one. */
@@ -92,19 +92,41 @@ export function tally(tag: string, checks: Checks) {
   return { done, total };
 }
 
-/** Core rows checked, and the overall percentage when the guide shows one (null otherwise). */
-export function overall(checks: Checks) {
-  const done = coreRows.filter((row) => checks[row.id] === true).length;
-  const shown = completion.overall;
-  const percent = !shown ? null : shown.percent ? shown.percent(checks, coreRows) : pct(done, coreRows.length);
-  return { done, total: coreRows.length, percent };
+const listed = completion.board.filter((item) => !item.optional);
+
+/**
+ * The guide's completion list done, as a whole percentage rounded down: every board target that isn't optional, counted as the board
+ * counts it (an entry by one, the quantity category by amount) and only up to its goal. What's left counts the same targets the same
+ * way, so this is 100 exactly when What's left is empty, and never 100 while anything on the list is left.
+ */
+export function listedPercent(checks: Checks) {
+  let done = 0;
+  let total = 0;
+  for (const { tag, goal } of listed) {
+    const count = tally(tag, checks);
+    const target = goal ?? count.total;
+    done += Math.min(count.done, target);
+    total += target;
+  }
+  return pct(done, total);
 }
 
-/** "41% complete · 120 of 400 entries", or "120 of 400 entries checked" for a guide without an overall figure. */
-export function overallLine(checks: Checks) {
-  const { done, total, percent } = overall(checks);
-  return percent === null ? `${done} of ${total} entries checked` : `${percent}% ${completion.overall!.label} · ${done} of ${total} entries`;
+/**
+ * The guide's one overall figure and the words after it. By default it is the completion list (`listedPercent`); a guide whose game keeps
+ * a percentage of its own replaces it with a model of that (`completion.overall.percent`, Red Dead's estimate), whose rows are real
+ * entries, so their count comes with it. The list's own total isn't a count of anything a reader can point at (crystals by amount, a row
+ * once per target it carries), so it has none.
+ */
+export function overall(checks: Checks) {
+  const label = completion.overall?.label ?? "complete";
+  const weighted = completion.overall?.percent;
+  if (!weighted) return { percent: listedPercent(checks), label, entries: null };
+  const done = coreRows.filter((row) => checks[row.id] === true).length;
+  return { percent: weighted(checks, coreRows), label, entries: { done, total: coreRows.length } };
 }
+
+/** The figure in words, as a screen reader hears it: as it is shown, never rounded up (Base UI's own text goes through Intl, which reads 99.9 as "100%"). */
+export const overallText = (percent: number, label: string) => `${percent}% ${label}`;
 
 /** What is left per category, biggest first; finished categories drop out. */
 export function whatsLeft(checks: Checks): LeftItem[] {

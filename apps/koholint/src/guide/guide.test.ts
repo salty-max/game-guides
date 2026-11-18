@@ -1,4 +1,4 @@
-import { allRows, chapters, coreRows } from "@hundo/core/guide";
+import { allRows, chapters, completion, overall } from "@hundo/core/guide";
 import { STORAGE_KEY, defaultState, validateState } from "@hundo/core/progress-state";
 import { readRunLog } from "./run-log";
 import { THEME_KEY } from "@hundo/core/store/theme";
@@ -18,8 +18,11 @@ describe("Koholint completion", () => {
   });
 
   it("keeps optional amiibo out of overall completion", () => {
-    expect(coreRows.length).toBeLessThan(allRows.length);
-    expect(coreRows.every((row) => !row.tags.includes("amiibo"))).toBe(true);
+    expect(completion.board.find((item) => item.tag === "amiibo")?.optional).toBe(true);
+    const amiibo = allRows.filter((row) => row.tags.includes("amiibo"));
+    expect(amiibo.length).toBeGreaterThan(0);
+    expect(overall(Object.fromEntries(amiibo.map((row) => [row.id, true]))).percent).toBe(0);
+    expect(overall(Object.fromEntries(allRows.filter((row) => !amiibo.includes(row)).map((row) => [row.id, true]))).percent).toBe(100);
   });
 
   it("labels instruments and other route rows by what they award, not as route steps", () => {

@@ -3,6 +3,7 @@ import { cva } from "class-variance-authority";
 import type { ReactNode } from "react";
 import { Link } from "react-router";
 import { Icon } from "./Icon";
+import { Overall } from "./Overall";
 import { brand, chapterRows, chapters } from "../guide";
 import { pct, two } from "../format";
 import { isOpen, useProgress } from "../store/progress";
@@ -44,6 +45,8 @@ export function RailContent({ activeChapter, view, heading }: RailProps & { head
     <>
       <div>
         {heading ?? <div className={railHeading}>Walkthrough</div>}
+        {/* The guide's overall figure, over the chapters it sums up, outside their nav; under 800px in the drawer, under its heading. */}
+        <Overall place="rail" />
         <nav className="grid gap-0.75" aria-label="Walkthrough chapters">
           {chapters.map((chapter) => {
             const n = two(chapter.id);

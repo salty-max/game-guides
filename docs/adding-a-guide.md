@@ -66,8 +66,9 @@ The full type is `GuideConfig` in `packages/core/src/types.ts`, and every field 
 - **`defer`** (optional): rows Next up holds back until nothing else is left, such as optional amiibo outfits.
 - **`completion`**:
   - `board`: the counts on the Progress page. Give a `goal` where the game has a fixed total.
-  - `isCore`: which rows count toward the overall figure. The default is every row.
-  - `overall`: an overall percentage and the words after it. With only a `label`, it's the share of core rows checked: Koholint shows that as "complete". A `percent` function replaces it with a model, like Red Dead's estimate of the in-game figure. Leave `overall` out and the page shows counts only, as Echoes does.
+  - The overall figure needs nothing: it is the board's targets that aren't `optional`, each counted as the board counts it and up to its `goal`, rounded down, and it reads "complete" ([core.md](core.md#overall-completion)). So a target that isn't part of the game's 100% must be `optional`.
+  - `overall` (optional): only for a game that keeps a percentage of its own. A `percent` function replaces the figure with a model of it, read over the core rows and rounded down as the game rounds, and `label` its words, like Red Dead's estimate ("estimated in-game completion").
+  - `isCore` (optional): the rows that `percent` reads, and counts as entries beside it. The default is every row.
   - `left` and `unit: "points"`: only for a weighted model like Red Dead's estimate.
 - **`state: {}`**: a new guide has no saves from before the shared format, so no `legacy`. Add `extra`, with a `Register` declaration, only for a panel that saves its own state. Koholint's run log is the example.
 - **`text`**: the ten strings in `GuideText`.

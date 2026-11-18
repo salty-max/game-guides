@@ -25,7 +25,7 @@ The Vercel project `hundo-koholint` builds this folder as its Root Directory and
 
 - **Guide** opens at Tail Cave and remembers the last chapter you viewed. Reveal chapters as you reach them. Read each chapter straight through or jump to a section from **In this chapter**. Click a step’s opening sentence to check it off.
 - **Checklist** searches and filters the revealed route by location, chapter, category and completion. Checks sync with the guide and across categories. Open an item’s chapter link to read the directions in context.
-- **Progress** shows completion by chapter and category, what's left (biggest gaps first), and separate manual Normal and Hero deathless logs. Check the death count on your Switch save selection screen.
+- **Progress** shows overall completion (every category on the board, optional amiibo and route steps left out; also over the chapters), completion by chapter and category, what's left (biggest gaps first), and separate manual Normal and Hero deathless logs. Check the death count on your Switch save selection screen.
 - Use the sun or moon in the header to switch themes. Choose **Use device setting** under **Appearance** to follow your system. The theme is saved in this browser.
 - Open **Progress saved** for Sync devices, where a six-digit code links your other devices. Spoiler settings and the JSON backup are under **Change settings**, in the chapters menu (beside the page on a wide screen), and Progress has **Export progress** and **Import progress**. Your progress belongs to this browser and site address. Export before switching devices or clearing browser data. Backups are written in the format shared by all three guides (version 3, run log under `extra`); older backups and saves still load.
 
