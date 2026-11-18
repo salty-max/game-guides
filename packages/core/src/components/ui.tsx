@@ -4,7 +4,7 @@ import { Toggle } from "@base-ui/react/toggle";
 import { ToggleGroup } from "@base-ui/react/toggle-group";
 import { Tooltip } from "@base-ui/react/tooltip";
 import { cva } from "class-variance-authority";
-import { Children, type ComponentPropsWithRef, type ReactNode, type Ref } from "react";
+import type { ComponentPropsWithRef, ReactNode } from "react";
 import { Link } from "react-router";
 import { buttonClass, type ButtonSize, type ButtonStyle } from "./buttonStyle";
 import { Icon, type IconName } from "./Icon";
@@ -240,43 +240,6 @@ export function HeadedPage({ title, intro, stat, children }: { title: string; in
       <PageHeading title={title} intro={intro} stat={stat} />
       <div className="flex flex-col gap-3">{children}</div>
     </div>
-  );
-}
-
-/**
- * Two columns where both get 22rem, one where they don't, whatever the screen: the Questlines page's cards (Stacks, below). Its parts are
- * Stacks, so nothing lines up across the columns: a row of a grid is as tall as its tallest card, and a shorter card beside it would leave
- * a hole under it.
- */
-function Columns({ ref, children }: { ref?: Ref<HTMLDivElement>; children: ReactNode }) {
-  return (
-    <div ref={ref} className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,22rem),1fr))] gap-3">
-      {children}
-    </div>
-  );
-}
-
-/** Cards one under the other, each as tall as its own content, with the room between them the page keeps between its parts. */
-function Stack({ children }: { children: ReactNode }) {
-  return <div className="flex flex-col gap-3">{children}</div>;
-}
-
-/**
- * Cards in their order, in two Stacks side by side where `columns` (useColumns, read from this grid) is two or more, in one where it
- * isn't. Side by side the first, third… go down the left and the second, fourth… down the right, so each column reads in order from the
- * top and a card that opens pushes down only the cards under it. In one column they are one list in their order, in the page as on
- * screen, never the two stacks one after the other. As `columns` changes the even cards move to the other stack, which mounts them again:
- * keep what a card holds (open or closed) above it.
- */
-export function Stacks({ ref, columns = 1, children }: { ref?: Ref<HTMLDivElement>; columns?: number; children: ReactNode }) {
-  const cards = Children.toArray(children);
-  const stacks = columns > 1 ? [cards.filter((_, at) => at % 2 === 0), cards.filter((_, at) => at % 2 === 1)] : [cards];
-  return (
-    <Columns ref={ref}>
-      {stacks.map((stack, at) => (
-        <Stack key={at}>{stack}</Stack>
-      ))}
-    </Columns>
   );
 }
 

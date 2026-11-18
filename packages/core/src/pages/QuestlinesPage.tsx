@@ -1,20 +1,20 @@
 import { Collapsible } from "@base-ui/react/collapsible";
 import { cva } from "class-variance-authority";
-import { useLayoutEffect, useState } from "react";
-import { Link, useParams } from "react-router";
+import { useEffectEvent, useLayoutEffect, useRef, useState } from "react";
+import { Link, useLocation, useParams } from "react-router";
 import { CheckBox } from "../components/CheckBox";
+import { Contents } from "../components/Contents";
 import { Icon } from "../components/Icon";
 import { rowLinkClasses } from "../components/TickItem";
 import { toneClasses } from "../components/tone";
 import { pressClasses, pressRowClasses } from "../components/press-style";
-import { Callout, ChipGroup, Empty, HeadedPage, ProgressBar, Stacks, Tag } from "../components/ui";
+import { Callout, ChipGroup, Empty, HeadedPage, ProgressBar, Tag } from "../components/ui";
 import { config, missableWhy } from "../guide";
 import { two } from "../format";
 import { allRevealed, lines, lookOf, viewLine, type LineStatus, type LineView } from "../questlines";
-import { useKept } from "../store/place";
+import { useKept, useReturning } from "../store/place";
 import { isOpen, useProgress } from "../store/progress";
 import type { Row } from "../types";
-import { useColumns } from "../useColumns";
 
 const { title, intro } = config.questlines;
 
@@ -23,29 +23,42 @@ const filters: Filter[] = ["all", "going", "new", "done"];
 const isFilter = (value: unknown): value is Filter => filters.includes(value as Filter);
 
 /**
- * The guide's chained side quests, one card per line: its revealed steps in order, the next one to take, and a count of what's ticked.
- * Spoiler protection decides what shows (questlines.ts): a line whose first step is hidden isn't here at all, and while any chapter is
- * hidden every card ends with the same line and none says it's complete, so nothing tells whether a line goes on.
+ * The guide's chained side quests, one card per line in route order, one under another: its revealed steps in order, the next one to
+ * take, and a count of what's ticked. "On this page" lists the cards the chips show and jumps to each (`/questlines/<line>`).
+ * Spoiler protection decides what shows (questlines.ts): a line whose first step is hidden isn't here at all, in the cards or the list,
+ * and while any chapter is hidden every card ends with the same line and none says it's complete, so nothing tells whether a line goes on.
  */
 export function QuestlinesPage() {
   const { line: target } = useParams();
+  const { key } = useLocation();
+  const returning = useReturning();
   const data = useProgress((s) => s.data);
   const everything = allRevealed(data);
   const views = lines.map((line) => viewLine(line, data.checks, (chapter) => isOpen(data, chapter))).filter((view) => view !== null);
-  const targeted = views.some((view) => view.line.id === target) ? target : undefined;
-  // A line's own address shows every line, so the line is there to scroll to, whatever filter an earlier visit kept (as ChecklistRoute does).
-  const [filter, setFilter] = useKept<Filter>("status", "all", isFilter, !targeted);
+  const addressed = views.find((view) => view.line.id === target);
+  const targeted = addressed?.line.id;
+  // A line's own address shows its line: a filter an earlier visit kept comes back only if it shows the line, so the line is there to
+  // scroll to (as ChecklistRoute starts afresh at an entry's address). A chip picked from there is kept like any other.
+  const keeps = (value: unknown): value is Filter => isFilter(value) && (value === "all" || addressed === undefined || addressed.status === value);
+  const [filter, setFilter] = useKept<Filter>("status", "all", keeps);
   const count = (status: LineStatus) => views.filter((view) => view.status === status).length;
   const doneWord = everything ? "complete" : `done through chapter ${data.ceiling}`;
   const shown = filter === "all" ? views : views.filter((view) => view.status === filter);
-  const [columns, grid] = useColumns();
+  const column = useRef<HTMLDivElement>(null);
 
-  // Which cards are open, by line. Held here rather than in each card: a card moves between the one list and the two stacks as the page's
-  // width changes, and a card that moves is mounted again. Each starts as the page first sees its line, open while it's under way or when
-  // the address names it, and after that only the reader opens or closes it, so ticking a card's last step doesn't snap it shut.
+  // Which cards are open, by line. Held here rather than in each card: a chip that hides a card and shows it again mounts it again. Each
+  // starts as the page first sees its line, open while it's under way or when the address names it, and after that only the reader opens
+  // or closes it, so ticking a card's last step doesn't snap it shut. A line's link followed on the page (a new key: the router gives the
+  // address already shown one too) opens its card as well, as the same address does for a page built afresh; Back and Forward don't, as
+  // they put the page back as it was left.
   const [open, setOpen] = useState<Record<string, boolean>>({});
+  const [arrival, setArrival] = useState(key);
   const unseen = views.filter((view) => !Object.hasOwn(open, view.line.id));
-  if (unseen.length > 0) setOpen({ ...open, ...Object.fromEntries(unseen.map((view) => [view.line.id, view.status === "going" || view.line.id === targeted])) });
+  const followed = arrival !== key && !returning ? targeted : undefined;
+  if (unseen.length > 0 || followed) {
+    setOpen({ ...open, ...Object.fromEntries(unseen.map((view) => [view.line.id, view.status === "going" || view.line.id === targeted])), ...(followed ? { [followed]: true } : {}) });
+  }
+  if (arrival !== key) setArrival(key);
 
   const stat = [
     count("going") && `${count("going")} under way`,
@@ -55,14 +68,34 @@ export function QuestlinesPage() {
     .filter(Boolean)
     .join(" · ");
 
-  // A layout effect, so the line is in view before the page is shown (Layout leaves a listed line's address to the page). It waits for the
-  // cards to be in their columns (useColumns), but not for a later change in their count (a resize, a scrollbar coming): that would pull
-  // the reader back to the line from wherever they had scrolled. A kept page coming back runs it again with the count it had, before
-  // useColumns reads the new one; Back and Forward then put the page where it was left (Layout has the last word).
-  const laidOut = columns !== undefined;
-  useLayoutEffect(() => {
-    if (targeted && laidOut) document.getElementById(`line-${targeted}`)?.scrollIntoView({ block: "start" });
-  }, [targeted, laidOut]);
+  // Arrive at the line the address names, the button that holds its name focused, every time a link to it is followed (its key), as the
+  // Progress page does with its parts. Looked up in this page's own column, not the document: the kept pages share it (Pages). A layout
+  // effect, so the line is in view before the page is shown (Layout leaves a listed line's address to the page); it runs again as a kept
+  // page comes back, where Layout's own effect, after it, has the last word (Back and Forward put the page where it was left). Only on a
+  // move, never when the line comes in later (a chapter revealed, here or by a sync): the reader is busy elsewhere then.
+  const land = useEffectEvent(() => {
+    if (!targeted) return;
+    const card = column.current?.querySelector<HTMLElement>(`[id="line-${targeted}"]`);
+    card?.querySelector<HTMLElement>(":scope > button")?.focus({ preventScroll: true });
+    card?.scrollIntoView({ block: "start" });
+  });
+  useLayoutEffect(() => land(), [key]);
+
+  // One column at every width, so a card that opens pushes down only the cards under it and none leaves a hole beside a shorter one.
+  const cards = (
+    <div ref={column} className="flex min-w-0 flex-col gap-3">
+      {shown.map((view) => (
+        <LineCard
+          key={view.line.id}
+          view={view}
+          doneWord={doneWord}
+          hiddenPast={everything ? undefined : data.ceiling}
+          open={open[view.line.id] ?? false}
+          onOpenChange={(next) => setOpen((was) => ({ ...was, [view.line.id]: next }))}
+        />
+      ))}
+    </div>
+  );
 
   return (
     <HeadedPage title={title} intro={intro} stat={stat || undefined}>
@@ -87,19 +120,14 @@ export function QuestlinesPage() {
           />
           {shown.length === 0 ? (
             <Empty>No questline here yet.</Empty>
+          ) : views.length < 2 ? (
+            // One line met so far (Koholint has one at all): a list beside it would only name the card next to it.
+            cards
           ) : (
-            <Stacks ref={grid} columns={columns}>
-              {shown.map((view) => (
-                <LineCard
-                  key={view.line.id}
-                  view={view}
-                  doneWord={doneWord}
-                  hiddenPast={everything ? undefined : data.ceiling}
-                  open={open[view.line.id] ?? false}
-                  onOpenChange={(next) => setOpen((was) => ({ ...was, [view.line.id]: next }))}
-                />
-              ))}
-            </Stacks>
+            // The cards the chips show, so a link always lands on one, and only lines the page already shows: no hidden one, no count.
+            <Contents label="On this page" links={shown.map(({ line }) => ({ key: line.id, title: line.name, to: `/questlines/${line.id}` }))} current={targeted}>
+              {cards}
+            </Contents>
           )}
         </>
       )}
@@ -130,7 +158,7 @@ function LineCard({ view, doneWord, hiddenPast, open, onOpenChange }: LineCardPr
       open={open}
       onOpenChange={onOpenChange}
       render={<section id={`line-${line.id}`} aria-labelledby={`line-${line.id}-name`} />}
-      className="scroll-mt-4 overflow-hidden rounded-card border border-line bg-surface"
+      className="overflow-hidden rounded-card border border-line bg-surface"
     >
       <Collapsible.Trigger className={`${pressClasses} group/trigger grid min-h-12 w-full cursor-pointer grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 border-0 bg-transparent px-4 py-3 text-left font-sans text-inherit phone:px-3`}>
         <span className={tile({ tone })} aria-hidden="true">
