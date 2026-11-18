@@ -154,7 +154,7 @@ export const questlines = {
     },
     {
       "id": "stag",
-      "name": "The Last Stag",
+      "name": "The Stag",
       "steps": [
         "stag-crossroads",
         "stag-stagnest",
@@ -185,7 +185,7 @@ export const questlines = {
     },
     {
       "id": "grimm",
-      "name": "The Grimm Troupe",
+      "name": "The Nightmare Lantern",
       "steps": [
         "quest-nightmare-lantern",
         "charm-grimmchild",

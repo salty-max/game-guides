@@ -1,52 +1,54 @@
 import type { Missable } from "@hundo/core/types";
 
+const steam = "https://steamcommunity.com/sharedfiles/filedetails/?id=3005043947";
+const fextralifeTroupe = "https://hollowknight.wiki.fextralife.com/The+Grimm+Troupe+(Quest)";
+const slashkeys = "https://slashkeys.com/guides/hollow-knight/walkthrough";
+
+/** What can be lost for good, in route order. None of it costs a percent of the game's completion. */
 export const missables: Missable[] = [
   {
-    "id": "quest-zote-greenpath",
-    "why": "Rescue Zote in Greenpath before obtaining Mantis Claw to keep his rescue and later quest available.",
-    "sources": [
-      "https://hollowknight.wiki/w/Zote_the_Mighty",
-      "https://truesteamachievements.com/a230418/neglect-achievement"
-    ]
+    id: "quest-zote-greenpath",
+    why: "Free Zote from the Vengefly King on this visit: once you have the movement ability after the cloak, he dies in the trap and his later steps go with him.",
+    sources: ["https://hollowknight.wiki/w/Zote_the_Mighty", slashkeys],
   },
   {
-    "id": "quest-cloth-basin",
-    "why": "Meet Cloth in the Ancient Basin before defeating Traitor Lord for the branch where she joins the fight.",
-    "sources": [
-      "https://hollowknight.wiki/w/Cloth",
-      "https://www.steamsolo.com/guide/112-completion-walkthrough-with-maps-hollow-knight/"
-    ]
+    id: "quest-quirrel-station",
+    why: "Talk to Quirrel on your first visit to Queen’s Station: he’s gone once you leave the station or get your next movement ability.",
+    sources: ["https://hollowknight.wiki/w/Quirrel", steam],
   },
   {
-    "id": "pickup-lifeblood-egg",
-    "why": "Collect the Arcane Egg inside the Lifeblood chamber before taking Lifeblood Core, which closes the room.",
-    "sources": [
-      "https://hollowknight.wiki/w/Lifeblood_Core",
-      "https://www.steamsolo.com/guide/112-completion-walkthrough-with-maps-hollow-knight/"
-    ]
+    id: "quest-cloth-basin",
+    why: "Meet Cloth here before you beat the boss of a much later garden: after that, she can’t be met here and her story goes elsewhere.",
+    sources: ["https://hollowknight.wiki/w/Cloth", steam],
   },
   {
-    "id": "ending-hollow-knight",
-    "why": "Record the first Black Egg ending before acquiring Void Heart, which permanently switches the fight’s available endings.",
-    "sources": [
-      "https://hollowknight.wiki/w/Endings_(Hollow_Knight)",
-      "https://slashkeys.com/guides/hollow-knight/walkthrough"
-    ]
+    id: "pickup-lifeblood-egg",
+    why: "Take the Arcane Egg before the Lifeblood Core: picking up the charm throws you out and seals the room for good.",
+    sources: ["https://hollowknight.wiki/w/Lifeblood_Core", steam],
   },
   {
-    "id": "quest-divine",
-    "why": "Finish any desired Unbreakable charm upgrades before banishing the Grimm Troupe, which also removes Divine.",
-    "sources": [
-      "https://hollowknight.wiki/w/Divine",
-      "https://www.steamsolo.com/guide/112-completion-walkthrough-with-maps-hollow-knight/"
-    ]
+    id: "ending-hollow-knight",
+    why: "See this ending before you take Void Heart: once you hold it, the fight only leads to the other endings.",
+    sources: ["https://hollowknight.wiki/w/Endings_(Hollow_Knight)", "https://hollowknight.wiki.fextralife.com/Endings"],
   },
   {
-    "id": "ending-embrace-void",
-    "why": "Complete the fifth Pantheon before offering the Godseeker a Delicate Flower for the ungifted ending.",
-    "sources": [
-      "https://hollowknight.wiki/w/Endings_(Hollow_Knight)",
-      "https://teemo.dev/game-design/hollow-knight/systems/areas-and-progression-reference/"
-    ]
-  }
+    id: "quest-divine",
+    why: "Buy the Unbreakable upgrades before you banish the Troupe: Divine leaves with the Troupe, and a charm she holds is left in Dirtmouth, still Fragile.",
+    sources: ["https://hollowknight.wiki/w/Divine", fextralifeTroupe],
+  },
+  {
+    id: "troupe-finale-grimm-finale",
+    why: "For Banishment, break the lantern once Brumm has spoken: leave the room first and only Nightmare King Grimm is left.",
+    sources: ["https://hollowknight.wiki/w/Brumm", fextralifeTroupe],
+  },
+  {
+    id: "quest-nailsmith-sheo",
+    why: "When the Nailsmith asks you to cut him down after the Pure Nail, walk away: striking him ends his story before he can join Sheo.",
+    sources: ["https://hollowknight.wiki/w/Nailsmith", slashkeys],
+  },
+  {
+    id: "ending-embrace-void",
+    why: "Beat the Pantheon of Hallownest before you give the Godseeker a Delicate Flower: after that, the fight ends in the flower’s version.",
+    sources: ["https://hollowknight.wiki/w/Endings_(Hollow_Knight)", slashkeys],
+  },
 ];
