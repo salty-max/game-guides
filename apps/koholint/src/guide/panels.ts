@@ -2,4 +2,4 @@ import type { Panel } from "@hundo/core/types";
 import { DeathlessRun } from "./DeathlessRun";
 
 /** Opt-in panels for the Progress page; /dashboard/deathless scrolls to the run log. */
-export const panels: Panel[] = [{ id: "deathless", Component: DeathlessRun }];
+export const panels: Panel[] = [{ id: "deathless", title: "Deathless run", Component: DeathlessRun }];

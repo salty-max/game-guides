@@ -231,6 +231,22 @@ describe("coming back to a page", () => {
     expect(await screen.findByRole("heading", { level: 1 })).not.toBe(heading);
   });
 
+  it("comes Back to a chapter's linked section or step where it was left, with the focus in the page, not on what the link named", async () => {
+    const scrolled = vi.spyOn(window, "scrollTo");
+    const user = userEvent.setup();
+    render(<App />);
+    // The chapter's way in: "Read walkthrough" (an article) or "Start walkthrough" (a route), a link to its first section or step.
+    await user.click(await screen.findByRole("link", { name: /Read walkthrough|Start walkthrough|Resume route/ }));
+    await waitFor(() => expect(screen.getByRole("main").contains(document.activeElement)).toBe(true));
+    expect(screen.getByRole("main")).not.toHaveFocus();
+    scrollWindowTo(900);
+    await user.click(tab(/Progress/));
+    await screen.findByRole("heading", { name: "Your progress" });
+    act(() => history.back());
+    await waitFor(() => expect(scrolled).toHaveBeenLastCalledWith(0, 900));
+    expect(screen.getByRole("main")).toHaveFocus();
+  });
+
   for (const width of ["wide", "phone"] as const) {
     it(`never has two of an id in the page while pages are kept (${width})`, async () => {
       if (width === "phone")

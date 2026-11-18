@@ -14,7 +14,7 @@ export function WhatsLeft() {
   const inPoints = completion.unit === "points";
   const figure = inPoints ? points : String;
   return (
-    <Panel aria-labelledby="whats-left-title">
+    <Panel id="whats-left" aria-labelledby="whats-left-title">
       <PanelHead>
         <PanelTitle id="whats-left-title">What’s left</PanelTitle>
         <PanelText>

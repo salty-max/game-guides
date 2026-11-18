@@ -9,7 +9,7 @@ import { ToastHost } from "./ToastHost";
 import { TooltipHost } from "./TooltipHost";
 import { guideAnchor, readChapter } from "../guide";
 import { lineById } from "../questlines";
-import { panels } from "virtual:guide/panels";
+import { isDashboardSection } from "../dashboard";
 import { useLoadable, whenIdle } from "../loadable";
 import { isOpen, useProgress } from "../store/progress";
 import { arrive, entryOffset, offsetOf, placeOf, savePlace, scrolled, useReturning } from "../store/place";
@@ -76,7 +76,7 @@ export function Layout({ children }: { children: ReactNode }) {
     const line = view === "questlines" ? lineById(param) : undefined;
     return Boolean(line && isOpen(s.data, line.rows[0].chapter));
   });
-  const targeted = targetedGuide || targetedLine || (view === "dashboard" && panels.some((panel) => panel.id === param));
+  const targeted = targetedGuide || targetedLine || (view === "dashboard" && isDashboardSection(param));
   const place = placeOf(pathname, chapter);
   const returning = useReturning();
 
@@ -104,8 +104,9 @@ export function Layout({ children }: { children: ReactNode }) {
 
   // Moving to a new page: back to where the reader left it if they are coming back to it (Back or Forward to that very entry, a tab of the
   // bar, a launch that reopens the last place), its top otherwise, and the focus in <main>. An address that points at something to scroll
-  // to (a guide section or entry, a questline, or a dashboard panel) is left to the page, unless Back returns to it, where it was left wins. A layout
-  // effect, so the page is where it belongs before it is shown. It runs after the page's own effects, so it has the last word.
+  // to (a guide section or entry, a questline, or a part of the Progress page) is left to the page, unless Back returns to it, where it
+  // was left wins. A layout effect, so the page is where it belongs before it is shown. It runs after the page's own effects, so it has
+  // the last word.
   const pop = useNavigationType() === "POP";
   useLayoutEffect(() => {
     if (shown.current === key) return;
@@ -120,7 +121,9 @@ export function Layout({ children }: { children: ReactNode }) {
     window.scrollTo(0, offset ?? 0);
     // In the installed app the main area scrolls, not the page.
     mainRef.current?.scrollTo(0, offset ?? 0);
-    if (!first && !targeted) mainRef.current?.focus({ preventScroll: true });
+    // A page that put the focus on what its address names leaves it there, unless Back put the page back where it was left: then that
+    // may be screens away, and the focus goes into the page as for any page come back to.
+    if (!first && (!targeted || left !== undefined)) mainRef.current?.focus({ preventScroll: true });
   }, [key, place, pop, returning, targeted]);
 
   return (

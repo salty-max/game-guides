@@ -6,7 +6,7 @@ import { defaultState } from "@hundo/core/progress-state";
 import { useProgress } from "@hundo/core/store/progress";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { MemoryRouter } from "react-router";
-import { expect } from "storybook/test";
+import { expect, userEvent, within } from "storybook/test";
 
 // The dashboard's two lists of categories: What's left, biggest first with a bar of each one's size, and the board of counts, each card
 // opening its category's checklist. A third of the guide is ticked, so the bars and counts are partway.
@@ -82,51 +82,74 @@ export const WhatsLeftWide: Story = {
   },
 };
 
-// The Progress page's cards under the overall bar, each found by its title: Koholint's own panel is its deathless run.
+// The Progress page's parts under the overall bar, each found by its title: Koholint's own panel is its deathless run.
+const titles = ["Chapter progress", "Progress backup", "Deathless run", "What’s left", "By category"];
 const section = (canvas: { getByRole: (role: "heading", options: { name: string }) => HTMLElement }, name: string) =>
   canvas.getByRole("heading", { name }).closest("section")!;
 const room = (card: Element) => parseFloat(getComputedStyle(card.parentElement!).rowGap);
+const box = (element: Element) => element.getBoundingClientRect();
+
+// One column whatever its width: each part full width, right under the one before, in the page as on screen, so none leaves a hole.
+async function oneColumn(cards: Element[]) {
+  for (const [before, after] of cards.slice(1).map((card, at) => [cards[at], card])) {
+    await expect(before.compareDocumentPosition(after) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    await expect(box(after).left).toBe(box(before).left);
+    await expect(box(after).width).toBe(box(before).width);
+    await expect(box(after).top).toBeCloseTo(box(before).bottom + room(after), 1);
+  }
+}
+
+const inWidth = (width: number): Story["decorators"] => [
+  (Story) => (
+    <div style={{ width }}>
+      <Story />
+    </div>
+  ),
+];
 
 /**
- * The page where two columns of 22rem fit: the chapters, the backup and the guide's own panel down the left, what's left down the right.
- * Each column is as tall as its own cards, so the backup sits right under the chapters, however long what's left beside them is.
+ * A page column of 52rem or more: the parts in one column, What's left wide enough for each bar beside its name, and On this page beside
+ * them, a link to each part's address, level with the first.
  */
-export const PageSideBySide: Story = {
+export const PageWithContentsBeside: Story = {
   render: () => <DashboardPage />,
-  decorators: [
-    (Story) => (
-      <div style={{ width: 900 }}>
-        <Story />
-      </div>
-    ),
-  ],
+  decorators: inWidth(900),
   play: async ({ canvas }) => {
-    const [chapters, backup, run, left] = ["Chapter progress", "Progress backup", "Deathless run", "What’s left"].map((name) => section(canvas, name));
-    const box = (card: Element) => card.getBoundingClientRect();
-    await expect(box(left).top).toBe(box(chapters).top);
-    await expect(box(left).left).toBeGreaterThan(box(chapters).right);
-    await expect(box(backup).left).toBe(box(chapters).left);
-    await expect(box(backup).top).toBeCloseTo(box(chapters).bottom + room(backup), 1);
-    await expect(box(run).top).toBeCloseTo(box(backup).bottom + room(run), 1);
+    const cards = titles.map((name) => section(canvas, name));
+    await oneColumn(cards);
+    const list = canvas.getByRole("navigation", { name: "On this page" });
+    await expect(list).toBeVisible();
+    await expect(box(list).left).toBeGreaterThan(box(cards[0]).right);
+    await expect(box(list).top).toBeCloseTo(box(cards[0]).top, 0);
+    const links = within(list).getAllByRole("link");
+    await expect(links.map((link) => link.textContent)).toEqual(titles);
+    await expect(links.map((link) => link.getAttribute("href"))).toEqual(cards.map((card) => `/dashboard/${card.id}`));
+    const row = cards[3].querySelector("li")!;
+    await expect(getComputedStyle(row).gridTemplateColumns.split(" ")).toHaveLength(3);
   },
 };
 
-/** Where they don't: one column, in the page as on screen, the chapters, the backup, the guide's own panel, then what's left. */
-export const PageOneColumn: Story = {
+/** Under 52rem, On this page folds away above the parts, which take the whole width; its toggle opens the same links. */
+export const PageWithContentsFolded: Story = {
   render: () => <DashboardPage />,
-  decorators: [
-    (Story) => (
-      <div style={{ width: 400 }}>
-        <Story />
-      </div>
-    ),
-  ],
+  decorators: inWidth(600),
   play: async ({ canvas }) => {
-    const cards = ["Chapter progress", "Progress backup", "Deathless run", "What’s left"].map((name) => section(canvas, name));
-    for (const [before, after] of cards.slice(1).map((card, at) => [cards[at], card])) {
-      await expect(before.compareDocumentPosition(after) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-      await expect(after.getBoundingClientRect().left).toBe(before.getBoundingClientRect().left);
-      await expect(after.getBoundingClientRect().top).toBeGreaterThan(before.getBoundingClientRect().bottom);
-    }
+    const cards = titles.map((name) => section(canvas, name));
+    await oneColumn(cards);
+    const toggle = canvas.getByRole("button", { name: "On this page" });
+    await expect(box(toggle).bottom).toBeLessThan(box(cards[0]).top);
+    await expect(box(toggle.parentElement!).width).toBeCloseTo(box(cards[0]).width, 1);
+    await userEvent.click(toggle);
+    const [list] = canvas.getAllByRole("navigation", { name: "On this page" });
+    await expect(within(list).getAllByRole("link").map((link) => link.textContent)).toEqual(titles);
+  },
+};
+
+/** On a phone's width too: one column in the same order. */
+export const PageOnAPhone: Story = {
+  render: () => <DashboardPage />,
+  decorators: inWidth(360),
+  play: async ({ canvas }) => {
+    await oneColumn(titles.map((name) => section(canvas, name)));
   },
 };
