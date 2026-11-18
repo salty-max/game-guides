@@ -212,20 +212,24 @@ export const IconsWithRoom: Story = {
 
 /**
  * Just past 800px with large text, the rail beside the page: the brand's columns grow past the rail's width when the brand needs it, and
- * still give way before the pages do.
+ * still give way before the pages do. The brand fills first, so while its name is cut short the pages show no icons.
  */
 export const NarrowLaptopLargeText: Story = {
   globals: { viewport: { value: "narrowLaptop", isRotated: false } },
   beforeEach: largeTextLongName,
   play: async ({ canvas }) => {
     await expect(canvas.queryByRole("button", { name: "Open chapters" })).toBeNull();
-    await nothingOverlaps(canvas.getByRole("banner"));
+    const bar = canvas.getByRole("banner");
+    await nothingOverlaps(bar);
+    const name = bar.querySelector("strong")!;
+    const clipped = name.scrollWidth > name.clientWidth || name.getBoundingClientRect().top >= name.closest("a")!.getBoundingClientRect().bottom;
+    if (clipped) await expect(iconsShown(canvas.getByRole("navigation", { name: "Main navigation" }))).toBe(0);
   },
 };
 
 /**
- * Beside the rail, with room to spare: the brand's columns are as wide as the rail, so the pages start over the page, and the pages are
- * centred in what the brand and the buttons leave.
+ * Beside the rail on a small laptop: the brand's columns are as wide as the rail, so the pages start over the page. There isn't room to
+ * centre the pages over the page's column with the buttons beside them, so they sit against the buttons' side (their margin apart).
  */
 export const BesideTheRail: Story = {
   globals: { viewport: { value: "narrowLaptop", isRotated: false } },
@@ -235,16 +239,17 @@ export const BesideTheRail: Story = {
     await document.fonts.ready;
     const brandCell = canvas.getByRole("link", { name: /home$/ }).parentElement!.getBoundingClientRect();
     const buttons = canvas.getByRole("button", { name: /Open sync devices$/ }).parentElement!.getBoundingClientRect();
-    const pages = canvas.getByRole("navigation", { name: "Main navigation" }).getBoundingClientRect();
+    const nav = canvas.getByRole("navigation", { name: "Main navigation" });
     await expect(brandCell.width).toBeCloseTo(parseFloat(getComputedStyle(bar).getPropertyValue("--rail-w")), 0);
-    await expect(pages.left + pages.width / 2).toBeCloseTo((brandCell.right + buttons.left) / 2, 0);
+    await expect(nav.getBoundingClientRect().right + parseFloat(getComputedStyle(nav).marginRight)).toBeCloseTo(buttons.left, 0);
     await nothingOverlaps(bar);
   },
 };
 
 /**
  * A screen wider than the frame (--frame-max): the bar's contents sit on the frame the rail and the page share (Layout), centred, so the
- * brand's column starts where the rail does and is as wide, and the buttons end the frame's width further on, less their margin.
+ * brand's column starts where the rail does and is as wide, the buttons end the frame's width further on, less their margin, and the pages
+ * are centred over the page's column.
  */
 export const OnTheFrame: Story = {
   globals: { viewport: { value: "wide", isRotated: false } },
@@ -262,6 +267,8 @@ export const OnTheFrame: Story = {
     await expect(brandCell.left).toBeCloseTo(start, 0);
     await expect(brandCell.width).toBeCloseTo(railWidth, 0);
     await expect(buttons.getBoundingClientRect().right + parseFloat(getComputedStyle(buttons).marginRight)).toBeCloseTo(start + frame, 0);
+    const pages = canvas.getByRole("navigation", { name: "Main navigation" }).getBoundingClientRect();
+    await expect(pages.left + pages.width / 2).toBeCloseTo((start + railWidth + start + frame) / 2, 0);
     await nothingOverlaps(bar);
   },
 };
