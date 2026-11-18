@@ -3,7 +3,7 @@ import { Link, useParams } from "react-router";
 import { Stat } from "../components/Stats";
 import { WhatsLeft } from "../components/WhatsLeft";
 import { Overall } from "../components/Overall";
-import { Button, HeadedPage, Panel, PanelActions, PanelHead, PanelText, PanelTitle, ProgressBar } from "../components/ui";
+import { Button, Columns, HeadedPage, Panel, PanelActions, PanelHead, PanelText, PanelTitle, ProgressBar, Stack } from "../components/ui";
 import { CHAPTER_COUNT, chapterRows, chapters, completion, text } from "../guide";
 import { two } from "../format";
 import { exportProgress } from "../backup";
@@ -30,35 +30,36 @@ export function DashboardPage() {
       <Panel>
         <Overall place="page" />
       </Panel>
-      {/* Two columns where both get 22rem, one where they don't, whatever the screen: the chapter list's bars and the backup's buttons need it. */}
-      <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,22rem),1fr))] items-start gap-3">
-        <Panel>
-          <PanelHead>
-            <PanelTitle>Chapter progress</PanelTitle>
-            <PanelText>Open a revealed chapter.</PanelText>
-          </PanelHead>
-          {/* One list, its rows parted by rules rather than by the panel's room. */}
-          <div>
-            {visible.map((chapter) => {
-              const rows = chapterRows(chapter);
-              const count = rows.filter((row) => data.checks[row.id] === true).length;
-              return (
-                <Link key={chapter.id} className={`${pressClasses} flex items-center gap-2 border-b border-line-soft py-2 text-14 last-of-type:border-b-0`} to={`/guide/${chapter.id}`}>
-                  <small className="text-12 whitespace-nowrap text-muted tabular-nums">{two(chapter.id)}</small>
-                  <strong className="flex-1">{chapter.title}</strong>
-                  <div className="min-w-7.5 flex-[0_0_17%]">
-                    <ProgressBar done={count} total={rows.length} label={chapter.title} />
-                  </div>
-                  <small className="text-12 whitespace-nowrap text-muted tabular-nums">
-                    {count} / {rows.length}
-                  </small>
-                </Link>
-              );
-            })}
-          </div>
-          {data.spoilers && data.ceiling < CHAPTER_COUNT && <PanelText>{CHAPTER_COUNT - data.ceiling} chapters hidden by spoiler protection.</PanelText>}
-        </Panel>
-        <div className="grid gap-3">
+      {/* The chapters, what keeps the progress and the guide's own panels down one column, and what's left in each category down the
+          other: the tallest card by far, so the two columns end near each other. In one column, in that order. */}
+      <Columns>
+        <Stack>
+          <Panel>
+            <PanelHead>
+              <PanelTitle>Chapter progress</PanelTitle>
+              <PanelText>Open a revealed chapter.</PanelText>
+            </PanelHead>
+            {/* One list, its rows parted by rules rather than by the panel's room. */}
+            <div>
+              {visible.map((chapter) => {
+                const rows = chapterRows(chapter);
+                const count = rows.filter((row) => data.checks[row.id] === true).length;
+                return (
+                  <Link key={chapter.id} className={`${pressClasses} flex items-center gap-2 border-b border-line-soft py-2 text-14 last-of-type:border-b-0`} to={`/guide/${chapter.id}`}>
+                    <small className="text-12 whitespace-nowrap text-muted tabular-nums">{two(chapter.id)}</small>
+                    <strong className="flex-1">{chapter.title}</strong>
+                    <div className="min-w-7.5 flex-[0_0_17%]">
+                      <ProgressBar done={count} total={rows.length} label={chapter.title} />
+                    </div>
+                    <small className="text-12 whitespace-nowrap text-muted tabular-nums">
+                      {count} / {rows.length}
+                    </small>
+                  </Link>
+                );
+              })}
+            </div>
+            {data.spoilers && data.ceiling < CHAPTER_COUNT && <PanelText>{CHAPTER_COUNT - data.ceiling} chapters hidden by spoiler protection.</PanelText>}
+          </Panel>
           <Panel>
             <PanelHead>
               <PanelTitle>Progress backup</PanelTitle>
@@ -82,9 +83,11 @@ export function DashboardPage() {
           {panels.map(({ id, Component }) => (
             <Component key={id} />
           ))}
-        </div>
-      </div>
-      <WhatsLeft />
+        </Stack>
+        <Stack>
+          <WhatsLeft />
+        </Stack>
+      </Columns>
       <Panel>
         <PanelHead>
           <PanelTitle>{text.boardTitle}</PanelTitle>
