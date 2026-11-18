@@ -1,5 +1,6 @@
 import { Stat } from "@hundo/core/components/Stats";
 import { WhatsLeft } from "@hundo/core/components/WhatsLeft";
+import { DashboardPage } from "@hundo/core/pages/DashboardPage";
 import { allRows, completion } from "@hundo/core/guide";
 import { defaultState } from "@hundo/core/progress-state";
 import { useProgress } from "@hundo/core/store/progress";
@@ -78,5 +79,54 @@ export const WhatsLeftWide: Story = {
   play: async ({ canvasElement }) => {
     const row = canvasElement.querySelector("li")!;
     await expect(getComputedStyle(row).gridTemplateColumns.split(" ")).toHaveLength(3);
+  },
+};
+
+// The Progress page's cards under the overall bar, each found by its title: Koholint's own panel is its deathless run.
+const section = (canvas: { getByRole: (role: "heading", options: { name: string }) => HTMLElement }, name: string) =>
+  canvas.getByRole("heading", { name }).closest("section")!;
+const room = (card: Element) => parseFloat(getComputedStyle(card.parentElement!).rowGap);
+
+/**
+ * The page where two columns of 22rem fit: the chapters, the backup and the guide's own panel down the left, what's left down the right.
+ * Each column is as tall as its own cards, so the backup sits right under the chapters, however long what's left beside them is.
+ */
+export const PageSideBySide: Story = {
+  render: () => <DashboardPage />,
+  decorators: [
+    (Story) => (
+      <div style={{ width: 900 }}>
+        <Story />
+      </div>
+    ),
+  ],
+  play: async ({ canvas }) => {
+    const [chapters, backup, run, left] = ["Chapter progress", "Progress backup", "Deathless run", "What’s left"].map((name) => section(canvas, name));
+    const box = (card: Element) => card.getBoundingClientRect();
+    await expect(box(left).top).toBe(box(chapters).top);
+    await expect(box(left).left).toBeGreaterThan(box(chapters).right);
+    await expect(box(backup).left).toBe(box(chapters).left);
+    await expect(box(backup).top).toBeCloseTo(box(chapters).bottom + room(backup), 1);
+    await expect(box(run).top).toBeCloseTo(box(backup).bottom + room(run), 1);
+  },
+};
+
+/** Where they don't: one column, in the page as on screen, the chapters, the backup, the guide's own panel, then what's left. */
+export const PageOneColumn: Story = {
+  render: () => <DashboardPage />,
+  decorators: [
+    (Story) => (
+      <div style={{ width: 400 }}>
+        <Story />
+      </div>
+    ),
+  ],
+  play: async ({ canvas }) => {
+    const cards = ["Chapter progress", "Progress backup", "Deathless run", "What’s left"].map((name) => section(canvas, name));
+    for (const [before, after] of cards.slice(1).map((card, at) => [cards[at], card])) {
+      await expect(before.compareDocumentPosition(after) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+      await expect(after.getBoundingClientRect().left).toBe(before.getBoundingClientRect().left);
+      await expect(after.getBoundingClientRect().top).toBeGreaterThan(before.getBoundingClientRect().bottom);
+    }
   },
 };

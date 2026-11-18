@@ -9,6 +9,11 @@ if (typeof window !== "undefined") {
   // jsdom has no canvas (it would log "not implemented"): code that draws on one gets nothing and falls back.
   HTMLCanvasElement.prototype.getContext = (() => null) as typeof HTMLCanvasElement.prototype.getContext;
   window.scrollTo = () => {};
+  window.ResizeObserver ??= class {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  };
 
   // The dialog and the select load on use (components/chunks.ts). Load them before any test renders, so that a test sees the real
   // components, not the stand-ins shown while they load. A test of the loading itself brings its own (loading.test.tsx). This waits for

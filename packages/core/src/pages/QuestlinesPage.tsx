@@ -7,13 +7,14 @@ import { Icon } from "../components/Icon";
 import { rowLinkClasses } from "../components/TickItem";
 import { toneClasses } from "../components/tone";
 import { pressClasses, pressRowClasses } from "../components/press-style";
-import { Callout, ChipGroup, Empty, HeadedPage, ProgressBar, Tag } from "../components/ui";
+import { Callout, ChipGroup, Empty, HeadedPage, ProgressBar, Stacks, Tag } from "../components/ui";
 import { config, missableWhy } from "../guide";
 import { two } from "../format";
 import { allRevealed, lines, lookOf, viewLine, type LineStatus, type LineView } from "../questlines";
 import { useKept } from "../store/place";
 import { isOpen, useProgress } from "../store/progress";
 import type { Row } from "../types";
+import { useColumns } from "../useColumns";
 
 const { title, intro } = config.questlines;
 
@@ -37,6 +38,14 @@ export function QuestlinesPage() {
   const count = (status: LineStatus) => views.filter((view) => view.status === status).length;
   const doneWord = everything ? "complete" : `done through chapter ${data.ceiling}`;
   const shown = filter === "all" ? views : views.filter((view) => view.status === filter);
+  const [columns, grid] = useColumns();
+
+  // Which cards are open, by line. Held here rather than in each card: a card moves between the one list and the two stacks as the page's
+  // width changes, and a card that moves is mounted again. Each starts as the page first sees its line, open while it's under way or when
+  // the address names it, and after that only the reader opens or closes it, so ticking a card's last step doesn't snap it shut.
+  const [open, setOpen] = useState<Record<string, boolean>>({});
+  const unseen = views.filter((view) => !Object.hasOwn(open, view.line.id));
+  if (unseen.length > 0) setOpen({ ...open, ...Object.fromEntries(unseen.map((view) => [view.line.id, view.status === "going" || view.line.id === targeted])) });
 
   const stat = [
     count("going") && `${count("going")} under way`,
@@ -46,10 +55,14 @@ export function QuestlinesPage() {
     .filter(Boolean)
     .join(" · ");
 
-  // A layout effect, so the line is in view before the page is shown (Layout leaves a listed line's address to the page).
+  // A layout effect, so the line is in view before the page is shown (Layout leaves a listed line's address to the page). It waits for the
+  // cards to be in their columns (useColumns), but not for a later change in their count (a resize, a scrollbar coming): that would pull
+  // the reader back to the line from wherever they had scrolled. A kept page coming back runs it again with the count it had, before
+  // useColumns reads the new one; Back and Forward then put the page where it was left (Layout has the last word).
+  const laidOut = columns !== undefined;
   useLayoutEffect(() => {
-    if (targeted) document.getElementById(`line-${targeted}`)?.scrollIntoView({ block: "start" });
-  }, [targeted]);
+    if (targeted && laidOut) document.getElementById(`line-${targeted}`)?.scrollIntoView({ block: "start" });
+  }, [targeted, laidOut]);
 
   return (
     <HeadedPage title={title} intro={intro} stat={stat || undefined}>
@@ -75,11 +88,18 @@ export function QuestlinesPage() {
           {shown.length === 0 ? (
             <Empty>No questline here yet.</Empty>
           ) : (
-            <div className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,22rem),1fr))] items-start gap-3 phone:gap-2.5">
+            <Stacks ref={grid} columns={columns}>
               {shown.map((view) => (
-                <LineCard key={view.line.id} view={view} doneWord={doneWord} hiddenPast={everything ? undefined : data.ceiling} opened={view.line.id === targeted} />
+                <LineCard
+                  key={view.line.id}
+                  view={view}
+                  doneWord={doneWord}
+                  hiddenPast={everything ? undefined : data.ceiling}
+                  open={open[view.line.id] ?? false}
+                  onOpenChange={(next) => setOpen((was) => ({ ...was, [view.line.id]: next }))}
+                />
               ))}
-            </div>
+            </Stacks>
           )}
         </>
       )}
@@ -95,21 +115,20 @@ interface LineCardProps {
   doneWord: string;
   /** The last revealed chapter while spoiler protection hides any. */
   hiddenPast?: number;
-  /** Opened by its own address. */
-  opened: boolean;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
 /** One line: its name and count, which open and close it, then its revealed steps; closed, it shows the step to take next. */
-function LineCard({ view, doneWord, hiddenPast, opened }: LineCardProps) {
+function LineCard({ view, doneWord, hiddenPast, open, onOpenChange }: LineCardProps) {
   const { line, shown, done, next, status } = view;
-  const [open, setOpen] = useState(status === "going" || opened);
   const { icon, tone } = lookOf(line);
   const summary = status === "done" ? doneWord[0].toUpperCase() + doneWord.slice(1) : status === "new" ? `Not started · ${shown.length} revealed ${shown.length === 1 ? "step" : "steps"}` : `${done} of ${shown.length} revealed steps`;
   const ahead = next ?? (status === "new" ? shown[0] : undefined);
   return (
     <Collapsible.Root
       open={open}
-      onOpenChange={setOpen}
+      onOpenChange={onOpenChange}
       render={<section id={`line-${line.id}`} aria-labelledby={`line-${line.id}-name`} />}
       className="scroll-mt-4 overflow-hidden rounded-card border border-line bg-surface"
     >
