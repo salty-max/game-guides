@@ -13,10 +13,10 @@ export function NextUp({ chapter }: { chapter: number }) {
   );
 
   return (
-    <Panel space="above-wide" pad="snug" aria-labelledby="next-up-title">
+    <Panel pad="snug" aria-labelledby="next-up-title">
       <PanelTitle id="next-up-title">Next up</PanelTitle>
       {rows.length ? (
-        <ul className="mt-2 mb-0 list-none p-0">
+        <ul className="list-none p-0">
           {rows.map((row) => (
             <TickItem
               key={row.id}
@@ -33,7 +33,7 @@ export function NextUp({ chapter }: { chapter: number }) {
         <Empty>{text.nextUpDone}</Empty>
       )}
       {holding && (
-        <div className="mt-2">
+        <div>
           <Button onClick={release}>Show next steps</Button>
         </div>
       )}

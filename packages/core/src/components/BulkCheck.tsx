@@ -7,8 +7,11 @@ import type { Row } from "../types";
 /** Unchecking more than this many at once asks first. */
 export const BULK_CONFIRM_THRESHOLD = 10;
 
-/** Check what is left in a section, or uncheck all of it once it is done. Either way the toast can undo it. */
-export function BulkCheck({ rows, label, space = "none" }: { rows: Row[]; label: string; space?: "none" | "above" }) {
+/**
+ * Check what is left in a section, or uncheck all of it once it is done. Either way the toast can undo it. `ownLine` puts it on a line of
+ * its own, for a stack (an article section's header) that would otherwise stretch the button across it. Under two rows it is nothing at all.
+ */
+export function BulkCheck({ rows, label, ownLine = false }: { rows: Row[]; label: string; ownLine?: boolean }) {
   const checks = useProgress((s) => s.data.checks);
   const openDialog = useUi((s) => s.openDialog);
   if (rows.length < 2) return null;
@@ -36,6 +39,5 @@ export function BulkCheck({ rows, label, space = "none" }: { rows: Row[]; label:
       <span className="sr-only"> in {label}</span>
     </Button>
   );
-  // Under an article section's title and lines, with room above it.
-  return space === "above" ? <div className="mt-[.6rem]">{button}</div> : button;
+  return ownLine ? <div>{button}</div> : button;
 }

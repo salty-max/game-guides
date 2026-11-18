@@ -23,7 +23,7 @@ export function DialogBody({ children }: { children: ReactNode }) {
 
 /** A row of actions at the end of a section. */
 export function DialogFooter({ children }: { children: ReactNode }) {
-  return <div className="mt-2 flex flex-wrap gap-1.75">{children}</div>;
+  return <div className="mt-2 flex flex-wrap gap-2">{children}</div>;
 }
 
 /** A paragraph. `small` is for the fine print, `error` for a problem that isn't tied to a field. */

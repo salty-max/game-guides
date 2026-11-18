@@ -1,7 +1,7 @@
 import { MainNav } from "@hundo/core/components/MainNav";
 import { Pages } from "@hundo/core/components/Pages";
 import { SearchField } from "@hundo/core/components/SearchField";
-import { PageHeading } from "@hundo/core/components/ui";
+import { HeadedPage } from "@hundo/core/components/ui";
 import { forgetPlaces } from "@hundo/core/store/place";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
@@ -12,10 +12,9 @@ import { expect, userEvent, within } from "storybook/test";
 function Stand({ title }: { title: string }) {
   const [query, setQuery] = useState("");
   return (
-    <>
-      <PageHeading title={title} />
+    <HeadedPage title={title}>
       <SearchField id={`${title}-search`} label={`Search ${title}`} placeholder="Type something" value={query} onChange={setQuery} />
-    </>
+    </HeadedPage>
   );
 }
 

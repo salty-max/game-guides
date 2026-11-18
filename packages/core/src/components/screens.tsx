@@ -136,7 +136,7 @@ export function SettingsScreen() {
   return (
     <>
       <DialogText>Choose your theme and how far the guide can reveal.</DialogText>
-      <form id="guide-settings" className="grid gap-2.25" onSubmit={submit}>
+      <form id="guide-settings" className="grid gap-2.5" onSubmit={submit}>
         <RadioGroup label="Appearance" choices={themeOptions} value={theme} onChange={(next) => setTheme(normalizeTheme(next))} />
         <Checkbox label="Hide later chapters" checked={spoilers} onChange={setSpoilers} />
         <Select

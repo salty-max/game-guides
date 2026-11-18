@@ -1,18 +1,20 @@
 import { TextField } from "@hundo/core/components/TextField";
-import { Button, ChipGroup, Panel, PanelActions, PanelFigure, PanelForm, PanelText, PanelTitle } from "@hundo/core/components/ui";
+import { Button, ChipGroup, Panel, PanelActions, PanelFigure, PanelForm, PanelHead, PanelText, PanelTitle } from "@hundo/core/components/ui";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-// A panel on the dashboard, or a guide's own (Koholint's deathless run, Red Dead's calibration): a title, words in
-// three tones, a row of buttons, and the room it keeps from its neighbours.
+// A panel on the dashboard, or a guide's own (Koholint's deathless run, Red Dead's calibration): a title and the words that open it, words
+// in three tones, a row of buttons. The panel keeps the room between its parts, roomy or snug.
 const meta = {
   title: "Core/Panel",
   component: Panel,
-  args: { space: "none" },
+  args: { pad: "roomy" },
   decorators: [(Story) => <div style={{ maxWidth: 560 }}><Story /></div>],
   render: (args) => (
     <Panel {...args}>
-      <PanelTitle>Progress backup</PanelTitle>
-      <PanelText>Progress lives in this browser. Export a backup to move it to another device or keep a copy.</PanelText>
+      <PanelHead>
+        <PanelTitle>Progress backup</PanelTitle>
+        <PanelText>Progress lives in this browser. Export a backup to move it to another device or keep a copy.</PanelText>
+      </PanelHead>
       <PanelActions>
         <Button>Export progress</Button>
         <Button>Import progress</Button>
@@ -27,31 +29,20 @@ type Story = StoryObj<typeof meta>;
 /** A title, the muted words every panel opens with, and its buttons. */
 export const WithActions: Story = {};
 
+/** Snug, as Next up: a short list between other parts of a page, with less room inside and between its parts. */
+export const Snug: Story = { args: { pad: "snug" } };
+
 /** The three tones: muted as a rule, ink for a result the reader asked for, the error colour for what went wrong. */
 export const Tones: Story = {
   render: (args) => (
     <Panel {...args} aria-labelledby="tones-title">
-      <PanelTitle id="tones-title">Check against the game</PanelTitle>
-      <PanelText>Enter the completion percentage from Stats → General to see how far this guide’s estimate is off.</PanelText>
+      <PanelHead>
+        <PanelTitle id="tones-title">Check against the game</PanelTitle>
+        <PanelText>Enter the completion percentage from Stats → General to see how far this guide’s estimate is off.</PanelText>
+      </PanelHead>
       <PanelText tone="ink">Guide 42% · game 44% · the game is 2 points ahead.</PanelText>
       <PanelText tone="error">Enter a number from 0 to 100.</PanelText>
     </Panel>
-  ),
-};
-
-/** `space`: room above (a panel under another) and below (a panel over the next block), shown between two plain lines. */
-export const Spacing: Story = {
-  render: () => (
-    <>
-      <p>Above</p>
-      <Panel space="above">
-        <PanelTitle>Room above</PanelTitle>
-      </Panel>
-      <Panel space="below">
-        <PanelTitle>Room below</PanelTitle>
-      </Panel>
-      <p>Below</p>
-    </>
   ),
 };
 
@@ -60,7 +51,7 @@ export const Figure: Story = {
   render: (args) => (
     <Panel {...args}>
       <PanelTitle>Deathless run</PanelTitle>
-      <ChipGroup label="Run mode" choices={[["normal", "Normal"], ["hero", "Hero"]]} value="normal" onChange={() => {}} space="above" />
+      <ChipGroup label="Run mode" choices={[["normal", "Normal"], ["hero", "Hero"]]} value="normal" onChange={() => {}} />
       <PanelFigure value={3} unit="deaths" />
       <PanelText>A Game Over ends this deathless attempt. Your collection checklist still works for this file.</PanelText>
       <PanelActions>
@@ -75,8 +66,10 @@ export const Figure: Story = {
 export const Form: Story = {
   render: (args) => (
     <Panel {...args} aria-labelledby="form-title">
-      <PanelTitle id="form-title">Check against the game</PanelTitle>
-      <PanelText>Enter the completion percentage from Stats → General to see how far this guide’s estimate is off.</PanelText>
+      <PanelHead>
+        <PanelTitle id="form-title">Check against the game</PanelTitle>
+        <PanelText>Enter the completion percentage from Stats → General to see how far this guide’s estimate is off.</PanelText>
+      </PanelHead>
       <PanelForm onSubmit={(event) => event.preventDefault()}>
         <TextField
           id="reported"

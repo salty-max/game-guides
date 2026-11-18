@@ -7,7 +7,7 @@ import { Icon } from "../components/Icon";
 import { rowLink } from "../components/TickItem";
 import { tones } from "../components/tone";
 import { press, pressRow } from "../components/press-style";
-import { Callout, ChipGroup, Empty, PageHeading, ProgressBar, Tag } from "../components/ui";
+import { Callout, ChipGroup, Empty, HeadedPage, ProgressBar, Tag } from "../components/ui";
 import { config, missableWhy } from "../guide";
 import { two } from "../format";
 import { allRevealed, lines, lookOf, viewLine, type LineStatus, type LineView } from "../questlines";
@@ -52,8 +52,7 @@ export function QuestlinesPage() {
   }, [targeted]);
 
   return (
-    <>
-      <PageHeading title={title} intro={intro} stat={stat || undefined} />
+    <HeadedPage title={title} intro={intro} stat={stat || undefined}>
       {!everything && (
         <Callout icon="lock">Showing questlines from chapters 1–{data.ceiling} only. More of them, and later steps, appear as you reveal chapters.</Callout>
       )}
@@ -64,7 +63,6 @@ export function QuestlinesPage() {
           <ChipGroup
             label="Questlines by status"
             flow="scroll"
-            space="none"
             choices={[
               ["all", `All · ${views.length}`],
               ["going", `Under way · ${count("going")}`],
@@ -75,11 +73,9 @@ export function QuestlinesPage() {
             onChange={(next) => setFilter(isFilter(next) ? next : "all")}
           />
           {shown.length === 0 ? (
-            <div className="mt-3.25">
-              <Empty>No questline here yet.</Empty>
-            </div>
+            <Empty>No questline here yet.</Empty>
           ) : (
-            <div className="mt-3.25 grid grid-cols-[repeat(auto-fill,minmax(min(100%,22rem),1fr))] items-start gap-3.25 phone:gap-2.5">
+            <div className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,22rem),1fr))] items-start gap-3 phone:gap-2.5">
               {shown.map((view) => (
                 <LineCard key={view.line.id} view={view} doneWord={doneWord} hiddenPast={everything ? undefined : data.ceiling} opened={view.line.id === targeted} />
               ))}
@@ -87,7 +83,7 @@ export function QuestlinesPage() {
           )}
         </>
       )}
-    </>
+    </HeadedPage>
   );
 }
 

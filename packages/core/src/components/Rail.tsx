@@ -13,9 +13,10 @@ import { railHeading, railPanel } from "./rail-style";
 import { press, pressPart, pressText } from "./press-style";
 
 // A chapter in the rail: a link to it, or, while spoiler protection hides it, a button that reveals it (and says what it's hidden by).
-// A locked one keeps its muted colour when it's hovered; an open one darkens.
+// A locked one keeps its muted colour when it's hovered; an open one darkens. The current one's frame is an inset ring, not a border, so
+// it takes no room: the rail's 16px and the link's 8px put the numbers 24px in, under the top bar's tile, and the heading's 8px over the words.
 const chapterLink = cva(
-  `${press} group/chapter grid min-h-12 w-full cursor-pointer grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2.5 rounded-small border border-transparent bg-transparent p-2 text-left font-sans font-bold no-underline hover:bg-rail-hover aria-[current=page]:border-soft-line aria-[current=page]:text-ink [&_svg]:size-3.5 [&_svg]:text-muted [&[aria-current=page]:not(:hover)]:bg-soft`,
+  `${press} group/chapter grid min-h-12 w-full cursor-pointer grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2.5 rounded-small bg-transparent p-2 text-left font-sans font-bold no-underline hover:bg-rail-hover aria-[current=page]:text-ink aria-[current=page]:inset-ring aria-[current=page]:inset-ring-soft-line [&_svg]:size-3.5 [&_svg]:text-muted [&[aria-current=page]:not(:hover)]:bg-soft`,
   { variants: { locked: { true: "text-13 text-muted", false: "text-14 text-inherit hover:text-ink" } } },
 );
 
@@ -43,11 +44,11 @@ export function RailContent({ activeChapter, view, heading }: RailProps & { head
   const openDialog = useUi((s) => s.openDialog);
   return (
     <>
-      <div>
+      <div className="flex flex-col gap-2.5">
         {heading ?? <div className={railHeading}>Walkthrough</div>}
         {/* The guide's overall figure, over the chapters it sums up, outside their nav; under 800px in the drawer, under its heading. */}
         <Overall place="rail" />
-        <nav className="grid gap-0.75" aria-label="Walkthrough chapters">
+        <nav className="grid gap-1" aria-label="Walkthrough chapters">
           {chapters.map((chapter) => {
             const n = two(chapter.id);
             if (!isOpen(data, chapter.id)) {
@@ -78,12 +79,12 @@ export function RailContent({ activeChapter, view, heading }: RailProps & { head
           })}
         </nav>
       </div>
-      <div className="mt-auto grid gap-3.25 px-0.5">
-        <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-3.5 rounded-card border border-line bg-surface px-2.5 pt-3.25 pb-3">
+      <div className="mt-auto grid gap-3 px-0.5">
+        <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-3.5 rounded-card border border-line bg-surface px-2.5 py-3">
           <Icon name={data.spoilers ? "lock" : "unlock"} className="mt-0.5 size-4.5 text-primary" />
           <div>
             <strong className="text-13">Spoiler protection {data.spoilers ? "on" : "off"}</strong>
-            <p className="mt-0.5 mb-1.25 text-12 leading-[1.46] text-muted">{data.spoilers ? `Chapters past ${data.ceiling} are hidden.` : "All chapters are visible."}</p>
+            <p className="mt-0.5 mb-1 text-12 leading-[1.46] text-muted">{data.spoilers ? `Chapters past ${data.ceiling} are hidden.` : "All chapters are visible."}</p>
             <BaseButton
               className={`${pressText} inline-flex min-h-8 cursor-pointer items-center border-0 bg-transparent px-0 py-1 text-left font-sans text-12 font-bold text-primary underline underline-offset-3`}
               onClick={() => openDialog({ kind: "settings" })}

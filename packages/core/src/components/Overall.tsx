@@ -36,7 +36,7 @@ export function OverallBar({ percent, label, entries, place }: OverallBarProps) 
   const text = place === "page" && entries ? `${overallText(percent, label)}, ${entries.done} of ${entries.total} entries` : overallText(percent, label);
   if (place === "rail") {
     return (
-      <Progress.Root value={percent} getAriaValueText={() => text} data-nosnippet="" className="mb-2.5 grid gap-2 rounded-card border border-line bg-surface px-2.75 pt-2.5 pb-3">
+      <Progress.Root value={percent} getAriaValueText={() => text} data-nosnippet="" className="grid gap-2 rounded-card border border-line bg-surface px-2.5 pt-2.5 pb-3">
         <span className="flex items-baseline justify-between gap-2">
           <Progress.Label className="text-13 font-bold">Overall completion</Progress.Label>
           <Progress.Value className="text-16 font-extrabold tabular-nums">{() => `${percent}%`}</Progress.Value>

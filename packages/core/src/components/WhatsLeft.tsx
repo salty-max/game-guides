@@ -1,5 +1,5 @@
 import { Link } from "react-router";
-import { Panel, PanelText, PanelTitle } from "./ui";
+import { Panel, PanelHead, PanelText, PanelTitle } from "./ui";
 import { cats, completion, whatsLeft } from "../guide";
 import { useProgress } from "../store/progress";
 import { pressText } from "./press-style";
@@ -14,17 +14,21 @@ export function WhatsLeft() {
   const inPoints = completion.unit === "points";
   const figure = inPoints ? points : String;
   return (
-    <Panel space="below" aria-labelledby="whats-left-title">
-      <PanelTitle id="whats-left-title">What’s left</PanelTitle>
-      {items.length ? (
-        <>
-          <PanelText>
-            {inPoints
+    <Panel aria-labelledby="whats-left-title">
+      <PanelHead>
+        <PanelTitle id="whats-left-title">What’s left</PanelTitle>
+        <PanelText>
+          {!items.length
+            ? "Nothing left. That’s a 100%."
+            : inPoints
               ? `About ${points(items.reduce((sum, item) => sum + item.left, 0))} points to go. Biggest remaining first, using the estimate’s weights.`
               : "Biggest gaps first."}
-          </PanelText>
+        </PanelText>
+      </PanelHead>
+      {items.length > 0 && (
+        <>
           {/* Its own width decides (`/left`): under 28rem a category's bar goes under its name and figures, so the bar keeps a length worth reading. */}
-          <ul className="@container/left mt-3 mb-0 grid list-none gap-2.5 p-0">
+          <ul className="@container/left grid list-none gap-2.5 p-0">
             {items.map((item) => (
               <li key={item.tag} className="grid grid-cols-[minmax(7.5rem,11.875rem)_1fr_auto] items-center gap-3 text-14 @max-[28rem]/left:grid-cols-[1fr_auto]">
                 {/* At least 24px tall, the smallest target WCAG 2.2's target size allows, where its line alone is 22px. */}
@@ -44,8 +48,6 @@ export function WhatsLeft() {
             ))}
           </ul>
         </>
-      ) : (
-        <PanelText>Nothing left. That’s a 100%.</PanelText>
       )}
     </Panel>
   );

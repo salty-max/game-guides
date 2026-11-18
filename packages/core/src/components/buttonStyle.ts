@@ -19,7 +19,7 @@ const button = cva(
         danger: "border-transparent bg-danger text-on-danger",
       },
       size: {
-        default: "min-h-11 px-(--button-px,1.125rem) py-2.25 text-14",
+        default: "min-h-11 px-(--button-px,1rem) py-2 text-14",
         compact: "min-h-10 px-(--button-px,0.875rem) py-1.5 text-13",
       },
     },

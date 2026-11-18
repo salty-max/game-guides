@@ -37,14 +37,14 @@ export function ChecklistRoute({ chapter, target, footer }: { chapter: Chapter; 
   const allOpen = groups.every((group, index) => groupOpen(group.key, index, group.shown.map((row) => row.id)));
 
   return (
-    <section id="route" aria-labelledby="route-title">
-      <div className="mb-3.25 flex items-end justify-between gap-3.25 phone:flex-wrap phone:items-start phone:gap-1">
+    <section id="route" aria-labelledby="route-title" className="flex flex-col gap-4">
+      <div className="flex items-end justify-between gap-3 phone:flex-wrap phone:items-start phone:gap-1">
         <div>
           {/* (27px in a phone's column, 32px from a column of 416px: `cqi` is the page column's width) */}
           <h2 id="route-title" className="m-0 font-display text-[clamp(1.6875rem,7.7cqi,2rem)] leading-[1.17] font-bold tracking-[-0.015em]">
             Chapter route
           </h2>
-          <p className="mt-1.25 mb-0 text-14 text-muted">
+          <p className="mt-1.5 text-14 text-muted">
             {done} of {rows.length} steps complete
           </p>
         </div>
@@ -52,7 +52,7 @@ export function ChecklistRoute({ chapter, target, footer }: { chapter: Chapter; 
           {allOpen ? "Collapse all" : "Expand all"}
         </Button>
       </div>
-      <div className="mb-3.75 flex flex-wrap items-center justify-between gap-2.75">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <ChipGroup
           label="Route categories"
           choices={labels}
@@ -75,22 +75,24 @@ export function ChecklistRoute({ chapter, target, footer }: { chapter: Chapter; 
         />
       </div>
       {groups.length ? (
-        groups.map((group, index) => (
-          <RouteGroup
-            key={group.key}
-            groupKey={group.key}
-            title={group.title}
-            location={group.location}
-            icon={group.icon}
-            note={group.note}
-            map={group.map}
-            rows={group.shown}
-            open={groupOpen(group.key, index, group.shown.map((row) => row.id))}
-            highlightedId={highlighted}
-            fallbackFocusId="route-status"
-            rememberToggle={!filtered}
-          />
-        ))
+        <div className="flex flex-col gap-3">
+          {groups.map((group, index) => (
+            <RouteGroup
+              key={group.key}
+              groupKey={group.key}
+              title={group.title}
+              location={group.location}
+              icon={group.icon}
+              note={group.note}
+              map={group.map}
+              rows={group.shown}
+              open={groupOpen(group.key, index, group.shown.map((row) => row.id))}
+              highlightedId={highlighted}
+              fallbackFocusId="route-status"
+              rememberToggle={!filtered}
+            />
+          ))}
+        </div>
       ) : (
         <Empty>No steps match these filters.</Empty>
       )}

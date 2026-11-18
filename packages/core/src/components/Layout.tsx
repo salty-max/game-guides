@@ -173,7 +173,7 @@ export function Layout({ children }: { children: ReactNode }) {
           // so in the installed app it is always the row the frame bounds, and so a scroller. Its padding is the room above and under the
           // page (--pad-end, and the home indicator under that, but on a phone the tab bar covers the home indicator, so the room under the
           // page is --pad-end alone) and the notch's insets.
-          className="col-[3/-1] row-start-1 min-w-0 pt-6 pr-(--safe-right) pb-[calc(var(--pad-end)+var(--safe-bottom))] outline-none [--pad-end:3.125rem] standalone:scroll-pt-(--sticky-gap) standalone:overflow-y-auto standalone:overscroll-contain drawer:col-auto drawer:pt-4.5 drawer:pl-(--safe-left) drawer:[--pad-end:1.875rem] phone:pt-3.25 phone:pb-(--pad-end) phone:[--pad-end:1.5625rem]"
+          className="col-[3/-1] row-start-1 min-w-0 pt-6 pr-(--safe-right) pb-[calc(var(--pad-end)+var(--safe-bottom))] outline-none [--pad-end:3rem] standalone:scroll-pt-(--sticky-gap) standalone:overflow-y-auto standalone:overscroll-contain drawer:col-auto drawer:pt-4 drawer:pl-(--safe-left) drawer:[--pad-end:2rem] phone:pt-3 phone:pb-(--pad-end) phone:[--pad-end:1.5rem]"
         >
           {/* The page itself: the page's column of the frame, at most --page-max, its side padding --gutter. The gutter is one clamp from a
               phone's 12px up, in vw: it is the frame's own padding, not a part's. This is also the page's container (`/page`), so what

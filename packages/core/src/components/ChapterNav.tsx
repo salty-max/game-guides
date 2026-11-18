@@ -4,9 +4,10 @@ import { CHAPTER_COUNT } from "../guide";
 import { useReveal } from "../useReveal";
 import { isOpen, useProgress } from "../store/progress";
 
-// Under a checklist route it follows the last group; at the end of an article it is set off from the last section by a rule.
+// Under a checklist route it follows the last group; at the end of an article it is set off from the last section by a rule. The route
+// or the article it ends keeps the room above it.
 const chapterNav = cva("flex flex-wrap justify-between gap-2.5", {
-  variants: { in: { route: "mt-4.75", article: "mt-8 border-t border-line pt-5" } },
+  variants: { in: { route: "", article: "border-t border-line pt-5" } },
   defaultVariants: { in: "route" },
 });
 

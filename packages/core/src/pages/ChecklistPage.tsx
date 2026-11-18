@@ -4,7 +4,7 @@ import { RouteGroup } from "../components/RouteGroup";
 import { Select } from "../components/Select";
 import { SearchField } from "../components/SearchField";
 import { chunks, loadFailed } from "../components/chunks";
-import { ActiveFilter, Button, Callout, ChipGroup, Empty, PageHeading } from "../components/ui";
+import { ActiveFilter, Button, Callout, ChipGroup, Empty, HeadedPage } from "../components/ui";
 import { allRows, CHAPTER_COUNT, cats, chapters, config, hasMissables, isCategory, readChapter, statusOptions, tagName, text } from "../guide";
 import { two } from "../format";
 import { useLoadable, whenIdle } from "../loadable";
@@ -114,42 +114,44 @@ function ChecklistView() {
   );
 
   return (
-    <>
-      <PageHeading title="Completion checklist" intro={text.checklistIntro} />
+    <HeadedPage title="Completion checklist" intro={text.checklistIntro}>
       {data.spoilers && data.ceiling < CHAPTER_COUNT && (
         <Callout icon="lock">Showing chapters 1–{data.ceiling} only. Later entries unlock as you reveal chapters.</Callout>
       )}
       {phone ? (
         <>
           <ChipGroup label="Checklist categories" choices={topFilters} value={filter} onChange={setFilter} flow="scroll" />
-          <div className="mt-2.5 mb-2 flex items-end gap-2">
-            <div className="min-w-0 flex-1">{search}</div>
-            <Button ref={filtersButton} id="collection-filters" icon="sliders" aria-haspopup="dialog" aria-expanded={sheetOpen}
-              aria-label={active.length ? `Filters, ${active.length} on` : undefined}
-              onClick={() => setSheetOpen(true)}
-            >
-              {active.length ? `Filters · ${active.length}` : "Filters"}
-            </Button>
-          </div>
-          {active.length > 0 && (
-            <div className="mb-1 flex flex-wrap gap-1.5">
-              {active.map(({ key, label, remove }) => (
-                <ActiveFilter
-                  key={key}
-                  label={label}
-                  onRemove={() => {
-                    remove();
-                    filtersButton.current?.focus();
-                  }}
-                />
-              ))}
+          {/* The search and the filters that are on, closer to each other than to the rest of the page. */}
+          <div className="flex flex-col gap-2">
+            <div className="flex items-end gap-2">
+              <div className="min-w-0 flex-1">{search}</div>
+              <Button ref={filtersButton} id="collection-filters" icon="sliders" aria-haspopup="dialog" aria-expanded={sheetOpen}
+                aria-label={active.length ? `Filters, ${active.length} on` : undefined}
+                onClick={() => setSheetOpen(true)}
+              >
+                {active.length ? `Filters · ${active.length}` : "Filters"}
+              </Button>
             </div>
-          )}
+            {active.length > 0 && (
+              <div className="flex flex-wrap gap-1.5">
+                {active.map(({ key, label, remove }) => (
+                  <ActiveFilter
+                    key={key}
+                    label={label}
+                    onRemove={() => {
+                      remove();
+                      filtersButton.current?.focus();
+                    }}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
         </>
       ) : (
         <>
           <ChipGroup label="Checklist categories" choices={topFilters} value={filter} onChange={setFilter} />
-          <div className="my-3 flex flex-wrap items-end gap-2.25">
+          <div className="flex flex-wrap items-end gap-2">
             <div className="min-w-46.25 flex-1">{search}</div>
             {selects}
             <Button onClick={() => clear()}>Clear</Button>
@@ -174,17 +176,17 @@ function ChecklistView() {
           {phone && <div className="grid gap-4">{selects}</div>}
         </sheet.Sheet>
       )}
-      <div className="mb-3.25 flex items-end justify-between gap-3.25 text-14 text-muted phone:flex-wrap phone:items-start phone:gap-1">
-        <p id="results-count" className="mt-1.25" role="status">
+      <div className="flex items-end justify-between gap-3 text-14 text-muted phone:flex-wrap phone:items-start phone:gap-1">
+        <p id="results-count" role="status">
           {matchesLine}
         </p>
-        <p className="mt-1.25">
+        <p>
           {checked} of {visible.length} revealed entries checked
         </p>
       </div>
       {/* The chapters' groups are third-level headings, as they are under a chapter's route; this is the level between, for a screen reader. */}
       <h2 className="sr-only">Entries</h2>
-      <div id="checklist-results">
+      <div id="checklist-results" className="flex flex-col gap-3">
         {matches.length ? (
           openChapters.map((chapter) => {
             const here = matches.filter((row) => row.chapter === chapter.id);
@@ -208,6 +210,6 @@ function ChecklistView() {
           <Empty>Nothing matches. Try changing a filter or search term.</Empty>
         )}
       </div>
-    </>
+    </HeadedPage>
   );
 }

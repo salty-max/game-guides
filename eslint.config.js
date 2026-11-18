@@ -36,9 +36,10 @@ export default tseslint.config(
       ...tailwind.configs["recommended-error"].rules,
       // No formatter wraps this repo's lines, so a class list stays on one line.
       "better-tailwindcss/enforce-consistent-line-wrapping": "off",
-      // The tick box's sizes are spacing tokens (tokens.css), so the rule would call any 26px or 34px length `check` or `check-indent`.
-      // A badge or a margin that happens to be that long isn't the tick box: it stays a quarter step.
-      "better-tailwindcss/enforce-canonical-classes": ["error", { ignore: ["^(?:.+:)?-?[a-z-]+-(?:6\\.5|8\\.5)$"] }],
+      // The tick box's sizes are spacing tokens (tokens.css), so the rule would call any 34px length `check-indent`. A 34px tile (a route
+      // group's icon, the brand on a narrow top bar) isn't the tick box: it stays `size-8.5`. Spacing itself has no half steps above 4
+      // (spacing.test.ts), so no margin or gap can be mistaken for the tick box.
+      "better-tailwindcss/enforce-canonical-classes": ["error", { ignore: ["^(?:.+:)?-?[a-z-]+-8\\.5$"] }],
     },
   },
   {
