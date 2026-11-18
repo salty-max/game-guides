@@ -1,13 +1,13 @@
 import { cva } from "class-variance-authority";
 import { Link } from "react-router";
 import { Icon } from "./Icon";
-import { tones } from "./tone";
+import { toneClasses } from "./tone";
 import { ProgressBar } from "./ui";
 import { cats, tally } from "../guide";
 import { useProgress } from "../store/progress";
-import { press } from "./press-style";
+import { pressClasses } from "./press-style";
 
-const statIcon = cva("grid size-7 flex-none place-items-center rounded-small [&_svg]:size-3.75", { variants: { tone: tones }, defaultVariants: { tone: "none" } });
+const statIcon = cva("grid size-7 flex-none place-items-center rounded-small [&_svg]:size-3.75", { variants: { tone: toneClasses }, defaultVariants: { tone: "none" } });
 
 /** A category's count on the dashboard's board: its icon and name, done of its goal, and the bar. It opens the category's checklist. */
 export function Stat({ tag, goal }: { tag: string; goal?: number }) {
@@ -16,7 +16,7 @@ export function Stat({ tag, goal }: { tag: string; goal?: number }) {
   const [name, , graphic, tone] = cats[tag];
   return (
     <Link
-      className={`${press} flex min-w-0 flex-col gap-2 rounded-card border border-line bg-surface px-3 py-2.5 text-left hover:border-control-line hover:bg-raised`}
+      className={`${pressClasses} flex min-w-0 flex-col gap-2 rounded-card border border-line bg-surface px-3 py-2.5 text-left hover:border-control-line hover:bg-raised`}
       to={`/checklist/${tag}`}
     >
       <span className="flex items-center gap-2 text-12 leading-[1.18] font-extrabold">

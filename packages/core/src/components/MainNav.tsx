@@ -6,7 +6,7 @@ import { Icon } from "./Icon";
 import { config } from "../guide";
 import type { IconName } from "./Icon";
 import { pages } from "../nav";
-import { press, pressPart } from "./press-style";
+import { pressClasses, pressPartClasses } from "./press-style";
 import { placeOf, safePlace, tabPlaces } from "../store/place";
 import { useProgress } from "../store/progress";
 
@@ -38,7 +38,7 @@ const list = cva("", { variants: { place: { top: "flex gap-2 drawer:gap-0.5", bo
 // brand gets its whole width before the links get room for their icons, and with less than all four need, every link narrows a little and
 // all four icons go together. So the icons show exactly when the bar has room for them, in every guide's fonts and at any text size, with
 // no width named for it.
-const link = cva(`${press} group/page font-bold whitespace-nowrap text-muted`, {
+const link = cva(`${pressClasses} group/page font-bold whitespace-nowrap text-muted`, {
   variants: {
     place: {
       top: "flex h-10 flex-row-reverse flex-wrap content-start items-center justify-center gap-x-2 overflow-clip rounded-button px-3.5 text-14/10 hover:bg-raised hover:text-ink drawer:gap-x-1 drawer:px-2 [&[aria-current=page]:not(:hover)]:bg-soft [&[aria-current=page]:not(:hover)]:text-soft-ink",
@@ -52,7 +52,7 @@ const icon = cva("", {
     place: {
       // (after the words, so it is the part that wraps away: `link` above. The tab bar keeps its icons.)
       top: "order-1 size-4",
-      bottom: `${pressPart} box-content size-5.5 rounded-button px-4 py-1 group-aria-[current=page]/page:bg-soft`,
+      bottom: `${pressPartClasses} box-content size-5.5 rounded-button px-4 py-1 group-aria-[current=page]/page:bg-soft`,
     },
   },
 });

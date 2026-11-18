@@ -13,7 +13,7 @@ import { useSyncStatus, type SyncPhase } from "../store/sync";
 import { useUi } from "../store/ui";
 import { usePhone } from "../useNarrow";
 import { useResolvedTheme } from "../useThemeEffects";
-import { press } from "./press-style";
+import { pressClasses } from "./press-style";
 
 function ThemeToggle() {
   const dark = useResolvedTheme() === "dark";
@@ -54,7 +54,7 @@ function SaveStatus() {
   // chapters menu's "Change settings" (the rail beside the page on a wide screen) and the Progress page's Import progress.
   return (
     <BaseButton
-      className={`${press} flex min-h-10 items-center gap-2 rounded-control border border-control-line bg-transparent px-3 py-1.5 text-12 font-bold whitespace-nowrap text-muted hover:bg-raised drawer:h-(--icon-h,2.5rem) drawer:w-(--icon-w,2.5rem) drawer:justify-center drawer:gap-0 drawer:p-0 drawer:text-[0px]`}
+      className={`${pressClasses} flex min-h-10 items-center gap-2 rounded-control border border-control-line bg-transparent px-3 py-1.5 text-12 font-bold whitespace-nowrap text-muted hover:bg-raised drawer:h-(--icon-h,2.5rem) drawer:w-(--icon-w,2.5rem) drawer:justify-center drawer:gap-0 drawer:p-0 drawer:text-[0px]`}
       data-error={error || ["offline", "paused", "error"].includes(phase) ? "" : undefined}
       aria-label={`${words.join(". ")}. Open sync devices`}
       onClick={() => openDialog({ kind: "sync" })}
@@ -70,7 +70,7 @@ function SaveStatus() {
 // clips: the tile shows alone rather than a cut letter. Clipped, not hidden, so find in page can't scroll the link to the name. Under 361px
 // only the tile shows.
 const brandLink = cva(
-  `${press} flex h-10 min-w-0 flex-wrap content-start items-center gap-x-3 overflow-clip px-6 mid:pl-4 drawer:h-8.5 drawer:gap-x-2 drawer:px-2`,
+  `${pressClasses} flex h-10 min-w-0 flex-wrap content-start items-center gap-x-3 overflow-clip px-6 mid:pl-4 drawer:h-8.5 drawer:gap-x-2 drawer:px-2`,
 );
 
 // The guide's painting, its square the dark surface: a hairline in the guide's line keeps the cornered tile on a dark bar.

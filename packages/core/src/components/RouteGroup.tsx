@@ -7,14 +7,14 @@ import { BulkCheck } from "./BulkCheck";
 import { CheckBox } from "./CheckBox";
 import { LineChips } from "./LineChip";
 import { MapLink } from "./MapLink";
-import { rowLink } from "./TickItem";
+import { rowLinkClasses } from "./TickItem";
 import { Quantity, Tag } from "./ui";
 import { cats, config, primaryTag } from "../guide";
 import { useProgress } from "../store/progress";
 import { useUi } from "../store/ui";
 import type { IconName } from "./Icon";
 import type { MapLink as Map, Row } from "../types";
-import { press, pressRow } from "./press-style";
+import { pressClasses, pressRowClasses } from "./press-style";
 
 interface RowProps {
   row: Row;
@@ -50,7 +50,7 @@ export const RouteRow = memo(function RouteRow({ row, prefix, highlighted, origi
         <label
           id={labelId}
           htmlFor={boxId}
-          className={`${pressRow} inline-block cursor-pointer text-15 leading-[1.3] font-extrabold after:absolute after:inset-0 after:cursor-pointer`}
+          className={`${pressRowClasses} inline-block cursor-pointer text-15 leading-[1.3] font-extrabold after:absolute after:inset-0 after:cursor-pointer`}
         >
           {row.title}
         </label>
@@ -65,7 +65,7 @@ export const RouteRow = memo(function RouteRow({ row, prefix, highlighted, origi
         {row.quantity > 0 && <Quantity row={row} at="column" />}
         {row.tags.includes("missable") && <Tag tag="missable" at="column" />}
         {origin ? (
-          <Link className={rowLink} to={`/guide/${row.chapter}/${row.id}`} aria-label={`Open “${row.title}” in chapter ${row.chapter}`}>
+          <Link className={rowLinkClasses} to={`/guide/${row.chapter}/${row.id}`} aria-label={`Open “${row.title}” in chapter ${row.chapter}`}>
             Chapter {row.chapter}
           </Link>
         ) : (
@@ -96,7 +96,7 @@ interface GroupProps {
 }
 
 // The group's header is its heading, and the button inside it opens and closes the steps (a button can't hold a heading).
-const trigger = `${press} group/trigger grid min-h-14.5 w-full cursor-pointer grid-cols-[auto_minmax(0,1fr)_auto_auto] items-center gap-3 border-0 bg-transparent px-3.5 py-3 text-left font-sans text-16 leading-[1.58] font-normal text-inherit hover:bg-raised phone:gap-2 phone:p-2.5`;
+const triggerClasses = `${pressClasses} group/trigger grid min-h-14.5 w-full cursor-pointer grid-cols-[auto_minmax(0,1fr)_auto_auto] items-center gap-3 border-0 bg-transparent px-3.5 py-3 text-left font-sans text-16 leading-[1.58] font-normal text-inherit hover:bg-raised phone:gap-2 phone:p-2.5`;
 
 export function RouteGroup({ groupKey, title, location, icon, note, map, rows, open, highlightedId, origin, fallbackFocusId, rememberToggle }: GroupProps) {
   const setGroupOpen = useUi((s) => s.setGroupOpen);
@@ -122,7 +122,7 @@ export function RouteGroup({ groupKey, title, location, icon, note, map, rows, o
       }}
     >
       <h3 className="m-0">
-        <Collapsible.Trigger className={trigger}>
+        <Collapsible.Trigger className={triggerClasses}>
           <span className="grid size-8.5 place-items-center rounded-small bg-soft text-soft-ink phone:size-7 [&_svg]:size-4.25">
             <Icon name={graphic} />
           </span>
