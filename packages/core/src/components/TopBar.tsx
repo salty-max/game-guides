@@ -94,44 +94,48 @@ interface TopBarProps {
 export function TopBar({ chapter, view, menuOpen, onToggleMenu, menuToggle }: TopBarProps) {
   const phone = usePhone();
   return (
-    // Beside the rail the brand's columns come to the rail's width or the brand's, whichever is wider, so the pages start over the page
-    // when there's room. The pages' column is `1fr`, whose minimum is the pages' words (their icons wrap away first, MainNav), so they
-    // never shrink past their words: the brand's columns give way. It gets anything over that only after the brand has all its width.
-    <header className="sticky top-0 z-10 grid h-(--bar) grid-cols-[minmax(0,var(--rail-w))_minmax(0,auto)_1fr_auto] items-center border-b border-line bg-surface pt-(--safe-top) pr-(--safe-right) pl-(--safe-left) text-ink standalone:relative standalone:flex-none standalone:select-none standalone:[-webkit-touch-callout:none] drawer:grid-cols-[auto_minmax(0,auto)_1fr_auto] phone:grid-cols-[auto_minmax(0,1fr)_auto] phone:[--icon-h:2.75rem] phone:[--icon-w:2.75rem]">
-      {/* Shown only under 800px: `hidden` is the class's own, and `drawer:block` brings it back. */}
-      <div className="ml-[11px] hidden drawer:block tiny:ml-[7px]">
-        <IconButton
-          ref={menuToggle}
-          icon="menu"
-          label={menuOpen ? "Close chapters" : "Open chapters"}
-          aria-haspopup="dialog"
-          aria-controls={menuOpen ? "chapter-rail" : undefined}
-          aria-expanded={menuOpen}
-          onClick={onToggleMenu}
-        />
-      </div>
-      {/* Beside the rail the brand spans the rail's column and one that fits whatever of the brand runs past it. */}
-      <div className="col-span-2 flex min-w-0 items-center drawer:col-span-1">
-        <Link
-          className={brandLink()}
-          to={`/guide/${chapter}`}
-          aria-label={`${brand.name} home`}
-        >
-          {/* The guide's own painting, as the home screen shows it (pnpm icons writes the sizes). The link carries the name. */}
-          <img src={iconUrl(tileSrc(tileSizes[0]))} srcSet={tileSrcSet(iconUrl)} alt="" width={40} height={40} className={brandTile()} />
-          {/* (wraps away, rather than ellipsizing, when there isn't room for 5ch of the body text, or all of the name if it's shorter; then grows to all of it) */}
-          <span className="grid max-w-max min-w-0 grow basis-[5ch] gap-[3px] leading-[1.1] tiny:hidden">
-            <strong className="truncate font-display text-[21px] leading-[1.05] font-bold tracking-[-0.01em] drawer:text-[17px]">{brand.mark}</strong>
-            {/* The space isn't drawn (it's a grid), but without it the link's visible text reads "KoholintHundo", which its name, "Koholint Hundo home", doesn't contain. */}
-            {" "}
-            <small className="text-[11px] font-extrabold tracking-[0.2em] text-primary uppercase drawer:hidden">Hundo</small>
-          </span>
-        </Link>
-      </div>
-      {!phone && <MainNav chapter={chapter} view={view} place="top" />}
-      <div className="mr-[25px] flex items-center gap-[9px] drawer:mr-[11px] drawer:gap-1.5 tiny:mr-[7px] tiny:gap-1">
-        <ThemeToggle />
-        <SaveStatus />
+    // The bar runs across the screen; what's in it sits on the frame the rail and the page share (--frame-max, Layout), centred the same
+    // way, so on a wide screen the brand stays over the rail and the buttons end over the page's edge.
+    <header className="sticky top-0 z-10 h-(--bar) border-b border-line bg-surface pt-(--safe-top) pr-(--safe-right) pl-(--safe-left) text-ink standalone:relative standalone:flex-none standalone:select-none standalone:[-webkit-touch-callout:none] phone:[--icon-h:2.75rem] phone:[--icon-w:2.75rem]">
+      {/* Beside the rail the brand's columns come to the rail's width or the brand's, whichever is wider, so the pages start over the page
+          when there's room. The pages' column is `1fr`, whose minimum is the pages' words (their icons wrap away first, MainNav), so they
+          never shrink past their words: the brand's columns give way. It gets anything over that only after the brand has all its width. */}
+      <div className="mx-auto grid h-full max-w-(--frame-max) grid-cols-[minmax(0,var(--rail-w))_minmax(0,auto)_1fr_auto] items-center drawer:grid-cols-[auto_minmax(0,auto)_1fr_auto] phone:grid-cols-[auto_minmax(0,1fr)_auto]">
+        {/* Shown only under 800px: `hidden` is the class's own, and `drawer:block` brings it back. */}
+        <div className="ml-[11px] hidden drawer:block tiny:ml-[7px]">
+          <IconButton
+            ref={menuToggle}
+            icon="menu"
+            label={menuOpen ? "Close chapters" : "Open chapters"}
+            aria-haspopup="dialog"
+            aria-controls={menuOpen ? "chapter-rail" : undefined}
+            aria-expanded={menuOpen}
+            onClick={onToggleMenu}
+          />
+        </div>
+        {/* Beside the rail the brand spans the rail's column and one that fits whatever of the brand runs past it. */}
+        <div className="col-span-2 flex min-w-0 items-center drawer:col-span-1">
+          <Link
+            className={brandLink()}
+            to={`/guide/${chapter}`}
+            aria-label={`${brand.name} home`}
+          >
+            {/* The guide's own painting, as the home screen shows it (pnpm icons writes the sizes). The link carries the name. */}
+            <img src={iconUrl(tileSrc(tileSizes[0]))} srcSet={tileSrcSet(iconUrl)} alt="" width={40} height={40} className={brandTile()} />
+            {/* (wraps away, rather than ellipsizing, when there isn't room for 5ch of the body text, or all of the name if it's shorter; then grows to all of it) */}
+            <span className="grid max-w-max min-w-0 grow basis-[5ch] gap-[3px] leading-[1.1] tiny:hidden">
+              <strong className="truncate font-display text-[21px] leading-[1.05] font-bold tracking-[-0.01em] drawer:text-[17px]">{brand.mark}</strong>
+              {/* The space isn't drawn (it's a grid), but without it the link's visible text reads "KoholintHundo", which its name, "Koholint Hundo home", doesn't contain. */}
+              {" "}
+              <small className="text-[11px] font-extrabold tracking-[0.2em] text-primary uppercase drawer:hidden">Hundo</small>
+            </span>
+          </Link>
+        </div>
+        {!phone && <MainNav chapter={chapter} view={view} place="top" />}
+        <div className="mr-[25px] flex items-center gap-[9px] drawer:mr-[11px] drawer:gap-1.5 tiny:mr-[7px] tiny:gap-1">
+          <ThemeToggle />
+          <SaveStatus />
+        </div>
       </div>
     </header>
   );
