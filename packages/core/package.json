@@ -10,7 +10,6 @@
     "./progress-state": "./src/progress-state.ts",
     "./persistence": "./src/persistence.ts",
     "./counts": "./src/counts.ts",
-    "./useColumns": "./src/useColumns.ts",
     "./store/*": "./src/store/*.ts",
     "./sync/*": "./src/sync/*.ts",
     "./components/chunks": "./src/components/chunks.ts",

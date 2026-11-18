@@ -50,3 +50,37 @@ export const NotStarted: Story = {
     await expect(canvas.getByText("Starts with")).toBeVisible();
   },
 };
+
+const box = (element: Element) => element.getBoundingClientRect();
+const inWidth = (width: number): Story["decorators"] => [
+  (Story) => (
+    <div style={{ width }}>
+      <Story />
+    </div>
+  ),
+];
+
+// The line's card the whole width of the page's column, with no On this page beside it or folded above it: with one line met (Koholint
+// has one at all), the list would only name the card beside it. The list itself is Contents, drawn in the Dashboard and article stories.
+async function wholeWidthWithNoList(canvas: Parameters<NonNullable<Story["play"]>>[0]["canvas"]) {
+  const card = canvas.getByRole("region", { name: "The trading quest" });
+  const page = canvas.getByRole("group", { name: "Questlines by status" }).parentElement!;
+  await expect(box(card).left).toBe(box(page).left);
+  await expect(box(card).width).toBeCloseTo(box(page).width, 1);
+  await expect(canvas.queryByRole("navigation", { name: "On this page" })).toBeNull();
+  await expect(canvas.queryByRole("button", { name: "On this page" })).toBeNull();
+}
+
+/** One line on a wide page: one column, no list. */
+export const OneLineWide: Story = {
+  parameters: { progress: { spoilers: false } },
+  decorators: inWidth(900),
+  play: async ({ canvas }) => wholeWidthWithNoList(canvas),
+};
+
+/** And on a phone's width. */
+export const OneLineOnAPhone: Story = {
+  parameters: { progress: { spoilers: false } },
+  decorators: inWidth(360),
+  play: async ({ canvas }) => wholeWidthWithNoList(canvas),
+};

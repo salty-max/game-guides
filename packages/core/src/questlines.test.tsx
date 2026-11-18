@@ -1,6 +1,6 @@
 import { act, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { MemoryRouter, Route, Routes } from "react-router";
+import { MemoryRouter, Route, Routes, useNavigate } from "react-router";
 import { chapterRows, chapters } from "./guide";
 import { defaultState } from "./progress-state";
 import { allRevealed, lineById, lines, linesOf, viewLine } from "./questlines";
@@ -42,11 +42,6 @@ const early = lineById("early")!;
 const ticked = (...ids: string[]): Checks => Object.fromEntries(ids.map((id) => [id, true]));
 const upTo = (ceiling: number) => (chapter: number) => chapter <= ceiling;
 
-// How many columns the page's grid lays out. jsdom lays out nothing (useColumns reads one there), so a test sets it; the stories check the
-// real count in a browser (Stacks.stories.tsx).
-const layout = vi.hoisted(() => ({ columns: 1 as number | undefined }));
-vi.mock("./useColumns", () => ({ useColumns: () => [layout.columns, () => undefined] }));
-
 const routes = (path = "/questlines") => (
   <MemoryRouter initialEntries={[path]}>
     <Routes>
@@ -57,7 +52,6 @@ const routes = (path = "/questlines") => (
 const page = (path?: string) => render(routes(path));
 
 beforeEach(() => {
-  layout.columns = 1;
   forgetPlaces();
   localStorage.clear();
   useProgress.setState({ data: { ...defaultState(), spoilers: true, ceiling: 1 }, storageError: false });
@@ -96,7 +90,7 @@ describe("questlines (questlines.ts)", () => {
 describe("QuestlinesPage", () => {
   it("lists only the lines met so far, their revealed steps, and the same closing line on each, with no hidden step's title", () => {
     page();
-    expect(screen.getByText("Met early")).toBeVisible();
+    expect(screen.getByRole("region", { name: "Met early" })).toBeVisible();
     expect(screen.queryByText("Met later")).toBeNull();
     expect(document.body.textContent).not.toContain(c.title);
     expect(document.body.textContent).not.toContain(d.title);
@@ -143,62 +137,157 @@ describe("QuestlinesPage", () => {
   });
 
   // The three lines' cards in route order (Met early's first step is chapter 1's first row, Met twice's its second, Met later's in chapter 2).
-  const cards = () => ["Met early", "Met twice", "Met later"].map((name) => screen.getByRole("region", { name }));
-  const trigger = (name: string) => within(screen.getByRole("region", { name })).getByRole("button");
+  const names = ["Met early", "Met twice", "Met later"];
+  const card = (name: string) => screen.getByRole("region", { name });
+  const trigger = (name: string) => within(card(name)).getAllByRole("button")[0];
+  const lists = () => screen.getAllByRole("navigation", { name: "On this page" });
+  // A chip, in the page's row of them: a card's button can say "Not started" too.
+  const chip = (name: RegExp) => within(screen.getByRole("group", { name: "Questlines by status" })).getByRole("button", { name });
+  // On this page's links in each of its two lists, opened: folded above the cards, and beside them (CSS shows one of the two, by width).
+  const listed = async () => {
+    if (screen.getByRole("button", { name: "On this page" }).getAttribute("aria-expanded") !== "true") await userEvent.click(screen.getByRole("button", { name: "On this page" }));
+    return lists().map((list) => within(list).getAllByRole("link").map((link) => [link.textContent, link.getAttribute("href")]));
+  };
 
-  it("puts the first and third lines down the left and the second down the right, where two columns fit", () => {
-    layout.columns = 2;
+  it("is one column in route order, each card under the one before, in the page as on screen", () => {
     useProgress.setState({ data: { ...defaultState(), spoilers: false } });
     page();
-    const [first, second, third] = cards();
-    const [left, right] = [first.parentElement!, second.parentElement!];
-    expect([...left.children]).toEqual([first, third]);
-    expect([...right.children]).toEqual([second]);
-    expect(left.nextElementSibling).toBe(right);
+    const cards = names.map(card);
+    const column = cards[0].parentElement!;
+    expect([...column.children]).toEqual(cards);
+    // The column the list stands beside, its only other part the list.
+    expect(within(column.parentElement!).getByRole("navigation", { name: "On this page" })).toBeInTheDocument();
   });
 
-  it("is one list in route order, in the page as on screen, where they don't", () => {
-    useProgress.setState({ data: { ...defaultState(), spoilers: false } });
-    page();
-    const [first, second, third] = cards();
-    expect([...first.parentElement!.children]).toEqual([first, second, third]);
-    expect(first.parentElement!.parentElement!.children).toHaveLength(1);
-  });
-
-  it("keeps each card open or closed as the page goes to two columns and back, and as its line moves on", async () => {
+  it("lists the cards the chips show in On this page, each a link to its line's address, and nothing when they show none", async () => {
     useProgress.setState({ data: { ...defaultState(), spoilers: false, checks: ticked(a.id) } });
-    const { rerender } = page();
-    // Met early is under way, so it opens; the others haven't started. The reader opens Met twice, which moves to the other stack and back.
+    page();
+    const all = names.map((name, at) => [name, `/questlines/${["early", "pair", "later"][at]}`]);
+    expect(await listed()).toEqual([all, all]);
+    await userEvent.click(chip(/Under way/));
+    expect(lists().map((list) => within(list).getAllByRole("link").map((link) => link.textContent))).toEqual([["Met early"], ["Met early"]]);
+    await userEvent.click(chip(/Complete/));
+    expect(screen.getByText("No questline here yet.")).toBeVisible();
+    expect(screen.queryByRole("navigation", { name: "On this page" })).toBeNull();
+  });
+
+  it("names in On this page only the lines the cards show while a chapter is hidden, with no count", async () => {
+    page();
+    expect(screen.getAllByRole("region").map((region) => region.getAttribute("aria-labelledby"))).toEqual(["line-early-name", "line-pair-name"]);
+    for (const links of await listed()) expect(links).toEqual([["Met early", "/questlines/early"], ["Met twice", "/questlines/pair"]]);
+    for (const list of lists()) expect(list.textContent).not.toMatch(/Met later|\d/);
+  });
+
+  it("arrives at the line its address names, the button with its name focused, and marks it in On this page", () => {
+    const scrolled = vi.spyOn(Element.prototype, "scrollIntoView");
+    useProgress.setState({ data: { ...defaultState(), spoilers: false } });
+    page("/questlines/pair");
+    expect(scrolled.mock.contexts.at(-1)).toBe(card("Met twice"));
+    expect(scrolled).toHaveBeenLastCalledWith({ block: "start" });
+    expect(trigger("Met twice")).toHaveFocus();
+    expect(trigger("Met twice")).toHaveAttribute("aria-expanded", "true");
+    expect(within(lists()[0]).getByRole("link", { name: "Met twice" })).toHaveAttribute("aria-current", "location");
+    scrolled.mockRestore();
+  });
+
+  it("goes to a line each time its link is followed, and opens its card, even one the reader closed", async () => {
+    const scrolled = vi.spyOn(Element.prototype, "scrollIntoView");
+    useProgress.setState({ data: { ...defaultState(), spoilers: false } });
+    page();
+    expect(scrolled).not.toHaveBeenCalled();
+    const [list] = lists();
+    await userEvent.click(within(list).getByRole("link", { name: "Met later" }));
+    expect(scrolled.mock.contexts.at(-1)).toBe(card("Met later"));
+    expect(trigger("Met later")).toHaveFocus();
+    expect(trigger("Met later")).toHaveAttribute("aria-expanded", "true");
+    // Other cards stay as they were.
+    expect(trigger("Met twice")).toHaveAttribute("aria-expanded", "false");
+    await userEvent.click(trigger("Met later"));
+    expect(trigger("Met later")).toHaveAttribute("aria-expanded", "false");
+    // The same link again (the router replaces the entry, with a new key): in view again, and open.
+    const before = scrolled.mock.calls.length;
+    await userEvent.click(within(list).getByRole("link", { name: "Met later" }));
+    expect(scrolled.mock.calls.length).toBeGreaterThan(before);
+    expect(scrolled.mock.contexts.at(-1)).toBe(card("Met later"));
+    expect(trigger("Met later")).toHaveAttribute("aria-expanded", "true");
+    scrolled.mockRestore();
+  });
+
+  it("keeps each card open or closed as a chip hides it and shows it again, and as its line moves on", async () => {
+    useProgress.setState({ data: { ...defaultState(), spoilers: false, checks: ticked(a.id) } });
+    page();
+    // Met early is under way, so it opens; the others haven't started. The reader opens Met twice, which a chip then hides and shows again.
     expect(trigger("Met early")).toHaveAttribute("aria-expanded", "true");
     await userEvent.click(trigger("Met twice"));
-    layout.columns = 2;
-    rerender(routes());
-    expect(cards()[1].parentElement).not.toBe(cards()[0].parentElement);
-    expect(trigger("Met twice")).toHaveAttribute("aria-expanded", "true");
-    layout.columns = 1;
-    rerender(routes());
+    await userEvent.click(chip(/Under way/));
+    expect(screen.queryByRole("region", { name: "Met twice" })).toBeNull();
+    await userEvent.click(chip(/^All/));
     expect(trigger("Met twice")).toHaveAttribute("aria-expanded", "true");
     expect(trigger("Met later")).toHaveAttribute("aria-expanded", "false");
     // Met early's last steps ticked: done now, and a done line starts closed, but this one stays as the reader had it.
     act(() => useProgress.setState({ data: { ...defaultState(), spoilers: false, checks: ticked(a.id, b.id, c.id, d.id) } }));
-    expect(within(screen.getByRole("region", { name: "Met early" })).getByText("Complete")).toBeVisible();
+    expect(within(card("Met early")).getByText("Complete")).toBeVisible();
     expect(trigger("Met early")).toHaveAttribute("aria-expanded", "true");
   });
 
-  it("scrolls to the line its address names once the cards are in their columns, and leaves the reader be when the count changes", () => {
-    const scrolled = vi.spyOn(Element.prototype, "scrollIntoView");
-    layout.columns = undefined;
+  it("leaves the cards as they were on Back: a card the reader closed stays closed", async () => {
+    function Back() {
+      const navigate = useNavigate();
+      return (
+        <button type="button" onClick={() => void navigate(-1)}>
+          Go back
+        </button>
+      );
+    }
     useProgress.setState({ data: { ...defaultState(), spoilers: false } });
-    const { rerender } = page("/questlines/pair");
+    render(
+      <MemoryRouter initialEntries={["/questlines"]}>
+        <Back />
+        <Routes>
+          <Route path="/questlines/:line?" element={<QuestlinesPage />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+    await userEvent.click(within(lists()[0]).getByRole("link", { name: "Met later" }));
+    await userEvent.click(trigger("Met later"));
+    await userEvent.click(within(lists()[0]).getByRole("link", { name: "Met early" }));
+    expect(trigger("Met early")).toHaveAttribute("aria-expanded", "true");
+    await userEvent.click(screen.getByRole("button", { name: "Go back" }));
+    expect(within(lists()[0]).getByRole("link", { name: "Met later" })).toHaveAttribute("aria-current", "location");
+    expect(trigger("Met later")).toHaveAttribute("aria-expanded", "false");
+  });
+
+  it("leaves the focus be when the line its address names comes in later, a chapter revealed", async () => {
+    const scrolled = vi.spyOn(Element.prototype, "scrollIntoView");
+    page("/questlines/later");
+    // Met later starts in chapter 2, hidden: the page shows the others, and goes nowhere.
+    expect(screen.queryByRole("region", { name: "Met later" })).toBeNull();
+    chip(/Not started/).focus();
+    act(() => useProgress.setState({ data: { ...defaultState(), spoilers: true, ceiling: 2 } }));
+    expect(card("Met later")).toBeVisible();
+    expect(chip(/Not started/)).toHaveFocus();
     expect(scrolled).not.toHaveBeenCalled();
-    layout.columns = 2;
-    rerender(routes("/questlines/pair"));
-    expect(scrolled).toHaveBeenCalledTimes(1);
-    expect(scrolled.mock.contexts[0]).toBe(screen.getByRole("region", { name: "Met twice" }));
-    layout.columns = 1;
-    rerender(routes("/questlines/pair"));
-    expect(scrolled).toHaveBeenCalledTimes(1);
     scrolled.mockRestore();
+  });
+
+  it("takes back a kept chip at a line's address only if it shows the line, and keeps a chip picked there", async () => {
+    useProgress.setState({ data: { ...defaultState(), spoilers: false, checks: ticked(a.id) } });
+    // A visit that left the chips at Under way: Met early is under way, Met later isn't.
+    let { unmount } = page("/questlines");
+    await userEvent.click(chip(/Under way/));
+    unmount();
+    // The first page of a visit is one come back to (the router's POP), so it finds what was kept, if it shows the line.
+    ({ unmount } = page("/questlines/early"));
+    expect(chip(/Under way/)).toHaveAttribute("aria-pressed", "true");
+    unmount();
+    ({ unmount } = page("/questlines/later"));
+    expect(chip(/^All/)).toHaveAttribute("aria-pressed", "true");
+    expect(card("Met later")).toBeVisible();
+    // A chip picked at the line's address is kept too.
+    await userEvent.click(chip(/Not started/));
+    unmount();
+    page("/questlines");
+    expect(chip(/Not started/)).toHaveAttribute("aria-pressed", "true");
   });
 });
 
