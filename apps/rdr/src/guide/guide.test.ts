@@ -1,4 +1,4 @@
-import { allRows, chapters, coreRows, missablesLeft } from "@hundo/core/guide";
+import { allRows, byId, chapters, coreRows, missablesLeft, rowsByTag, tally } from "@hundo/core/guide";
 import { STORAGE_KEY, defaultState, validateState } from "@hundo/core/progress-state";
 import { calibrationDelta, estimate, pointsLeft, readPercent } from "./estimate";
 import { THEME_KEY } from "@hundo/core/store/theme";
@@ -10,14 +10,15 @@ import { COUNTS_KEY } from "@hundo/core/counts";
 import { flatten, viewFrom } from "@hundo/core/sync/fields";
 import type { Entries } from "@hundo/core/sync/ledger";
 import { brand } from "./brand";
+import { questlines } from "./data/questlines";
 
 const all = Object.fromEntries(allRows.map((row) => [row.id, true as const]));
 const [a] = allRows.map((row) => row.id);
 
 describe("Red Dead completion estimate", () => {
-  it("keeps scraps and optional tasks out of the estimate", () => {
+  it("keeps scraps, optional tasks and the steps before a Stranger task's last out of the estimate", () => {
     expect(coreRows.length).toBeLessThan(allRows.length);
-    expect(coreRows.every((row) => !["scrap", "optional"].includes(row.tags[0]))).toBe(true);
+    expect(coreRows.every((row) => !["scrap", "optional", "stranger-step"].includes(row.tags[0]))).toBe(true);
   });
 
   it("totals roughly 100% when everything is checked", () => {
@@ -39,6 +40,26 @@ describe("Red Dead completion estimate", () => {
   it("measures calibration against the game's number", () => {
     expect(calibrationDelta(40.3, 41)).toBe(0.7);
     expect(calibrationDelta(41, 40.2)).toBe(-0.8);
+  });
+});
+
+describe("Stranger tasks", () => {
+  // The game's count: a task counts once, by its last step, however many steps it is split into.
+  it("counts the game's 18", () => {
+    expect(rowsByTag("stranger")).toHaveLength(18);
+    expect(tally("stranger", {}).total).toBe(18);
+  });
+
+  it("ends each task's line on its counted step, every step before it a stranger-step", () => {
+    const tagsOf = (id: string) => byId.get(id)!.tags;
+    for (const line of questlines.lines) {
+      if (line.id === "i-know-you") {
+        for (const id of line.steps) expect(tagsOf(id)[0], id).toBe("optional");
+        continue;
+      }
+      expect(tagsOf(line.steps.at(-1)!), line.id).toEqual(["stranger", "stranger-step"]);
+      for (const id of line.steps.slice(0, -1)) expect(tagsOf(id), id).toEqual(["stranger-step"]);
+    }
   });
 });
 

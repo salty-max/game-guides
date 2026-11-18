@@ -43,14 +43,15 @@ export default {
     },
     {
       title: "Cross-region Stranger tasks",
-      location: "New Austin · Nuevo Paraíso · West Elizabeth",
+      location: "Nuevo Paraíso · West Elizabeth",
       sources: [
         ["iRedDead · Stranger tasks", "https://www.ireddead.com/rdr/guides/stranger-side-mission-list"],
       ],
       rows: [
-        ["stranger-lights-camera-action", ["stranger"], "Lights, Camera, Action", "After The Sport of Kings, and Liars, speak to MacKenna behind the Armadillo cinema. Win the deed at the Thieves’ Landing saloon’s Liar’s Dice table, which requires a $200 stake, and disarm Spatchcock in a duel at Benedict Point by marking his gun hand. You can do those two jobs in either order. Return to the cinema. After An Appointed Time and roughly two in-game days, find MacKenna behind a building at Pacific Union Railroad Camp to finish.", { reference: "https://www.ireddead.com/rdr/guides/lights-camera-action" }],
-        ["stranger-deadalus-and-son", ["stranger"], "Deadalus and Son", "The first marker appears after We Shall Be Together in Paradise. Meet Charles Kinnear on the cliff southwest of Casa Madrugada. Gather 20 bird feathers of any kind, 10 Red Sage from Rio Bravo, and five Beaver Fur. Check the riverbanks on the West Elizabeth side of the Upper Montana River for beavers. Bring the materials to Charles, then return once the marker comes back, usually after about two in-game days.", { reference: "https://www.ireddead.com/rdr/guides/deadalus-and-son" }],
-        ["optional-i-know-you", ["optional"], "I Know You", "If you haven’t started, meet the man on the ridge southwest of MacFarlane’s Ranch after A Tempest Looms and talk to his contact outside the Thieves’ Landing saloon. Once Nuevo Paraíso opens, find him at his campsite south of El Matadero and decide what to do at the Las Hermanas entrance. After An Appointed Time, meet him at the last marker on the cliff overlooking Beecher’s Hope. Finish before starting the last main mission. This task is optional for the in-game 100%.", { reference: "https://www.ireddead.com/rdr/guides/i-know-you" }],
+        ["stranger-lights-camera-action", ["stranger", "stranger-step"], "Lights, Camera, Action", "After An Appointed Time, and at least two in-game days after you brought MacKenna the deed, find him behind a building at Pacific Union Railroad Camp to finish.", { reference: "https://www.ireddead.com/rdr/guides/lights-camera-action" }],
+        ["stranger-deadalus-and-son-materials", ["stranger-step"], "Deadalus and Son: the materials", "Bring Charles 20 bird feathers of any kind, 10 Red Sage from Rio Bravo and five Beaver Fur at his cliff southwest of Casa Madrugada. Beavers are easier to find on the West Elizabeth bank of the river between New Austin and West Elizabeth.", { reference: "https://www.ireddead.com/rdr/guides/deadalus-and-son" }],
+        ["stranger-deadalus-and-son", ["stranger", "stranger-step"], "Deadalus and Son", "Return to Charles on the cliff once his marker comes back, usually about two in-game days after you brought him the materials.", { reference: "https://www.ireddead.com/rdr/guides/deadalus-and-son" }],
+        ["optional-i-know-you", ["optional"], "I Know You", "After An Appointed Time, meet the man at the last marker on the cliff overlooking Beecher’s Hope. Finish before starting the last main mission. This task is optional for the in-game 100%.", { reference: "https://www.ireddead.com/rdr/guides/i-know-you" }],
       ],
     },
     {
@@ -60,9 +61,10 @@ export default {
         ["iRedDead · Stranger tasks", "https://www.ireddead.com/rdr/guides/stranger-side-mission-list"],
       ],
       rows: [
-        ["stranger-american-lobbyist", ["stranger"], "American Lobbyist", "After An Appointed Time, accept the photographs from the man at the gazebo in Blackwater’s main plaza. Visit the bank during business hours, roughly 7 a.m.–6 p.m., and approach the man seated on the left. Return to the gazebo for payment.", { reference: "https://www.ireddead.com/rdr/guides/american-lobbyist" }],
-        ["stranger-the-wronged-woman", ["stranger"], "The Wronged Woman", "After An Appointed Time, visit Clara at the Blackwater chapel at night, between about 6 p.m. and 7 a.m. Find Harold in the saloon and follow him outside. Win the duel, take the $200 from him, and return to Clara. About two in-game days later, speak to the woman at the marked grave in Blackwater Cemetery to finish the task.", { reference: "https://www.ireddead.com/rdr/guides/the-wronged-woman" }],
-        ["stranger-the-prohibitionist", ["stranger"], "The Prohibitionist", "After The Wronged Woman, speak to Abner Forsyth outside Blackwater’s saloon, then visit Oliver Philips at the marked alley near the docks. Return to Abner, make your choice, and report back to Philips. Warning Abner raises drink and room prices. Killing him lowers them and costs honor. Either outcome completes the task, so consider buying any remaining rooms first.", { reference: "https://www.ireddead.com/rdr/guides/the-prohibitionist" }],
+        ["stranger-american-lobbyist", ["stranger", "stranger-step"], "American Lobbyist", "After An Appointed Time, accept the photographs from the man at the gazebo in Blackwater’s main plaza. Visit the bank during business hours, roughly 7 a.m.–6 p.m., and approach the man seated on the left. Return to the gazebo for payment.", { reference: "https://www.ireddead.com/rdr/guides/american-lobbyist" }],
+        ["stranger-the-wronged-woman-chapel", ["stranger-step"], "The Wronged Woman: the chapel", "After An Appointed Time, visit Clara at the Blackwater chapel at night, between about 6 p.m. and 7 a.m. Find Harold in the saloon and follow him outside. Kill him in the duel, take the $200 from his body, and bring it back to Clara.", { reference: "https://www.ireddead.com/rdr/guides/the-wronged-woman" }],
+        ["stranger-the-wronged-woman", ["stranger", "stranger-step"], "The Wronged Woman", "About two in-game days after you brought Clara the money, speak to the woman at the marked grave in Blackwater Cemetery to finish the task.", { reference: "https://www.ireddead.com/rdr/guides/the-wronged-woman" }],
+        ["stranger-the-prohibitionist", ["stranger", "stranger-step"], "The Prohibitionist", "After The Wronged Woman, speak to Abner Forsyth outside Blackwater’s saloon, then visit Oliver Philips at the marked alley near the docks. Return to Abner, make your choice, and report back to Philips. Warning Abner raises drink and room prices. Killing him lowers them and costs honor. Either outcome completes the task, so consider buying any remaining rooms first.", { reference: "https://www.ireddead.com/rdr/guides/the-prohibitionist" }],
       ],
     },
     {

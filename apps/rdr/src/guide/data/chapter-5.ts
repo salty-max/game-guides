@@ -14,7 +14,7 @@ export default {
         ["iRedDead · Stranger tasks", "https://www.ireddead.com/rdr/guides/stranger-side-mission-list"],
       ],
       rows: [
-        ["stranger-remember-my-family", ["stranger"], "Remember My Family", "After The Last Enemy That Shall Be Destroyed, speak to the agent at Blackwater station. Ask at the marked cabin by Lake Don Julio, then visit Phillip at the river camp near Río del Toro. Follow the river to the final marker and win the duel. Let the credits run before returning to the cleanup checklist.", { reference: "https://www.ireddead.com/rdr/guides/remember-my-family" }],
+        ["stranger-remember-my-family", ["stranger", "stranger-step"], "Remember My Family", "After The Last Enemy That Shall Be Destroyed, speak to the agent at Blackwater station. Ask at the marked cabin by Lake Don Julio, then visit Phillip at the river camp near Río del Toro. Follow the river to the final marker and win the duel. Let the credits run before returning to the cleanup checklist.", { reference: "https://www.ireddead.com/rdr/guides/remember-my-family" }],
       ],
     },
     {
