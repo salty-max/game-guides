@@ -46,7 +46,7 @@ export default {
       rows: [
         ["forge-coiled-nail", ["forge"], "Upgrade to the Coiled Nail", "Take 2,000 Geo and 2 Pale Ore to the Nailsmith once you have the Channelled Nail."],
         ["forge-pure-nail", ["forge"], "Upgrade to the Pure Nail", "The last upgrade costs 4,000 Geo and 3 Pale Ore."],
-        ["quest-nailsmith-sheo", ["choice"], "Visit the Nailsmith and Sheo together", "Once the Pure Nail is done, he asks you to strike him down. It’s a choice, and the game saves at once: striking him (Purity) ends his story and this step. To keep his story going, walk away. With Great Slash learned, rest at a bench or ride a Stag, then find him in Sheo’s hut in Greenpath and talk to him (Happy Couple)."],
+        ["quest-nailsmith-sheo", ["quest"], "Visit the Nailsmith and Sheo together", "Once the Pure Nail is done, he asks you to strike him down: walk away instead. With Great Slash learned, rest at a bench or ride a Stag, then find him in Sheo’s hut in Greenpath and talk to him (Happy Couple)."],
         ["pickup-salubra-blessing", ["pickup"], "Buy Salubra’s Blessing at 40 charms", "With all 40 charms and every notch Salubra sells, go back to her shop in the Forgotten Crossroads and buy her Blessing for 800 Geo. It adds nothing to the game’s own percentage, but the bar counts it. A Fragile charm Divine is holding doesn’t count toward the 40, and after a banishment you’re one short until Nymm gives you Carefree Melody."],
       ],
     },

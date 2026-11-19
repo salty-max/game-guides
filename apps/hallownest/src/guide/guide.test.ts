@@ -9,6 +9,7 @@ import { COUNTS_KEY } from "@hundo/core/counts";
 import { flatten } from "@hundo/core/sync/fields";
 import type { Checks, Row } from "@hundo/core/types";
 import { targets } from "./config";
+import { choices } from "./data/choices";
 import { FULL, gamePoints } from "./points";
 
 const [a] = allRows.map((row) => row.id);
@@ -50,7 +51,7 @@ describe("Hollow Knight completion", () => {
     const off = allRows.filter((row) => !row.tags.some((tag) => targets.some((target) => target.tag === tag)));
     expect(off.length).toBeGreaterThan(0);
     // (a missable row also carries `missable`, which core adds)
-    expect(off.every((row) => row.tags[0] === "route" || row.tags[0] === "choice")).toBe(true);
+    expect(off.every((row) => row.tags[0] === "route")).toBe(true);
     expect(overall(tick(off)).percent).toBe(0);
   });
 
@@ -60,11 +61,11 @@ describe("Hollow Knight completion", () => {
     for (const id of ["charm-grimmchild", "boss-troupe-master-grimm", "troupe-finale-grimm-finale", "quest-city-nailsmith"]) expect(rowsByTag("quest").map((row) => row.id), id).not.toContain(id);
   });
 
-  // The rows of a one-way choice, counted by no target until the choice block lands.
-  it("leaves the rows of a one-way choice off every target", () => {
-    expect(rowsByTag("choice").map((row) => row.id).sort()).toEqual(["quest-nailsmith-sheo"]);
-    for (const row of rowsByTag("choice")) expect(row.tags.some((tag) => targets.some((target) => target.tag === tag)), row.id).toBe(false);
-    expect(overall(tick(rowsByTag("choice"))).percent).toBe(0);
+  // Both ways of the one-way choice count: the first save's, recommended, and the second save's, in its own chapter at the end.
+  it("counts both ways of its one-way choice, the later one in A Second Save", () => {
+    expect(choices.map((choice) => [choice.row, choice.later.map((later) => later.row)])).toEqual([["quest-nailsmith-sheo", ["quest-nailsmith-purity"]]]);
+    for (const id of ["quest-nailsmith-sheo", "quest-nailsmith-purity"]) expect(rowsByTag("quest").map((row) => row.id), id).toContain(id);
+    expect(allRows.find((row) => row.id === "quest-nailsmith-purity")?.chapter).toBe(chapters.length);
   });
 
   // 100% is every target, each item once: it never shows while anything on the board is left, and What's left says what.
