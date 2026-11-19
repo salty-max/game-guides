@@ -35,7 +35,7 @@ export default {
     {
       title: "Beyond the Basin door",
       location: "The Abyss",
-      sources: [["Abyss gate at the bottom of the Basin", "https://hollowknight.wiki/w/King%27s_Brand"], ["Shade Cloak: lighthouse and Void bowl", "https://hollowknight.wiki/w/Shade_Cloak"], ["Markoth: shade gate, Essence and fight", "https://hollowknight.wiki/w/Markoth"]],
+      sources: [["Abyss gate at the bottom of the Basin", "https://hollowknight.wiki/w/King%27s_Brand"], ["Shade Cloak: lighthouse and Void bowl", "https://hollowknight.wiki/w/Shade_Cloak"]],
       rows: [
         ["route-abyss-door", ["route"], "Open the Abyss with King’s Brand", "From the Hidden Station, cross to the Basin’s central hub room and drop through its floor. Down and to the left is the gate at the bottom of the Basin, which opens for the King’s Brand. The Abyss has no benches, so arrive healthy."],
         ["equipment-shade-cloak", ["equipment"], "Collect Shade Cloak across the Void lake", "From the bottom of the Abyss, head east to the lighthouse on the shore of the Void sea. Climb inside and pull the lever: the light calms the tendrils in the sea, and Crystal Heart carries you across. At the far end, stand in the bowl of Void held by a corpse. It turns your Mothwing Cloak into the Shade Cloak, whose dash passes through enemies, their attacks and shade gates."],
@@ -45,7 +45,7 @@ export default {
     {
       title: "High ledges and secret rooms in the East",
       location: "Kingdom’s Edge · City of Tears",
-      sources: [["Steam guide ch 15 and 22 · King’s Station fragment and Quick Slash", "https://steamcommunity.com/sharedfiles/filedetails/?id=3005043947"], ["Quick Slash: floor by the training dummy", "https://hollowknight.wiki/w/Quick_Slash"], ["Vessel Fragment above King’s Station", "https://hollowknight.wiki/w/Vessel_Fragment"]],
+      sources: [["Steam guide ch 15 and 22 · King’s Station fragment and Quick Slash", "https://steamcommunity.com/sharedfiles/filedetails/?id=3005043947"], ["Quick Slash: floor by the training dummy", "https://hollowknight.wiki/w/Quick_Slash"], ["Vessel Fragment above King’s Station", "https://hollowknight.wiki/w/Vessel_Fragment"], ["Markoth: shade gate, Essence and fight", "https://hollowknight.wiki/w/Markoth"]],
       compact: true,
       rows: [
         ["charm-quick-slash", ["charm"], "Find Quick Slash near Oro’s hut", "Beside the training dummy east of Oro’s hut, smash the loose floor with Desolate Dive or Descending Dark and keep diving through the floors below. At the bottom, loop back west and up: a tunnel in the wall leads to an anvil in front of a huge dead nailsmith, with the charm on it."],

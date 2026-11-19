@@ -40,6 +40,7 @@ export default {
       compact: true,
       rows: [
         ["pickup-hunter-journal", ["pickup"], "Receive the Hunter’s Journal", "One room below Cornifer, a doorway on the right is framed by big grey teeth. Follow it to the Hunter and hear him out; he leaves his journal on the ground for you. Kills fill it in."],
+        ["boss-massive-moss-charger", ["boss", "other-boss"], "Defeat Massive Moss Charger in lower Greenpath", "In lower Greenpath, west of the way down to Fog Canyon, a big bush below a ruined structure stirs as you come near and gives chase. It charges and belly-flops at you. You aren’t locked in, so you can leave and come back."],
         ["vessel-fragment-greenpath", ["vessel-fragment"], "Collect the Vessel Fragment on the lower Greenpath route", "The fragment hides above the west end of a long corridor beyond the Massive Moss Charger’s arena, west of the Fog Canyon drop. Beat the Charger, follow the corridor to its end, then jump up through the ceiling and go right."],
       ],
     },
