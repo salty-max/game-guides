@@ -8,6 +8,7 @@ Nothing in this guide has been replayed against the game by its author. The data
 - **Counts** (57 story missions, 18 Stranger tasks, 94 map locations, 20 bounties, 13 safehouses, 9 outfits): taken from the same pages, not recounted in the game or against each other.
 - **What counts toward the in-game stat** (scraps do not, optional tasks do not, outfits give credit): from guides, not tested.
 - The estimate is rounded **down** to a tenth. The game’s own rounding is not confirmed.
+- The estimate is the **Check against the game** panel's figure, not the overall bar's. The bar counts every board target, each item once, scraps and optional tasks included (`guide.test.ts` pins it: 100 only with everything ticked, under 100 with any one item left), and What's left counts items, not points.
 - Version differences: the game exists in original and later releases. Guides do not always say which they describe, so unlock conditions may differ between them.
 
 ## Missables

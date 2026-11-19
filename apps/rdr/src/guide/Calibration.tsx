@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { TextField } from "@hundo/core/components/TextField";
 import { Button, Panel, PanelForm, PanelHead, PanelText, PanelTitle } from "@hundo/core/components/ui";
-import { coreRows } from "@hundo/core/guide";
+import { allRows } from "@hundo/core/guide";
 import { useProgress } from "@hundo/core/store/progress";
 import { useUi } from "@hundo/core/store/ui";
 import { calibrationDelta, estimate, readPercent } from "./estimate";
@@ -19,7 +19,7 @@ export function Calibration() {
     setSeen(reported);
     setDraft(reported === null ? "" : String(reported));
   }
-  const estimated = estimate(checks, coreRows);
+  const estimated = estimate(checks, allRows);
   const setReported = (value: number | null) => setExtra((extra) => ({ ...extra, reported: value }));
 
   const submit = (event: FormEvent) => {
@@ -40,8 +40,14 @@ export function Calibration() {
     <Panel id="calibration" aria-labelledby="calibration-title">
       <PanelHead>
         <PanelTitle id="calibration-title">Check against the game</PanelTitle>
-        <PanelText>Enter the completion percentage from Stats → General to see how far this guide’s estimate is off.</PanelText>
+        <PanelText>
+          The game keeps its own completion percentage in Stats → General. This is the guide’s estimate of it, from the game’s category weights: Ambient
+          Challenges add credit at ranks 5 and 10, outfit scraps and optional tasks add none, and a Stranger task counts once its last step is checked.
+          It is not the overall bar’s figure, which counts every target on the board, each item once.
+        </PanelText>
       </PanelHead>
+      <PanelText tone="ink">Estimated in-game completion: {estimated}%</PanelText>
+      <PanelText>Enter the completion percentage from Stats → General to see how far the estimate is off.</PanelText>
       <PanelForm onSubmit={submit}>
         <TextField
           id="reported"
@@ -74,12 +80,12 @@ export function Calibration() {
       </PanelForm>
       {delta !== null && (
         <PanelText tone="ink" role="status">
-          Guide {estimated}% · game {reported}% ·{" "}
+          Estimate {estimated}% · game {reported}% ·{" "}
           {delta === 0
             ? "they match."
             : delta > 0
               ? `the game is ${delta} points ahead. Something is done in the game that isn’t checked here.`
-              : `the guide is ${Math.abs(delta)} points ahead. Something checked here may not count in the game yet.`}
+              : `the estimate is ${Math.abs(delta)} points ahead. Something checked here may not count in the game yet.`}
         </PanelText>
       )}
     </Panel>

@@ -1,6 +1,6 @@
-import { allRows, byId, cats, chapters, checklistOf, config, coreRows, missablesLeft, rowsByTag, tally } from "@hundo/core/guide";
+import { allRows, byId, cats, chapters, checklistOf, completion, config, missablesLeft, overall, rowsByTag, tally, whatsLeft } from "@hundo/core/guide";
 import { STORAGE_KEY, defaultState, validateState } from "@hundo/core/progress-state";
-import { calibrationDelta, estimate, pointsLeft, readPercent } from "./estimate";
+import { calibrationDelta, estimate, readPercent, weightOf } from "./estimate";
 import { THEME_KEY } from "@hundo/core/store/theme";
 import { AWAKE_KEY } from "@hundo/core/store/awake";
 import { PLACE_KEY } from "@hundo/core/store/place";
@@ -14,22 +14,67 @@ import { questlines } from "./data/questlines";
 
 const all = Object.fromEntries(allRows.map((row) => [row.id, true as const]));
 const [a] = allRows.map((row) => row.id);
+const tick = (rows: typeof allRows) => Object.fromEntries(rows.map((row) => [row.id, true as const]));
+const without = (left: (typeof allRows)[number]) => tick(allRows.filter((row) => row !== left));
 
-describe("Red Dead completion estimate", () => {
-  it("keeps scraps, optional tasks and the steps before a Stranger task's last out of the estimate", () => {
-    expect(coreRows.length).toBeLessThan(allRows.length);
-    expect(coreRows.every((row) => !["scrap", "optional", "stranger-step"].includes(row.tags[0]))).toBe(true);
+// 100% is every target on the board, each item once: scraps, optional tasks and every challenge rank included.
+describe("Red Dead completion", () => {
+  it("counts every category of the board, with no weights, points or estimate behind the bar", () => {
+    expect(completion.board.some((item) => item.optional)).toBe(false);
+    expect(completion.overall).toBeUndefined();
+    expect(completion.isCore).toBeUndefined();
+    expect(completion.left).toBeUndefined();
+    expect(completion.unit).toBeUndefined();
+    expect(completion.board.map((item) => item.tag)).toEqual(expect.arrayContaining(["scrap", "optional", "challenge", "outfit", "stranger"]));
+    expect(overall({}).label).toBe("complete");
+  });
+
+  it("reads 100 only with everything ticked, and What's left is empty then", () => {
+    expect(overall({}).percent).toBe(0);
+    expect(overall(all).percent).toBe(100);
+    expect(whatsLeft(all)).toEqual([]);
+  });
+
+  it("reads under 100 with any one counted item left, and What's left says which category", () => {
+    for (const { tag } of completion.board) {
+      const [row] = rowsByTag(tag);
+      expect(overall(without(row)).percent, tag).toBeLessThan(100);
+      expect(whatsLeft(without(row)).map((item) => item.tag), tag).toEqual([tag]);
+    }
+  });
+
+  it("counts a scrap, an optional task and a challenge rank without credit like any other item", () => {
+    for (const tag of ["scrap", "optional"]) {
+      expect(weightOf(rowsByTag(tag)[0]), tag).toBe(0);
+      expect(overall(tick(rowsByTag(tag))).percent, tag).toBeGreaterThan(0);
+    }
+    // (the game credits only ranks 5 and 10, so most ranks have no weight, but the board counts them all)
+    expect(rowsByTag("challenge").some((row) => weightOf(row) === 0)).toBe(true);
+    expect(tally("challenge", tick(rowsByTag("challenge")))).toEqual({ done: rowsByTag("challenge").length, total: rowsByTag("challenge").length });
+  });
+
+  it("counts a Stranger task once, by its last step, and nothing for the steps before it", () => {
+    const stepsOnly = allRows.filter((row) => row.tags.length === 1 && row.tags[0] === "stranger-step");
+    expect(stepsOnly.length).toBeGreaterThan(0);
+    expect(overall(tick(stepsOnly)).percent).toBe(0);
+    expect(tally("stranger", tick(rowsByTag("stranger")))).toEqual({ done: 18, total: 18 });
+  });
+
+  it("shows What's left in counts, not points", () => {
+    for (const item of whatsLeft({})) expect(Number.isInteger(item.left), item.tag).toBe(true);
+  });
+});
+
+describe("Red Dead's in-game estimate", () => {
+  it("weighs scraps, optional tasks and the steps before a Stranger task's last at nothing", () => {
+    for (const row of allRows) if (["scrap", "optional", "stranger-step"].includes(row.tags[0])) expect(weightOf(row), row.id).toBe(0);
+    expect(estimate(tick(allRows.filter((row) => ["scrap", "optional", "stranger-step"].includes(row.tags[0]))), allRows)).toBe(0);
   });
 
   it("totals roughly 100% when everything is checked", () => {
-    expect(estimate({}, coreRows)).toBe(0);
-    expect(estimate(all, coreRows)).toBeGreaterThanOrEqual(99);
-    expect(estimate(all, coreRows)).toBeLessThanOrEqual(100);
-  });
-
-  it("totals the points left per category to the whole estimate", () => {
-    expect(pointsLeft({}, coreRows).reduce((sum, item) => sum + item.left, 0)).toBeGreaterThanOrEqual(99);
-    expect(pointsLeft(all, coreRows).every((item) => item.left === 0)).toBe(true);
+    expect(estimate({}, allRows)).toBe(0);
+    expect(estimate(all, allRows)).toBeGreaterThanOrEqual(99);
+    expect(estimate(all, allRows)).toBeLessThanOrEqual(100);
   });
 
   it("flags the time-limited Stranger chain", () => {
