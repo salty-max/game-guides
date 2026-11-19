@@ -8,6 +8,10 @@ import { appendFileSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSyn
 import { createServer } from "node:net";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { queueSelf } from "../tools/queued.mjs";
+
+// A heavy job: on a machine shared by several sessions it takes its turn in the queue (tools/queued.mjs; not in CI), and its table is in the log q names.
+await queueSelf("lighthouse");
 
 const root = fileURLToPath(new URL("..", import.meta.url));
 const args = process.argv.slice(2);

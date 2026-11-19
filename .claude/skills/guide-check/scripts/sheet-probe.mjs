@@ -5,6 +5,11 @@
 //   node .claude/skills/guide-check/scripts/sheet-probe.mjs <checkout>
 import { spawn } from "node:child_process";
 import { chromium, webkit } from "playwright-core";
+import { queueSelf } from "../../../../tools/queued.mjs";
+
+// (a heavy browser job: it takes its turn in the machine's queue and runs in the background, see tools/queued.mjs)
+await queueSelf("sheet-probe");
+
 const [root] = process.argv.slice(2);
 const port = 4995;
 const server = spawn("pnpm", ["-C", "apps/rdr", "exec", "vite", "preview", "--port", String(port), "--strictPort"], { cwd: root, stdio: "ignore", detached: true });
