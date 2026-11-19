@@ -39,7 +39,6 @@ export default {
         ["achievement-wisdom-of-a-sage", ["route"], "Check the 24 base-game sorceries", "Collect all 24 base-game sorceries. The four from Oolacile (Dark Bead, Dark Orb, Dark Fog and Pursuers) count apart, as expansion spells.", {"reference": "https://darksouls.wikidot.com/sorceries"}],
         ["achievement-bond-of-a-pyromancer", ["route"], "Check the 19 base-game pyromancies", "Collect all 19 base-game pyromancies. Black Flame counts apart, as an expansion spell.", {"reference": "https://darksouls.wikidot.com/pyromancies"}],
         ["achievement-prayer-of-a-maiden", ["route"], "Check all 23 miracles", "Collect all 23 miracles, including the one made from Gwyn’s soul in NG+.", {"reference": "https://darksouls.wikidot.com/miracles"}],
-        ["achievement-the-dark-soul", ["route"], "Clear What’s left on the Progress page", "Open Progress: What’s left lists every target this save still needs, by kind. The bar reads 100% once it’s empty."],
       ],
     },
   ],
