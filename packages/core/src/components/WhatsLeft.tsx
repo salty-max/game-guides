@@ -1,28 +1,20 @@
 import { Link } from "react-router";
 import { Panel, PanelHead, PanelText, PanelTitle } from "./ui";
-import { cats, checklistOf, completion, whatsLeft } from "../guide";
+import { cats, checklistOf, whatsLeft } from "../guide";
 import { useProgress } from "../store/progress";
 import { pressTextClasses } from "./press-style";
-
-const points = (value: number) => (Math.round(value * 10) / 10).toFixed(1);
 
 /** The dashboard's categories by what is left in them, biggest first, each with a bar of its size and how much of it is done. */
 export function WhatsLeft() {
   const checks = useProgress((s) => s.data.checks);
   const items = whatsLeft(checks);
   const max = Math.max(...items.map((item) => item.total), 1);
-  const inPoints = completion.unit === "points";
-  const figure = inPoints ? points : String;
   return (
     <Panel id="whats-left" aria-labelledby="whats-left-title">
       <PanelHead>
         <PanelTitle id="whats-left-title">What’s left</PanelTitle>
         <PanelText>
-          {!items.length
-            ? "Nothing left. That’s a 100%."
-            : inPoints
-              ? `About ${points(items.reduce((sum, item) => sum + item.left, 0))} points to go. Biggest remaining first, using the estimate’s weights.`
-              : "Biggest gaps first."}
+          {items.length ? "Biggest gaps first." : "Nothing left. That’s a 100%."}
         </PanelText>
       </PanelHead>
       {items.length > 0 && (
@@ -42,7 +34,7 @@ export function WhatsLeft() {
                   </span>
                 </span>
                 <span className="font-extrabold whitespace-nowrap tabular-nums">
-                  {figure(item.left)} <small className="text-12 font-bold text-muted">of {figure(item.total)} {inPoints ? "pts " : ""}left</small>
+                  {item.left} <small className="text-12 font-bold text-muted">of {item.total} left</small>
                 </span>
               </li>
             ))}

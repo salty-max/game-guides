@@ -21,7 +21,6 @@ const hidden = new Set([
   "icon",
   "layout",
   "corners",
-  "unit",
 ]);
 /** Tuples whose leading or trailing places hold identifiers: a row's id and tags, a category's icon and tone, a chip's id. */
 const tuples: [path: RegExp, places: number[]][] = [
