@@ -5,8 +5,7 @@ export const questlines = {
   "title": "Hallownest questlines",
   "intro": "Find selected NPC routes as far as you have revealed them. Their checks are shared with the walkthrough.",
   "cover": [
-    "quest",
-    "choice"
+    "quest"
   ],
   "lines": [
     {
@@ -97,7 +96,8 @@ export const questlines = {
         "forge-channelled-nail",
         "forge-coiled-nail",
         "forge-pure-nail",
-        "quest-nailsmith-sheo"
+        "quest-nailsmith-sheo",
+        "quest-nailsmith-purity"
       ]
     },
     {

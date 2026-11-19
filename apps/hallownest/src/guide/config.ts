@@ -13,6 +13,8 @@ import chapter9 from "./data/chapter-9";
 import chapter10 from "./data/chapter-10";
 import chapter11 from "./data/chapter-11";
 import chapter12 from "./data/chapter-12";
+import chapter13 from "./data/chapter-13";
+import { choices } from "./data/choices";
 import { missables } from "./data/missables";
 import { questlines } from "./data/questlines";
 import { sources } from "./data/sources";
@@ -58,18 +60,17 @@ export const targets: BoardItem[] = [
   { tag: "pickup", goal: 7 },
   { tag: "challenge", goal: 4 },
   { tag: "achievement", goal: 1 },
-  { tag: "quest", goal: 41 },
+  { tag: "quest", goal: 43 },
 ];
 
 const config: GuideConfig = {
   brand,
   layout: "article",
-  chapters: [chapter1, chapter2, chapter3, chapter4, chapter5, chapter6, chapter7, chapter8, chapter9, chapter10, chapter11, chapter12],
+  chapters: [chapter1, chapter2, chapter3, chapter4, chapter5, chapter6, chapter7, chapter8, chapter9, chapter10, chapter11, chapter12, chapter13],
   sources,
   categories: {
     route: ["Route steps", "Route", "compass"],
     quest: ["Quest steps", "Quest", "scroll", "mint"],
-    choice: ["Quest choices", "Choice", "scroll", "rose"],
     map: ["Area maps", "Map", "compass", "sky"],
     stag: ["Stag stations", "Stag station", "pin", "sky"],
     boss: ["Boss encounters", "Boss", "sword", "rose"],
@@ -119,6 +120,7 @@ const config: GuideConfig = {
     ],
   },
   missables,
+  choices,
   questlines,
   banners,
   completion: { board: targets },
