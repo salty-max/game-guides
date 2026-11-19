@@ -1,5 +1,5 @@
 import { byChapter } from "@hundo/core/format";
-import type { Banner, GuideConfig } from "@hundo/core/types";
+import type { Banner, BoardItem, GuideConfig } from "@hundo/core/types";
 import { brand } from "./brand";
 import chapter1 from "./data/chapter-1";
 import chapter2 from "./data/chapter-2";
@@ -20,7 +20,8 @@ const banners = byChapter(import.meta.glob<Banner>("./banners/chapter-*.webp", {
 const categories: GuideConfig["categories"] = {
   heart: ["Heart Pieces", "Heart Piece", "heart", "rose"],
   shell: ["Secret Seashells", "Seashell", "shell", "violet"],
-  chest: ["Treasure Chests", "Chest", "chest", "amber"],
+  chest: ["Chests", "Chest", "chest", "amber"],
+  treasure: ["Treasure Chests", "Chest", "chest", "amber"],
   trade: ["Trading Quest", "Trade", "swap", "clay"],
   gear: ["Equipment & Upgrades", "Equipment", "sword"],
   container: ["Heart Containers", "Heart Container", "heart"],
@@ -39,6 +40,37 @@ const categories: GuideConfig["categories"] = {
   amiibo: ["Optional amiibo", "amiibo", "star"],
   story: ["Route Steps", "Route", "book"],
 };
+
+/**
+ * The guide's completion list, and what 100% is: every target counts, each item once, up to its goal, so the bar reads 100 exactly when
+ * What's left is empty. Only the amiibo stay out (they need physical figures), and route steps (`story`) are directions, among them
+ * fishing with the pond's default Lightweight Lure and buying back the item traded for the Boomerang. Treasure Chests, Equipment &
+ * Upgrades and the Island Sweep are the guide's own lists, and the rest are game totals (facts-to-verify.md names two hosts for each).
+ * A row of the guide's own lists counts nowhere else: Treasure Chests are the chests holding nothing another target counts (`chest`
+ * tags the guide's chest list, for the filter), Equipment leaves out the instruments and songs, and the Mini-game Rewards (`mini`) and Chamber
+ * Effects (`effect`) are filters, not targets, since each of their rows is already a Heart Piece, a figure, a Chamber Stone and so on.
+ * A row on two of the game's lists counts on both: Dampé's challenges that award a Heart Piece, a Seashell, a Fairy Bottle or a Heart
+ * Container, and Manbo's Mambo, a song and the Manbo's Pond warp point. guide.test.ts pins every goal.
+ */
+export const targets: BoardItem[] = [
+  { tag: "heart", goal: 32 },
+  { tag: "shell", goal: 50 },
+  { tag: "treasure", goal: 83 },
+  { tag: "trade", goal: 14 },
+  { tag: "gear", goal: 24 },
+  { tag: "container", goal: 9 },
+  { tag: "instrument", goal: 8 },
+  { tag: "song", goal: 3 },
+  { tag: "bottle", goal: 3 },
+  { tag: "figure", goal: 10 },
+  { tag: "lure", goal: 2 },
+  { tag: "challenge", goal: 24 },
+  { tag: "stone", goal: 14 },
+  { tag: "warp", goal: 10 },
+  { tag: "fairy", goal: 4 },
+  { tag: "explore", goal: 5 },
+  { tag: "amiibo", goal: 6, optional: true },
+];
 
 const config: GuideConfig = {
   brand,
@@ -62,11 +94,7 @@ const config: GuideConfig = {
   reassurance,
   banners,
   defer: (row) => row.tags.includes("amiibo"),
-  completion: {
-    board: Object.keys(categories)
-      .filter((tag) => tag !== "story")
-      .map((tag) => ({ tag, optional: tag === "amiibo" })),
-  },
+  completion: { board: targets },
   state: {
     // Saves from before the shared format: version 1, no guide id, the run log at the top level.
     legacy: (v) => (v.version === 1 && v.guide === undefined ? { extra: { mode: v.mode, runs: v.runs } } : null),
@@ -77,7 +105,8 @@ const config: GuideConfig = {
     searchPlaceholder: "Search items or locations",
     dashboardIntro: "Track completion across the island and log a deathless attempt.",
     boardTitle: "By category",
-    boardNote: "Category totals include the full guide. Optional amiibo and the deathless log sit outside overall completion.",
+    boardNote:
+      "Every target counts, each item once, so 100% is exactly when What’s left is empty. A mini-game prize or a chamber reward counts as the item it is, and a chest holding a Seashell or a dungeon item counts as that, so Treasure Chests are the chests holding nothing else counted. A Dampé challenge counts as well as the Heart Piece, Seashell, bottle or Heart Container it awards, and Manbo’s Mambo as a song and a warp point, since the game lists each. Treasure Chests, Equipment & Upgrades and the Island Sweep are the guide’s own lists, not game totals. Optional amiibo and the deathless log sit outside overall completion.",
     nextUpDone: "Everything revealed so far is done. Reveal the next chapter or check the progress page.",
     backupBlurb: "Export a copy of all checks, spoiler settings and run logs.",
   },

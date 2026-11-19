@@ -6,6 +6,8 @@ export const sources: SourceLink[] = [
   ["Secret Seashell maps", "https://www.nintendolife.com/guides/zelda-links-awakening-all-secret-seashells-map-and-locations"],
   ["Secret Seashell route cross-check", "https://www.thonky.com/zelda-links-awakening/nintendo-switch-secret-seashells"],
   ["Fishing rewards and lure techniques", "https://nintendowire.com/guides/the-legend-of-zelda-links-awakening/fishing/"],
+  ["Fishing pond prizes: Blooper and Cheep Cheep", "https://www.gamepressure.com/the-legend-of-zelda-links-awakening/fishing/zbcc3b"],
+  ["Fishing pond prizes by size", "https://game8.co/games/Zelda-Links-Awakening/archives/270368"],
   ["Trade sequence directions", "https://www.thonky.com/zelda-links-awakening/trading-sequence"],
   ["Trendy Game figures and pedestals", "https://gamefaqs.gamespot.com/switch/258622-the-legend-of-zelda-links-awakening/faqs/77938/nintendo-figurine-quest"],
   ["All ten warp points", "https://www.linkshideaway.com/links-awakening-switch/warp-points/"],
