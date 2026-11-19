@@ -34,9 +34,9 @@ export default {
       rows: [
         ["echo-lynel", ["echo"], "Follow the hoofprints and learn Lynel", "Start with the tracks just south of the Waypoint. Follow them in order around to the clearing east of the stone, which makes the Lynel appear. Keep a strong echo between you and the Lynel. Let it finish a charge before you close in to attack, then learn it when it falls."],
         ["crystal-eternal-forest-grass", ["might-crystal"], "Find the Might Crystal in the grass ring above the trees", "Climb above the treeline northwest of the Lynel clearing and check the center of the grass ring.", { quantity: 1 }],
-        ["chest-eternal-south-stone", ["chest"], "Pull up the Monster Stone chest south of the entrance", "Bind the partially buried chest and pull it free."],
-        ["chest-eternal-west-rupees", ["chest"], "Pull up the 50-rupee chest in the western clearing", "Look in the westernmost clearing with Sword Moblin Lv. 3 and use Bind on the buried chest."],
-        ["chest-eternal-northwest-stone", ["chest"], "Open the Monster Stone chest in the northwest nook", "Follow the forest's northwest edge to the alcove before returning to the main route."],
+        ["chest-eternal-south-stone", ["chest", "overworld-chest"], "Pull up the Monster Stone chest south of the entrance", "Bind the partially buried chest and pull it free."],
+        ["chest-eternal-west-rupees", ["chest", "overworld-chest"], "Pull up the 50-rupee chest in the western clearing", "Look in the westernmost clearing with Sword Moblin Lv. 3 and use Bind on the buried chest."],
+        ["chest-eternal-northwest-stone", ["chest", "overworld-chest"], "Open the Monster Stone chest in the northwest nook", "Follow the forest's northwest edge to the alcove before returning to the main route."],
       ],
     },
     {

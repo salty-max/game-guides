@@ -38,7 +38,7 @@ export default {
         ["story-gerudo-oasis-guards", ["story"], "Clear the enemies at the Southern Oasis Ruins Rift", "From the Oasis, go south to the quest marker near where you first met Dohna. Defeat the shadows around the downed guards and talk to them."],
         ["story-gerudo-cactus-smoothie", ["story"], "Deliver a Cactus Smoothie to the southern guards", "Find the thirsty guards south of Gerudo Town. Take the two Chilly Cactus from Dohna to the Oasis shop, combine them into a Cactus Smoothie and return with the drink."],
         ["echo-holmill", ["echo"], "Learn Holmill in the Ancestor's Cave of Rest", "Go to the cave at the north end of the desert. Move the rock on the left with Bind and defeat a Holmill past it. Move the next rock to expose the ladder into the sand passage."],
-        ["chest-ancestor-cave-egg", ["chest"], "Open the Golden Egg chest in the sand passage", "Summon Holmill where you want to descend. Use the holes it digs to reach the alcove on the left for the egg. Then dig down to the lower route and climb the ladder on the right."],
+        ["chest-ancestor-cave-egg", ["chest", "overworld-chest"], "Open the Golden Egg chest in the sand passage", "Summon Holmill where you want to descend. Use the holes it digs to reach the alcove on the left for the egg. Then dig down to the lower route and climb the ladder on the right."],
         ["story-gerudo-ancestors-rest", ["story"], "Light both braziers by the ancestor's coffin", "Place Ignizol near each brazier on the far side of the cave. Return to Seera once all three requests are finished. Follow the group northeast from the Oasis when the new rift opens."],
       ],
     },
@@ -76,11 +76,11 @@ export default {
     {
       title: "Sanctum exterior and roof",
       rows: [
-        ["chest-gerudo-stilled-northwest", ["chest"], "Pull up the 20-rupee chest on the stilled exterior", "From the exterior exit, work around the ledges to the northwest corner. Use Bind on the partially buried chest and pull it out of the sand."],
-        ["chest-gerudo-stilled-ladder", ["chest"], "Open the 50-rupee chest above the rotating ladder", "Bind and rotate the drum with the ladder piece until it lines up with the fixed rungs. Climb to the chest, then continue east toward the roof."],
+        ["chest-gerudo-stilled-northwest", ["chest", "overworld-chest"], "Pull up the 20-rupee chest on the stilled exterior", "From the exterior exit, work around the ledges to the northwest corner. Use Bind on the partially buried chest and pull it out of the sand."],
+        ["chest-gerudo-stilled-ladder", ["chest", "overworld-chest"], "Open the 50-rupee chest above the rotating ladder", "Bind and rotate the drum with the ladder piece until it lines up with the fixed rungs. Climb to the chest, then continue east toward the roof."],
         ["dungeon-waypoint-gerudo-roof", ["dungeon-waypoint"], "Activate the Sanctum roof Waypoint", "Touch it before making the drop into the hidden chest room."],
         ["chest-gerudo-sanctum-roof-drop", ["chest","dungeon-chest"], "Dig through the roof to the isolated 50-rupee chest", "At the sandy square just west of the roof Waypoint, summon Holmill and drop into its hole. Open the chest in the sealed 2F room, then warp back to the roof stone."],
-        ["chest-gerudo-stilled-monster-stone", ["chest"], "Uncover the Monster Stone chest on the roof", "Blow away the sand piles near the southern side of the roof with Wind Cannon or Tornando."],
+        ["chest-gerudo-stilled-monster-stone", ["chest", "overworld-chest"], "Uncover the Monster Stone chest on the roof", "Blow away the sand piles near the southern side of the roof with Wind Cannon or Tornando."],
         ["echo-hawk-statue", ["echo"], "Learn Hawk Statue on the eastern exterior", "Drop down east of the roof, then work north past the enemies. Line up another rotating ladder with Bind and climb to the statue."],
       ],
     },

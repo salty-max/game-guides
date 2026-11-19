@@ -42,9 +42,9 @@ export default {
         ["echo-rock-roast", ["echo"], "Learn Rock-Roast in the quarry", "Approach the meat-shaped rocks across the lava and copy one."],
         ["story-eldin-rock-roast", ["story"], "Bring Rock-Roast to the three Gorons", "Carry roasts with Bind and follow the route back left and down. Give a roast to each of the hungry Gorons."],
         ["story-eldin-crater-door", ["story"], "Open Darston's hidden crater shortcut", "Return to the city, speak to the elders and then to Darston in the upper back room. Use Bind on the protrusion beside the large portrait and pull to expose the passage."],
-        ["chest-eldin-crater-stones", ["chest"], "Open the Monster Stone chest in the crater shortcut", "Glide over the first lava gap. In the next chamber, move a Lava Rock to a geyser and ride to the chest ledge."],
-        ["chest-eldin-crater-rupees", ["chest"], "Open the 50-rupee chest in the side-view lava passage", "Use Lava Rocks to work left to the chest. Ride the tall lava jet up, then cross the bridge and let Darston break the rock. Enter the rift."],
-        ["chest-stilled-eldin-rocktatoes", ["chest"], "Open the chest of five Rocktatoes in Stilled Eldin Volcano", "Climb north from the entrance and detour east to the chest. Return to the main climb, use the wall and lava geysers, and go north to the temple."],
+        ["chest-eldin-crater-stones", ["chest", "overworld-chest"], "Open the Monster Stone chest in the crater shortcut", "Glide over the first lava gap. In the next chamber, move a Lava Rock to a geyser and ride to the chest ledge."],
+        ["chest-eldin-crater-rupees", ["chest", "overworld-chest"], "Open the 50-rupee chest in the side-view lava passage", "Use Lava Rocks to work left to the chest. Ride the tall lava jet up, then cross the bridge and let Darston break the rock. Enter the rift."],
+        ["chest-stilled-eldin-rocktatoes", ["chest", "overworld-chest"], "Open the chest of five Rocktatoes in Stilled Eldin Volcano", "Climb north from the entrance and detour east to the chest. Return to the main climb, use the wall and lava geysers, and go north to the temple."],
       ],
     },
     {
