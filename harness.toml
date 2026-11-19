@@ -22,3 +22,4 @@ decisions = "opener"  # a child asks the user nothing: every question and every 
 
 [checks]
 queue = true        # one `check` at a time on the machine: parallel worktrees' checks overloaded it (harness/queue.ts)
+# queue_limit = 30  # minutes a queued run may take before q stops it (0: none); a job that runs longer passes its own: `queueSelf(name, { limit })`, `q.ts --limit`
