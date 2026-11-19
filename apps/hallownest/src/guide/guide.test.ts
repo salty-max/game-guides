@@ -8,7 +8,7 @@ import { PERSIST_KEY } from "@hundo/core/persistence";
 import { COUNTS_KEY } from "@hundo/core/counts";
 import { flatten } from "@hundo/core/sync/fields";
 import type { Checks, Row } from "@hundo/core/types";
-import { targets } from "./config";
+import config, { targets } from "./config";
 import { choices } from "./data/choices";
 import { FULL, gamePoints } from "./points";
 
@@ -125,6 +125,15 @@ describe("Hollow Knight completion", () => {
     // (every one of the sixteen earns points, and a row of the rest that carries none of them adds nothing)
     for (const tag of gameTags) expect(gamePoints(tick(rowsByTag(tag)), allRows), tag).toBeGreaterThan(0);
     for (const tag of beyondTags) expect(gamePoints(tick(rowsByTag(tag).filter((row) => !gameRows.includes(row))), allRows), tag).toBe(0);
+  });
+});
+
+describe("achievements", () => {
+  // Hollow Knight keeps its own list, so a reader sees its achievements: on Switch, which has none, the game shows them as Feats
+  // (facts-to-verify.md). The guide tracks one, Pure Completion, which every platform's list has.
+  it("shows the game's own achievements, backed by their sources", () => {
+    expect(config.achievements?.sources.length).toBeGreaterThanOrEqual(2);
+    expect(rowsByTag("achievement").map((row) => row.id)).toEqual(["achievement-pure-completion"]);
   });
 });
 
