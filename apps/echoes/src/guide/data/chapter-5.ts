@@ -50,7 +50,7 @@ export default {
     {
       title: "Eldin Temple first floor",
       rows: [
-        ["dungeon-waypoint-eldin-entry", ["dungeon-waypoint"], "Activate the Eldin Temple entrance Waypoint", "Use the hot spring to the left if you need hearts, then go north. Explore both optional and key routes before opening the west locked door."],
+        ["dungeon-waypoint-eldin-entry", ["dungeon-waypoint", "waypoint"], "Activate the Eldin Temple entrance Waypoint", "Use the hot spring to the left if you need hearts, then go north. Explore both optional and key routes before opening the west locked door."],
         ["chest-eldin-pumpkins", ["chest","dungeon-chest"], "Free the chest of eight Twisted Pumpkins", "In the north side chamber, use a bomb or a Zirro to break the cracked block near the upper-right corner. Pull the buried chest out with Bind."],
         ["chest-eldin-key-1", ["chest","dungeon-chest"], "Glide to the first Small Key chest", "From the main room go east, riding Lava Rocks up the jets. In the updraft chamber, grab Ghirro or Mothula and ride the air across to the far ledge. Return to the central room and unlock the west door."],
         ["chest-eldin-golden-egg", ["chest","dungeon-chest"], "Open the Golden Egg chest in the rising-lava room", "When the lava falls, go to the south side and pull the chest clear. Retreat to a Lava Rock or solid ground before the lava rises."],
@@ -62,14 +62,14 @@ export default {
     {
       title: "Bombs of Might and the upper keys",
       rows: [
-        ["dungeon-waypoint-eldin-miniboss", ["dungeon-waypoint"], "Unlock the miniboss route and activate its Waypoint", "Use the second key at the door above the vent shaft. Touch the stone before entering the arena."],
+        ["dungeon-waypoint-eldin-miniboss", ["dungeon-waypoint", "waypoint"], "Unlock the miniboss route and activate its Waypoint", "Use the second key at the door above the vent shaft. Touch the stone before entering the arena."],
         ["gear-bombs-of-might", ["equipment"], "Beat the bomb wielder and take the Bombs of Might", "Keep the cracked blocks between you and the bombs until they break. Use ranged attacks or corner the fighter with fast echoes. Move away from the Bombchus in the second phase."],
         ["chest-eldin-key-3", ["chest","dungeon-chest"], "Blast the cracked blocks hiding the third Small Key", "Take the ladder beyond the arena and cut the dark barrier. Use a bomb on the cracked blocks below it and open the revealed chest. Continue right and up the ladder."],
         ["chest-eldin-silver-rupee", ["chest","dungeon-chest"], "Open the 100-rupee chest in the bomb-block chamber", "Clear the Tweelus and break the obstacles. Take the chest at the northwest end. Bomb the blocked route on the right for the next fight."],
         ["echo-fire-wizzrobe", ["echo"], "Learn Fire Wizzrobe after the upper chamber fight", "Summon a quick flying or ranged echo each time the Wizzrobe reappears. Learn the remnant before opening the reward chest."],
         ["chest-eldin-key-4", ["chest","dungeon-chest"], "Open the Small Key chest from the Fire Wizzrobe fight", "Return to the side-view bomb-block passage with both keys. Use one on the southwest gate and descend into the Big Key chamber."],
         ["chest-eldin-big-key", ["chest","dungeon-chest"], "Open the Big Key chest and escape the rising lava", "Clear enemies along the descent. Open the chest at the bottom, then climb immediately. Use echoes only where you need them to get across a gap. Reach the ladder above the rising lava."],
-        ["dungeon-waypoint-eldin-boss", ["dungeon-waypoint"], "Cross the last lava river and activate the boss Waypoint", "Use the remaining Small Key on the upper-left door. Glide over the air vents in each section and use Lava Rocks on lava geysers between landings. Activate the stone by the boss door."],
+        ["dungeon-waypoint-eldin-boss", ["dungeon-waypoint", "waypoint"], "Cross the last lava river and activate the boss Waypoint", "Use the remaining Small Key on the upper-left door. Glide over the air vents in each section and use Lava Rocks on lava geysers between landings. Activate the stone by the boss door."],
       ],
     },
     {
