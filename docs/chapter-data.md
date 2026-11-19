@@ -153,7 +153,7 @@ What goes in:
 - **Counts and weights** taken from sources and not recounted in the game, with where they came from.
 - **Missable candidates** with fewer than two sources, and what each source says.
 - **Disagreements** between sources, and which one the data follows.
-- **How a source was read.** Say "read directly on 2026-11-14", "read in the browser (fetching was refused)" or "search summary only": a page that blocked fetching and was only seen through a search summary is weaker.
+- **How a source was read.** Say "read directly on 2026-11-14", "read in the browser (fetching was refused)" (a page you read yourself, since the `source-checker` helper has no browser), "unread (fetching was refused)" (a page the helper couldn't fetch) or "search summary only": a page that blocked fetching and was only seen through a search summary is weaker.
 - **Spoiler checks** done by eye, not by a playtester.
 - **Content left out on purpose**, and why, so nobody adds it back as a "fix".
 

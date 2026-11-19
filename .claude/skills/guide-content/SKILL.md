@@ -54,8 +54,7 @@ Rewriting directions is where errors creep in: a turn smoothed into the wrong co
   - *Contradicted:* first make sure it isn't moves against positions. "Head west, then take the second turning north" and "the east side of B2" can both be true. In Dragon Quest's Erdrick's Hollow, one guide gives moves for the chests, the research gives positions, and another guide's chest labels back every position (the entry in its `SOURCES.md`). If it's a real contradiction, fix the row to match the source, keeping its id. Where two sources disagree with each other, follow the more direct one (a map pin or a position label over prose for a position) and record the disagreement in `facts-to-verify.md`.
   - *Frame differs:* settle it with a page that gives positions, or record it in `facts-to-verify.md`.
   - *Not on the page:* find a page that says it and cite it, cut the detail, or record it in `facts-to-verify.md`.
-  - *Unread:* record it in `facts-to-verify.md`, with how far the helper got.
-  - *Read in the browser:* the helper falls back to the built-in browser when a page refuses fetching, and names those pages. Say so in `facts-to-verify.md`: "read in the browser (fetching was refused)".
+  - *Unread:* record it in `facts-to-verify.md`, with how far the helper got. A page that refuses fetching (a 403, a bot wall) lands here: the helper has no browser, since the built-in browser asks the user to approve every new site, so it names the page and goes on. Say so in `facts-to-verify.md`: "unread (fetching was refused)".
 
 ## 6. Check it
 
