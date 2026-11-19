@@ -1,6 +1,6 @@
 import { createContext, useContext, useState } from "react";
 import { useLocation, useNavigationType } from "react-router";
-import { brand, cats, hasMissables, readChapter, statusOptions } from "../guide";
+import { brand, cats, hasChoices, hasMissables, readChapter, statusOptions } from "../guide";
 import { isOpen, useProgress } from "./progress";
 import type { ProgressState } from "../types";
 
@@ -57,7 +57,7 @@ export function safePlace(path: unknown, data: ProgressState): string | null {
   if (view === "guide") return parts.length === 2 && chapter(first) ? path : null;
   if (view === "dashboard" || view === "questlines") return parts.length === 1 ? path : null;
   if (view !== "checklist" || parts.length > 3) return null;
-  if (first !== undefined && !(Object.hasOwn(cats, first) || (hasMissables && first === "missable") || first === "all")) return null;
+  if (first !== undefined && !(Object.hasOwn(cats, first) || (hasMissables && first === "missable") || (hasChoices && first === "one-way") || first === "all")) return null;
   if (second !== undefined && !chapter(second)) return null;
   return path;
 }
@@ -140,7 +140,7 @@ export function useKept<T>(name: string, initial: T | (() => T), valid: (value: 
 
 /** What useKept accepts back for a list's filters: a category the guide has (or Missable, or all), a chapter, a status, a search. */
 export const isFilter = (value: unknown): value is string =>
-  value === "all" || (typeof value === "string" && (Object.hasOwn(cats, value) || (hasMissables && value === "missable")));
+  value === "all" || (typeof value === "string" && (Object.hasOwn(cats, value) || (hasMissables && value === "missable") || (hasChoices && value === "one-way")));
 export const isChapterFilter = (value: unknown): value is string => value === "all" || isChapter(value);
 export const isStatus = (value: unknown): value is string => statusOptions.some(([key]) => key === value);
 export const isText = (value: unknown): value is string => typeof value === "string";

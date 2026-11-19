@@ -89,7 +89,32 @@ export const missables: Missable[] = [
 
 - An entry needs **two independent sources on different hosts** that agree on the exact condition **(tested: two hosts, https, a real row id, a `why` of more than 10 characters)**. Anything weaker goes in `docs/facts-to-verify.md`, not in the strip.
 - `why` is one line: the exact condition for losing it.
-- While nothing qualifies, export a `reassurance` instead: one honest sentence and two sources on different hosts **(tested)**. Echoes and Koholint do this. The strip then shows the sentence alone in place of a "Don't miss" list.
+- While nothing qualifies, export a `reassurance` instead: one honest sentence and two sources on different hosts **(tested)**. Echoes and Koholint do this. The strip then shows the sentence alone in place of a "Don't miss" list, in every chapter with nothing to list: a [one-way choice](#one-way-choices) is listed in its own chapter, and the others keep the sentence.
+
+## One-way choices
+
+`data/choices.ts` exports `choices`, which `config.ts` passes as `choices`. Each one is a decision a single playthrough can't take every way of: Frampt or Kaathe for the Lordvessel, the Nailsmith's request. The guide recommends one way for this playthrough, and puts each other way in a later playthrough's chapter as a row of its own: an NG+ chapter where the game has one, otherwise a "Second save" chapter at the end. Every way counts, so 100% takes the later playthrough too, as endings do (decided 19 Nov 2026).
+
+```ts
+export const choices: Choice[] = [
+  {
+    row: "lordvessel-frampt",
+    name: "Frampt or Kaathe",
+    why: "Whichever serpent takes the Lordvessel, the other leaves for the rest of the cycle.",
+    later: [{ row: "cycle-ng-plus-kaathe", on: "NG+" }],
+    sources: ["https://darksouls.wikidot.com/darkstalker-kaathe", "https://darksouls.wiki.fextralife.com/Darkstalker+Kaathe"],
+  },
+];
+```
+
+- **`row`** is the way recommended for this playthrough, a row in the choice's chapter. Core draws it inside the choice's block and lists it in "Don't miss" with the `why` until it's ticked. That warning is the choice's, so the row is never in `missables.ts` as well **(tested)**.
+- **`later`** holds the other ways, at least one, each a row in a later chapter than the choice's **(tested)**, with `on` naming its playthrough as the block shows it ("NG+", "a second save"). In its own chapter that row links back to the choice.
+- **A row is in one choice at most**, as `row` or as a later way **(tested)**.
+- **`sources`**: two independent https hosts that agree, as a missable needs **(tested)**. Anything weaker goes in `docs/facts-to-verify.md`.
+- **Spoilers.** The `name` and the `why` show in the choice's chapter, and so does each later way's title (the block names it, and names its chapter by number only). All three say only what the choice's chapter already says, as a questline's name does. No test can catch one that spoils.
+- **Not a choice**: ways that all fit on one playthrough (Dark Souls' boss-soul items over NG, NG+ and NG++; endings in order), a row that already covers every outcome ("by ritual or banishment"), and a loss with nothing in return, which is a missable (Zote).
+- Core adds the `one-way` tag to a choice's row, as it adds `missable`: never write either in the data **(tested)**.
+- A choice's row can carry any categories. New rows for later ways get new ids, which is safe for saves. An existing row's id never changes.
 
 ## Questlines
 

@@ -1,21 +1,23 @@
 import { Collapsible } from "@base-ui/react/collapsible";
 import { cva } from "class-variance-authority";
+import type { ReactNode } from "react";
 import { Icon } from "./Icon";
 import { TickItem } from "./TickItem";
-import { config, hasMissables, missablesLeft, missableWhy } from "../guide";
+import { choiceOf, config, hasChoices, hasMissables, missablesLeft, missableWhy } from "../guide";
 import { useHeldRows } from "../useHeldRows";
 import { useProgress } from "../store/progress";
 import type { Chapter } from "../types";
 import { pressClasses } from "./press-style";
 
 /**
- * "Don't miss" strip for a chapter: the unchecked entries that can be lost for good. While the guide flags
- * nothing at all, it says so instead.
+ * "Don't miss" strip for a chapter: the unchecked entries that can be lost for good, and the recommended ways at its one-way choices.
+ * While the guide flags no missable at all, a chapter with nothing to list says so instead.
  */
 export function MissablesStrip({ chapter }: { chapter: Chapter }) {
-  if (!hasMissables) return config.reassurance ? <Reassurance {...config.reassurance} /> : null;
+  const reassurance = !hasMissables && config.reassurance ? <Reassurance {...config.reassurance} /> : null;
+  if (!hasMissables && !hasChoices) return reassurance;
   // Re-mount per chapter so a held list never leaks into the next one.
-  return <MissablesList key={chapter.id} chapter={chapter} />;
+  return <MissablesList key={chapter.id} chapter={chapter} empty={reassurance} />;
 }
 
 // The strip's frame and its header, which opens and closes it.
@@ -30,10 +32,10 @@ function Reassurance({ text }: NonNullable<typeof config.reassurance>) {
   );
 }
 
-function MissablesList({ chapter }: { chapter: Chapter }) {
+function MissablesList({ chapter, empty }: { chapter: Chapter; /** What shows while the chapter has nothing to list. */ empty: ReactNode }) {
   const checks = useProgress((s) => s.data.checks);
   const { rows, hold } = useHeldRows(missablesLeft(chapter, checks), checks);
-  if (!rows.length) return null;
+  if (!rows.length) return empty;
   const left = rows.filter((row) => checks[row.id] !== true).length;
   return (
     <Collapsible.Root render={<aside />} defaultOpen className={frame({ tone: "flagged" })} aria-label="Missable entries">
@@ -53,6 +55,7 @@ function MissablesList({ chapter }: { chapter: Chapter }) {
               prefix="missable"
               ticked={checks[row.id] === true}
               detail={missableWhy(row.id) ?? row.group}
+              tag={choiceOf(row.id) ? "one-way" : undefined}
               jumpLabel={`Jump to “${row.title}”`}
               onToggle={hold}
             />

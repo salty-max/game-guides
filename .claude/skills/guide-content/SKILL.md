@@ -38,6 +38,7 @@ Follow [the doc's row rules](../../../docs/chapter-data.md#a-row). The calls it 
 
 - **Sources:** per chapter and per group, as [the doc](../../../docs/chapter-data.md#sources) says. Link the page you actually used. They're kept for checking the data and never shown to readers, so a row's directions must stand on their own.
 - **Missables:** flag one only on two independent sources on different hosts. Otherwise write a sourced reassurance, or say only what you can source ([the doc](../../../docs/chapter-data.md#missables)).
+- **One-way choices:** a decision one playthrough can't take every way of goes in `data/choices.ts`. Recommend one way for this playthrough, make each other way a row in a later playthrough's chapter (NG+, or a "Second save" chapter at the end), and back the choice with two hosts, as a missable needs. The choice's name, its why and the later rows' titles show in the choice's chapter, so they say only what that chapter says. Ways that all fit on one playthrough, and losses with nothing in return, aren't choices ([the doc](../../../docs/chapter-data.md#one-way-choices)).
 - **Facts to verify:** update the app's `docs/facts-to-verify.md` in the same commit as the data. Carry over `SOURCES.md`'s disagreements, with which way the data went.
 - **Never claim more checking than happened.** No "tested", "verified" or "confirmed in game" unless someone played it and said so. `SOURCES.md` calls the Dragon Quest route "source-checked … with gameplay verification still outstanding". Keep that honesty in the README and the facts file.
 

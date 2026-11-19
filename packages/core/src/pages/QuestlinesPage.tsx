@@ -9,7 +9,7 @@ import { rowLinkClasses } from "../components/TickItem";
 import { toneClasses } from "../components/tone";
 import { pressClasses, pressRowClasses } from "../components/press-style";
 import { Callout, ChipGroup, Empty, HeadedPage, ProgressBar, Tag } from "../components/ui";
-import { config, missableWhy } from "../guide";
+import { choiceOf, config, missableWhy } from "../guide";
 import { two } from "../format";
 import { allRevealed, lines, lookOf, viewLine, type LineStatus, type LineView } from "../questlines";
 import { useKept, useReturning } from "../store/place";
@@ -220,7 +220,7 @@ interface StepProps {
   label?: string;
 }
 
-/** A step: its box, its title (and the missable warning it carries), and a link to it in its chapter. */
+/** A step: its box, its title (and the missable or one-way warning it carries), and a link to it in its chapter. */
 function Step({ line, row, prefix, next = false, label }: StepProps) {
   const id = `${prefix}-${line}-${row.id}`;
   const why = missableWhy(row.id);
@@ -241,7 +241,7 @@ function Step({ line, row, prefix, next = false, label }: StepProps) {
         </label>
         {why && (
           <p className="m-0 flex items-start gap-2 text-12.5 leading-[1.4] text-muted">
-            <Tag tag="missable" />
+            <Tag tag={choiceOf(row.id) ? "one-way" : "missable"} />
             <span>{why}</span>
           </p>
         )}

@@ -2,13 +2,13 @@ import { useState, type ReactNode } from "react";
 import { RouteGroup } from "./RouteGroup";
 import { Select } from "./Select";
 import { Button, ChipGroup, Empty } from "./ui";
-import { chapterRows, config, hasMissables, statusOptions } from "../guide";
+import { chapterRows, config, hasChoices, hasMissables, statusOptions } from "../guide";
 import { useProgress } from "../store/progress";
 import { useUi } from "../store/ui";
 import { isFilter, isStatus, useKept } from "../store/place";
 import type { Chapter } from "../types";
 
-const routeChips: [string, string][] = [["all", "All steps"], ...(config.chips.route ?? []), ...(hasMissables ? [["missable", "Missable"] as [string, string]] : [])];
+const routeChips: [string, string][] = [["all", "All steps"], ...(config.chips.route ?? []), ...(hasMissables ? [["missable", "Missable"] as [string, string]] : []), ...(hasChoices ? [["one-way", "One-way"] as [string, string]] : [])];
 
 /** The chapter as collapsible route groups with category chips and a status filter. Re-mounted per target, so filters reset there. */
 export function ChecklistRoute({ chapter, target, footer }: { chapter: Chapter; target?: string; footer: ReactNode }) {
