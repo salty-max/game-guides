@@ -28,7 +28,7 @@ export default {
         ["pantheon-artist", ["pantheon"], "Clear the Pantheon of the Artist", "The second door. Paintmaster Sheo is its last fight."],
         ["pantheon-sage", ["pantheon"], "Clear the Pantheon of the Sage", "The third door, ending with Great Nailsage Sly. Grey Prince Zote is in it only if you beat him in Bretta’s basement; otherwise the run skips him."],
         ["pantheon-knight", ["pantheon"], "Clear the Pantheon of the Knight", "Its door opens to the right of the other three once they’re cleared. The last fight is Pure Vessel, a harder, faster Hollow Knight. This is the last Pantheon that counts toward 112%."],
-        ["achievement-pure-completion", ["achievement"], "Finish an ending with 112% on your file", "Once your inventory reads 112%, finish any ending: the completion achievements are only given after one. Your save loads again afterward, at the Temple bench or, after a Godhome ending, in Godhome."],
+        ["achievement-pure-completion", ["achievement"], "Finish an ending with 112% on your file", "Once your inventory reads 112%, finish any ending: the game gives its completion achievements, Pure Completion among them, only after one (on Switch it lists them itself, as Feats). Your save loads again afterward, at the Temple bench or, after a Godhome ending, in Godhome."],
       ],
     },
     {

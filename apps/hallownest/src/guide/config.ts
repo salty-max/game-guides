@@ -68,6 +68,14 @@ const config: GuideConfig = {
   layout: "article",
   chapters: [chapter1, chapter2, chapter3, chapter4, chapter5, chapter6, chapter7, chapter8, chapter9, chapter10, chapter11, chapter12, chapter13],
   sources,
+  // The game keeps its own achievement list: Switch has none of its own, so there the game shows them itself, as Feats.
+  achievements: {
+    sources: [
+      ["Hollow Knight wiki · on Switch the achievements are in-game Feats (Quests before 1.5.12459)", "https://hollowknight.wiki/w/Achievements_(Hollow_Knight)"],
+      ["Rogue Ranker · Switch lists them in-game as Feats", "https://rogueranker.com/hollow-knight-achievements/"],
+      ["fextralife · on Switch the achievements are in the game, as Quests", "https://hollowknight.wiki.fextralife.com/Trophy_and_Achievement_Guide"],
+    ],
+  },
   categories: {
     route: ["Route steps", "Route", "compass"],
     quest: ["Quest steps", "Quest", "scroll", "mint"],
@@ -100,7 +108,7 @@ const config: GuideConfig = {
     pantheon: ["Completion Pantheons", "Pantheon", "sword", "amber"],
     ending: ["Endings", "Ending", "book", "violet"],
     challenge: ["Optional challenges", "Challenge", "ribbon", "violet"],
-    achievement: ["Completion achievement", "Achievement", "ribbon", "amber"],
+    achievement: ["Pure Completion", "Achievement", "ribbon", "amber"],
   },
   chips: {
     checklist: [
