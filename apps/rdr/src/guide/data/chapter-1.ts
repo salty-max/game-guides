@@ -325,7 +325,7 @@ export default {
         ["iRedDead · minigames", "https://www.ireddead.com/rdr/guides/activities-and-minigames"],
       ],
       rows: [
-        ["minigame-horseshoes", ["minigame"], "Horseshoes", "Play at MacFarlane’s Ranch. Aim at the stake, then release near the middle of the power meter. Win the match here to earn the Bollard Twins scrap too."],
+        ["minigame-horseshoes", ["minigame"], "Horseshoes", "Play at MacFarlane’s Ranch. Aim at the stake, then release near the middle of the power meter. Win the match here to earn the Bollard Twins scrap too, then keep playing until every challenger waiting in line is beaten, which is what the game credits."],
         ["minigame-blackjack", ["minigame"], "Blackjack", "Play at Rathskeller Fork to combine this with a Treasure Hunter scrap. Leave the table with more chips than you bought in with."],
         ["minigame-five-finger-fillet", ["minigame"], "Five Finger Fillet", "Use the table in Armadillo or another town offering it. Learn each button sequence at the lowest stake and stay until every challenger is beaten."],
         ["minigame-poker", ["minigame"], "Poker", "Win the entire table by taking every opponent’s chips. The ranch table has a low buy-in. You can also do this later at the Blackwater saloon for an Army scrap."],

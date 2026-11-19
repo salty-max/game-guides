@@ -10,6 +10,7 @@ import { COUNTS_KEY } from "@hundo/core/counts";
 import { flatten, viewFrom } from "@hundo/core/sync/fields";
 import type { Entries } from "@hundo/core/sync/ledger";
 import { brand } from "./brand";
+import { targets } from "./config";
 import { questlines } from "./data/questlines";
 
 const all = Object.fromEntries(allRows.map((row) => [row.id, true as const]));
@@ -58,6 +59,50 @@ describe("Red Dead completion", () => {
 
   it("shows What's left in counts, not points", () => {
     for (const item of whatsLeft({})) expect(Number.isInteger(item.left), item.tag).toBe(true);
+  });
+});
+
+// Every target has a goal, and every goal has its hosts in docs/facts-to-verify.md (Counts). Eleven are the game's own counts; the scraps are
+// six for each of five outfits on two hosts' lists; the optional tasks are the guide's own list, whose goal is its rows with no total behind it.
+describe("Red Dead's goals", () => {
+  const goals = Object.fromEntries(targets.map(({ tag, goal }) => [tag, goal]));
+
+  it("sets a goal on every target, and each is exactly its rows", () => {
+    expect(targets.map(({ tag }) => tag)).toEqual(Object.keys(cats).filter((tag) => tag !== "stranger-step"));
+    for (const { tag, goal } of targets) expect(goal, tag).toBe(rowsByTag(tag).length);
+    expect(tally("stranger", {}).total).toBe(goals.stranger);
+  });
+
+  it("pins the thirteen counts", () => {
+    expect(goals).toEqual({
+      mission: 57, stranger: 18, location: 94, bounty: 20, challenge: 40, outfit: 9, scrap: 30, safehouse: 13, hideout: 7, weapon: 5, job: 5, minigame: 6, optional: 4,
+    });
+  });
+
+  // The 30 scraps are two hosts' lists: six for each of five outfits (the Elegant Suit has none), one per outfit's own part.
+  it("holds six scraps for each of five outfits", () => {
+    const perOutfit: Record<string, number> = {};
+    for (const row of rowsByTag("scrap")) {
+      const outfit = row.id.split("-")[1];
+      perOutfit[outfit] = (perOutfit[outfit] ?? 0) + 1;
+    }
+    expect(perOutfit).toEqual({ bollard: 6, treasure: 6, bandito: 6, reyes: 6, army: 6 });
+  });
+
+  // Each count times what the game credits for it is the game's 100%, so a count that drifted would show here and in the estimate's test.
+  it("weighs the game's counts at the game's 100", () => {
+    const credit = (tag: string) => rowsByTag(tag).reduce((sum, row) => sum + weightOf(row), 0);
+    const game = targets.filter(({ tag }) => !["scrap", "optional"].includes(tag));
+    expect(game).toHaveLength(11);
+    expect(Math.round(game.reduce((sum, { tag }) => sum + credit(tag), 0) * 1e6) / 1e6).toBe(100);
+  });
+
+  // The story missions are the game's own list, credited in Stats → General, so they count: steps the game doesn't credit never count.
+  it("counts the 57 story missions, which the game credits, and counts the Stranger steps before a task's last at nothing", () => {
+    expect(tally("mission", tick(rowsByTag("mission")))).toEqual({ done: 57, total: 57 });
+    expect(weightOf(rowsByTag("mission")[0])).toBe(1);
+    expect(completion.board.map((item) => item.tag)).toContain("mission");
+    expect(completion.board.map((item) => item.tag)).not.toContain("stranger-step");
   });
 });
 

@@ -1,5 +1,5 @@
 import { byChapter } from "@hundo/core/format";
-import type { Banner, GuideConfig } from "@hundo/core/types";
+import type { Banner, BoardItem, GuideConfig } from "@hundo/core/types";
 import { brand } from "./brand";
 import chapter1 from "./data/chapter-1";
 import chapter2 from "./data/chapter-2";
@@ -35,6 +35,31 @@ const categories: GuideConfig["categories"] = {
 /** Bulk or sweep work: held back from "Next up" until nothing else is left. */
 const sweep = new Set(["location", "scrap", "optional"]);
 
+/**
+ * The completion board, and what 100% is: every target counts, each item once, up to its goal, so the bar reads 100 exactly when
+ * What's left is empty. Eleven goals are the game's own counts, and together they weigh 100 in the estimate: every target but the
+ * scraps and the optional tasks. Each has two hosts named in `docs/facts-to-verify.md` (Counts). The scraps' 30 is six for each of five
+ * outfits, listed by two hosts (the game credits only the finished outfit). The optional tasks are the guide's own list, whose goal is its
+ * rows: no host totals them, and two say the game's 100% leaves each out. A Stranger task counts once, by its last step, so the steps
+ * before it carry no target.
+ * The story missions count: the game itself lists and credits them (Stats → General), so they are not directions. A test pins every goal.
+ */
+export const targets: BoardItem[] = [
+  { tag: "mission", goal: 57 },
+  { tag: "stranger", goal: 18, opens: "stranger-step" },
+  { tag: "location", goal: 94 },
+  { tag: "bounty", goal: 20 },
+  { tag: "challenge", goal: 40 },
+  { tag: "outfit", goal: 9 },
+  { tag: "scrap", goal: 30 },
+  { tag: "safehouse", goal: 13 },
+  { tag: "hideout", goal: 7 },
+  { tag: "weapon", goal: 5 },
+  { tag: "job", goal: 5 },
+  { tag: "minigame", goal: 6 },
+  { tag: "optional", goal: 4 },
+];
+
 const config: GuideConfig = {
   brand,
   layout: "checklist",
@@ -63,12 +88,8 @@ const config: GuideConfig = {
   questlines,
   banners,
   defer: (row) => sweep.has(row.tags[0]),
-  completion: {
-    // Every category counts, each item once. A Stranger task counts once, by its last step: the steps before it get no tile of their own, and the tile opens every step.
-    board: Object.keys(categories)
-      .filter((tag) => tag !== "stranger-step")
-      .map((tag) => (tag === "stranger" ? { tag, opens: "stranger-step" } : { tag })),
-  },
+  // A Stranger task counts once, by its last step: the steps before it get no tile of their own, and the tile opens every step.
+  completion: { board: targets },
   state: {
     // Saves from before the shared format: version 1 (no in-game percentage) and version 2 (`reported` at the top level).
     legacy: (v) =>
@@ -82,7 +103,7 @@ const config: GuideConfig = {
       "100% is every target on the board, each item counted once, outfit scraps and optional tasks included. The game’s own weighted percentage is estimated under Check against the game, to compare with Stats → General.",
     boardTitle: "By category",
     boardNote:
-      "Every category counts, each item once, so 100% is exactly when What’s left is empty. That includes outfit scraps and optional tasks, which the game’s own percentage leaves out, and every Ambient Challenge rank, where the game credits only ranks 5 and 10. A Stranger task counts once its last step is checked. The game’s weights are in the estimate under Check against the game.",
+      "Every category counts, each item once, so 100% is exactly when What’s left is empty. That includes the story missions, which the game credits, and some things its own percentage leaves out: outfit scraps, optional tasks, and every Ambient Challenge rank, where the game credits only ranks 5 and 10. A Stranger task counts once, by its last step: the steps before it, which the game doesn’t credit, never count. The game’s weights are in the estimate under Check against the game.",
     nextUpDone: "Everything revealed is checked. Reveal the next chapter or compare with Stats → General.",
     backupBlurb: "Export a copy of your checks, spoiler settings and in-game percentage.",
   },
