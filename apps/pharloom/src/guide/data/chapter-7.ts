@@ -1,0 +1,120 @@
+import type { RawChapter } from "@hundo/core/types";
+
+export default {
+  id: 7,
+  title: "The Threefold Melody",
+  region: "Cogwork Core · High Halls · Whispering Vaults · Memorium",
+  teaser: "Cogwork Core",
+  intro: "Learn the Citadel's three songs, then leave the lift to the top for the next visit so you can finish the wishes and gear detours.",
+  sources: [["Cogwork Core", "https://hollowknight.wiki/w/Cogwork_Core"], ["High Halls", "https://hollowknight.wiki/w/High_Halls"], ["Whispering Vaults", "https://hollowknight.wiki/w/Whispering_Vaults"], ["Memorium", "https://hollowknight.wiki/w/Memorium"], ["Cogheart", "https://hollowknight.wiki/w/Cogheart"], ["Route reference", "https://www.nintendolife.com/guides/hollow-knight-silksong-progression-guide-recommended-route"]],
+  groups: [
+    {
+      title: "The clockwork tower and the High Halls",
+      location: "Cogwork Core · High Halls",
+      rows: [
+        ["boss-cogwork-dancers", ["boss"], "Defeat the Cogwork Dancers", "Enter the central Cogwork Core from the Choral Chambers. Read where each dancer pauses before the pair charges. In later phases wait for their shared attack to pass, then punish the recovery."],
+        ["wish-green-prince-citadel", ["quest"], "Meet the Green Prince in the Citadel", "After freeing him in Sinner's Road, clear the Choral Chambers gauntlet and talk to him west of the Spa. Visit Songclave and meet him again in the passage left of the Dancers' arena.", {"reference": "https://hollowknight.wiki/w/Green_Prince"}],
+        ["route-architects-melody", ["route"], "Learn the Architect's Melody at the Cogwork Core summit", "From the Dancers, climb the moving gear route. Use Clawline on the hoops to cross the long gaps, time jumps after the gears pass, and play the Needolin at the song mechanism at the top."],
+        ["challenge-architect-shop", ["challenge"], "Collect the Architect's workshop stock", "Purchase the counted tools and Crafting Kit when you have enough materials. Once the shop is cleared and you have the Architect's Melody, the Architect can die after one more conversation. The Ruined Tool can still be repaired by Forge Daughter or on Mount Fay.", {"reference": "https://hollowknight.wiki/w/Twelfth_Architect"}],
+        ["route-conductors-melody", ["route"], "Clear the High Halls arena and learn the Conductor's Melody", "Enter the High Halls from the upper Choral Chambers. Beat the sequence of enemies beyond the station, then play at the melody location. If you have helped allies in their earlier encounters, look for their optional aid."],
+        ["route-rosary-storage", ["pickup"], "Open Rosary Storage with a Simple Key", "Use one of Pharloom's four Simple Keys on the locked store in High Halls. Search the breakable wall inside for the Rosary Cannon. If keys are scarce, record the door and return with one."],
+      ],
+    },
+    {
+      title: "The Vaults and Stage",
+      location: "Whispering Vaults",
+      rows: [
+        ["route-vault-entry", ["route"], "Rotate the corridor toward the Whispering Vaults", "Use the lever in the rotating Choral Chambers hall. Take the resulting route into the Vaults. Strike weighted moving blocks to set up climbs and remember which ones are meant to be used again."],
+        ["wish-garmond-zaza-act-two", ["quest", "boss"], "Take Garmond and Zaza's friendly duel in Act 2", "After talking to them outside the Citadel, open the shortcut onto the roof above the Whispering Vaults. Challenge Garmond there. Finish before Act 3 and before the pair settle at Songclave when both Threefold Melody and Fine Pins are complete.", {"reference": "https://hollowknight.wiki/w/Garmond_and_Zaza"}],
+        ["route-vaultkeepers-melody", ["route"], "Play the Sacred Cylinder to learn the Vaultkeeper's Melody", "Find the Sacred Cylinder inside the vaults and bring it to the room with the playable mechanism. Use the device and play the Needolin while it sounds. Check the task list for all three melodies before returning to the Core."],
+        ["boss-trobbio", ["boss"], "Defeat Trobbio at the Stage", "Find the theatre beyond the Vaults. Watch the sparks left by his dives and stay clear of his explosions while they spread. Take the Claw Mirror after the fight and open the lift shortcut to the Underworks."],
+        ["pickup-twisted-bud", ["pickup"], "Collect the Twisted Bud on the Vaults-to-Bilewater path", "Go into the Bilewater passage from the eastern Whispering Vaults. Drop through its shaft and break into the little room on the left to take the Bud. Keep it in your inventory until the ending section tells you what to do with it."],
+        ["route-memorium", ["route"], "Open Memorium and its Ventrica station", "Use the upper Choral Chambers connection to Memorium. Open the station and visit both sides of the exhibits. Remember the eastern breakable route toward the Putrified Ducts for the caravan later."],
+        ["pickup-cogheart-choral", ["pickup"], "Get the Cogheart Piece in the Choral Chambers", "Find the bells in the western Choral Chambers. Number them left to right. Copy 1–5–4–6, then 3–6–5–1–7, then 2–4–6–3–5–1.", {"reference": "https://hollowknight.wiki/w/Cogheart"}],
+        ["pickup-cogheart-vaults", ["pickup"], "Get the Cogheart Piece in the Whispering Vaults", "Check below the entrance to Trobbio's Stage. Number the bells left to right. Copy 1–2–7–4, then 7–5–6–4–5, then 2–7–3–5–6–1.", {"reference": "https://hollowknight.wiki/w/Cogheart"}],
+        ["pickup-cogheart-memorium", ["pickup"], "Get the Cogheart Piece in Memorium", "Explore eastern Memorium above the map room. Number the bells from top to bottom. Copy 7–2–4–6, then 4–2–1–4–3, then 1–5–6–2–7–3.", {"reference": "https://hollowknight.wiki/w/Cogheart"}],
+      ],
+    },
+    {
+      title: "Citadel projects and rescues",
+      location: "Choral Chambers · Memorium",
+      rows: [
+        ["wish-final-audience", ["quest"], "Repair Second Sentinel and accept Final Audience", "Install all three Cogheart Pieces in the inactive Sentinel. Learn the Conductor's Melody, finish Building Up Songclave and one other local Wish, and meet the Sentinel twice while it patrols. Take Final Audience from Songclave's Wishwall and follow its pins to High Halls.", {"reference": "https://hollowknight.wiki/w/Final_Audience"}],
+        ["boss-second-sentinel", ["boss"], "Defeat Second Sentinel in High Halls", "Accept Final Audience first. Go to the arena in southeastern High Halls, let the passing blade attacks finish, then punish the recovery. Take Reserve Bind once the challenge ends."],
+      ],
+    },
+    {
+      title: "Collectibles and unlocks · High Halls",
+      location: "High Halls",
+      compact: true,
+      map: ["Pharloom Calculator", "https://pharloomcalculator.com/map/"],
+      rows: [
+        ["tool-cogfly", ["tool"], "Cogfly", "Break the grate to the hidden High Halls workshop. Craft the Cogfly at the table using one Craftmetal.", {"reference": "https://hollowknight.wiki/w/Cogfly", "map": ["Map Genie", "https://mapgenie.io/hollow-knight-silksong/maps/pharloom?locationIds=478903"]}],
+        ["tool-rosary-cannon", ["tool"], "Rosary Cannon", "Open the Rosary Bank west of the High Halls Ventrica station with a Simple Key. Break the false wall inside to reach the tool.", {"reference": "https://hollowknight.wiki/w/Rosary_Cannon", "map": ["Map Genie", "https://mapgenie.io/hollow-knight-silksong/maps/pharloom?locationIds=478937"]}],
+        ["tool-reserve-bind", ["tool"], "Reserve Bind", "Finish Second Sentinel's duel during Final Audience and take the reward from the encounter.", {"reference": "https://hollowknight.wiki/w/Reserve_Bind", "map": ["Map Genie", "https://mapgenie.io/hollow-knight-silksong/maps/pharloom?locationIds=479254"]}],
+        ["spool-fragment-15", ["spool-fragment"], "Spool Fragment · High Halls", "Clawline through the hoops at the top of the area. Search the upper passage beyond the vertical climb.", {"reference": "https://hollowknight.wiki/w/Spool_Fragment", "map": ["Map Genie", "https://mapgenie.io/hollow-knight-silksong/maps/pharloom?locationIds=478909"]}],
+        ["relic-psalm-cylinder-high-halls", ["relic"], "Psalm Cylinder · High Halls", "Cross the hooked platforms with Clawline and break open the wall marked on the map for another cylinder.", {"reference": "https://hollowknight.wiki/w/Items_(Silksong)#Tradables", "map": ["Map Genie", "https://mapgenie.io/hollow-knight-silksong/maps/pharloom?locationIds=478908"]}],
+        ["map-high-halls", ["map"], "Get the High Halls map", "Use the map machine in the High Halls. The map costs 70 Rosaries.", {"reference": "https://hollowknight.wiki/w/Map_and_Quill_(Silksong)#Maps"}],
+        ["ventrica-high-halls", ["ventrica"], "Open High Halls Ventrica", "Find the station mechanism and pay 80 Rosaries to unlock this stop.", {"reference": "https://hollowknight.wiki/w/Bellway#Ventrica", "map": ["Map Genie", "https://mapgenie.io/hollow-knight-silksong/maps/pharloom?locationIds=478445"]}],
+      ],
+    },
+    {
+      title: "Collectibles and unlocks · Memorium",
+      location: "Memorium",
+      compact: true,
+      map: ["Pharloom Calculator", "https://pharloomcalculator.com/map/"],
+      rows: [
+        ["tool-voltvessels", ["tool"], "Voltvessels", "Explore the northeast end of the displays. Break the wall and clear the two Memoria guarding the item.", {"reference": "https://hollowknight.wiki/w/Voltvessels", "map": ["Map Genie", "https://mapgenie.io/hollow-knight-silksong/maps/pharloom?locationIds=479121"]}],
+        ["memory-locket-memorium", ["memory-locket"], "Memory Locket · Memorium", "Clear the platforming course in the marked side room of the exhibits. Take the locket from the last ledge.", {"reference": "https://hollowknight.wiki/w/Memory_Locket", "map": ["Map Genie", "https://mapgenie.io/hollow-knight-silksong/maps/pharloom?locationIds=479110"]}],
+        ["mossberry-7", ["mossberry"], "Mossberry · Memorium", "Visit the exhibits and follow the Mossberry map marker to the plant display for the last berry.", {"reference": "https://hollowknight.wiki/w/Mossberry", "map": ["Map Genie", "https://mapgenie.io/hollow-knight-silksong/maps/pharloom?locationIds=479108"]}],
+        ["map-memorium", ["map"], "Get the Memorium map", "Use the machine in Memorium's map room below the bell puzzle. The map costs 70 Rosaries.", {"reference": "https://hollowknight.wiki/w/Map_and_Quill_(Silksong)#Maps"}],
+        ["ventrica-memorium", ["ventrica"], "Open Memorium Ventrica", "Find the station mechanism and pay 80 Rosaries to unlock this stop.", {"reference": "https://hollowknight.wiki/w/Bellway#Ventrica", "map": ["Map Genie", "https://mapgenie.io/hollow-knight-silksong/maps/pharloom?locationIds=478425"]}],
+      ],
+    },
+    {
+      title: "Collectibles and unlocks · Whispering Vaults",
+      location: "Whispering Vaults",
+      compact: true,
+      map: ["Pharloom Calculator", "https://pharloomcalculator.com/map/"],
+      rows: [
+        ["tool-claw-mirror", ["tool"], "Claw Mirror / Claw Mirrors", "Beat Trobbio at the Stage and collect Claw Mirror. The Act 3 rematch can upgrade it to Claw Mirrors without adding another percentage point.", {"reference": "https://hollowknight.wiki/w/Claw_Mirror", "map": ["Map Genie", "https://mapgenie.io/hollow-knight-silksong/maps/pharloom?locationIds=478691"]}],
+        ["mask-shard-9", ["mask-shard"], "Mask Shard · Whispering Vaults", "Work through the raised Vaults platforming route and follow the linked marker to the side chamber containing the Mask Shard.", {"reference": "https://hollowknight.wiki/w/Mask_Shard_(Silksong)", "map": ["Map Genie", "https://mapgenie.io/hollow-knight-silksong/maps/pharloom?locationIds=478671"]}],
+        ["flea-whispering-vaults", ["flea"], "Lost Flea past the Vaults box puzzle", "Strike the movable box along the long track until it reaches the other end. Use its final position as a step to the flea.", {"reference": "https://hollowknight.wiki/w/Flea", "map": ["Map Genie", "https://mapgenie.io/hollow-knight-silksong/maps/pharloom?locationIds=478402"]}],
+        ["memory-locket-whispering-vaults", ["memory-locket"], "Memory Locket · Whispering Vaults", "Use the shaft near the map marker and climb into the upper chamber for the locket.", {"reference": "https://hollowknight.wiki/w/Memory_Locket", "map": ["Map Genie", "https://mapgenie.io/hollow-knight-silksong/maps/pharloom?locationIds=478676"]}],
+        ["relic-psalm-cylinder-whispering-vaults", ["relic"], "Psalm Cylinder · Whispering Vaults", "Explore Cardinius's lair for one of the Psalm Cylinders.", {"reference": "https://hollowknight.wiki/w/Items_(Silksong)#Tradables", "map": ["Map Genie", "https://mapgenie.io/hollow-knight-silksong/maps/pharloom?locationIds=478650"]}],
+        ["relic-psalm-cylinder-whispering-vaults-2", ["relic"], "Psalm Cylinder · Whispering Vaults (#2)", "Use Clawline in the high Vaults platforming course to find the cylinder at the end.", {"reference": "https://hollowknight.wiki/w/Items_(Silksong)#Tradables", "map": ["Map Genie", "https://mapgenie.io/hollow-knight-silksong/maps/pharloom?locationIds=478774"]}],
+        ["relic-sacred-cylinder", ["relic"], "Sacred Cylinder", "Take the distinctive Sacred Cylinder and play it for the Vaultkeeper's Melody. Keep it separate from the ordinary Psalm Cylinders.", {"reference": "https://hollowknight.wiki/w/Items_(Silksong)#Tradables", "map": ["Map Genie", "https://mapgenie.io/hollow-knight-silksong/maps/pharloom?locationIds=479717"]}],
+        ["map-whispering-vaults", ["map"], "Get the Whispering Vaults map", "Use the map machine in the Vaults. The map costs 70 Rosaries.", {"reference": "https://hollowknight.wiki/w/Map_and_Quill_(Silksong)#Maps"}],
+      ],
+    },
+    {
+      title: "Collectibles and unlocks · Cogwork Core",
+      location: "Cogwork Core",
+      compact: true,
+      map: ["Pharloom Calculator", "https://pharloomcalculator.com/map/"],
+      rows: [
+        ["mask-shard-8", ["mask-shard"], "Mask Shard · Cogwork Core", "Clear the arena by the leftmost shaft, then climb that shaft to its highest shelf for the shard.", {"reference": "https://hollowknight.wiki/w/Mask_Shard_(Silksong)", "map": ["Map Genie", "https://mapgenie.io/hollow-knight-silksong/maps/pharloom?locationIds=478615"]}],
+        ["spool-fragment-8", ["spool-fragment"], "Spool Fragment · Cogwork Core", "Explore the lower-right branch of the Core rather than riding the gear tower all the way up. Follow the map to the fragment ledge.", {"reference": "https://hollowknight.wiki/w/Spool_Fragment", "map": ["Map Genie", "https://mapgenie.io/hollow-knight-silksong/maps/pharloom?locationIds=478618"]}],
+        ["map-cogwork-core", ["map"], "Get the Cogwork Core map", "Find and use the map mechanism inside the clockwork tower.", {"reference": "https://hollowknight.wiki/w/Map_and_Quill_(Silksong)#Maps"}],
+      ],
+    },
+    {
+      title: "Collectibles and unlocks · Songclave from the Vaults",
+      location: "Songclave from the Vaults",
+      compact: true,
+      map: ["Pharloom Calculator", "https://pharloomcalculator.com/map/"],
+      rows: [
+        ["flea-songclave", ["flea"], "Lost Flea in upper Songclave", "Enter from the Whispering Vaults and grapple through the upper-right Songclave route. Use the hoops to reach the platform holding the cage.", {"reference": "https://hollowknight.wiki/w/Flea", "map": ["Map Genie", "https://mapgenie.io/hollow-knight-silksong/maps/pharloom?locationIds=478404"]}],
+      ],
+    },
+    {
+      title: "Collectibles and unlocks · Whispering Vaults to Choral Chambers",
+      location: "Whispering Vaults to Choral Chambers",
+      compact: true,
+      map: ["Pharloom Calculator", "https://pharloomcalculator.com/map/"],
+      rows: [
+        ["pale-oil-1", ["pale-oil"], "Pale Oil · Whispering Vaults to Choral Chambers", "Use the movable shelving in the Vaults to reach the passage to the Choral Chambers oil room. Follow the raised route east and take the oil from the specimen display.", {"reference": "https://hollowknight.wiki/w/Pale_Oil", "map": ["Map Genie", "https://mapgenie.io/hollow-knight-silksong/maps/pharloom?locationIds=478668"]}],
+      ],
+    },
+  ],
+} satisfies RawChapter;

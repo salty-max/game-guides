@@ -132,6 +132,15 @@ importers:
         specifier: 'catalog:'
         version: 19.3.1
 
+  apps/pharloom:
+    dependencies:
+      '@hundo/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      react:
+        specifier: 'catalog:'
+        version: 19.3.1
+
   apps/rdr:
     dependencies:
       '@hundo/core':

@@ -1,0 +1,9 @@
+/* Pharloom's palette. Everything else, from borders to the banner tint, derives from it in packages/core/src/tokens.css. */
+:root{
+  --paper:#f5f2f4;--surface:#fefcfd;--raised:#ede6eb;--ink:#241520;--muted:#5c4a57;--line:#e1d6de;
+  --primary:#7a2140;--on-primary:#fff;--accent:#7fd1c3;--on-accent:#0f332d;--focus:#1c7568;
+}
+:root[data-theme="dark"]{
+  --paper:#22121d;--surface:#321c2a;--raised:#3d2534;--ink:#f5eaf0;--muted:#cdb8c4;--line:#4d3142;
+  --primary:#f2a3b8;--on-primary:#2a0c18;--accent:#7fd1c3;--on-accent:#0f332d;--focus:#7fd1c3;
+}

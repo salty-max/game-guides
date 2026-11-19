@@ -39,6 +39,14 @@ Made with GPT's draft of the guide, and kept by the user's choice (18 Nov 2026):
 
 Create an original square 1:1 home-screen icon for a Hollow Knight guide in the Hundo family. Centered stylized ivory-white Hollow Knight mask head, two tall curving horn tips, two large black oval eyes and no mouth, clearly from the original Hollow Knight. Simple painted dimensional shading and cool pale blue highlights. The head and horns fill roughly 65% of the canvas within a single centered circular field of foggy slate blue. A dark abyssal navy #141d2c background extending square and opaque to every edge. The circular field ends clearly before the corners. Keep a powerful silhouette and preserve the thin tips at 32 pixels. No particles beyond a faint mist, no body, sword, characters, locks, text, symbols, logo, borders, transparent pixels or pre-rounded edge.
 
+## Pharloom
+
+[Master](../apps/pharloom/scripts/icon-master.webp) · [Home-screen icon](../apps/pharloom/public/icons/icon-512.png)
+
+Made with GPT's draft of the guide, and kept by the user's choice (19 Nov 2026), as Hallownest's mask was: it paints Hornet's own mask and cloak, where most guides paint an object. The prompt asked for a claret square; the painting came back with a flat `#321c2a`, which the palette takes as its dark `--surface`.
+
+Square 1:1 painted app icon master. Helmet-like pure ivory horned mask of Hornet from Hollow Knight Silksong, paired tall outward curved needlepoint horns, small dark eye holes on a narrow tapering face, recognisable small vermilion red folded cloak below head and over shoulders. Head and cloth only, centered, bold silhouette, legible at 16–32 px, no weapons or text. Material brushwork matches painted Hundo app icons. Background a smooth subdued deep claret #5a242d softly glowing near mask, strictly dark maroon toward outer edges, flat square fully filled. Figure occupies central 62% in both axes. Do not draw a border, tile, ring, disk or drop shadow. No badges, duplicate mask, typography or screenshot.
+
 ## Tab drawings
 
 A painting shrunk to 16px loses its subject, so each guide also has a hand-drawn tab icon, `scripts/favicon.svg`: a 32-unit tile with 7-unit corners in the guide's light `--primary`, with a flat version of the painting's subject.
@@ -47,3 +55,4 @@ A painting shrunk to 16px loses its subject, so each guide also has a hand-drawn
 - **Echoes of Wisdom**: the Tri Rod as one honey-gold stroke, triangle head and handle.
 - **Red Dead Redemption**: the hat in peach (the dark-theme `--primary`) with a brown band.
 - **Hallownest**: the mask in ivory with its two dark eyes.
+- **Pharloom**: Hornet's horned mask in ivory over a red cloak.
