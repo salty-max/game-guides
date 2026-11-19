@@ -221,7 +221,8 @@ export const questlines = {
       "name": "The Huntress",
       "steps": [
         "wish-broodfeast",
-        "tool-longclaw"
+        "tool-longclaw",
+        "wish-runtfeast"
       ]
     },
     {

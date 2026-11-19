@@ -9,6 +9,7 @@ import { COUNTS_KEY } from "@hundo/core/counts";
 import { flatten } from "@hundo/core/sync/fields";
 import type { Checks, Row } from "@hundo/core/types";
 import config, { targets } from "./config";
+import { choices } from "./data/choices";
 import { missables } from "./data/missables";
 import { questlines } from "./data/questlines";
 
@@ -40,15 +41,24 @@ describe("Silksong completion", () => {
     for (const target of targets) expect(target.optional, target.tag).toBeFalsy();
   });
 
-  // Route steps are directions, and a one-way choice's sides wait for core's choice block (core adds "missable" to missables.ts's rows).
-  it("counts every row but the route's steps and the one-way choices", () => {
-    for (const row of allRows.filter((row) => !counted.includes(row))) expect(row.tags.every((tag) => ["route", "choice", "missable"].includes(tag)), row.id).toBe(true);
+  // Route steps are directions (core adds "missable" to missables.ts's rows).
+  it("counts every row but the route's steps", () => {
+    for (const row of allRows.filter((row) => !counted.includes(row))) expect(row.tags.every((tag) => ["route", "missable"].includes(tag)), row.id).toBe(true);
+  });
+
+  // Both ways of the one-way choice count: the first save's, recommended, and the second save's in the last chapter, A Second Save,
+  // beside the boss only Steel Soul has. So 100% takes two saves, and nothing else waits for the second.
+  it("counts both ways of its one-way choice and the Steel Soul boss, the second save's two in the last chapter", () => {
+    expect(choices.map((choice) => [choice.row, choice.later.map((later) => later.row)])).toEqual([["wish-broodfeast", ["wish-runtfeast"]]]);
+    for (const id of ["wish-broodfeast", "wish-runtfeast"]) expect(counted.map((row) => row.id), id).toContain(id);
+    expect(chapters.at(-1)?.title).toBe("A Second Save");
+    expect(allRows.filter((row) => row.chapter === chapters.length).map((row) => row.id).sort()).toEqual(["boss-summoned-saviour", "wish-runtfeast"]);
   });
 
   it("gives every target a goal, the guide's own lists their rows", () => {
     for (const { tag, goal } of targets) expect(goal, tag).toBe(rowsByTag(tag).length);
     const own = ["pickup", "wish", "boss", "challenge"];
-    expect(Object.fromEntries(targets.filter(({ tag }) => own.includes(tag)).map(({ tag, goal }) => [tag, goal]))).toEqual({ pickup: 13, wish: 77, boss: 41, challenge: 8 });
+    expect(Object.fromEntries(targets.filter(({ tag }) => own.includes(tag)).map(({ tag, goal }) => [tag, goal]))).toEqual({ pickup: 13, wish: 79, boss: 41, challenge: 8 });
   });
 
   // 100% is full completion: every tracked entry, one each, so it never shows while anything on the board is left.
@@ -95,8 +105,18 @@ describe("Silksong spoilers", () => {
     for (const text of words(early)) expect(text).not.toMatch(act);
   });
 
-  it("teases the last three chapters as late game", () => {
-    expect(chapters.slice(9).map((chapter) => chapter.teaser)).toEqual(["Late game", "Late game", "Late game"]);
+  it("teases chapters 10 to 12 as late game, and the second save as itself", () => {
+    expect(chapters.slice(9).map((chapter) => chapter.teaser)).toEqual(["Late game", "Late game", "Late game", "Second save"]);
+  });
+
+  // A choice's block shows in its own chapter: its name, its why, and each later way's title and playthrough. None names the last
+  // act, or Runt, whose Wish the later way is: that would tell chapter 9 how the Huntress's story ends.
+  it("keeps the one-way choice's block clear of the last act and of Runt", () => {
+    for (const choice of choices) {
+      const shown = [choice.name, choice.why, ...choice.later.flatMap((later) => [later.on, allRows.find((row) => row.id === later.row)?.title ?? ""])];
+      for (const text of shown) expect(text, choice.row).not.toMatch(act);
+      for (const text of shown) expect(text, choice.row).not.toMatch(/\brunt/i);
+    }
   });
 
   it("keeps the missables' lines, the questline names and the Progress page's words clear of the last act", () => {
@@ -106,6 +126,15 @@ describe("Silksong spoilers", () => {
     for (const [key, text] of Object.entries(config.text)) expect(text, key).not.toMatch(act);
     for (const [tag, [plural, singular]] of Object.entries(config.categories)) expect(`${plural} ${singular}`, tag).not.toMatch(/everbloom|epilogue|act\s*3/i);
     expect(`${config.text.boardNote} ${config.text.dashboardIntro}`).not.toMatch(/everbloom|farsight|93|act\s*3|last act/i);
+  });
+});
+
+describe("achievements", () => {
+  // Silksong keeps its own list, so a reader sees its achievements: on Switch and Switch 2, which have none, the game records them
+  // itself, as Feats (facts-to-verify.md). The guide tracks one, Completion, a challenge.
+  it("shows the game's own achievements, backed by their sources", () => {
+    expect(config.achievements?.sources.length).toBeGreaterThanOrEqual(2);
+    expect(allRows.filter((row) => /achievement/i.test(`${row.title} ${row.text}`)).map((row) => row.id)).toEqual(["challenge-completion-achievement"]);
   });
 });
 

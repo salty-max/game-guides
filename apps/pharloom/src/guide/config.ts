@@ -13,6 +13,8 @@ import chapter9 from "./data/chapter-9";
 import chapter10 from "./data/chapter-10";
 import chapter11 from "./data/chapter-11";
 import chapter12 from "./data/chapter-12";
+import chapter13 from "./data/chapter-13";
+import { choices } from "./data/choices";
 import { missables } from "./data/missables";
 import { questlines } from "./data/questlines";
 import { sources } from "./data/sources";
@@ -24,7 +26,8 @@ const banners = byChapter(import.meta.glob<Banner>("./banners/chapter-*.webp", {
  * everything the guide tracks and the bar reads 100 exactly when What's left is empty. The first eleven are the game's own
  * completion count, term by term. The game's lists follow (fleas, lockets, maps and the rest), then the guide's own lists, whose
  * goals are their rows rather than a game total: the pickups, the Wishes, the bosses and the challenges. Route steps are
- * directions and the two sides of a one-way choice (`choice`) wait for core's choice block, so neither counts. A test pins every goal.
+ * directions and never count. Both ways of the one-way choice count, the second in chapter 13 with the Steel Soul boss, so 100%
+ * takes a second save. A test pins every goal.
  */
 export const targets: BoardItem[] = [
   { tag: "tool", goal: 51 },
@@ -52,7 +55,7 @@ export const targets: BoardItem[] = [
   { tag: "bellway", goal: 12 },
   { tag: "ventrica", goal: 7 },
   { tag: "pickup", goal: 13 },
-  { tag: "wish", goal: 77 },
+  { tag: "wish", goal: 79 },
   { tag: "boss", goal: 41 },
   { tag: "ending", goal: 5 },
   { tag: "challenge", goal: 8 },
@@ -61,11 +64,17 @@ export const targets: BoardItem[] = [
 const config: GuideConfig = {
   brand,
   layout: "article",
-  chapters: [chapter1, chapter2, chapter3, chapter4, chapter5, chapter6, chapter7, chapter8, chapter9, chapter10, chapter11, chapter12],
+  chapters: [chapter1, chapter2, chapter3, chapter4, chapter5, chapter6, chapter7, chapter8, chapter9, chapter10, chapter11, chapter12, chapter13],
   sources,
+  // The game keeps its own achievement list: Switch and Switch 2 have none of their own, so there the game records them itself, as Feats.
+  achievements: {
+    sources: [
+      ["Hollow Knight wiki · on Switch and Switch 2 the achievements are in-game Feats", "https://hollowknight.wiki/w/Achievements_(Silksong)"],
+      ["Nintendo Life · on Switch and Switch 2 they're recorded in-game, on the main menu", "https://www.nintendolife.com/guides/hollow-knight-silksong-all-achievements"],
+    ],
+  },
   categories: {
     route: ["Route steps", "Route", "compass"],
-    choice: ["One-way choices", "Choice", "scroll", "rose"],
     pickup: ["Other discoveries", "Pickup", "chest", "mint"],
     boss: ["Boss encounters", "Boss", "sword", "rose"],
     wish: ["Wishes", "Wish", "scroll", "mint"],
@@ -112,6 +121,7 @@ const config: GuideConfig = {
     ],
   },
   missables,
+  choices,
   questlines,
   banners,
   completion: { board: targets },
@@ -122,7 +132,7 @@ const config: GuideConfig = {
     dashboardIntro: "Every entry the guide tracks counts once, so 100% means all of it: every item, collection, Wish, boss, ending and challenge.",
     boardTitle: "Completion targets",
     boardNote:
-      "Every target counts toward the overall figure, one entry each. The first eleven are what the game's own completion counts, with four Mask Shards to a mask and two Spool Fragments to a spool; the rest are the collections, pickups, Wishes, bosses, endings and challenges a full save also holds. Route steps and one-way choices don't count.",
+      "Every target counts toward the overall figure, one entry each. The first eleven are what the game's own completion counts, with four Mask Shards to a mask and two Spool Fragments to a spool; the rest are the collections, pickups, Wishes, bosses, endings and challenges a full save also holds. Route steps don't count. One boss and one way of a one-way choice need a second save, so 100% takes two.",
     nextUpDone: "Everything revealed is checked. Reveal the next chapter or check the totals on the Progress page.",
     backupBlurb: "Export a copy of your checks and spoiler settings.",
   },
