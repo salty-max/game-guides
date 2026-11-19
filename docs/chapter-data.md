@@ -136,6 +136,10 @@ export const questlines: Questlines = {
 - **A name says only what the line's first step's chapter already says**: the character as first met ("Siegmeyer of Catarina", never the daughter met later). It shows as soon as that chapter is revealed, so it follows the same rule as a chapter's `teaser`. There's no blurb, for the same reason. No test can catch a name that spoils.
 - A line is a claim that its steps belong together. Group only what the rows' own texts or two sources tie together, and put any doubt in `facts-to-verify.md`.
 
+## Achievements
+
+A platform's achievements (Steam, Xbox, PlayStation trophies) are a good source: their list is a quick way to check nothing is missing, and a count can cite one. **A reader sees achievements only when the game keeps a list of its own**, so every reader has one whatever they play on: in-game where the platform has no achievements, as Hollow Knight's Feats on Switch. Then the guide's config sets `achievements` with two hosts or more that say so, and the guide calls them the game's achievements, by the game's own names. Without it no text a reader sees says "achievement" or "trophy" **(tested: `data.test.ts` walks every reader-facing string in the config, `readerText` in core)**: no target, category, chip or row named after one, and no achievement's name dressed as a list's (Dark Souls Remastered's achievements are the platforms' alone, so Lordran's rare weapons aren't "Knight's Honor"). A row that existed only for an achievement keeps its id: it counts as its real kind, or becomes a route step when the board already counts what it asks. Decided 19 Nov 2026.
+
 ## Counts
 
 Where the game has a fixed total, put it in `completion.board` with a `goal` and pin it in `guide.test.ts`, as Echoes' `targets` does. A missing or doubled row then fails a count. The test checks the data against the number, not the number against the game, so record where each number came from in `facts-to-verify.md`.

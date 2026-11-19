@@ -1,5 +1,7 @@
 // @vitest-environment node
+import { panels } from "virtual:guide/panels";
 import { allRows, brand, byId, cats, chapterRows, chapters, CHAPTER_COUNT, completion, config, guideAnchor, hasMissables, isCategory, missablesLeft, nextUp, readChapter, rowsByTag, tally, whatsLeft } from "./guide";
+import { readerText } from "./reader-text";
 
 const everything = Object.fromEntries(allRows.map((row) => [row.id, true as const]));
 const hosts = (urls: string[]) => new Set(urls.map((url) => new URL(url).host));
@@ -47,6 +49,7 @@ describe("guide data", () => {
     const links = [
       ...config.sources,
       ...(config.reassurance?.sources ?? []),
+      ...(config.achievements?.sources ?? []),
       ...chapters.flatMap((chapter) => [...chapter.sources, ...chapter.groups.flatMap((group) => group.sources)]),
     ];
     for (const [label, url] of links) {
@@ -124,6 +127,44 @@ describe("guide data", () => {
       expect(missablesLeft(chapter, everything)).toEqual([]);
     }
     expect(chapters.flatMap((chapter) => missablesLeft(chapter, {})).length).toBe(config.missables.length + (config.choices ?? []).length);
+  });
+
+  // Platform achievements can check the data, but a reader sees achievements only where the game keeps its own list (types.ts).
+  it("says achievement or trophy only where the game keeps its own, backed by two independent hosts", () => {
+    const said = readerText(config, panels).filter(([, text]) => /achievement|\btroph(y|ies)\b/i.test(text));
+    if (config.achievements) expect(hosts(config.achievements.sources.map(([, url]) => url)).size).toBeGreaterThanOrEqual(2);
+    else expect(said.map(([path, text]) => `${path}: ${text}`)).toEqual([]);
+  });
+
+  it("reads every row, chapter, group, map, category, chip, missable, questline, page text and panel title as reader text, and never a citation, a link or an id", () => {
+    const found = readerText(config, panels);
+    const text = new Set(found.map(([, value]) => value));
+    for (const row of allRows) for (const value of [row.title, row.text]) expect(text.has(value), row.id).toBe(true);
+    const shown = [
+      ...Object.values(config.text),
+      brand.name,
+      brand.shortName,
+      brand.title,
+      brand.mark,
+      brand.description,
+      ...Object.values(cats).flatMap(([plural, singular]) => [plural, singular]),
+      ...[...config.chips.checklist, ...(config.chips.route ?? [])].map(([, label]) => label),
+      ...chapters.flatMap((chapter) => [chapter.title, chapter.region, chapter.intro, chapter.teaser]),
+      ...chapters.flatMap((chapter) => chapter.groups.flatMap((group) => [group.title, group.location, group.note, group.map?.[0]])),
+      ...allRows.map((row) => row.map?.[0]),
+      ...config.missables.map((item) => item.why),
+      config.reassurance?.text,
+      completion.overall?.label,
+      config.questlines.tab,
+      config.questlines.title,
+      config.questlines.intro,
+      ...config.questlines.lines.map((line) => line.name),
+      ...panels.map((panel) => panel.title),
+    ];
+    for (const value of shown) {
+      if (value !== undefined) expect(text.has(value), value).toBe(true);
+    }
+    expect(found.filter(([path, value]) => /sources|reference/.test(path) || /^https?:/.test(value) || byId.has(value))).toEqual([]);
   });
 
   it("names every category it shows", () => {
