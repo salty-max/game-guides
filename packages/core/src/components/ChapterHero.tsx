@@ -21,6 +21,15 @@ import type { Banner, Chapter } from "../types";
 // 1,320 copy, for a banner 5% softer at 1x in that one case. At 2x every side-by-side ask gets the original anyway.
 const BANNER_SIZES = "(max-width: 550px) calc(100vw - 24px), (max-width: 670px) 94vw, (max-width: 800px) 1320px, (max-width: 905px) calc(94vw - 224px), 1320px";
 
+/** "Chapter 03 / 13": a chapter's place among them, as the top of a chapter (and of a hidden one, SealedChapter) shows it. */
+export function ChapterNumber({ chapter }: { chapter: number }) {
+  return (
+    <span className="rounded-tag bg-ink px-2.5 py-1 text-11 font-extrabold tracking-[0.14em] text-paper uppercase">
+      Chapter {two(chapter)} / {two(CHAPTER_COUNT)}
+    </span>
+  );
+}
+
 export function ChapterHero({ chapter, banner, children }: { chapter: Chapter; banner?: Banner; children: ReactNode }) {
   // The hero's own width is the container its parts read (`/hero`), the wrapper's: a container can't query itself, and the section changes.
   return (
@@ -40,9 +49,7 @@ export function ChapterHero({ chapter, banner, children }: { chapter: Chapter; b
         )}
         <div className="w-[59%] max-w-140 @max-[40rem]/hero:w-full @max-[40rem]/hero:max-w-none @max-[40rem]/hero:px-[clamp(1.25rem,5cqi,2.5rem)] @max-[40rem]/hero:py-5 phone:px-3.5 phone:py-4">
           <div className="mb-2 flex flex-wrap items-center gap-2.5 text-13 font-bold">
-            <span className="rounded-tag bg-ink px-2.5 py-1 text-11 font-extrabold tracking-[0.14em] text-paper uppercase">
-              Chapter {two(chapter.id)} / {two(CHAPTER_COUNT)}
-            </span>
+            <ChapterNumber chapter={chapter.id} />
             <span>{chapter.region}</span>
           </div>
           <h1 className="mb-2.5 font-display text-[clamp(2.125rem,6cqi,3.875rem)] leading-[1.02] font-bold tracking-[-0.02em] phone:mb-1.5">{chapter.title}</h1>

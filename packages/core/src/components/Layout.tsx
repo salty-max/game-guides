@@ -144,8 +144,12 @@ export function Layout({ children }: { children: ReactNode }) {
           The frame (tokens.css): the rail's column and the page's, centred together between two bands that share whatever the screen has
           past --frame-max, so on a wide screen the rail and the page stay side by side and the spare width is split on either side of
           them. The left band is drawn in the rail's tint (the `before:`), so the rail runs to the screen's edge; the right one is <main>'s,
-          which runs to the edge too: in the installed app it is what scrolls, so the scrollbar and the wheel belong to the window's edge. */}
-      <div className="mb-(--tabs) grid min-h-[calc(100dvh-var(--bar)-var(--tabs))] grid-cols-[minmax(0,1fr)_var(--rail-col)_minmax(0,var(--page-max))_minmax(0,1fr)] before:col-start-1 before:row-start-1 before:bg-rail before:content-[''] standalone:mb-0 standalone:min-h-0 standalone:flex-1 standalone:grid-rows-[minmax(0,1fr)] drawer:block drawer:before:hidden standalone:drawer:grid standalone:drawer:grid-cols-[minmax(0,1fr)]">
+          which runs to the edge too: in the installed app it is what scrolls, so the scrollbar and the wheel belong to the window's edge.
+          From 800px down it is one column, in a tab as in the app. Its one row is the room under the top bar (at least the screen less the
+          bars in a tab, the room the fixed frame leaves in the app), and <main>, the page and the kept page in it (Pages) are each a track
+          that fills what is left of it, so a page can sit something in the middle of the screen (SealedChapter) with no height worked out
+          for it; a page taller than that is as tall as it needs, as before. */}
+      <div className="mb-(--tabs) grid min-h-[calc(100dvh-var(--bar)-var(--tabs))] grid-cols-[minmax(0,1fr)_var(--rail-col)_minmax(0,var(--page-max))_minmax(0,1fr)] before:col-start-1 before:row-start-1 before:bg-rail before:content-[''] standalone:mb-0 standalone:min-h-0 standalone:flex-1 standalone:grid-rows-[minmax(0,1fr)] drawer:grid-cols-[minmax(0,1fr)] drawer:before:hidden">
         {/* The drawer stays mounted (closed, it renders nothing) so that widening past 800px closes it the ordinary way, focus and all. */}
         {drawer && (
           <drawer.RailDrawer
@@ -176,12 +180,12 @@ export function Layout({ children }: { children: ReactNode }) {
           // so in the installed app it is always the row the frame bounds, and so a scroller. Its padding is the room above and under the
           // page (--pad-end, and the home indicator under that, but on a phone the tab bar covers the home indicator, so the room under the
           // page is --pad-end alone) and the notch's insets.
-          className="col-[3/-1] row-start-1 min-w-0 pt-6 pr-(--safe-right) pb-[calc(var(--pad-end)+var(--safe-bottom))] outline-none [--pad-end:3rem] standalone:scroll-pt-(--sticky-gap) standalone:overflow-y-auto standalone:overscroll-contain drawer:col-auto drawer:pt-4 drawer:pl-(--safe-left) drawer:[--pad-end:2rem] phone:pt-3 phone:pb-(--pad-end) phone:[--pad-end:1.5rem]"
+          className="col-[3/-1] row-start-1 flex min-w-0 flex-col pt-6 pr-(--safe-right) pb-[calc(var(--pad-end)+var(--safe-bottom))] outline-none [--pad-end:3rem] standalone:scroll-pt-(--sticky-gap) standalone:overflow-y-auto standalone:overscroll-contain drawer:col-auto drawer:pt-4 drawer:pl-(--safe-left) drawer:[--pad-end:2rem] phone:pt-3 phone:pb-(--pad-end) phone:[--pad-end:1.5rem]"
         >
           {/* The page itself: the page's column of the frame, at most --page-max, its side padding --gutter. The gutter is one clamp from a
               phone's 12px up, in vw: it is the frame's own padding, not a part's. This is also the page's container (`/page`), so what
               lives in the page column (a page's title) can size itself by the column, in `cqi`. */}
-          <div className="@container/page max-w-(--page-max) px-(--gutter) [--gutter:clamp(0.75rem,3.25vw,3.3125rem)]">{children}</div>
+          <div className="@container/page flex max-w-(--page-max) grow flex-col px-(--gutter) [--gutter:clamp(0.75rem,3.25vw,3.3125rem)]">{children}</div>
         </main>
       </div>
       {phone && <MainNav chapter={chapter} view={view} place="bottom" />}

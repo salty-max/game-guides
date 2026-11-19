@@ -216,14 +216,16 @@ export function Callout({ icon, children }: { icon: IconName; children: ReactNod
   );
 }
 
+/** A page's title: it scales with the page column (`cqi` of the page's container in `<main>`, Layout), down to 30px on a phone. */
+export const pageTitleClasses = "font-display text-[clamp(1.875rem,6cqi,3.625rem)] leading-[1.17] font-bold tracking-[-0.015em] phone:leading-[1.15]";
+
 /**
- * A page's title, the line under it, and a figure in a pill under that (the Questlines page's count). The title scales with the page
- * column (`cqi` of the page's container in `<main>`, Layout; the screen's width where there is no container), down to 30px on a phone; its spacing is compact there.
+ * A page's title, the line under it, and a figure in a pill under that (the Questlines page's count). Its spacing is compact on a phone.
  */
 export function PageHeading({ title, intro, stat }: { title: string; intro?: ReactNode; stat?: ReactNode }) {
   return (
     <header>
-      <h1 className="font-display text-[clamp(1.875rem,6cqi,3.625rem)] leading-[1.17] font-bold tracking-[-0.015em] phone:leading-[1.15]">{title}</h1>
+      <h1 className={pageTitleClasses}>{title}</h1>
       {intro && <p className="mt-1.5 text-14 text-muted phone:mt-1 phone:text-13 phone:leading-[1.45]">{intro}</p>}
       {stat && <span className="mt-2 inline-block rounded-tag bg-soft px-3 py-1 text-12 font-extrabold text-soft-ink">{stat}</span>}
     </header>

@@ -8,7 +8,8 @@ import { ChapterNav } from "../components/ChapterNav";
 import { ChecklistRoute } from "../components/ChecklistRoute";
 import { MissablesStrip } from "../components/MissablesStrip";
 import { NextUp } from "../components/NextUp";
-import { Button, HeadedPage, LinkButton } from "../components/ui";
+import { SealedChapter } from "../components/SealedChapter";
+import { LinkButton } from "../components/ui";
 import { chapterRows, chapters, config, guideAnchor, overall, readChapter } from "../guide";
 import { useReveal } from "../useReveal";
 import { isOpen, useProgress } from "../store/progress";
@@ -29,18 +30,7 @@ export function GuidePage() {
     if (open) visitChapter(chapterId);
   }, [open, chapterId, visitChapter]);
 
-  if (!open) {
-    return (
-      <HeadedPage title={`Chapter ${chapterId} is hidden`} intro="Revealing it also reveals every chapter before it.">
-        <div className="flex flex-wrap gap-2">
-          <Button look="" icon="unlock" onClick={() => reveal(chapterId, target ? entry : undefined)}>
-            Reveal chapter
-          </Button>
-          <LinkButton to={`/guide/${ceiling}`}>Back to your guide</LinkButton>
-        </div>
-      </HeadedPage>
-    );
-  }
+  if (!open) return <SealedChapter chapter={chapterId} ceiling={ceiling} onReveal={() => reveal(chapterId, target ? entry : undefined)} />;
 
   // Re-mount per chapter so held lists and filters never leak into the next one.
   return <GuideView key={chapterId} chapter={chapters[chapterId - 1]} target={target} />;
