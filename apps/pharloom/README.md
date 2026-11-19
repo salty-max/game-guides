@@ -19,7 +19,7 @@ pnpm icons      # regenerate public/icons and public/favicon.ico from scripts/ic
 
 ## Deploy
 
-The Vercel project `hundo-pharloom`, created on the user's go, will build this folder as its Root Directory and serve [pharloom.hundo.quest](https://pharloom.hundo.quest), a domain it takes only at launch: before the merge, its deployments live on `hundo-pharloom.vercel.app` and the branch addresses, as [a new project](../../docs/deploying.md#a-new-project) says. `vercel.json` here sets the install, build, ignore command, rewrites, CSP and cache rules; [docs/deploying.md](../../docs/deploying.md) explains them.
+The Vercel project `hundo-pharloom` (created on 19 November 2026, on the user's go) builds this folder as its Root Directory and serves [pharloom.hundo.quest](https://pharloom.hundo.quest), a domain it takes only at launch: before the merge, its deployments live on `hundo-pharloom.vercel.app` and the branch addresses, as [a new project](../../docs/deploying.md#a-new-project) says. `vercel.json` here sets the install, build, ignore command, rewrites, CSP and cache rules; [docs/deploying.md](../../docs/deploying.md) explains them.
 
 ## Use the guide
 
