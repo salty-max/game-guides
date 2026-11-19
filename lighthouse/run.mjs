@@ -1,5 +1,7 @@
 // Runs Lighthouse, through Lighthouse CI, on each guide's production build served by `vite preview`, as the pull request's lighthouse
-// job does: `pnpm lighthouse [koholint,rdr]`, with `--no-build` to audit the dist already there. Each guide's pages are audited three
+// job does: `pnpm lighthouse [koholint,rdr]`, with `--no-build` to audit the dist already there. Named, those guides; with `--all`, every
+// guide; with neither, the guides whose own files this checkout's change touches (tools/scope.mjs's guidesOf). A change to core or the
+// root's files alone names none: it reaches every guide, which CI's lighthouse job audits, so name the ones worth auditing here. Each guide's pages are audited three
 // times on a phone (Lighthouse's default), and the checklist three times more on a desktop, then held to lighthouserc.mjs's
 // assertions. The reports land in .cache/lighthouse/<guide>/report, a table of each page's numbers as the assertions read them is
 // printed (and added to the job's summary on GitHub), and the exit code is 1 when an assertion fails. Nothing runs it in `pnpm check`.
@@ -9,15 +11,31 @@ import { createServer } from "node:net";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { queueSelf } from "../tools/queued.mjs";
-
-// A heavy job: on a machine shared by several sessions it takes its turn in the queue (tools/queued.mjs; not in CI), and its table is in the log q names.
-await queueSelf("lighthouse");
+import { BASE, changesOf, guidesOf, workspaceOf } from "../tools/scope.mjs";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
 const args = process.argv.slice(2);
 const build = !args.includes("--no-build");
 const named = args.find((arg) => !arg.startsWith("--"));
-const apps = named ? named.split(",") : readdirSync(join(root, "apps")).filter((app) => existsSync(join(root, "apps", app, "vercel.json")));
+const everyGuide = () => readdirSync(join(root, "apps")).filter((app) => existsSync(join(root, "apps", app, "vercel.json")));
+/** The guides the change reaches, or why there are none to pick: worked out before the queue, so a run with nothing to audit doesn't wait. */
+const changedGuides = () => {
+  const changes = changesOf(root);
+  if (!changes) return { why: `no ${BASE} to tell what changed` };
+  const { every, guides } = guidesOf(changes.files, workspaceOf(root));
+  if (guides.length) return { guides, also: every ? " (the change reaches every guide too: CI's lighthouse job audits each one)" : "" };
+  return { why: every ? "the change reaches every guide, which CI's lighthouse job audits one by one" : `no guide changes against ${BASE}` };
+};
+const picked = named ? { guides: named.split(",") } : args.includes("--all") ? { guides: everyGuide() } : changedGuides();
+if (!picked.guides) {
+  console.error(`lighthouse: ${picked.why}. Name the guides to audit (pnpm lighthouse koholint,rdr), or --all for every guide.`);
+  process.exit(2);
+}
+const apps = picked.guides;
+
+// A heavy job: on a machine shared by several sessions it takes its turn in the queue (tools/queued.mjs; not in CI), and its table is in the log q names.
+await queueSelf("lighthouse");
+if (!named) console.log(`lighthouse: ${apps.join(", ")} (${args.includes("--all") ? "--all" : "the guides whose own files this change touches"})${picked.also ?? ""}`);
 const config = `--config=${join(root, "lighthouse", "lighthouserc.mjs")}`;
 const lhci = join(root, "node_modules", ".bin", "lhci");
 const out = join(root, ".cache", "lighthouse");
