@@ -12,7 +12,7 @@ export const reassurance: { text: string; sources: SourceLink[] } = {
   text: "After the ending you can load your clear save and keep collecting.",
   sources: [
     ["Gamer Guides · loose ends after the ending", "https://gamerguides.com/the-legend-of-zelda-links-awakening/guide/walkthrough/finale/loose-ends"],
-    ["TheGamer · things to do after beating the game", "https://www.thegamer.com/links-awakening-post-game-quest-heart-pieces-seashells/"],
+    ["GameFAQs · the BowWow figure after the ending (save and reload)", "https://gamefaqs.gamespot.com/switch/258622-the-legend-of-zelda-links-awakening/faqs/77938/nintendo-figurine-quest"],
     ["Zelda Wiki · permanently missable items (none of the 50 seashells)", "https://zeldawiki.wiki/wiki/Permanently_Missable_Items"],
   ],
 };

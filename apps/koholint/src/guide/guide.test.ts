@@ -1,4 +1,4 @@
-import { allRows, chapters, completion, overall, rowsByTag, whatsLeft } from "@hundo/core/guide";
+import { allRows, chapters, completion, overall, rowsByTag, tally, whatsLeft } from "@hundo/core/guide";
 import { STORAGE_KEY, defaultState, validateState } from "@hundo/core/progress-state";
 import { readRunLog } from "./run-log";
 import { THEME_KEY } from "@hundo/core/store/theme";
@@ -9,6 +9,7 @@ import { PERSIST_KEY } from "@hundo/core/persistence";
 import { COUNTS_KEY } from "@hundo/core/counts";
 import { flatten, viewFrom } from "@hundo/core/sync/fields";
 import type { Entries } from "@hundo/core/sync/ledger";
+import { targets } from "./config";
 
 const [a] = allRows.map((row) => row.id);
 
@@ -47,6 +48,62 @@ describe("Koholint completion", () => {
     expect(off.length).toBeGreaterThan(0);
     expect(off.every((row) => row.tags[0] === "story" || row.tags[0] === "amiibo")).toBe(true);
     expect(completion.board.filter((item) => item.optional).map((item) => item.tag)).toEqual(["amiibo"]);
+  });
+
+  // Two hosts for each game total, and the guide's own lists, whose goals are their rows: docs/facts-to-verify.md.
+  it("gives every target a goal equal to its rows", () => {
+    expect(Object.fromEntries(targets.map(({ tag, goal }) => [tag, goal]))).toEqual({
+      heart: 32,
+      shell: 50,
+      treasure: 83,
+      trade: 14,
+      gear: 24,
+      container: 9,
+      instrument: 8,
+      song: 3,
+      bottle: 3,
+      figure: 10,
+      lure: 2,
+      challenge: 24,
+      stone: 14,
+      warp: 10,
+      fairy: 4,
+      explore: 5,
+      amiibo: 6,
+    });
+    for (const { tag, goal } of targets) expect(tally(tag, {}).total, tag).toBe(goal);
+  });
+
+  // One each: a row on the guide's own list counts nowhere else. A row on two of the game's own lists counts on both (a Dampé
+  // challenge and the Heart Piece it awards are two items the game lists).
+  it("never counts a row of the guide's own lists on a second target", () => {
+    const own = ["treasure", "gear", "explore"];
+    const counted = targets.filter((item) => !item.optional).map((item) => item.tag);
+    for (const tag of own) {
+      expect(counted, tag).toContain(tag);
+      for (const row of rowsByTag(tag)) expect(row.tags.filter((entry) => counted.includes(entry)), row.id).toEqual([tag]);
+    }
+  });
+
+  // The Lightweight Lure is the pond's default, and buying back the item traded for the Boomerang gets back one already counted.
+  it("counts neither the default lure nor the bought-back item", () => {
+    for (const id of ["lure-light", "buyback"]) expect(allRows.find((row) => row.id === id)?.tags, id).toEqual(["story"]);
+  });
+
+  it("keeps the mini-game rewards and chamber effects as filters, each row counted as the item it is", () => {
+    for (const tag of ["mini", "effect"]) {
+      expect(targets.map((item) => item.tag), tag).not.toContain(tag);
+      expect(rowsByTag(tag).length, tag).toBeGreaterThan(0);
+      for (const row of rowsByTag(tag)) expect(row.tags.some((entry) => targets.some((item) => item.tag === entry && !item.optional)), row.id).toBe(true);
+    }
+  });
+
+  it("files every chest under Chests, and counts as Treasure Chests only those holding nothing else counted", () => {
+    expect(targets.map((item) => item.tag)).not.toContain("chest");
+    for (const row of rowsByTag("treasure")) expect(row.tags, row.id).toEqual(["chest", "treasure"]);
+    const holding = rowsByTag("chest").filter((row) => !row.tags.includes("treasure"));
+    expect(holding.map((row) => row.tags[0]).sort()).toEqual([...Array(8).fill("gear"), ...Array(3).fill("shell")]);
+    for (const row of holding) expect(row.tags, row.id).toEqual([row.tags[0], "chest"]);
   });
 
   it("labels instruments and other route rows by what they award, not as route steps", () => {
