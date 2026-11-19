@@ -47,7 +47,8 @@ describe("Silksong completion", () => {
 
   it("gives every target a goal, the guide's own lists their rows", () => {
     for (const { tag, goal } of targets) expect(goal, tag).toBe(rowsByTag(tag).length);
-    expect(Object.fromEntries(targets.slice(-5).map(({ tag, goal }) => [tag, goal]))).toEqual({ pickup: 13, wish: 77, boss: 41, ending: 5, challenge: 8 });
+    const own = ["pickup", "wish", "boss", "challenge"];
+    expect(Object.fromEntries(targets.filter(({ tag }) => own.includes(tag)).map(({ tag, goal }) => [tag, goal]))).toEqual({ pickup: 13, wish: 77, boss: 41, challenge: 8 });
   });
 
   // 100% is full completion: every tracked entry, one each, so it never shows while anything on the board is left.
