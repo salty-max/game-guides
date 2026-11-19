@@ -16,9 +16,7 @@ import type { Checks, Row } from "@hundo/core/types";
 const [a] = allRows.map((row) => row.id);
 const tick = (rows: Row[]): Checks => Object.fromEntries(rows.map((row) => [row.id, true]));
 const without = (rows: Row[], left: Row) => tick(rows.filter((row) => row !== left));
-// What each target counts: its goal, or its rows when it has none (the expansion's gear).
-const goalOf = (target: (typeof targets)[number]) => ("goal" in target && target.goal !== undefined ? target.goal : tally(target.tag, {}).total);
-const goals = targets.reduce((sum, target) => sum + goalOf(target), 0);
+const goals = targets.reduce((sum, target) => sum + target.goal, 0);
 
 describe("Dark Souls Remastered completion", () => {
   it("cites sources for every chapter", () => {
@@ -29,8 +27,9 @@ describe("Dark Souls Remastered completion", () => {
     for (const row of allRows) expect(row.text.trim(), row.id).not.toBe("");
   });
 
-  it("reaches every target of the guide's completion list", () => {
-    for (const { tag, goal } of targets) if (goal !== undefined) expect(tally(tag, {}).total, tag).toBe(goal);
+  it("gives every target a goal and reaches it", () => {
+    for (const target of targets) expect(Number.isInteger(target.goal) && target.goal > 0, target.tag).toBe(true);
+    for (const { tag, goal } of targets) expect(tally(tag, {}).total, tag).toBe(goal);
   });
 
   it("counts every target: none is optional, and What's left starts with all of them and their goals", () => {
@@ -52,8 +51,8 @@ describe("Dark Souls Remastered completion", () => {
     }
   });
 
-  it("counts the NPC quest steps by their rows, goal and all, and the trades, souls, slabs, invasions, cycles, extras and pickups", () => {
-    for (const tag of ["quest", "trade", "estus", "forge", "invasion", "cycle", "extra", "pickup"]) {
+  it("counts the NPC quest steps by their rows, goal and all, and the expansion's gear, trades, souls, slabs, invasions, cycles, extras and pickups", () => {
+    for (const tag of ["quest", "dlc-gear", "trade", "estus", "forge", "invasion", "cycle", "extra", "pickup"]) {
       const target = targets.find((item) => item.tag === tag);
       expect(target, tag).toBeDefined();
       expect("goal" in target! && target.goal, tag).toBe(rowsByTag(tag).length);
@@ -81,6 +80,26 @@ describe("Dark Souls Remastered completion", () => {
       for (const later of choice.later) expect(allRows.find((entry) => entry.id === later.row)!.chapter, later.row).toBe(13);
     }
     expect(choices.map((choice) => choice.row).sort()).toEqual(["quest-ciaran", "quest-lautrec-invasion", "quest-lordvessel-frampt", "quest-patches-forgive", "quest-sieg-ash", "quest-solaire-shortcut"]);
+    // Where the other way only yields an item, the item's own row is the later way, so the item counts once (19 Nov 2026).
+    const laterOf = (row: string) => choices.find((choice) => choice.row === row)!.later.map((later) => later.row);
+    expect(laterOf("quest-sieg-ash")).toEqual(["ring-speckled-stoneplate"]);
+    expect(laterOf("quest-ciaran")).toEqual(["dlc-abyss-greatsword"]);
+    // A recommended way is the choice's own row, so where it only yields items it counts them, and their rows are directions: Ciaran's
+    // trade counts the two Tracers it gives (the user's decision, 19 Nov 2026).
+    for (const id of ["dlc-gear-gold-tracer", "dlc-gear-dark-silver-tracer"]) expect(allRows.find((row) => row.id === id)?.tags[0], id).toBe("route");
+  });
+
+  // An item a later cycle gives counts once, in chapter 13, so no first-playthrough chapter sends a reader after it, and a later cycle's
+  // step that only repeats something or yields an item its own row counts is a route step (decided 19 Nov 2026).
+  it("counts each later cycle's item once, in chapter 13, and its steps as directions", () => {
+    const laterItems = ["ring-leo", "ring-speckled-stoneplate", "rare-weapon-dragonslayer-spear", "rare-weapon-crystal-ring-shield", "rare-weapon-chaos-blade", "rare-weapon-dragon-bone-fist", "rare-weapon-artorias-sword-cursed", "rare-weapon-tin-darkmoon-catalyst", "rare-weapon-artorias-greatshield", "rare-weapon-great-lord-greatsword", "dlc-abyss-greatsword", "dlc-manus-catalyst"];
+    for (const id of laterItems) expect(allRows.find((row) => row.id === id)?.chapter, id).toBe(13);
+    const steps = ["cycle-ng-plus-bells", "cycle-ng-plus-anor", "cycle-ng-plus-sif", "cycle-ng-plus-gwyndolin", "cycle-ng-plus-dlc", "cycle-ng-plus-lords", "cycle-ng-plus-siegmeyer", "cycle-ng-plus-shiva", "cycle-ng-plus-plus-route", "cycle-ng-plus-plus-forge"];
+    for (const id of steps) expect(allRows.find((row) => row.id === id)?.tags[0], id).toBe("route");
+    // What's left on the later cycles' own list is the other way at four one-way choices.
+    const laterWays = choices.flatMap((choice) => choice.later.map((later) => later.row));
+    expect(rowsByTag("cycle").map((row) => row.id).sort()).toEqual(["cycle-ng-plus-lautrec", "cycle-ng-plus-patches", "cycle-ng-plus-plus-kaathe", "cycle-ng-plus-solaire"]);
+    for (const row of rowsByTag("cycle")) expect(laterWays, row.id).toContain(row.id);
   });
 
   it("counts the base game's spells apart from the expansion's", () => {
