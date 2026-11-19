@@ -9,13 +9,15 @@ The tests don't see layout, fonts, colour or how a page reads. [docs/testing.md]
 
 ## 1. Pass the checks first
 
-Run `bun harness/q.ts check -- bun run check` at the root.
+Run `bun harness/q.ts check -- bun run check` at the root. It checks the packages your change reaches ([docs/testing.md](../../../docs/testing.md#what-pnpm-check-runs)).
 
 ## 2. Pick the guides and pages
 
-- **A change in one guide:** that guide.
-- **A change in `packages/core`:** every guide. The first three cover both layouts, both corner presets and three palettes.
-- **Pages:** the defaults are `guide=/guide/1,checklist=/checklist,progress=/dashboard`. `--pages` replaces that list, so name every page you want, such as `--pages guide=/guide/1,c3=/guide/3,run=/dashboard/deathless`.
+Shoot only what the change touches: each guide is a build and 18 shots.
+
+- **A change in one guide:** that guide. It's `shoot.mjs`'s default: with no `--apps`, it shoots the guides whose own files the change in `--root` touches (`guidesOf` in `tools/scope.mjs`) and says which on its first line.
+- **A change in `packages/core`:** Koholint, Red Dead and Echoes, which cover both layouts, both corner presets and three palettes. `shoot.mjs` adds them by default to the guides whose own files change when the change reaches every guide (core, the root's files: a new guide's branch, which also edits the README and the lockfile, shoots the new guide and those three). `--all` shoots every guide, for a change whose look differs by guide (a palette rule, the fonts).
+- **Pages:** the defaults are `guide=/guide/1,checklist=/checklist,progress=/dashboard`. `--pages` replaces that list, so name only the pages the change touches, such as `--pages c3=/guide/3` for a row in chapter 3, or `--pages guide=/guide/1,c3=/guide/3,run=/dashboard/deathless`.
 - **Hidden chapters:** a fresh visit shows only chapter 1, because spoiler protection is on. Add `--reveal` to seed a save with protection off, so `/guide/N` shows every chapter and its banner.
 
 ## 3. Shoot the change
@@ -62,6 +64,8 @@ git worktree add <scratchpad>/base origin/main
 ```bash
 node .claude/skills/guide-check/scripts/shoot.mjs --root <scratchpad>/base --out <scratchpad>/before --apps echoes
 ```
+
+Name the guides here: the base is `main` itself, with no change of its own for `shoot.mjs` to pick guides from, so without `--apps` it stops and says so. Use the same `--apps` and `--pages` as the "after" shot.
 
 Put the two side by side. A missing "before" folder counts as empty, which suits a new guide. Capture the page whole if it goes into a report:
 

@@ -113,7 +113,7 @@ Every guide is listed in a few places outside its own folder. A test holds each 
 - Root `README.md`: add a row to the apps table, the one list of guides and their Vercel projects (`wiring.test.ts` checks it).
 - `.claude/launch.json`: copy Echoes's two entries onto the next band, 5500 and 4500 (each guide's ports sit 100 apart, [testing.md](testing.md#start-a-guide) says why). Keep `"autoPort": true`, and `--port ${PORT:-<its port>}` in the preview's shell string. `wiring.test.ts` checks the entries, their package filter and that no two share a port.
 
-What finds the guides in `apps/` by itself and needs nothing: `pnpm lighthouse`, `pnpm screenshots` and `guide-check`'s scripts (a folder with a `vercel.json` is a guide).
+What finds the guides in `apps/` by itself and needs nothing: `pnpm lighthouse --all`, `pnpm screenshots`, `guide-check`'s scripts with `--all`, and `pnpm check`'s scope (a folder with a `vercel.json` is a guide; a new package checks every package).
 
 ## 5. Check it
 
