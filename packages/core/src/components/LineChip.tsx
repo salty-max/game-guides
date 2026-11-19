@@ -1,18 +1,10 @@
-import { cva } from "class-variance-authority";
 import { Fragment } from "react";
 import { Link } from "react-router";
 import { Icon } from "./Icon";
-import { pressTextClasses } from "./press-style";
+import { lineChip } from "./line-chip-style";
 import { linesOf } from "../questlines";
 import { useProgress } from "../store/progress";
 import type { Row } from "../types";
-
-// A row's small link, as `rowLinkClasses` is, but its words wrap: a long name ("Laurentius of the Great Swamp · step 2") is wider than a small
-// phone's line. In a row's column of tags it keeps to the tags' width on a phone, flush right, as a long tag does.
-const chip = cva(
-  `${pressTextClasses} relative z-1 -mx-0.5 -my-2 px-0.5 py-2 text-13 font-semibold text-primary underline underline-offset-3 [&_svg]:me-1 [&_svg]:inline [&_svg]:size-3.75 [&_svg]:align-[-0.1875rem]`,
-  { variants: { at: { prose: "", column: "phone:max-w-21 phone:text-right" } } },
-);
 
 /**
  * Where a row stands in its questlines ("Siegmeyer of Catarina · step 3"), each a link to the line's card. Only once a line has two revealed
@@ -27,7 +19,7 @@ export function LineChips({ row, at }: { row: Row; /** In a line of prose (a spa
   return lines.map((line) => (
     <Fragment key={line.id}>
       {at === "prose" && " "}
-      <Link className={chip({ at })} to={`/questlines/${line.id}`}>
+      <Link className={lineChip({ at })} to={`/questlines/${line.id}`}>
         <Icon name="scroll" />
         {line.name} · step {line.steps.indexOf(row.id) + 1}
       </Link>

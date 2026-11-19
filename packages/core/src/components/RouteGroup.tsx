@@ -5,11 +5,12 @@ import { Link } from "react-router";
 import { Icon } from "./Icon";
 import { BulkCheck } from "./BulkCheck";
 import { CheckBox } from "./CheckBox";
+import { ChoiceBlock, ChoiceChip } from "./ChoiceBlock";
 import { LineChips } from "./LineChip";
 import { MapLink } from "./MapLink";
 import { rowLinkClasses } from "./TickItem";
 import { Quantity, Tag } from "./ui";
-import { cats, config, primaryTag } from "../guide";
+import { cats, choiceAt, choiceOf, config, primaryTag } from "../guide";
 import { useProgress } from "../store/progress";
 import { useUi } from "../store/ui";
 import type { IconName } from "./Icon";
@@ -23,6 +24,8 @@ interface RowProps {
   /** On the checklist page: link back to the row in its chapter. */
   origin?: boolean;
   fallbackFocusId: string;
+  /** In a choice's block, which says it's one-way, so the row doesn't. */
+  inChoice?: boolean;
 }
 
 // A step: its box, its title over its text, and its tags and link at the end. Ticked, it takes the done tint; linked to (a deep link or the
@@ -34,12 +37,14 @@ const routeRow = cva(
 
 // Memoised: the checklist re-renders the whole list on every tick, and only the ticked row has anything new to draw (it reads its own
 // check from the store).
-export const RouteRow = memo(function RouteRow({ row, prefix, highlighted, origin = false, fallbackFocusId }: RowProps) {
+export const RouteRow = memo(function RouteRow({ row, prefix, highlighted, origin = false, fallbackFocusId, inChoice = false }: RowProps) {
   const checked = useProgress((s) => s.data.checks[row.id] === true);
   const boxId = `${prefix}-${row.id}`;
   const labelId = `${boxId}-label`;
   const tag = primaryTag(row);
   const badges = row.tags.filter((entry) => entry !== tag && config.badges?.includes(entry));
+  // A later playthrough's way at a one-way choice links back to it.
+  const otherSide = choiceAt(row.id);
 
   return (
     // On the checklist the row isn't what a link points at, and its chapter's page, which is, may be kept beside it (Pages).
@@ -64,6 +69,7 @@ export const RouteRow = memo(function RouteRow({ row, prefix, highlighted, origi
         ))}
         {row.quantity > 0 && <Quantity row={row} at="column" />}
         {row.tags.includes("missable") && <Tag tag="missable" at="column" />}
+        {!inChoice && row.tags.includes("one-way") && <Tag tag="one-way" at="column" />}
         {origin ? (
           <Link className={rowLinkClasses} to={`/guide/${row.chapter}/${row.id}`} aria-label={`Open “${row.title}” in chapter ${row.chapter}`}>
             Chapter {row.chapter}
@@ -72,6 +78,7 @@ export const RouteRow = memo(function RouteRow({ row, prefix, highlighted, origi
           <>
             {row.map && <MapLink map={row.map} of={row.title} at="row" />}
             <LineChips row={row} at="column" />
+            {otherSide && <ChoiceChip choice={otherSide} at="column" />}
           </>
         )}
       </div>
@@ -150,9 +157,18 @@ export function RouteGroup({ groupKey, title, location, icon, note, map, rows, o
           </div>
         )}
         <div className="border-t border-line">
-          {rows.map((row) => (
-            <RouteRow key={row.id} row={row} prefix={groupKey} highlighted={highlightedId === row.id} origin={origin} fallbackFocusId={fallbackFocusId} />
-          ))}
+          {rows.map((row) => {
+            const choice = choiceOf(row.id);
+            const drawn = <RouteRow key={row.id} row={row} prefix={groupKey} highlighted={highlightedId === row.id} origin={origin} fallbackFocusId={fallbackFocusId} inChoice={choice !== undefined} />;
+            return choice ? (
+              <ChoiceBlock key={row.id} choice={choice} idPrefix={`${groupKey}-${row.id}-choice`} at="route">
+                {/* First in its wrapper, so it draws no rule of its own under the caption. */}
+                <div>{drawn}</div>
+              </ChoiceBlock>
+            ) : (
+              drawn
+            );
+          })}
         </div>
       </Collapsible.Panel>
     </Collapsible.Root>

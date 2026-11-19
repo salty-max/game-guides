@@ -1,5 +1,6 @@
 import { Link } from "react-router";
 import { CheckBox } from "./CheckBox";
+import { Tag } from "./ui";
 import type { Row } from "../types";
 import { pressRowClasses, pressTextClasses } from "./press-style";
 
@@ -13,13 +14,15 @@ interface TickItemProps {
   ticked: boolean;
   /** The quieter second line. */
   detail: string;
+  /** A tag before it ("One-way" for the guide's way at a choice). */
+  tag?: string;
   /** The Jump to link's accessible name. */
   jumpLabel: string;
   onToggle: () => void;
 }
 
 /** One step in a short list (Next up, Don't miss): its box, its title over a quieter line, and a link to the step in its chapter. */
-export function TickItem({ row, prefix, ticked, detail, jumpLabel, onToggle }: TickItemProps) {
+export function TickItem({ row, prefix, ticked, detail, tag, jumpLabel, onToggle }: TickItemProps) {
   const id = `${prefix}-${row.id}`;
   return (
     <li className="relative grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 border-t border-line-soft py-2.5 first:border-t-0 phone:gap-2.5">
@@ -27,7 +30,15 @@ export function TickItem({ row, prefix, ticked, detail, jumpLabel, onToggle }: T
       {/* The label stretches over the whole item, so the item is the tap target; the link sits above it. */}
       <label id={`${id}-label`} className={`${pressRowClasses} grid cursor-pointer gap-0.5 leading-[1.3] after:absolute after:inset-0`} htmlFor={id}>
         <strong className={ticked ? "text-15 text-muted line-through decoration-1" : "text-15"}>{row.title}</strong>
-        <small className="text-12 text-muted">{detail}</small>
+        {tag ? (
+          // The tag beside its line, as a questline's step lays out a missable's: wrapped words stay clear of it.
+          <small className="flex items-start gap-2 text-12 text-muted">
+            <Tag tag={tag} />
+            <span className="pt-0.5">{detail}</span>
+          </small>
+        ) : (
+          <small className="text-12 text-muted">{detail}</small>
+        )}
       </label>
       <Link className={rowLinkClasses} to={`/guide/${row.chapter}/${row.id}`} aria-label={jumpLabel}>
         Jump to

@@ -255,8 +255,8 @@ type TagAt = "line" | "prose" | "column";
 /** A category label, coloured by the category's tone. */
 export function Tag({ tag: name, at, children }: { tag: string; at?: TagAt; children?: ReactNode }) {
   return (
-    <span className={tag({ tone: name === "missable" ? "rose" : (cats[name]?.[3] ?? "none"), at })}>
-      {children ?? cats[name]?.[1] ?? (name === "missable" ? "Missable" : name)}
+    <span className={tag({ tone: name === "missable" ? "rose" : name === "one-way" ? "amber" : (cats[name]?.[3] ?? "none"), at })}>
+      {children ?? cats[name]?.[1] ?? (name === "missable" ? "Missable" : name === "one-way" ? "One-way" : name)}
     </span>
   );
 }

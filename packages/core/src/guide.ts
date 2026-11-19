@@ -1,12 +1,19 @@
 import config from "virtual:guide/config";
 import { pct } from "./format";
-import type { Chapter, Checks, LeftItem, Row } from "./types";
+import type { Chapter, Checks, Choice, LeftItem, Row } from "./types";
 
 export { config };
 export const { brand, categories: cats, completion, text } = config;
 
 const missableIds = new Set(config.missables.map((item) => item.id));
+const choiceByRow = new Map((config.choices ?? []).map((choice) => [choice.row, choice]));
+const choiceByLater = new Map((config.choices ?? []).flatMap((choice) => choice.later.map((later) => [later.row, choice] as const)));
 export const hasMissables = missableIds.size > 0;
+export const hasChoices = choiceByRow.size > 0;
+/** The one-way choice a row is the recommended way at, if any. */
+export const choiceOf = (rowId: string): Choice | undefined => choiceByRow.get(rowId);
+/** The one-way choice a row is a later playthrough's way at, if any. */
+export const choiceAt = (rowId: string): Choice | undefined => choiceByLater.get(rowId);
 
 export const chapters: Chapter[] = config.chapters.map((chapter) => ({
   ...chapter,
@@ -28,7 +35,8 @@ export const chapters: Chapter[] = config.chapters.map((chapter) => ({
         chapter: chapter.id,
         group: group.title,
         location: group.location,
-        tags: missableIds.has(id) ? [...tags, "missable"] : tags,
+        // Core's own tags: what "Don't miss" lists, a missable or the recommended way at a one-way choice (never both: data.test).
+        tags: [...tags, ...(missableIds.has(id) ? ["missable"] : []), ...(choiceByRow.has(id) ? ["one-way"] : [])],
         quantity: extra?.quantity ?? 0,
         reference: extra?.reference,
         map: extra?.map,
@@ -44,8 +52,9 @@ export const rowsByTag = (tag: string) => allRows.filter((row) => row.tags.inclu
 export const chapterRows = (chapter: Chapter) => chapter.groups.flatMap((group) => group.rows);
 export const primaryTag = (row: Row) => row.tags[0];
 export const isCategory = (value: string | undefined): value is string => value !== undefined && Object.hasOwn(cats, value);
-export const tagName = (tag: string) => (isCategory(tag) ? cats[tag][0] : tag === "missable" ? "Missable" : tag);
-export const missableWhy = (id: string) => config.missables.find((item) => item.id === id)?.why;
+export const tagName = (tag: string) => (isCategory(tag) ? cats[tag][0] : tag === "missable" ? "Missable" : tag === "one-way" ? "One-way" : tag);
+/** The line "Don't miss" and a questline's step show under an entry: a missable's condition, or a one-way choice's why. */
+export const missableWhy = (id: string) => config.missables.find((item) => item.id === id)?.why ?? choiceOf(id)?.why;
 
 export const readChapter = (value: unknown, fallback = 1) => {
   const n = Number(value);
@@ -73,8 +82,9 @@ export function nextUp(checks: Checks, isChapterOpen: (chapter: number) => boole
   return (steps.length ? steps : left).slice(0, count);
 }
 
+/** What "Don't miss" lists for a chapter: its missables and the recommended ways at its one-way choices, unticked, in route order. */
 export const missablesLeft = (chapter: Chapter, checks: Checks) =>
-  chapterRows(chapter).filter((row) => missableIds.has(row.id) && checks[row.id] !== true);
+  chapterRows(chapter).filter((row) => (missableIds.has(row.id) || choiceByRow.has(row.id)) && checks[row.id] !== true);
 
 /** Rows a weighted overall figure reads (`completion.overall.percent`, Red Dead's estimate). Default: every row. */
 export const coreRows = completion.isCore ? allRows.filter(completion.isCore) : allRows;

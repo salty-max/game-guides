@@ -3,9 +3,11 @@ import type { ReactNode } from "react";
 import { BulkCheck } from "./BulkCheck";
 import { Contents } from "./Contents";
 import { CheckBox } from "./CheckBox";
+import { ChoiceBlock, ChoiceChip } from "./ChoiceBlock";
 import { LineChips } from "./LineChip";
 import { MapLink } from "./MapLink";
 import { Quantity, Tag } from "./ui";
+import { choiceAt, choiceOf } from "../guide";
 import type { Chapter, Group, Row } from "../types";
 import { pressTextClasses } from "./press-style";
 
@@ -41,8 +43,14 @@ const entry = cva("scroll-mt-4", {
       prose: "leading-[1.8]",
       list: "flex flex-wrap items-center gap-x-2 gap-y-0.5 border-t border-line-soft py-2 first:border-t-0",
     },
-    linked: { true: "rounded-[3px] bg-paper [box-shadow:-3px_0_var(--accent)]", false: "" },
+    linked: { true: "rounded-[3px] [box-shadow:-3px_0_var(--accent)]", false: "" },
+    // In a one-way choice's block, which is on the page's colour already, a linked step takes the card's.
+    inChoice: { true: "", false: "" },
   },
+  compoundVariants: [
+    { linked: true, inChoice: false, class: "bg-paper" },
+    { linked: true, inChoice: true, class: "bg-surface" },
+  ],
 });
 
 // Its padding and title are in `cqi`, which is the nearest container's width, whatever its name: the article's, as long as no container
@@ -67,45 +75,84 @@ function Section({ group, target }: { group: Group; target?: string }) {
       </header>
       {group.compact ? (
         <ul className="m-0 list-none p-0">
-          {group.rows.map((row) => (
-            <li key={row.id} id={`entry-${row.id}`} tabIndex={-1} className={entry({ in: "list", linked: target === `entry-${row.id}` })}>
-              <label id={`walkthrough-${row.id}-label`} className={check({ in: "list" })}>
-                <CheckBox id={`walkthrough-${row.id}`} labelId={`walkthrough-${row.id}-label`} row={row} prose />
-                {row.title}
-              </label>
-              <Badges row={row} />
-              {row.map && <MapLink map={row.map} of={row.title} at="row" />}
-              <LineChips row={row} at="prose" />
-              {/* Under the step's words, not under its box. */}
-              {row.text && <span className="basis-full ps-check-indent text-14/normal text-muted">{row.text}</span>}
-            </li>
-          ))}
+          {group.rows.map((row) => {
+            const choice = choiceOf(row.id);
+            if (!choice) return <ListRow key={row.id} row={row} target={target} />;
+            return (
+              <li key={row.id} className="py-2">
+                <ChoiceBlock choice={choice} idPrefix={`walkthrough-${row.id}-choice`} at="article">
+                  <ul className="m-0 list-none px-4 phone:px-3">
+                    <ListRow row={row} target={target} inChoice />
+                  </ul>
+                </ChoiceBlock>
+              </li>
+            );
+          })}
         </ul>
       ) : (
-        group.rows.map((row) => (
-          <p key={row.id} id={`entry-${row.id}`} tabIndex={-1} className={entry({ in: "prose", linked: target === `entry-${row.id}` })}>
-            <label id={`walkthrough-${row.id}-label`} className={check({ in: "prose" })}>
-              <CheckBox id={`walkthrough-${row.id}`} labelId={`walkthrough-${row.id}-label`} row={row} prose />
-              {row.title}
-              {/[.!?]$/.test(row.title) ? "" : "."}
-            </label>{" "}
-            <Badges row={row} />
-            {row.text}
-            {row.map && (
-              <>
-                {" "}
-                <MapLink map={row.map} of={row.title} at="row" />
-              </>
-            )}
-            <LineChips row={row} at="prose" />
-          </p>
-        ))
+        group.rows.map((row) => {
+          const choice = choiceOf(row.id);
+          if (!choice) return <ProseRow key={row.id} row={row} target={target} />;
+          return (
+            <ChoiceBlock key={row.id} choice={choice} idPrefix={`walkthrough-${row.id}-choice`} at="article">
+              <div className="px-4 pt-1 pb-2 phone:px-3">
+                <ProseRow row={row} target={target} inChoice />
+              </div>
+            </ChoiceBlock>
+          );
+        })
       )}
     </section>
   );
 }
 
-function Badges({ row }: { row: Row }) {
+export function ListRow({ row, target, inChoice = false }: { row: Row; target?: string; inChoice?: boolean }) {
+  return (
+    <li id={`entry-${row.id}`} tabIndex={-1} className={entry({ in: "list", linked: target === `entry-${row.id}`, inChoice })}>
+      <label id={`walkthrough-${row.id}-label`} className={check({ in: "list" })}>
+        <CheckBox id={`walkthrough-${row.id}`} labelId={`walkthrough-${row.id}-label`} row={row} prose />
+        {row.title}
+      </label>
+      <Badges row={row} inChoice={inChoice} />
+      {row.map && <MapLink map={row.map} of={row.title} at="row" />}
+      <LineChips row={row} at="prose" />
+      <LaterChip row={row} at="prose" />
+      {/* Under the step's words, not under its box. */}
+      {row.text && <span className="basis-full ps-check-indent text-14/normal text-muted">{row.text}</span>}
+    </li>
+  );
+}
+
+export function ProseRow({ row, target, inChoice = false }: { row: Row; target?: string; inChoice?: boolean }) {
+  return (
+    <p id={`entry-${row.id}`} tabIndex={-1} className={entry({ in: "prose", linked: target === `entry-${row.id}`, inChoice })}>
+      <label id={`walkthrough-${row.id}-label`} className={check({ in: "prose" })}>
+        <CheckBox id={`walkthrough-${row.id}`} labelId={`walkthrough-${row.id}-label`} row={row} prose />
+        {row.title}
+        {/[.!?]$/.test(row.title) ? "" : "."}
+      </label>{" "}
+      <Badges row={row} inChoice={inChoice} />
+      {row.text}
+      {row.map && (
+        <>
+          {" "}
+          <MapLink map={row.map} of={row.title} at="row" />
+        </>
+      )}
+      <LineChips row={row} at="prose" />
+      <LaterChip row={row} at="prose" />
+    </p>
+  );
+}
+
+// Beside a later playthrough's way at a one-way choice: the choice it's the other side of.
+function LaterChip({ row, at }: { row: Row; at: "prose" | "column" }) {
+  const choice = choiceAt(row.id);
+  return choice ? <ChoiceChip choice={choice} at={at} /> : null;
+}
+
+// In a choice's block the block says it's one-way, so the row doesn't.
+function Badges({ row, inChoice = false }: { row: Row; inChoice?: boolean }) {
   return (
     <>
       {row.quantity > 0 && (
@@ -116,6 +163,11 @@ function Badges({ row }: { row: Row }) {
       {row.tags.includes("missable") && (
         <>
           <Tag tag="missable" at="prose" />{" "}
+        </>
+      )}
+      {!inChoice && row.tags.includes("one-way") && (
+        <>
+          <Tag tag="one-way" at="prose" />{" "}
         </>
       )}
     </>

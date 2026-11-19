@@ -5,7 +5,7 @@ import { Select } from "../components/Select";
 import { SearchField } from "../components/SearchField";
 import { chunks, loadFailed } from "../components/chunks";
 import { ActiveFilter, Button, Callout, ChipGroup, Empty, HeadedPage } from "../components/ui";
-import { allRows, CHAPTER_COUNT, cats, chapters, config, hasMissables, isCategory, readChapter, statusOptions, tagName, text } from "../guide";
+import { allRows, CHAPTER_COUNT, cats, chapters, config, hasChoices, hasMissables, isCategory, readChapter, statusOptions, tagName, text } from "../guide";
 import { two } from "../format";
 import { useLoadable, whenIdle } from "../loadable";
 import { isOpen, useProgress } from "../store/progress";
@@ -13,7 +13,7 @@ import { isChapterFilter, isFilter, isStatus, isText, useKept, useShowing } from
 import { isPhone, usePhone } from "../useNarrow";
 
 // The Missable filter only exists once something is actually flagged.
-const missable: [string, string][] = hasMissables ? [["missable", "Missable"]] : [];
+const missable: [string, string][] = [...(hasMissables ? [["missable", "Missable"] as [string, string]] : []), ...(hasChoices ? [["one-way", "One-way"] as [string, string]] : [])];
 const topFilters: [string, string][] = [["all", "All entries"], ...config.chips.checklist, ...missable];
 const categoryChoices: [string, string][] = [["all", "All categories"], ...Object.entries(cats).map(([id, [name]]): [string, string] => [id, name]), ...missable];
 const categoryName = new Map(categoryChoices);
@@ -31,7 +31,7 @@ function ChecklistView() {
   const { category, chapter: chapterParam } = useParams();
   const data = useProgress((s) => s.data);
   // Kept while the guide is open, so a reader coming back from another tab (or with Back) finds the list as they left it.
-  const [filter, setFilter] = useKept("category", isCategory(category) || (hasMissables && category === "missable") ? category! : "all", isFilter);
+  const [filter, setFilter] = useKept("category", isCategory(category) || (hasMissables && category === "missable") || (hasChoices && category === "one-way") ? category! : "all", isFilter);
   const [chapterFilter, setChapterFilter] = useKept(
     "chapter",
     () => (chapterParam && isOpen(data, readChapter(chapterParam)) ? String(readChapter(chapterParam)) : "all"),

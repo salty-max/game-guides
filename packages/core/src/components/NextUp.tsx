@@ -1,6 +1,6 @@
 import { Button, Empty, Panel, PanelTitle } from "./ui";
 import { TickItem } from "./TickItem";
-import { cats, nextUp, primaryTag, text } from "../guide";
+import { cats, choiceOf, nextUp, primaryTag, text } from "../guide";
 import { useHeldRows } from "../useHeldRows";
 import { isOpen, useProgress } from "../store/progress";
 
@@ -23,7 +23,8 @@ export function NextUp({ chapter }: { chapter: number }) {
               row={row}
               prefix="next"
               ticked={data.checks[row.id] === true}
-              detail={`${row.chapter !== chapter ? `Chapter ${row.chapter} · ` : ""}${cats[primaryTag(row)][1]} · ${row.group}`}
+              detail={`${row.chapter !== chapter ? `Chapter ${row.chapter} · ` : ""}${choiceOf(row.id)?.why ?? `${cats[primaryTag(row)][1]} · ${row.group}`}`}
+              tag={choiceOf(row.id) ? "one-way" : undefined}
               jumpLabel={`Jump to “${row.title}” in chapter ${row.chapter}`}
               onToggle={hold}
             />

@@ -88,6 +88,33 @@ export interface Missable {
   sources: string[];
 }
 
+/** Another way at a one-way choice: a row in a later playthrough's chapter, ticked and counted like any row. */
+export interface ChoiceLater {
+  /** The row's id. Its title shows in the choice's block, so it says only what the choice's chapter already says. */
+  row: string;
+  /** Which playthrough it belongs to, as the block names it: "NG+", "a second save". */
+  on: string;
+}
+
+/**
+ * A one-way choice: ways a single playthrough can't all take. The guide recommends one for this playthrough, a row in the choice's
+ * chapter, and puts each other way in a later playthrough's chapter, as a row of its own. Every way counts, so 100% takes the later
+ * playthrough too, as endings do. The block draws the recommended row with the later ones named and linked; "Don't miss" lists the
+ * recommended row with the why while it's unticked.
+ */
+export interface Choice {
+  /** The way recommended for this playthrough. A row is in one choice at most, and the recommended one is never in `missables` too. */
+  row: string;
+  /** What the reader decides, naming only what its chapter's rows already say ("Frampt or Kaathe"). */
+  name: string;
+  /** One line: what makes it one-way. */
+  why: string;
+  /** The other ways, at least one, each in a chapter after the choice's. */
+  later: ChoiceLater[];
+  /** At least two independent https sources that agree, as a missable's. */
+  sources: string[];
+}
+
 /** A chained side quest: one character's arc, or one task in parts, as existing rows. Progress stays per row. */
 export interface Questline {
   /** Stable once live: it's the line's address, `/questlines/<id>`. Never shown. */
@@ -233,6 +260,8 @@ export interface GuideConfig {
   /** The category a row's `quantity` counts toward (Might Crystals by amount). */
   quantity?: string;
   missables: Missable[];
+  /** One-way choices, each drawn as one block and counted once. */
+  choices?: Choice[];
   /** Chained side quests, on the Questlines page. */
   questlines: Questlines;
   /** Shown while nothing is flagged as missable: why that is safe. Its sources back the claim and aren't shown. */

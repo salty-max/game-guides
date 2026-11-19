@@ -20,10 +20,13 @@ describe("guide data", () => {
     for (const row of allRows) expect(row.title.trim(), row.id).not.toBe("");
   });
 
-  it("only uses known categories, and the primary tag is never 'missable'", () => {
+  it("only uses known categories, and leaves core's own tags ('missable', 'one-way') to core", () => {
+    for (const [id, tags] of config.chapters.flatMap((chapter) => chapter.groups.flatMap((group) => group.rows))) {
+      expect(tags.includes("missable") || tags.includes("one-way"), `${id}: core adds these from missables.ts and choices.ts`).toBe(false);
+    }
     for (const row of allRows) {
       expect(isCategory(row.tags[0]), row.id).toBe(true);
-      for (const tag of row.tags) expect(isCategory(tag) || tag === "missable", `${row.id}: ${tag}`).toBe(true);
+      for (const tag of row.tags) expect(isCategory(tag) || tag === "missable" || tag === "one-way", `${row.id}: ${tag}`).toBe(true);
     }
     const configured = [...config.chips.checklist, ...(config.chips.route ?? [])].map(([id]) => id);
     const board = completion.board.flatMap((item) => (item.opens ? [item.tag, item.opens] : [item.tag]));
@@ -74,6 +77,28 @@ describe("guide data", () => {
     if (!hasMissables && config.reassurance) expect(hosts(config.reassurance.sources.map(([, url]) => url)).size).toBeGreaterThanOrEqual(2);
   });
 
+  it("keeps each one-way choice to real rows, its later ways in later chapters, backed by two independent https sources", () => {
+    const missable = new Set(config.missables.map((item) => item.id));
+    const ids = (config.choices ?? []).flatMap((choice) => [choice.row, ...choice.later.map((later) => later.row)]);
+    expect(new Set(ids).size, "a row is in one choice at most").toBe(ids.length);
+    for (const choice of config.choices ?? []) {
+      const row = byId.get(choice.row);
+      expect(row, choice.row).toBeDefined();
+      expect(missable.has(choice.row), `${choice.row} is a choice, so its warning is the choice's, not a missable's`).toBe(false);
+      expect(choice.name.trim(), choice.row).not.toBe("");
+      expect(choice.why.length, choice.row).toBeGreaterThan(10);
+      expect(choice.later.length, `${choice.row} needs a later way`).toBeGreaterThan(0);
+      for (const later of choice.later) {
+        const other = byId.get(later.row);
+        expect(other, later.row).toBeDefined();
+        expect(other!.chapter, `${later.row} comes in a later chapter than ${choice.row}`).toBeGreaterThan(row!.chapter);
+        expect(later.on.trim(), later.row).not.toBe("");
+      }
+      expect(choice.sources.every((url) => url.startsWith("https://"))).toBe(true);
+      expect(hosts(choice.sources).size, `${choice.row} needs two independent hosts`).toBeGreaterThanOrEqual(2);
+    }
+  });
+
   it("keeps each questline to real rows, once each and in route order, under a stable id, and covers every row its tags name", () => {
     const at = new Map(allRows.map((row, index) => [row.id, index]));
     const { lines, cover = [] } = config.questlines;
@@ -92,13 +117,13 @@ describe("guide data", () => {
     expect(allRows.filter((row) => row.tags.some((tag) => cover.includes(tag)) && !inLine.has(row.id)).map((row) => row.id)).toEqual([]);
   });
 
-  it("finds the missables left in a chapter and drops them once checked", () => {
+  it("finds the missables and one-way choices left in a chapter and drops them once checked", () => {
     for (const chapter of chapters) {
       const left = missablesLeft(chapter, {});
-      expect(left.every((row) => row.tags.includes("missable"))).toBe(true);
+      expect(left.every((row) => row.tags.includes("missable") || row.tags.includes("one-way"))).toBe(true);
       expect(missablesLeft(chapter, everything)).toEqual([]);
     }
-    expect(chapters.flatMap((chapter) => missablesLeft(chapter, {})).length).toBe(config.missables.length);
+    expect(chapters.flatMap((chapter) => missablesLeft(chapter, {})).length).toBe(config.missables.length + (config.choices ?? []).length);
   });
 
   it("names every category it shows", () => {
