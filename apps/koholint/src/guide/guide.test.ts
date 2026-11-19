@@ -1,4 +1,4 @@
-import { allRows, chapters, completion, overall } from "@hundo/core/guide";
+import { allRows, chapters, completion, overall, rowsByTag, whatsLeft } from "@hundo/core/guide";
 import { STORAGE_KEY, defaultState, validateState } from "@hundo/core/progress-state";
 import { readRunLog } from "./run-log";
 import { THEME_KEY } from "@hundo/core/store/theme";
@@ -23,6 +23,30 @@ describe("Koholint completion", () => {
     expect(amiibo.length).toBeGreaterThan(0);
     expect(overall(Object.fromEntries(amiibo.map((row) => [row.id, true]))).percent).toBe(0);
     expect(overall(Object.fromEntries(allRows.filter((row) => !amiibo.includes(row)).map((row) => [row.id, true]))).percent).toBe(100);
+  });
+
+  // Everything the board counts is everything but the amiibo and the route steps: 100 only with all of it ticked.
+  it("reads 100 only with everything counted ticked, and under 100 with any one item left", () => {
+    const counted = completion.board.filter((item) => !item.optional);
+    const tick = (rows: typeof allRows) => Object.fromEntries(rows.map((row) => [row.id, true as const]));
+    const everything = allRows.filter((row) => row.tags.some((tag) => counted.some((item) => item.tag === tag)));
+    expect(overall(tick(everything)).percent).toBe(100);
+    expect(whatsLeft(tick(everything))).toEqual([]);
+    expect(overall({}).percent).toBe(0);
+    expect(overall({}).label).toBe("complete");
+    for (const { tag } of counted) {
+      const left = rowsByTag(tag)[0];
+      const checks = tick(everything.filter((row) => row !== left));
+      expect(overall(checks).percent, tag).toBeLessThan(100);
+      expect(whatsLeft(checks).map((item) => item.tag), tag).toContain(tag);
+    }
+  });
+
+  it("leaves out nothing but the optional amiibo and the route steps", () => {
+    const off = allRows.filter((row) => !row.tags.some((tag) => completion.board.some((item) => item.tag === tag && !item.optional)));
+    expect(off.length).toBeGreaterThan(0);
+    expect(off.every((row) => row.tags[0] === "story" || row.tags[0] === "amiibo")).toBe(true);
+    expect(completion.board.filter((item) => item.optional).map((item) => item.tag)).toEqual(["amiibo"]);
   });
 
   it("labels instruments and other route rows by what they award, not as route steps", () => {
