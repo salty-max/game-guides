@@ -1,0 +1,163 @@
+import type { RawChapter } from "@hundo/core/types";
+
+export default {
+  id: 4,
+  title: "Shellwood and the Threadspun Town",
+  region: "Shellwood · Bellhart · Weavenest Atla",
+  teaser: "Shellwood",
+  intro: "Learn to climb walls, free Bellhart, then revisit doors that respond to Hornet's music.",
+  sources: [["Shellwood", "https://hollowknight.wiki/w/Shellwood"], ["Bellhart", "https://hollowknight.wiki/w/Bellhart"], ["Widow", "https://hollowknight.wiki/w/Widow"], ["Needolin", "https://hollowknight.wiki/w/Needolin"], ["Weavenest Atla", "https://hollowknight.wiki/w/Weavenest_Atla"], ["Route reference", "https://www.nintendolife.com/guides/hollow-knight-silksong-progression-guide-recommended-route"]],
+  groups: [
+    {
+      title: "Open Bellhart from above",
+      location: "Shellwood · Bellhart",
+      rows: [
+        ["route-shellwood", ["route"], "Pass through Bellhart to Shellwood", "Cross the silk-bound town and take the west passage into Shellwood. Use the Bellway and the nearest bench. Find Shakra among the pale shell paths and talk to Greyroot if you pass the roots."],
+        ["boss-sister-splinter", ["boss"], "Defeat Sister Splinter in Shellwood", "Climb to the Sister's arena. Give her ground slams space, watch the hanging branches, and remove spawning enemies when they restrict your movement."],
+        ["ability-cling-grip", ["ability"], "Take Cling Grip from the Shellwood shrine", "Continue up after Sister Splinter and Bind at the Weaver Burial Spire. Use the new wall grip to climb the upper paths and loop back into Bellhart from above."],
+        ["route-shellwood-shrine", ["bellshrine"], "Ring the Shellwood Bellshrine", "Find the large bell and strike its floor lever. If you have taken a high shortcut, check the mapped lower paths for the chamber before leaving Shellwood."],
+        ["boss-widow", ["boss"], "Defeat Widow above Bellhart", "Climb into the silk-covered upper chamber. Cross under airborne attacks during their buildup and track the bells as they ricochet. Break away from the later floor rush before trying to heal."],
+        ["ability-needolin", ["ability"], "Learn Needolin after defeating Widow", "Follow the Weaver memory that opens from the Widow encounter. Complete its traversal section and Bind to learn the song. Play it beside marked Weaver doors and other mechanisms that respond to Silk."],
+        ["needle-sharpened", ["needle"], "Receive the Sharpened Needle from Plinney", "Return to the newly freed Bellhart and visit Pinmaster Plinney's workshop. Take the first sharpening and return with Pale Oil later for further upgrades."],
+        ["pouch-loddie", ["pouch"], "Earn Loddie's Tool Pouch", "After Widow, return to the prison in the Marrow and find Loddie. Pay 25 Rosaries for a round and hit the target 15 times from behind the line. If the game is gone in Act 3, collect the pouch from the desk.", {"reference": "https://hollowknight.wiki/w/Loddie"}],
+        ["challenge-loddie-two", ["challenge"], "Beat Loddie’s 25-hit trial", "After claiming the Tool Pouch, try the second 25-Rosary challenge. Keep behind the line and land 25 hits with at most two misses. Loddie awards a Heavy Rosary Necklace.", {"reference": "https://hollowknight.wiki/w/Loddie"}],
+        ["route-bellhart-shrine", ["bellshrine"], "Ring the Bellhart Bellshrine", "Find the town's large bell, hit the floor lever, and register the bench. Make a separate stop at the Bellway."],
+      ],
+    },
+    {
+      title: "Bellhart, Bone Bottom, and the Weaver doors",
+      location: "Bellhart · Weavenest Atla",
+      rows: [
+        ["wish-restoration-of-bellhart", ["quest"], "Fund Restoration of Bellhart", "After freeing Bellhart, get Plinney's first upgrade, talk to Pavo, and sell a relic to Relic Seeker Scrounge. Donate 250 Rosaries at the Wishwall. This unlocks the following renovation once you advance the Citadel.", {"reference": "https://hollowknight.wiki/w/Restoration_of_Bellhart"}],
+        ["wish-my-missing-courier", ["quest"], "Find Frey's missing courier", "Take the Wish at Bellhart's wall and inspect the dropped wares in lower Shellwood. Follow that route toward northern Bone Bottom, where Tipp hides from two Caranids. Beat them and return to Bellhart to open Frey's stock.", {"reference": "https://hollowknight.wiki/w/My_Missing_Courier"}],
+        ["wish-crawbug-clearing", ["quest"], "Clear the Crawbug nests for Bellhart", "Accept Crawbug Clearing from the Bellhart wall. Locate the marked sites around Greymoor's Craw Lake and the towers, destroy the nests, and turn in the Wish for a Crafting Kit."],
+        ["wish-rite-of-the-pollip", ["quest"], "Gather Six Pollip Hearts for Greyroot", "Speak to Greyroot in Shellwood. Use Cling Grip to explore the pink pollips growing off the vertical paths. Strike a pollip and collect its heart. Return all six to get the Pollip Pouch."],
+        ["route-atla", ["route"], "Open Weavenest Atla in Moss Grotto", "Enter the lower grotto passages and play the Needolin at the carved gate. Record its map tablet and search the breakable walls for upgrades. Meet Eva inside and get her first Hunter Crest improvement."],
+        ["boss-moss-mothers-atla", ["boss"], "Defeat the two Moss Mothers in Weavenest Atla", "Use Needolin at Atla and explore to the twin arena. Keep both bodies in sight while you dodge ceiling debris and ground charges. Search above the arena for Weavelight afterwards.", {"reference": "https://hollowknight.wiki/w/Moss_Mother#Weavenest_Atla"}],
+        ["wish-a-lifesaving-bridge", ["quest"], "Finish the Bone Bottom bridge donations", "After Greymoor or Widow, complete Bone Bottom Repairs and donate another 300 Shell Shards at the Wishwall. Rest outside the town and return for the bridge.", {"reference": "https://hollowknight.wiki/w/A_Lifesaving_Bridge"}],
+      ],
+    },
+    {
+      title: "Wishwall detours and older paths",
+      location: "Bone Bottom · Bellhart · Moss Grotto",
+      compact: true,
+      rows: [
+        ["wish-volatiles", ["quest"], "Hunt the three Volatile Flintbeetles", "Accept the Bone Bottom Wish after reaching Greymoor. Follow the scent patches through the Marrow, defeat the three beetles, and collect the locker reward from the Wishwall. Finish before Act 3."],
+        ["wish-garb-of-the-pilgrims", ["quest"], "Deliver 12 shawls for Garb of the Pilgrims", "After Bell Beast, accept it in Bone Bottom and clear shawl-dropping pilgrims through lower Pharloom. Return all 12 before the settlement changes."],
+        ["wish-terrible-tyrant", ["quest", "boss"], "Hunt the Skull Tyrant for Bone Bottom", "Accept the Wish after gaining Cling Grip. Find the Skull Tyrant in the Marrow, fight from a clear stretch of floor and pick up the Crown Fragment. Return it to the Wishwall."],
+        ["wish-silver-bells", ["quest"], "Bring eight Silver Bells back to Bellhart", "After Widow, take the Wish from Bellhart. Search the bell tunnels near the town for the loose Silver Bells and return eight for the necklace."],
+        ["crest-wanderer", ["crest"], "Bind the Wanderer Crest in Bonegrave", "Reach the Chapel of the Wanderer in Bonegrave off Moss Grotto. Clear the chapel encounter, then Bind at the shrine."],
+        ["kit-crawbug-clearing", ["kit"], "Claim Bellhart's Crafting Kit", "Finish Crawbug Clearing for Bellhart and take the kit reward."],
+      ],
+    },
+    {
+      title: "Collectibles and unlocks · Bellhart",
+      location: "Bellhart",
+      compact: true,
+      map: ["Pharloom Calculator", "https://pharloomcalculator.com/map/"],
+      rows: [
+        ["tool-longpin", ["tool"], "Longpin", "Find the Wood Wasp nest on the upper Bellhart paths and check its hidden chamber for the tool.", {"reference": "https://hollowknight.wiki/w/Longpin", "map": ["Map Genie", "https://mapgenie.io/hollow-knight-silksong/maps/pharloom?locationIds=478158"]}],
+        ["tool-multibinder", ["tool"], "Multibinder", "Finish My Missing Courier to open Frey's shop, then pay 880 Rosaries when you can afford it.", {"reference": "https://hollowknight.wiki/w/Multibinder", "map": ["Map Genie", "https://mapgenie.io/hollow-knight-silksong/maps/pharloom?locationIds=478203"]}],
+        ["spool-fragment-6", ["spool-fragment"], "Spool Fragment · Bellhart", "Finish My Missing Courier, then buy the fragment from Frey for 270 Rosaries when his shop opens.", {"reference": "https://hollowknight.wiki/w/Spool_Fragment", "map": ["Map Genie", "https://mapgenie.io/hollow-knight-silksong/maps/pharloom?locationIds=478347"]}],
+        ["flea-bellhart", ["flea"], "Lost Flea above Bellhart", "Climb the high Bellhart route with Cling Grip. Strike the false wall near the top for the cage.", {"reference": "https://hollowknight.wiki/w/Flea", "map": ["Map Genie", "https://mapgenie.io/hollow-knight-silksong/maps/pharloom?locationIds=478193"]}],
+        ["memory-locket-bellhart", ["memory-locket"], "Memory Locket · Bellhart", "Open Frey's shop through My Missing Courier and pay 330 Rosaries for the locket.", {"reference": "https://hollowknight.wiki/w/Memory_Locket", "map": ["Map Genie", "https://mapgenie.io/hollow-knight-silksong/maps/pharloom?locationIds=478204"]}],
+        ["map-bellhart", ["map"], "Get the Bellhart map", "Check Shakra's post in Bellhart and buy the town map. The map costs 40 Rosaries.", {"reference": "https://hollowknight.wiki/w/Map_and_Quill_(Silksong)#Maps"}],
+        ["bellway-bellhart", ["bellway"], "Open Bellhart Bellway", "Find the station mechanism and pay 60 Rosaries to unlock this stop.", {"reference": "https://hollowknight.wiki/w/Bellway#Bellways", "map": ["Map Genie", "https://mapgenie.io/hollow-knight-silksong/maps/pharloom?locationIds=478029"]}],
+      ],
+    },
+    {
+      title: "Collectibles and unlocks · Greymoor",
+      location: "Greymoor",
+      compact: true,
+      map: ["Pharloom Calculator", "https://pharloomcalculator.com/map/"],
+      rows: [
+        ["tool-pimpillo", ["tool"], "Pimpillo", "With Cling Grip, get to the hidden upper-left crafting room near Yarnaby's bellhome. Bring one Craftmetal to the workbench.", {"reference": "https://hollowknight.wiki/w/Pimpillo", "map": ["Map Genie", "https://mapgenie.io/hollow-knight-silksong/maps/pharloom?locationIds=478964"]}],
+        ["spool-fragment-3", ["spool-fragment"], "Spool Fragment · Greymoor revisit", "Return with Cling Grip to the platforms northeast of the Greymoor Bellshrine and climb to the fragment.", {"reference": "https://hollowknight.wiki/w/Spool_Fragment", "map": ["Map Genie", "https://mapgenie.io/hollow-knight-silksong/maps/pharloom?locationIds=478263"]}],
+        ["flea-greymoor-kratt", ["flea"], "Lost Flea named Kratt", "Climb up and right from Halfway Home. Break the wall by the hidden shelf and free Kratt. He counts as a rescue even though he is a named NPC.", {"reference": "https://hollowknight.wiki/w/Flea", "map": ["Map Genie", "https://mapgenie.io/hollow-knight-silksong/maps/pharloom?locationIds=478271"]}],
+      ],
+    },
+    {
+      title: "Collectibles and unlocks · Shellwood",
+      location: "Shellwood",
+      compact: true,
+      map: ["Pharloom Calculator", "https://pharloomcalculator.com/map/"],
+      rows: [
+        ["tool-pollip-pouch", ["tool"], "Pollip Pouch", "Bring Greyroot all six Pollip Hearts to finish Rite of the Pollip. Speak to Greyroot for the tool.", {"reference": "https://hollowknight.wiki/w/Pollip_Pouch", "map": ["Map Genie", "https://mapgenie.io/hollow-knight-silksong/maps/pharloom?locationIds=478294"]}],
+        ["mask-shard-4", ["mask-shard"], "Mask Shard · Shellwood", "Hit the breakable wall off the shell paths. Finish the platforming course inside and take the pickup at the end.", {"reference": "https://hollowknight.wiki/w/Mask_Shard_(Silksong)", "map": ["Map Genie", "https://mapgenie.io/hollow-knight-silksong/maps/pharloom?locationIds=478177"]}],
+        ["flea-shellwood", ["flea"], "Lost Flea in the Shellwood pit", "Drop into the pit with Pollenica and Phacia. Check the floor at its deepest point for the flea.", {"reference": "https://hollowknight.wiki/w/Flea", "map": ["Map Genie", "https://mapgenie.io/hollow-knight-silksong/maps/pharloom?locationIds=478176"]}],
+        ["map-shellwood", ["map"], "Get the Shellwood map", "Find Shakra among the pale shell paths and buy the map. The map costs 70 Rosaries.", {"reference": "https://hollowknight.wiki/w/Map_and_Quill_(Silksong)#Maps"}],
+        ["bellway-shellwood", ["bellway"], "Open Shellwood Bellway", "Find the station mechanism and pay 40 Rosaries to unlock this stop.", {"reference": "https://hollowknight.wiki/w/Bellway#Bellways", "map": ["Map Genie", "https://mapgenie.io/hollow-knight-silksong/maps/pharloom?locationIds=478178"]}],
+      ],
+    },
+    {
+      title: "Collectibles and unlocks · Weavenest Atla",
+      location: "Weavenest Atla",
+      compact: true,
+      map: ["Pharloom Calculator", "https://pharloomcalculator.com/map/"],
+      rows: [
+        ["tool-weavelight", ["tool"], "Weavelight", "Play the Needolin to open Atla. Above the two Moss Mothers' chamber, strike the hanging decoration at the roof to dislodge the tool.", {"reference": "https://hollowknight.wiki/w/Weavelight", "map": ["Map Genie", "https://mapgenie.io/hollow-knight-silksong/maps/pharloom?locationIds=479070"]}],
+        ["mask-shard-6", ["mask-shard"], "Mask Shard · Weavenest Atla", "Play the Needolin at Atla's gate and break the interior walls near the mapped upgrade pickup.", {"reference": "https://hollowknight.wiki/w/Mask_Shard_(Silksong)", "map": ["Map Genie", "https://mapgenie.io/hollow-knight-silksong/maps/pharloom?locationIds=478233"]}],
+        ["spool-fragment-5", ["spool-fragment"], "Spool Fragment · Weavenest Atla", "Open Atla with Needolin and search the breakable walls off the chambers for the Spool Fragment.", {"reference": "https://hollowknight.wiki/w/Spool_Fragment", "map": ["Map Genie", "https://mapgenie.io/hollow-knight-silksong/maps/pharloom?locationIds=478230"]}],
+        ["relic-rune-harp-weavernest-atla", ["relic"], "Rune Harp · Weavernest Atla", "Climb to the shelf high in Atla and take the Rune Harp.", {"reference": "https://hollowknight.wiki/w/Items_(Silksong)#Tradables", "map": ["Map Genie", "https://mapgenie.io/hollow-knight-silksong/maps/pharloom?locationIds=478231"]}],
+        ["mossberry-6", ["mossberry"], "Mossberry · Weavenest Atla", "Open Atla with Needolin and check the ceiling plants off the upper chambers.", {"reference": "https://hollowknight.wiki/w/Mossberry", "map": ["Map Genie", "https://mapgenie.io/hollow-knight-silksong/maps/pharloom?locationIds=479069"]}],
+        ["map-weavenest-atla", ["map"], "Get the Weavenest Atla map", "Open Atla with Needolin and read its map tablet.", {"reference": "https://hollowknight.wiki/w/Map_and_Quill_(Silksong)#Maps"}],
+      ],
+    },
+    {
+      title: "Collectibles and unlocks · Far Fields",
+      location: "Far Fields",
+      compact: true,
+      map: ["Pharloom Calculator", "https://pharloomcalculator.com/map/"],
+      rows: [
+        ["tool-silkspeed-anklets", ["tool"], "Silkspeed Anklets", "Play the Needolin at the gate of Weavenest Cindril. Use Swift Step through the timed pressure plates to open the reward.", {"reference": "https://hollowknight.wiki/w/Silkspeed_Anklets", "map": ["Map Genie", "https://mapgenie.io/hollow-knight-silksong/maps/pharloom?locationIds=478216"]}],
+        ["flea-far-fields-2", ["flea"], "Lost Flea in the Far Fields course", "Start to the right of the Far Fields Bellway and look for the concealed platforming course. Glide and wall-jump to reach the cage.", {"reference": "https://hollowknight.wiki/w/Flea", "map": ["Map Genie", "https://mapgenie.io/hollow-knight-silksong/maps/pharloom?locationIds=478219"]}],
+      ],
+    },
+    {
+      title: "Collectibles and unlocks · Deep Docks",
+      location: "Deep Docks",
+      compact: true,
+      map: ["Pharloom Calculator", "https://pharloomcalculator.com/map/"],
+      rows: [
+        ["mask-shard-5", ["mask-shard"], "Mask Shard · Deep Docks revisit", "Return with Cling Grip and approach Deep Docks from the Marrow. Climb the wall route close to the regional entrance for this shard.", {"reference": "https://hollowknight.wiki/w/Mask_Shard_(Silksong)", "map": ["Map Genie", "https://mapgenie.io/hollow-knight-silksong/maps/pharloom?locationIds=477901"]}],
+      ],
+    },
+    {
+      title: "Collectibles and unlocks · Bone Bottom",
+      location: "Bone Bottom",
+      compact: true,
+      map: ["Pharloom Calculator", "https://pharloomcalculator.com/map/"],
+      rows: [
+        ["memory-locket-bone-bottom", ["memory-locket"], "Memory Locket · Bone Bottom", "Complete Volatile Flintbeetles and return to the Wishwall for this reward.", {"reference": "https://hollowknight.wiki/w/Memory_Locket", "map": ["Map Genie", "https://mapgenie.io/hollow-knight-silksong/maps/pharloom?locationIds=478222"]}],
+        ["relic-weaver-effigy-bone-bottom", ["relic"], "Weaver Effigy · Bone Bottom", "Find the concealed room above Bone Bottom. You can glide down from above with Drifter's Cloak to reach the Weaver Effigy.", {"reference": "https://hollowknight.wiki/w/Items_(Silksong)#Tradables", "map": ["Map Genie", "https://mapgenie.io/hollow-knight-silksong/maps/pharloom?locationIds=478093"]}],
+      ],
+    },
+    {
+      title: "Collectibles and unlocks · The Marrow",
+      location: "The Marrow",
+      compact: true,
+      map: ["Pharloom Calculator", "https://pharloomcalculator.com/map/"],
+      rows: [
+        ["memory-locket-the-marrow", ["memory-locket"], "Memory Locket · The Marrow", "Climb the upper Marrow with Cling Grip to reach the high mapped shelf.", {"reference": "https://hollowknight.wiki/w/Memory_Locket", "map": ["Map Genie", "https://mapgenie.io/hollow-knight-silksong/maps/pharloom?locationIds=478246"]}],
+      ],
+    },
+    {
+      title: "Collectibles and unlocks · Moss Grotto",
+      location: "Moss Grotto",
+      compact: true,
+      map: ["Pharloom Calculator", "https://pharloomcalculator.com/map/"],
+      rows: [
+        ["relic-choral-commandment-bone-bottom", ["relic"], "Choral Commandment · Bone Bottom", "Go left from Mosshome and reach the high ledge for the Choral Commandment.", {"reference": "https://hollowknight.wiki/w/Items_(Silksong)#Tradables", "map": ["Map Genie", "https://mapgenie.io/hollow-knight-silksong/maps/pharloom?locationIds=477867"]}],
+      ],
+    },
+    {
+      title: "Collectibles and unlocks · Weavenest Cindril",
+      location: "Weavenest Cindril",
+      compact: true,
+      map: ["Pharloom Calculator", "https://pharloomcalculator.com/map/"],
+      rows: [
+        ["relic-rune-harp-far-fields", ["relic"], "Rune Harp · Far Fields", "Equip Silkspeed Anklets and use Flea Brew to make the faster run over the timed plates and open the Rune Harp reward.", {"reference": "https://hollowknight.wiki/w/Items_(Silksong)#Tradables", "map": ["Map Genie", "https://mapgenie.io/hollow-knight-silksong/maps/pharloom?locationIds=479057"]}],
+      ],
+    },
+  ],
+} satisfies RawChapter;
