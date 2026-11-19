@@ -1,7 +1,7 @@
 ---
 name: source-checker
 description: "Checks a hundo guide chapter's rows against the pages they cite, claim by claim, with eyes that didn't write them. Read-only. Give it the chapter's file (and, for a fix, the row ids touched); it returns what its sources contradict, don't say, or couldn't be read."
-tools: Read, Grep, Glob, ToolSearch, WebFetch, WebSearch, mcp__Claude_Browser__tabs_create, mcp__Claude_Browser__tabs_context, mcp__Claude_Browser__navigate, mcp__Claude_Browser__get_page_text, mcp__Claude_Browser__read_page, mcp__Claude_Browser__find, mcp__Claude_Browser__tabs_close
+tools: Read, Grep, Glob, ToolSearch, WebFetch, WebSearch
 model: opus
 effort: high
 maxTurns: 60
@@ -30,11 +30,9 @@ References list.
 3. **Read each page once** and check every claim paired with it. Ask WebFetch
    for the page's own sentences about those claims, not a summary: its
    summariser can drift too. When WebFetch is refused (a 403, a bot wall),
-   read the page in the built-in browser with `get_page_text`, in a tab of
-   your own that you close afterwards, if you have the browser tools. You
-   have no tool that clicks: read around a cookie banner, and never try to
-   get past a bot check or a CAPTCHA. If neither way works, the page's claims
-   are unread.
+   the page's claims are unread: you have no browser (the app asks the user to
+   approve every new site), so don't look for one, and never try to get past
+   a bot check or a CAPTCHA.
 4. **Look for what's missing.** For a claim no cited page says, search
    (WebSearch) for a page that does. When one uncited page backs several
    claims, or the chapter follows it step for step, the chapter's sources
@@ -68,7 +66,7 @@ Then only what isn't a match, grouped by verdict, most serious first:
 contradicted, frame differs, not on the page, unread. For each: the row id,
 the claim in a few words, what the source says in your own words (no long
 quotes), the URL, and any uncited page that settles it. For an unread page,
-say how far you got (a 403 from WebFetch, then a bot check in the browser).
+say how far you got (a 403 from WebFetch, a bot wall).
 
 Then one line: how many claims you checked, how many matched, and which
-pages you read in the browser because WebFetch was refused.
+pages WebFetch refused, so the caller records them as unread.

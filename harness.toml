@@ -23,3 +23,8 @@ decisions = "opener"  # a child asks the user nothing: every question and every 
 [checks]
 queue = true        # one `check` at a time on the machine: parallel worktrees' checks overloaded it (harness/queue.ts)
 # queue_limit = 30  # minutes a queued run may take before q stops it (0: none); a job that runs longer passes its own: `queueSelf(name, { limit })`, `q.ts --limit`
+
+[asks]
+# the template's asks this project leaves out (harness/templates/settings-asks.json), exact strings: init.ts doesn't merge them and removes them from .claude/settings.json, doctor.ts reports one that is there.
+# git push: main is protected server-side, so a push can't change it (CLAUDE.md, Working rules, says what it still reaches). gh pr merge, Vercel and every other ask stay. The user level (a hook in ~/.claude/settings.json, harness/claude-hooks/ask-push.ts) allows a plain push to origin here and asks for a destructive one and for every push elsewhere.
+skip = ["Bash(git push *)", "Bash(git -C * push)", "Bash(git -C * push *)"]
