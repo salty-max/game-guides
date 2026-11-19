@@ -1,3 +1,5 @@
+import { createHash } from "node:crypto";
+import { globSync, readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import js from "@eslint/js";
 import tailwind from "eslint-plugin-better-tailwindcss";
@@ -8,6 +10,13 @@ import storybook from "eslint-plugin-storybook";
 import tseslint from "typescript-eslint";
 
 const core = new URL("./packages/core/src/", import.meta.url);
+
+// What a cached lint result can't see: core's stylesheets, which the Tailwind lint reads for the house tokens, and the plugins' versions (the
+// lockfile). Their hash goes in the settings, part of the config ESLint keys every cached result on, so a change to either lints every file
+// again (`pnpm check` lints with --cache: tools/check.mjs).
+const lintInputs = createHash("sha256");
+for (const file of globSync("**/*.css", { cwd: fileURLToPath(core) }).sort()) lintInputs.update(readFileSync(new URL(file, core)));
+lintInputs.update(readFileSync(new URL("./pnpm-lock.yaml", import.meta.url)));
 
 // A class list kept in a constant is named `<what>Classes`: the plugin reads className, cva-style calls and a few variable names by
 // default, so the selector below teaches it this one, and the guard further down keeps a module-level string constant from being
@@ -42,6 +51,7 @@ export default tseslint.config(
     files: ["**/*.{ts,tsx}"],
     plugins: { "better-tailwindcss": tailwind },
     settings: {
+      lintInputs: lintInputs.digest("hex"),
       "better-tailwindcss": {
         entryPoint: fileURLToPath(new URL("app.css", core)),
         // `strings` reads a string or template constant, `objectValues` a map of them (`toneClasses`).
