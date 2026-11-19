@@ -75,7 +75,10 @@ describe("Echoes of Wisdom completion", () => {
     for (const row of rowsByTag("dungeon-chest")) expect(row.tags).toContain("chest");
     // (one second tag names the overworld ones, so a dungeon chest isn't a chest and a dungeon chest both)
     const overworld = rowsByTag("chest").filter((row) => !row.tags.includes("dungeon-chest") && !row.tags.includes("mini-dungeon-chest"));
-    expect(rowsByTag("overworld-chest").map((row) => row.id)).toEqual(overworld.map((row) => row.id));
+    // (a chest that awards a bottle, crystals or an accessory counts as that, once)
+    const counted = (row: Row) => row.tags.filter((tag) => targets.some((target) => target.tag === tag && tag !== "overworld-chest")).length;
+    expect(rowsByTag("overworld-chest").map((row) => row.id)).toEqual(overworld.filter((row) => counted(row) === 0).map((row) => row.id));
+    expect(overworld.length - rowsByTag("overworld-chest").length).toBe(8);
   });
 
   it("counts a minigame entry once: only those that award nothing the board counts already carry the minigame target", () => {
