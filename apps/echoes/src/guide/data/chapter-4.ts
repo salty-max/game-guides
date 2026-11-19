@@ -48,7 +48,7 @@ export default {
         ["chest-castle-bomb-wall", ["chest","dungeon-chest"], "Blast the cracked wall for 50 rupees", "Take the east door from the boss hall. Clear the sand enemies, use Bombfish on the cracked east wall and build up to the hole. Open the chest inside."],
         ["echo-ball-and-chain-trooper", ["echo"], "Learn Ball-and-Chain Trooper in the armored guard room", "Take the south ladder beyond the cracked wall and use the key. Cross the side-view rooms with flying echoes or Strandtula silk. In the final fight, let an echo distract the gold-armored trooper and attack between its swings."],
         ["chest-castle-big-key", ["chest","dungeon-chest"], "Open the Big Key chest north of the armored guard room", "Clear the whole fight to open the north door. Take the large chest before checking the other two."],
-        ["chest-castle-frog-ring", ["chest","dungeon-chest","accessory"], "Open the Frog Ring chest beside the Big Key", "Take the accessory from the same reward room. Equip it to make Zelda's jump higher."],
+        ["chest-castle-frog-ring", ["chest","accessory"], "Open the Frog Ring chest beside the Big Key", "Take the accessory from the same reward room. Equip it to make Zelda's jump higher."],
         ["chest-castle-golden-egg", ["chest","dungeon-chest"], "Open the Golden Egg chest beside the Big Key", "Take the remaining chest before returning to the boss hall."],
       ],
     },

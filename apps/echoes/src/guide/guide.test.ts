@@ -87,10 +87,15 @@ describe("Echoes of Wisdom completion", () => {
     for (const row of rowsByTag("dungeon-chest")) expect(row.tags).toContain("chest");
     // (one second tag names the overworld ones, so a dungeon chest isn't a chest and a dungeon chest both)
     const overworld = rowsByTag("chest").filter((row) => !row.tags.includes("dungeon-chest") && !row.tags.includes("mini-dungeon-chest"));
-    // (a chest that awards a bottle, crystals or an accessory counts as that, once)
+    // (a chest that awards a bottle, crystals or an accessory counts as that, once: eight overworld ones, and two inside dungeons that carry
+    // neither the dungeon tag nor the overworld one, since the dungeon chests are the guide's own list and not a game total)
     const counted = (row: Row) => row.tags.filter((tag) => targets.some((target) => target.tag === tag && tag !== "overworld-chest")).length;
     expect(rowsByTag("overworld-chest").map((row) => row.id)).toEqual(overworld.filter((row) => counted(row) === 0).map((row) => row.id));
-    expect(overworld.length - rowsByTag("overworld-chest").length).toBe(8);
+    expect(overworld.length - rowsByTag("overworld-chest").length).toBe(10);
+    for (const id of ["chest-suthorn-ruins-heart-pin", "chest-castle-frog-ring"]) {
+      const row = rowsByTag("accessory").find((candidate) => candidate.id === id)!;
+      expect(row.tags, id).toEqual(["chest", "accessory"]);
+    }
   });
 
   it("counts a minigame entry once: only those that award nothing the board counts already carry the minigame target", () => {
@@ -98,6 +103,16 @@ describe("Echoes of Wisdom completion", () => {
     const extra = rowsByTag("minigame").filter((row) => !row.tags.some((tag) => others.includes(tag)));
     expect(rowsByTag("minigame-extra").map((row) => row.id)).toEqual(extra.map((row) => row.id));
     expect(rowsByTag("minigame").length).toBeGreaterThan(rowsByTag("minigame-extra").length);
+  });
+
+  // One each: a guide's own list counts only rows no other target counts, while a game's list keeps every row it lists (a side quest and
+  // the accessory it awards are two items the game lists).
+  it("counts a row of the guide's own lists under no other target", () => {
+    const own = ["dungeon-chest", "mini-dungeon-chest", "overworld-chest", "equipment", "ability", "upgrade", "milestone", "minigame-extra", "waypoint"];
+    for (const tag of own) {
+      expect(targets.some((target) => target.tag === tag), tag).toBe(true);
+      for (const row of rowsByTag(tag)) expect(row.tags.filter((other) => other !== tag && targets.some((target) => target.tag === other)), `${row.id} (${tag})`).toEqual([]);
+    }
   });
 });
 
