@@ -7,7 +7,7 @@ export const brand = {
   shortName: "Lordran",
   title: "Lordran Hundo · Dark Souls Remastered completion checklist",
   description:
-    "A spoiler-aware walkthrough and completion checklist for Dark Souls Remastered: every achievement, boss, ring and spell across three playthroughs.",
+    "A spoiler-aware walkthrough and completion checklist for Dark Souls Remastered: every boss, covenant, rare weapon, ring and spell across three playthroughs.",
   storagePrefix: "hundo-lordran",
   backupFile: "lordran-progress.json",
   mark: "Lordran",

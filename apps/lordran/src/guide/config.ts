@@ -23,17 +23,17 @@ const banners = byChapter(import.meta.glob<Banner>("./banners/chapter-*.webp", {
 
 /**
  * The guide's own completion list, and what 100% is: every target counts, each item once, up to its goal, so the bar reads 100
- * exactly when What's left is empty. The Steam achievements and the lists they count, the rings and the expansion's spells
- * come with game totals (facts-to-verify.md has their hosts), and so do Snuggly's trades (the game's 20, less the Pursuers spell and the Red Titanite Slab, which count as a spell and a slab, so 18) and the NPC invasions, whose lists two hosts
+ * exactly when What's left is empty. The bosses, covenants, rare weapons, spells, rings, embers, maximum reinforcements, endings and
+ * the expansion's spells come with game totals (facts-to-verify.md has their hosts), and so do Snuggly's trades (the game's 20, less the Pursuers spell and the Red Titanite Slab, which count as a spell and a slab, so 18) and the NPC invasions, whose lists two hosts
  * give as tables. The rest are the guide's own lists, whose goals are their rows, not a game total: the NPC quest steps, the Estus
  * souls and Titanite Slabs it sends you to, the expansion's gear, the New Game+ steps, the discoveries and the loot sweeps. A test pins every
  * goal to the data, so a missing row shows up as a failing
  * count. Route steps are directions and carry no target. At a one-way choice (data/choices.ts) the first cycle takes the way the
  * guide recommends and a later cycle the other, each a row that counts, so 100% takes NG+ as the endings do. Base-game spells have their own tags, so the five expansion
- * spells count in their schools without inflating the three spell achievements.
+ * spells count once, on their own line, and still show in their schools. The game keeps no achievement list of its own (facts-to-verify.md
+ * has what backs that), so the platforms' achievements are a source here and never a target, a category or a word a reader sees.
  */
 export const targets = [
-  { tag: "achievement", goal: 41 },
   { tag: "boss", goal: 26 },
   { tag: "covenant", goal: 9 },
   { tag: "rare-weapon", goal: 47 },
@@ -73,7 +73,7 @@ const config: GuideConfig = {
     estus: ["Estus upgrades", "Estus", "flask", "amber"],
     forge: ["Forging materials", "Forging", "gem", "clay"],
     reinforcement: ["Maximum reinforcements", "Reinforcement", "sword", "amber"],
-    "rare-weapon": ["Knight’s Honor weapons", "Knight’s Honor", "sword", "amber"],
+    "rare-weapon": ["Rare weapons", "Rare weapon", "sword", "amber"],
     sorcery: ["Sorceries", "Sorcery", "star", "sky"],
     pyromancy: ["Pyromancies", "Pyromancy", "star", "clay"],
     miracle: ["Miracles", "Miracle", "star", "amber"],
@@ -85,21 +85,19 @@ const config: GuideConfig = {
     ending: ["Endings", "Ending", "book", "rose"],
     cycle: ["Later cycles", "Later cycle", "compass", "sky"],
     extra: ["Discoveries", "Discovery", "star", "mint"],
-    achievement: ["Achievement milestones", "Achievement", "ribbon", "amber"],
     trade: ["Crow trades", "Trade", "chest", "mint"],
   },
   chips: {
     checklist: [
       ["boss", "Bosses"],
       ["quest", "NPC quests"],
-      ["rare-weapon", "Knight’s Honor"],
+      ["rare-weapon", "Rare weapons"],
       ["ring", "Rings"],
       ["covenant", "Covenants"],
       ["sorcery", "Sorceries"],
       ["pyromancy", "Pyromancies"],
       ["miracle", "Miracles"],
       ["ember", "Embers"],
-      ["achievement", "Achievements"],
     ],
   },
   missables,
@@ -111,10 +109,10 @@ const config: GuideConfig = {
   text: {
     checklistIntro: "Search by item, boss, NPC or place. Checks are shared with the walkthrough.",
     searchPlaceholder: "Search items, bosses or places",
-    dashboardIntro: "100% is every target on the board, each item counted once, across three playthroughs: the Steam achievements and the lists they count, the rings, the expansion, the NPC quests, Snuggly’s trades, the invasions and the later cycles.",
+    dashboardIntro: "100% is every target on the board, each item counted once, across three playthroughs: the bosses, covenants, rare weapons and spells, the rings, the expansion, the NPC quests, Snuggly’s trades, the invasions and the later cycles.",
     boardTitle: "Completion targets",
     boardNote:
-      "Every target counts, each item once, so 100% is exactly when What’s left is empty. Spell counts are the base game’s, as the achievements count them; the five expansion spells have their own line. Knight’s Honor counts all 47 rare weapons. NPC quests, Estus souls, slabs, later cycles, discoveries and pickups count the guide’s own rows, not a game total; trades (the game’s 20, less two that count as a spell and a slab) and invasions follow the game’s lists. At a one-way choice, like Frampt or Kaathe, the first cycle takes the way the guide recommends and a later cycle the other, and both count.",
+      "Every target counts, each item once, so 100% is exactly when What’s left is empty. Spell counts are the base game’s; the five expansion spells have their own line. Rare weapons are all 47. NPC quests, Estus souls, slabs, later cycles, discoveries and pickups count the guide’s own rows, not a game total; trades (the game’s 20, less two that count as a spell and a slab) and invasions follow the game’s lists. At a one-way choice, like Frampt or Kaathe, the first cycle takes the way the guide recommends and a later cycle the other, and both count.",
     nextUpDone: "Everything revealed is checked. Reveal the next chapter or check the totals on the Progress page.",
     backupBlurb: "Export a copy of your checks and spoiler settings.",
   },

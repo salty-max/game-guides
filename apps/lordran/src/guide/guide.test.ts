@@ -1,6 +1,7 @@
 import { allRows, chapters, overall, rowsByTag, tally, whatsLeft } from "@hundo/core/guide";
 import { STORAGE_KEY, validateState } from "@hundo/core/progress-state";
-import { targets } from "./config";
+import config, { targets } from "./config";
+import { readerText } from "@hundo/core/reader-text";
 import { choices } from "./data/choices";
 import { missables } from "./data/missables";
 import { THEME_KEY } from "@hundo/core/store/theme";
@@ -82,13 +83,23 @@ describe("Dark Souls Remastered completion", () => {
     expect(choices.map((choice) => choice.row).sort()).toEqual(["quest-ciaran", "quest-lautrec-invasion", "quest-lordvessel-frampt", "quest-patches-forgive", "quest-sieg-ash", "quest-solaire-shortcut"]);
   });
 
-  it("counts the base game's spells apart from the expansion's, as the achievements do", () => {
+  it("counts the base game's spells apart from the expansion's", () => {
     for (const row of rowsByTag("base-sorcery")) expect(row.tags, row.id).toContain("sorcery");
     for (const row of rowsByTag("base-pyromancy")) expect(row.tags, row.id).toContain("pyromancy");
     for (const row of rowsByTag("dlc-spell")) {
       expect(row.tags.some((tag) => tag.startsWith("base-")), row.id).toBe(false);
       expect(row.tags.some((tag) => tag === "sorcery" || tag === "pyromancy" || tag === "miracle"), row.id).toBe(true);
     }
+  });
+
+  // Dark Souls Remastered keeps no achievement list of its own (facts-to-verify.md). Steam's list checked the data for gaps, so no
+  // reader sees an achievement, a target of them or one's name: Knight's Honor (Steam's name for the 47 rare weapons) and the three
+  // spell sets' were row titles until 19 Nov 2026. The Dark Soul isn't here: it is the game's own lore too.
+  it("shows no achievement: no target, no category, no name of one", () => {
+    expect(config.achievements).toBeUndefined();
+    expect(targets.some((target) => target.tag === "achievement")).toBe(false);
+    expect(Object.keys(config.categories)).not.toContain("achievement");
+    expect(readerText(config).filter(([, text]) => /achievement|Knight.s Honor|Wisdom of a Sage|Bond of a Pyromancer|Prayer of a Maiden/i.test(text))).toEqual([]);
   });
 
   // The README and the Don't miss strip are written for these 18 (Solaire's became a one-way choice, which Don't miss lists too).

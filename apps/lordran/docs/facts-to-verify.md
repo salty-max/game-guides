@@ -8,16 +8,15 @@ Each game count in `targets` (`src/guide/config.ts`) rests on two independent ho
 
 | List | Count | Source 1 | Source 2 | Notes |
 | --- | ---: | --- | --- | --- |
-| Achievements | 41 | [Steam’s Remastered list](https://steamcommunity.com/stats/570940/achievements) (its embedded data; the page itself loads only part of the list in some readers) | [wikidot achievements](https://darksouls.wikidot.com/achievements) | |
 | Bosses | 26 | [fextralife bosses](https://darksouls.wiki.fextralife.com/Bosses) plus its expansion page | [wikidot bosses](https://darksouls.wikidot.com/bosses) plus [additional content](https://darksouls.wikidot.com/additional-content) | 22 base game and 4 expansion, with the Bell Gargoyles and Ornstein and Smough as one encounter each |
-| Knight’s Honor | 47 | [wikidot rare weapons](https://darksouls.wikidot.com/rare-weapons) | [Gold Phantom](https://www.goldphantom.com/tools/ds1/achievement-tracker/) | fextralife’s Knight’s Honor guide agrees. Cynic 0055’s Steam checklist lists 50, adding the Gargoyle Tail Axe, Demon’s Catalyst and Izalith Catalyst as items it couldn’t confirm. The 47 include the Greatshield of Artorias, so three Sif souls, NG++ when playing alone |
+| Rare weapons | 47 | [wikidot rare weapons](https://darksouls.wikidot.com/rare-weapons) | [Gold Phantom](https://www.goldphantom.com/tools/ds1/achievement-tracker/) | The list is the one Steam’s Knight’s Honor achievement counts, and fextralife’s Knight’s Honor guide agrees; the guide calls them rare weapons, since the game has no name for the list. Cynic 0055’s Steam checklist lists 50, adding the Gargoyle Tail Axe, Demon’s Catalyst and Izalith Catalyst as items it couldn’t confirm. The 47 include the Greatshield of Artorias, so three Sif souls, NG++ when playing alone |
 | Rings | 41 | [wikidot rings](https://darksouls.wikidot.com/rings) | [fextralife rings](https://darksouls.wiki.fextralife.com/Rings) | 40 base game and the Calamity Ring |
-| Sorceries for Wisdom of a Sage | 24 | [wikidot sorceries](https://darksouls.wikidot.com/sorceries) | Gold Phantom | The 4 expansion sorceries don’t count |
-| Pyromancies for Bond of a Pyromancer | 19 | [wikidot pyromancies](https://darksouls.wikidot.com/pyromancies) | Gold Phantom | Black Flame doesn’t count |
-| Miracles for Prayer of a Maiden | 23 | [wikidot miracles](https://darksouls.wikidot.com/miracles) | Gold Phantom | Sunlight Spear counts. fextralife lists a 24th, Escape Death, which can’t be obtained and doesn’t count |
+| Base-game sorceries | 24 | [wikidot sorceries](https://darksouls.wikidot.com/sorceries) | Gold Phantom | The 4 expansion sorceries count under the expansion spells. 24 is also what Steam’s Wisdom of a Sage counts |
+| Base-game pyromancies | 19 | [wikidot pyromancies](https://darksouls.wikidot.com/pyromancies) | Gold Phantom | Black Flame counts under the expansion spells. 19 is also what Steam’s Bond of a Pyromancer counts |
+| Miracles | 23 | [wikidot miracles](https://darksouls.wikidot.com/miracles) | Gold Phantom | Sunlight Spear counts. fextralife lists a 24th, Escape Death, which can’t be obtained and doesn’t count |
 | Covenants | 9 | [wikidot covenants](https://darksouls.wikidot.com/covenants) | Steam | |
 | Embers | 10 | [wikidot embers](https://darksouls.wikidot.com/embers) | [fextralife embers](https://darksouls.wiki.fextralife.com/Embers) | |
-| Weapon-path achievements | 10 | Steam | wikidot achievements | |
+| Maximum reinforcements | 10 | Steam (its ten weapon-path achievements) | wikidot achievements | One for each upgrade path |
 | Endings | 2 | Steam | wikidot achievements | |
 | Expansion spells | 5 | wikidot spell lists | fextralife spell lists | The four expansion sorceries and Black Flame |
 | Expansion equipment | 10 rows, no goal | | | The guide’s own selection, not a game count: eight weapons and catalysts, the Silver Pendant and the Cleansing Greatshield |
@@ -29,6 +28,13 @@ Each game count in `targets` (`src/guide/config.ts`) rests on two independent ho
 | Later cycles | 14 rows | | | The guide's own New Game+ steps, six of them the later ways at the one-way choices (four new, below); the wikidot NG+ page says up to NG+6 and gives no list |
 | Discoveries | 11 rows | | | The guide's own (tail cuts, hydras, Ricard, Havel, the Valley route, Avelyn, a gesture and the Township carvings); no total exists. Laurentius's goodbye is an NPC quest step and counts once, there |
 | Pickups | 22 rows | | | The guide's own loot sweeps; no total exists |
+
+## Achievements: a source, never shown
+
+Dark Souls Remastered keeps no achievement list of its own. Its 41 achievements are the platforms' (Steam, Xbox, PlayStation trophies), and the Switch version has none (one host, below), so since 19 November 2026 the guide shows none: no target, no category, no chip and no achievement named in a row (the rule is core's, `data.test.ts`, and `guide.test.ts` pins it here, Knight’s Honor included). Steam’s list stays a source, the way the counts above use it to check nothing is missing.
+
+- **No achievements on Switch.** One host says it outright: [gamepressure’s trophy list](https://www.gamepressure.com/darksouls/trophies/zfaf3e) (read directly) says they can be earned on every platform but the Switch, which has no system for them. The user said the same when making the rule (19 November 2026). No page found names an in-game list on any platform: fextralife’s trophy guide (read directly) and Steam’s list give the same 41 platform awards, and neither mentions the Switch. To settle it with a second host: a Switch review or Nintendo’s store page that says so.
+- **What became of the 41 rows.** None was dropped and no id changed. The 29 that are also a boss, covenant, ring, maximum reinforcement or ending count once, as that (they used to count twice). The 7 route steps (the first bonfire, the class gear, Firelink, both bells, the Lordvessel and Anor Londo) are directions now and count nothing. The 5 that were only achievements (`achievement-knights-honor`, `-wisdom-of-a-sage`, `-bond-of-a-pyromancer`, `-prayer-of-a-maiden`, `-the-dark-soul`) are the last route steps in chapter 13, worded as checks: the rare weapons, the three spell schools (already counted by their own targets) and What’s left.
 
 ## One-way choices
 
@@ -158,7 +164,7 @@ Every entry in `data/missables.ts` has two hosts that state its condition. None 
 
 - **estus-max: do the corpse Fire Keeper Souls come back in NG+, and is each one worth exactly +1?** wikidot fire-keeper-soul (read directly) lists the four corpse souls (Parish altar, Blighttown cell, upper New Londo, Archives giant cell) and gives +7 as the cap, but says nothing about how many levels one soul adds. wikidot new-game-plus (read directly) says the flask keeps its level and most progress resets, but doesn't name these souls. So the row does no sum and says only: reinforce up to +7, the level carries over, collect the souls in NG+ too. To settle it: fextralife's Estus Flask or Fire Keeper Soul page stating one level per soul and NG+ respawn, or reinforcing once in game.
 - **cycle-ng-plus-shiva: does absolution bring Shiva back after you take the ring?** wikidot shiva-of-the-east (read directly) says absolving and rejoining returns him to Blighttown after he turns hostile, but in its one ring case (kicking the bodyguard off the cliff, then looting the ring) he doesn't come back even after absolution. The row follows the page: buy first, absolution "usually" restores him, not after the kick-off method. Only one host was read. To settle it: fextralife's Shiva page, or killing the bodyguard outright in game and absolving.
-- **achievement-knights-honor: same character, or across characters on Steam?** The row says all 47 on one character. wikidot rare-weapons (read directly) says one character, then adds that the Steam version "seems to track weapons across characters". wikidot achievements (read directly) agrees on one character for Knight's Honor. The row stays with one character, which is safe either way. To settle it: a Steam player's report or Steam's own achievement text.
+- **achievement-knights-honor: same character, or across characters on Steam?** Moot since the row stopped naming the achievement (it now says "Collect all 47 rare weapons"): the question was only how Steam counts them. The row used to say all 47 on one character. wikidot rare-weapons (read directly) says one character, then adds that the Steam version "seems to track weapons across characters". wikidot achievements (read directly) agrees on one character for Knight's Honor. The row stays with one character, which is safe either way. To settle it: a Steam player's report or Steam's own achievement text.
 
 ## How the pages were read
 
