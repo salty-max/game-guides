@@ -1,4 +1,4 @@
-import { allRows, chapters, coreRows, overall, rowsByTag, tally, whatsLeft } from "@hundo/core/guide";
+import { allRows, chapters, overall, rowsByTag, tally, whatsLeft } from "@hundo/core/guide";
 import { STORAGE_KEY, validateState } from "@hundo/core/progress-state";
 import { THEME_KEY } from "@hundo/core/store/theme";
 import { AWAKE_KEY } from "@hundo/core/store/awake";
@@ -14,6 +14,14 @@ import { FULL, gamePoints } from "./points";
 const [a] = allRows.map((row) => row.id);
 const tick = (rows: Row[]): Checks => Object.fromEntries(rows.map((row) => [row.id, true]));
 const without = (rows: Row[], left: Row) => tick(rows.filter((row) => row !== left));
+// The sixteen targets that are the game's own 112%, and the rows that carry one of them. Everything else on the board counts here too.
+const gameTags = [
+  "charm", "percent-boss", "equipment", "warrior-dream", "spell", "forge", "mask-shard", "vessel-fragment",
+  "nail-art", "dreamer", "dream-milestone", "trial", "troupe-boss", "troupe-finale", "godtuner", "pantheon",
+];
+const beyondTags = targets.map((target) => target.tag).filter((tag) => !gameTags.includes(tag));
+const gameRows = allRows.filter((row) => row.tags.some((tag) => gameTags.includes(tag)));
+const goals = targets.reduce((sum, target) => sum + (target.goal ?? 0), 0);
 
 describe("Hollow Knight completion", () => {
   it("cites sources for every chapter", () => {
@@ -28,46 +36,88 @@ describe("Hollow Knight completion", () => {
     for (const { tag, goal } of targets) if (goal !== undefined) expect(tally(tag, {}).total, tag).toBe(goal);
   });
 
-  it("adds up to the game's 112% with every row the game counts, and to nothing with the rest", () => {
-    expect(gamePoints(tick(allRows), allRows)).toBe(FULL);
-    expect(gamePoints(tick(coreRows), coreRows)).toBe(FULL);
-    expect(gamePoints(tick(allRows.filter((row) => !coreRows.includes(row))), allRows)).toBe(0);
+  it("counts every target: none is optional, and What's left starts with all of them and their goals", () => {
+    expect(targets.some((target) => target.optional)).toBe(false);
+    expect(whatsLeft({}).map((item) => item.tag).sort()).toEqual(targets.map((target) => target.tag).sort());
+    expect(whatsLeft({}).reduce((sum, item) => sum + item.total, 0)).toBe(goals);
   });
 
-  it("counts Mask Shards by the mask and Vessel Fragments by the vessel", () => {
-    expect(gamePoints(tick(rowsByTag("mask-shard").slice(0, 3)), coreRows)).toBe(0);
-    expect(gamePoints(tick(rowsByTag("mask-shard").slice(0, 4)), coreRows)).toBe(1);
-    expect(gamePoints(tick(rowsByTag("mask-shard")), coreRows)).toBe(4);
-    expect(gamePoints(tick(rowsByTag("vessel-fragment").slice(0, 2)), coreRows)).toBe(0);
-    expect(gamePoints(tick(rowsByTag("vessel-fragment")), coreRows)).toBe(3);
-    expect(gamePoints(tick(rowsByTag("equipment").slice(0, 1)), coreRows)).toBe(2);
+  it("counts the game's sixteen and the rest, and leaves out only the route steps", () => {
+    expect(gameTags.every((tag) => targets.some((target) => target.tag === tag))).toBe(true);
+    for (const tag of ["grub", "notch", "pale-ore", "map", "stag", "root", "simple-key", "ending", "dream-boss", "other-boss", "pickup", "challenge", "achievement", "quest"]) {
+      expect(beyondTags, tag).toContain(tag);
+    }
+    const off = allRows.filter((row) => !row.tags.some((tag) => targets.some((target) => target.tag === tag)));
+    expect(off.length).toBeGreaterThan(0);
+    // (a missable row also carries `missable`, which core adds)
+    expect(off.every((row) => row.tags[0] === "route" || row.tags[0] === "choice")).toBe(true);
+    expect(overall(tick(off)).percent).toBe(0);
   });
 
-  // 100% is full completion: the game's 112 points scaled, rounded once, so it never shows while anything the game counts is left.
-  it("reads 100 only with every row the game counts, and 99 with one Mask Shard left", () => {
-    expect(overall(tick(coreRows)).percent).toBe(100);
-    expect(whatsLeft(tick(coreRows))).toEqual([]);
-    const [shard] = rowsByTag("mask-shard");
-    expect(overall(without(coreRows, shard)).percent).toBe(99);
-    for (const row of coreRows) expect(overall(without(coreRows, row)).percent, row.id).toBeLessThan(100);
+  // The rows of a one-way choice, counted by no target until the choice block lands.
+  it("leaves the rows of a one-way choice off every target", () => {
+    expect(rowsByTag("choice").map((row) => row.id).sort()).toEqual(["dream-boss-grey-prince-zote", "quest-nailsmith-sheo", "quest-zote-arena", "quest-zote-deepnest", "quest-zote-greenpath"]);
+    for (const row of rowsByTag("choice")) expect(row.tags.some((tag) => targets.some((target) => target.tag === tag)), row.id).toBe(false);
+    expect(overall(tick(rowsByTag("choice"))).percent).toBe(0);
   });
 
-  it("scales the game's points to 100 and rounds down", () => {
+  // 100% is every target, each item once: it never shows while anything on the board is left, and What's left says what.
+  it("reads 100 only with everything ticked, and What's left is empty then", () => {
     expect(overall({}).percent).toBe(0);
     expect(overall({}).label).toBe("complete");
-    // 55 of 112 is 49.1%, and one point alone is under 1%.
-    const halfway = coreRows.filter((row) => row.tags.includes("charm")).concat(rowsByTag("percent-boss"));
-    expect(gamePoints(tick(halfway), coreRows)).toBe(55);
-    expect(overall(tick(halfway)).percent).toBe(49);
+    expect(overall(tick(allRows)).percent).toBe(100);
+    expect(whatsLeft(tick(allRows))).toEqual([]);
+    // (all the game counts is not enough: the rest counts too)
+    expect(overall(tick(gameRows)).percent).toBeLessThan(100);
+    expect(whatsLeft(tick(gameRows)).length).toBeGreaterThan(0);
+    for (const { tag } of targets) {
+      const [row] = rowsByTag(tag);
+      const checks = without(allRows, row);
+      expect(overall(checks).percent, tag).toBeLessThan(100);
+      expect(whatsLeft(checks).map((item) => item.tag), tag).toContain(tag);
+    }
+  });
+
+  it("reads under 100 with one Grub missing, and says it is the Grub that is left", () => {
+    const [grub] = rowsByTag("grub");
+    expect(overall(without(allRows, grub)).percent).toBe(Math.floor(((goals - 1) * 100) / goals));
+    expect(overall(without(allRows, grub)).percent).toBeLessThan(100);
+    expect(whatsLeft(without(allRows, grub))).toEqual([{ tag: "grub", total: 46, left: 1 }]);
+  });
+
+  it("counts each item once, whatever the game weighs it at, rounded down", () => {
+    // 24 Grubs and 24 charms are the same share of the board, and three Mask Shards count though the game's own count holds them back.
+    const share = Math.floor((24 * 100) / goals);
+    expect(overall(tick(rowsByTag("grub").slice(0, 24))).percent).toBe(share);
+    expect(overall(tick(rowsByTag("charm").slice(0, 24))).percent).toBe(share);
+    expect(overall(tick(rowsByTag("equipment"))).percent).toBe(Math.floor((7 * 100) / goals));
+    expect(overall(tick(rowsByTag("mask-shard").slice(0, 3))).percent).toBe(Math.floor((3 * 100) / goals));
     expect(overall(tick(rowsByTag("charm").slice(0, 1))).percent).toBe(0);
   });
 
-  it("keeps the extra collections, the endings and the rematches out of the game's count", () => {
-    for (const { tag, optional } of targets) {
-      const rows = rowsByTag(tag);
-      if (optional) expect(rows.some((row) => coreRows.includes(row)), tag).toBe(false);
-      else expect(rows.every((row) => coreRows.includes(row)), tag).toBe(true);
-    }
+  // The panel's figure: the save's own, the game's points over its 112 (it is not the bar's).
+  it("adds up to the game's 112% with every row the game counts, and to nothing with the rest", () => {
+    expect(gamePoints(tick(allRows), allRows)).toBe(FULL);
+    expect(gamePoints(tick(gameRows), allRows)).toBe(FULL);
+    expect(gamePoints(tick(allRows.filter((row) => !gameRows.includes(row))), allRows)).toBe(0);
+  });
+
+  it("counts Mask Shards by the mask and Vessel Fragments by the vessel, and equipment twice", () => {
+    expect(gamePoints(tick(rowsByTag("mask-shard").slice(0, 3)), allRows)).toBe(0);
+    expect(gamePoints(tick(rowsByTag("mask-shard").slice(0, 4)), allRows)).toBe(1);
+    expect(gamePoints(tick(rowsByTag("mask-shard")), allRows)).toBe(4);
+    expect(gamePoints(tick(rowsByTag("vessel-fragment").slice(0, 2)), allRows)).toBe(0);
+    expect(gamePoints(tick(rowsByTag("vessel-fragment")), allRows)).toBe(3);
+    expect(gamePoints(tick(rowsByTag("equipment").slice(0, 1)), allRows)).toBe(2);
+    // (55 of 112: the 40 charms and the 15 bosses the game counts)
+    const halfway = allRows.filter((row) => row.tags.includes("charm")).concat(rowsByTag("percent-boss"));
+    expect(gamePoints(tick(halfway), allRows)).toBe(55);
+  });
+
+  it("reads the game's count from the first sixteen targets only", () => {
+    // (every one of the sixteen earns points, and a row of the rest that carries none of them adds nothing)
+    for (const tag of gameTags) expect(gamePoints(tick(rowsByTag(tag)), allRows), tag).toBeGreaterThan(0);
+    for (const tag of beyondTags) expect(gamePoints(tick(rowsByTag(tag).filter((row) => !gameRows.includes(row))), allRows), tag).toBe(0);
   });
 });
 

@@ -16,14 +16,17 @@ import chapter12 from "./data/chapter-12";
 import { missables } from "./data/missables";
 import { questlines } from "./data/questlines";
 import { sources } from "./data/sources";
-import { countsInGame, fullCompletion } from "./points";
 
 const banners = byChapter(import.meta.glob<Banner>("./banners/chapter-*.webp", { eager: true, query: "?banner", import: "default" }));
 
 /**
- * The completion board. The targets that aren't optional are the game's own 112%, term by term: what the overall figure reads.
- * The optional ones are the collections a full save also holds (Grubs, notches, Pale Ore, maps, stations, Roots, keys) and the
- * endings and dream rematches, which the game's percentage doesn't count. A test pins every goal to the data.
+ * The completion board, and what 100% is: every target counts, each item once, up to its goal, so the bar reads 100 exactly when
+ * What's left is empty. The first sixteen are the game's own completion (its 112%, term by term). The rest is what the game's
+ * percentage doesn't count: the collections a full save also holds (Grubs, notches, Pale Ore, maps, stations, Roots, keys), the
+ * endings and dream rematches, and the guide's own lists (key pickups, the six bosses outside the percentage, the
+ * challenges, Pure Completion and the quest steps), whose goals are their rows, not a game total. Route steps are directions and
+ * carry no target. The game's own figure is the Check against the game panel's (`points.ts`), not the bar's. A test pins every
+ * goal to the data.
  */
 export const targets: BoardItem[] = [
   { tag: "charm", goal: 40 },
@@ -42,15 +45,20 @@ export const targets: BoardItem[] = [
   { tag: "troupe-finale", goal: 1 },
   { tag: "godtuner", goal: 1 },
   { tag: "pantheon", goal: 4 },
-  { tag: "grub", goal: 46, optional: true },
-  { tag: "notch", goal: 8, optional: true },
-  { tag: "pale-ore", goal: 6, optional: true },
-  { tag: "map", goal: 13, optional: true },
-  { tag: "stag", goal: 11, optional: true },
-  { tag: "root", goal: 15, optional: true },
-  { tag: "simple-key", goal: 4, optional: true },
-  { tag: "ending", goal: 5, optional: true },
-  { tag: "dream-boss", goal: 5, optional: true },
+  { tag: "grub", goal: 46 },
+  { tag: "notch", goal: 8 },
+  { tag: "pale-ore", goal: 6 },
+  { tag: "map", goal: 13 },
+  { tag: "stag", goal: 11 },
+  { tag: "root", goal: 15 },
+  { tag: "simple-key", goal: 4 },
+  { tag: "ending", goal: 5 },
+  { tag: "dream-boss", goal: 4 },
+  { tag: "other-boss", goal: 6 },
+  { tag: "pickup", goal: 7 },
+  { tag: "challenge", goal: 4 },
+  { tag: "achievement", goal: 1 },
+  { tag: "quest", goal: 42 },
 ];
 
 const config: GuideConfig = {
@@ -61,10 +69,12 @@ const config: GuideConfig = {
   categories: {
     route: ["Route steps", "Route", "compass"],
     quest: ["Quest steps", "Quest", "scroll", "mint"],
+    choice: ["Quest choices", "Choice", "scroll", "rose"],
     map: ["Area maps", "Map", "compass", "sky"],
     stag: ["Stag stations", "Stag station", "pin", "sky"],
     boss: ["Boss encounters", "Boss", "sword", "rose"],
     "percent-boss": ["Bosses (in-game %)", "Boss (in-game %)", "sword", "rose"],
+    "other-boss": ["Bosses (outside the %)", "Boss (outside the %)", "sword", "clay"],
     "dream-boss": ["Dream boss rematches", "Dream rematch", "sword", "violet"],
     "warrior-dream": ["Warrior Dreams", "Warrior Dream", "sword", "violet"],
     dreamer: ["Dreamers", "Dreamer", "star", "violet"],
@@ -111,15 +121,16 @@ const config: GuideConfig = {
   missables,
   questlines,
   banners,
-  completion: { board: targets, isCore: countsInGame, overall: { label: "complete", percent: fullCompletion } },
+  completion: { board: targets },
   state: {},
   text: {
     checklistIntro: "Search by charm, boss, NPC or place. Checks are shared with the walkthrough.",
     searchPlaceholder: "Search charms, bosses or places",
-    dashboardIntro: "Counts follow the game’s own completion, scaled so that 100% is everything it counts, with all four free content packs.",
+    dashboardIntro:
+      "100% is every target on the board, each item counted once: the game’s own completion with all four free content packs, and the Grubs, maps, endings, quest steps and the rest it leaves out. What your save should read is under Check against the game.",
     boardTitle: "Completion targets",
     boardNote:
-      "The first sixteen targets are the game’s own completion, weighted as the game weighs them: equipment counts twice, and Mask Shards and Vessel Fragments count only as whole masks and vessels. Grubs, notches, Pale Ore, maps, stations, Roots, keys, endings and dream rematches don’t count toward it, and stay out of What’s left.",
+      "Every target counts, each item once, so 100% is exactly when What’s left is empty. The first sixteen are the game’s own completion, which weighs them differently (equipment counts twice, and Mask Shards and Vessel Fragments count only as whole masks and vessels), so its figure, in Check against the game, differs from this bar. Grubs, notches, Pale Ore, maps, stations, Roots, keys, endings and four dream rematches count here too, and so do the guide’s own lists: key pickups, six bosses outside the game’s percentage, the challenges, Pure Completion and the quest steps.",
     nextUpDone: "Everything revealed is checked. Reveal the next chapter or check the totals on the Progress page.",
     backupBlurb: "Export a copy of your checks and spoiler settings.",
   },

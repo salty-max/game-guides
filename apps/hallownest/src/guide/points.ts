@@ -1,6 +1,9 @@
 import type { Checks, Row } from "@hundo/core/types";
 
-/** What the game counts as everything: its own 112%, with all four free content packs installed. */
+/**
+ * What the game counts as everything: its own 112%, with all four free content packs installed. This is the save's figure, shown by
+ * the Check against the game panel; the guide's overall bar counts differently (every board target, each item once, see `config.ts`).
+ */
 export const FULL = 112;
 
 /**
@@ -27,11 +30,6 @@ const pointsByTag: Record<string, number> = {
 const SHARDS_PER_MASK = 4;
 const FRAGMENTS_PER_VESSEL = 3;
 
-const counted = new Set([...Object.keys(pointsByTag), "mask-shard", "vessel-fragment"]);
-
-/** The rows the game's count reads. */
-export const countsInGame = (row: Row) => row.tags.some((tag) => counted.has(tag));
-
 /** The in-game completion the ticked rows add up to, from 0 to 112, as the save file shows it. */
 export function gamePoints(checks: Checks, rows: Row[]): number {
   let points = 0;
@@ -48,9 +46,3 @@ export function gamePoints(checks: Checks, rows: Row[]): number {
   // Rounded once, as the game counts: a mask only when its four shards are in, a vessel only with its three fragments.
   return points + Math.floor(shards / SHARDS_PER_MASK) + Math.floor(fragments / FRAGMENTS_PER_VESSEL);
 }
-
-/**
- * The guide's overall figure: the game's points over its 112, as a whole percentage rounded down. Full completion is the game's
- * 112%, so the bar reads 100 only then, and every tick moves it by the game's own weights.
- */
-export const fullCompletion = (checks: Checks, rows: Row[]) => Math.floor((gamePoints(checks, rows) * 100) / FULL);
