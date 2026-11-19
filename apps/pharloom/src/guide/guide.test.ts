@@ -8,7 +8,9 @@ import { PERSIST_KEY } from "@hundo/core/persistence";
 import { COUNTS_KEY } from "@hundo/core/counts";
 import { flatten } from "@hundo/core/sync/fields";
 import type { Checks, Row } from "@hundo/core/types";
-import { targets } from "./config";
+import config, { targets } from "./config";
+import { missables } from "./data/missables";
+import { questlines } from "./data/questlines";
 
 const [a] = allRows.map((row) => row.id);
 const tick = (rows: Row[]): Checks => Object.fromEntries(rows.map((row) => [row.id, true]));
@@ -38,9 +40,14 @@ describe("Silksong completion", () => {
     for (const target of targets) expect(target.optional, target.tag).toBeFalsy();
   });
 
-  // (core adds "missable" to the rows in missables.ts)
-  it("counts every row but the route's own steps and pickups", () => {
-    for (const row of allRows.filter((row) => !counted.includes(row))) expect(row.tags.every((tag) => ["route", "pickup", "missable"].includes(tag)), row.id).toBe(true);
+  // Route steps are directions, and a one-way choice's sides wait for core's choice block (core adds "missable" to missables.ts's rows).
+  it("counts every row but the route's steps and the one-way choices", () => {
+    for (const row of allRows.filter((row) => !counted.includes(row))) expect(row.tags.every((tag) => ["route", "choice", "missable"].includes(tag)), row.id).toBe(true);
+  });
+
+  it("gives every target a goal, the guide's own lists their rows", () => {
+    for (const { tag, goal } of targets) expect(goal, tag).toBe(rowsByTag(tag).length);
+    expect(Object.fromEntries(targets.slice(-5).map(({ tag, goal }) => [tag, goal]))).toEqual({ pickup: 13, wish: 77, boss: 41, ending: 5, challenge: 8 });
   });
 
   // 100% is full completion: every tracked entry, one each, so it never shows while anything on the board is left.
@@ -49,17 +56,55 @@ describe("Silksong completion", () => {
     expect(overall({}).label).toBe("complete");
     expect(overall(tick(allRows)).percent).toBe(100);
     expect(whatsLeft(tick(allRows))).toEqual([]);
+    const all = tick(allRows);
     for (const row of counted) {
-      const left = tick(allRows.filter((other) => other !== row));
+      const left = { ...all };
+      delete left[row.id];
       expect(overall(left).percent, row.id).toBeLessThan(100);
       expect(whatsLeft(left), row.id).not.toEqual([]);
     }
-  });
+    // (some 450 entries, each read twice: past vitest's 5 s default when the whole check runs in parallel)
+  }, 30_000);
 
   it("weighs a flea like a tool", () => {
     const [flea] = rowsByTag("flea");
     const [tool] = rowsByTag("tool");
     expect(overall(tick(allRows.filter((row) => row !== flea))).percent).toBe(overall(tick(allRows.filter((row) => row !== tool))).percent);
+  });
+});
+
+// The game's last act is a spoiler: a first visit sees chapter 1, the rail's teasers and the Progress page, and each chapter shows once revealed.
+describe("Silksong spoilers", () => {
+  const act = /act\s*(3|three|iii)\b|third act|final act|last act|act changes|after the shift/i;
+  const words = (chapter: (typeof chapters)[number]) => [
+    chapter.title,
+    chapter.region,
+    chapter.intro,
+    chapter.teaser ?? "",
+    ...chapter.groups.flatMap((group) => [group.title, group.location ?? "", group.note ?? "", ...group.rows.flatMap((row) => [row.title, row.text])]),
+  ];
+
+  it("never names the last act in chapters 1 to 8", () => {
+    for (const chapter of chapters.slice(0, 8)) for (const text of words(chapter)) expect(text, `chapter ${chapter.id}`).not.toMatch(act);
+  });
+
+  it("names it in chapter 9 only in its last group, the point of no return", () => {
+    const nine = chapters[8];
+    const early = { ...nine, groups: nine.groups.slice(0, -1) };
+    for (const text of words(early)) expect(text).not.toMatch(act);
+  });
+
+  it("teases the last three chapters as late game", () => {
+    expect(chapters.slice(9).map((chapter) => chapter.teaser)).toEqual(["Late game", "Late game", "Late game"]);
+  });
+
+  it("keeps the missables' lines, the questline names and the Progress page's words clear of the last act", () => {
+    for (const { id, why } of missables) expect(why, id).not.toMatch(act);
+    for (const line of questlines.lines) expect(line.name, line.id).not.toMatch(act);
+    expect(`${questlines.tab} ${questlines.title} ${questlines.intro}`).not.toMatch(act);
+    for (const [key, text] of Object.entries(config.text)) expect(text, key).not.toMatch(act);
+    for (const [tag, [plural, singular]] of Object.entries(config.categories)) expect(`${plural} ${singular}`, tag).not.toMatch(/everbloom|epilogue|act\s*3/i);
+    expect(`${config.text.boardNote} ${config.text.dashboardIntro}`).not.toMatch(/everbloom|farsight|93|act\s*3|last act/i);
   });
 });
 

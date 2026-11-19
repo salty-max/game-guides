@@ -3,41 +3,44 @@ import type { RawChapter } from "@hundo/core/types";
 export default {
   id: 10,
   title: "Through the Abyss",
-  region: "Grand Bellway · Ruined Chapel · Deep Docks · The Abyss",
-  teaser: "The Abyss",
-  intro: "Restore travel, take the diving bell, and bring back the ability that opens Pharloom's highest paths.",
-  sources: [["Beast in the Bells", "https://hollowknight.wiki/w/Beast_in_the_Bells"], ["The Abyss (Silksong)", "https://hollowknight.wiki/w/The_Abyss_(Silksong)"], ["Silk Soar", "https://hollowknight.wiki/w/Silk_Soar"], ["Farsight", "https://hollowknight.wiki/w/Farsight"], ["Route reference", "https://www.nintendolife.com/guides/hollow-knight-silksong-progression-guide-recommended-route"]],
+  region: "Ruined Chapel · Bellways · Deep Docks · The Abyss",
+  teaser: "Late game",
+  intro: "Find the Snail Shamans in the Ruined Chapel, win back the Bellways and ride the diving bell into the Abyss. Climb out with Silk Soar, then take it to the high places you couldn't reach before.",
+  sources: [["Act 3 objectives and their order", "https://hollowknight.wiki/w/Acts"], ["Act 3 route: the Cradle, Moss Grotto, the boss before the Bell Beast, the Abyss", "https://www.nintendolife.com/guides/hollow-knight-silksong-progression-guide-recommended-route"], ["The Abyss: the one-way bell, Weavenest Absolom", "https://hollowknight.wiki/w/The_Abyss_(Silksong)"], ["Silk Soar: where and how", "https://hollowknight.wiki/w/Silk_Soar"], ["Farsight: where it is and what it shows", "https://hollowknight.wiki/w/Farsight"]],
   groups: [
     {
       title: "A changed Pharloom and the diving bell",
-      location: "Grand Bellway · Bone Bottom · Deep Docks",
+      location: "The Cradle · Moss Grotto · Bellways · Deep Docks",
+      sources: [["Escaping the ruined Cradle", "https://hollowknight.wiki/w/The_Cradle"], ["The Ruined Chapel's Act 3 room", "https://hollowknight.wiki/w/Moss_Grotto"], ["Snail Shamans: Awaiting the End, The Dark Below", "https://hollowknight.wiki/w/Snail_Shamans_(Silksong)"], ["Bell Eater fight", "https://hollowknight.wiki/w/Bell_Eater"], ["Diving bell and its key", "https://hollowknight.wiki/w/Diving_Bell"], ["Ballow", "https://hollowknight.wiki/w/Ballow"]],
       rows: [
-        ["boss-bell-eater", ["boss"], "Defeat Bell Eater to restore the Bellways", "Reload after Snared Silk and go to a Bellway. Follow the Beast in the Bells objective into the tunnels. Read the attack from the disturbed floor, then strike while Bell Eater is above ground. Return to the station after the fight."],
-        ["wish-ruined-chapel", ["quest"], "Meet the Snail Shamans at the Ruined Chapel", "Follow the Caretaker's lead from Songclave back toward the chapel by Bone Bottom. Speak to the Shamans and follow The Dark Below to Deep Docks."],
-        ["route-diving-bell", ["route"], "Get Ballow's key and ride the diving bell", "Speak to Ballow in Deep Docks, then descend to the diving bell in the lower foundry. With the key, operate the bell to enter the Abyss. Bring your preferred Crest and tools. The first descent cannot be reversed at the bell."],
+        ["wish-ruined-chapel", ["route"], "Meet the Snail Shamans at the Ruined Chapel", "You start in the wrecked Cradle with only the Hunter Crest and Silkspear: escape it, and you come out in Songclave. Make for the Ruined Chapel in Moss Grotto, beside Bone Bottom, where the Caretaker and his family now hide as the Snail Shamans in a room that was shut before. Speak to them and they send you to Deep Docks, where a way down beneath Pharloom still exists.", {"reference": "https://hollowknight.wiki/w/Snail_Shamans_(Silksong)"}],
+        ["boss-bell-eater", ["boss"], "Defeat Bell Eater to restore the Bellways", "The first time you call at a Bellway, a huge centipede bursts out in place of the Bell Beast, and every other station stays dead until it's beaten. Follow it down its hole into the tunnels. Its grey plates shrug off your needle: hit the soft beige rear or the red head whenever either pokes out. When it falls the Bell Beast returns to finish it, and her young teach you the Beastling Call.", {"reference": "https://hollowknight.wiki/w/Bell_Eater"}],
+        ["route-diving-bell", ["route"], "Get Ballow's key and ride the diving bell", "In Deep Docks, talk to Ballow, shovelling beside the Forge Daughter's shop. He goes down to the old diving bell at the base of the docks, in the part that opened when you beat the Forebrothers: climb through the open floor gate at the top right of the bell's room to his control panel and talk again for the Diving Bell Key. Get ready before you climb in, because the first trip is one-way: the bell's shield breaks on the way down and it can't bring you back up.", {"reference": "https://hollowknight.wiki/w/Diving_Bell"}],
       ],
     },
     {
       title: "Weavenest Absolom and the escape",
       location: "The Abyss",
+      sources: [["Weavenest Absolom and the way out", "https://hollowknight.wiki/w/The_Abyss_(Silksong)"], ["Lace's projection by the Void sea", "https://hollowknight.wiki/w/Lace"], ["Elegy of the Deep", "https://hollowknight.wiki/w/Elegy_of_the_Deep"], ["The Shamans teach the Elegy and send you for the hearts", "https://hollowknight.wiki/w/Snail_Shamans_(Silksong)"]],
       rows: [
-        ["ability-silk-soar", ["ability"], "Learn Silk Soar inside Weavenest Absolom", "Follow the lower route into the Weaver structure and reach the ability shrine. Bind to learn it. Hold Down plus the harpoon input and release after charging. Use it beneath the old lift openings to climb."],
-        ["pickup-farsight", ["pickup"], "Take the Farsight from the upper east Absolom passage", "Explore the upper eastern branch before leaving the Abyss. Take the item and open the nearby map tablet if needed. Missed items can be collected once the diving bell is usable again later."],
-        ["route-abyss-escape", ["route"], "Escape to Deep Docks with Silk Soar", "Use Silk Soar up through the marked openings and climb as the route collapses behind you. Get out of each movement sequence before pausing. Return to the Shamans and get Elegy of the Deep so you can enter the heart memories."],
-        ["route-farsight-bellhome", ["route"], "Build the Farsight in the Bellhome", "Go back to your unlocked Bellhome in Bellhart and construct the Farsight. It displays your in-game percentage and helps identify missing entries when viewing your inventory."],
+        ["ability-silk-soar", ["ability"], "Learn Silk Soar inside Weavenest Absolom", "In the Abyss's lower east, cross the lake of Void tendrils and the platforming past it to Weavenest Absolom, and play the Needolin to open its door. Silk Soar waits in the Weaver spire at the very bottom. Hold Down and Harpoon to charge it, then let go: Hornet flings her needle at the nearest ceiling and flies up after it, for one strand of Silk. The broken Weaver lifts you pass show where it takes you up.", {"reference": "https://hollowknight.wiki/w/Silk_Soar"}],
+        ["pickup-farsight", ["pickup"], "Take the Farsight from the upper east Absolom passage", "Before you climb out, search the Weavenest's upper eastern passage for the Farsight, a folded-up Weaver instrument. If you miss it, it keeps: Ballow later reinforces the bell so you can ride down and back up whenever you like.", {"reference": "https://hollowknight.wiki/w/Farsight"}],
+        ["route-abyss-escape", ["route"], "Escape to Deep Docks with Silk Soar", "Once you've met Lace's projection on the shore of the Void sea and learnt Silk Soar, climb out of the Abyss, flying up wherever a broken lift marks the way, until you're back in Deep Docks. Go back to the Snail Shamans at the Ruined Chapel. They teach you the Elegy of the Deep, played by holding Down with the Needolin to step into old memories, and send you after Pharloom's old hearts.", {"reference": "https://hollowknight.wiki/w/Elegy_of_the_Deep"}],
+        ["route-farsight-bellhome", ["route"], "Build the Farsight in the Bellhome", "Take the Farsight to your Bellhome in Bellhart and assemble it there. From then on the game shows its own completion percentage in your inventory and on your save file, and the Tools, Silk Skills, Journal entries and Materium entries you still lack appear as small grey circles.", {"reference": "https://hollowknight.wiki/w/Farsight"}],
       ],
     },
     {
       title: "Silk Soar revisits",
-      location: "Ruined Chapel · Weavenest Atla",
+      location: "Ruined Chapel · Weavenest Atla · Far Fields · Wormways",
       compact: true,
+      sources: [["Shaman Crest", "https://hollowknight.wiki/w/Shaman_Crest"], ["Eva's thresholds", "https://hollowknight.wiki/w/Eva"], ["Sylphsong", "https://hollowknight.wiki/w/Sylphsong"], ["The target room and the Skarr scout", "https://hollowknight.wiki/w/Unnamed_Skarr"], ["Curveclaw's point while the scout has it", "https://hollowknight.wiki/w/Completion_(Silksong)"], ["Advanced Alchemy", "https://hollowknight.wiki/w/Advanced_Alchemy"], ["Plasmified Zango", "https://hollowknight.wiki/w/Plasmified_Zango"]],
       rows: [
-        ["crest-shaman", ["crest"], "Bind the Shaman Crest above the Ruined Chapel", "Enter the Shamans' room. Before the Flickering Flame tablet, charge Silk Soar to reach the ceiling passage. Break through the closed walls and Bind at the large shell."],
-        ["wish-eva-vesticrest", ["quest"], "Upgrade the Vesticrest with Eva", "Visit Eva with 12 eligible unlocked slots for the yellow Vesticrest slot, 20 for the blue slot, and 27 for the second Hunter Crest upgrade. Slots opened on Hunter do not count toward these thresholds."],
-        ["ability-sylphsong", ["ability"], "Bind Eva in Weavenest Atla to learn Sylphsong", "Unlock at least 32 slots across Crests other than Hunter, counting inherent slots and those opened with Memory Lockets. Return to Eva in Atla and accept her offer. If short, unlock the Shaman Crest and spend your spare Lockets on the other Crests.", {"reference": "https://hollowknight.wiki/w/Eva"}],
-        ["challenge-curvesickle", ["challenge"], "Clear the Far Fields Curveclaw target room", "In Act 3, take the updraft above the Far Fields Bellway, then head right to the practice room with Curveclaw equipped. Remove Pollip Pouch first. Hit every target in a single throw and let the scout take the tool. Use a bench and return to pick up Curvesickle, which restores the slot's percentage point.", {"reference": "https://hollowknight.wiki/w/Curveclaw"}],
-        ["wish-advanced-alchemy", ["quest"], "Continue Zylotol's Advanced Alchemy in Act 3", "Return to the Wormways after Alchemist's Assistant. Read the new Wish and follow it into the Plasmium rooms. Use the phial for the requested Alchemy work."],
-        ["boss-plasmified-zango", ["boss"], "Defeat Plasmified Zango in the western Wormways", "Follow the Advanced Alchemy chain into the secret western room. Clear the spreading Plasmium hazards and defeat Zango.", {"reference": "https://hollowknight.wiki/w/Plasmified_Zango"}],
+        ["crest-shaman", ["crest"], "Bind the Shaman Crest above the Ruined Chapel", "In the Shamans' new room, to the right of where they sit, a gap in the ceiling is out of reach without Silk Soar. Fly up, smash the breakable walls along the hidden passage, and claim the great snail shell at its end, one of the Shamans' ancestors, to bind the Crest. It lets you equip several Silk Skills at once and strengthens them.", {"reference": "https://hollowknight.wiki/w/Moss_Grotto"}],
+        ["wish-eva-vesticrest", ["pickup"], "Upgrade the Vesticrest with Eva", "Eva in Weavenest Atla counts the slots unlocked on every Crest except the Hunter Crest, whether a Crest came with them or a Memory Locket opened them. At 12 she grants the Vesticrest, an extra yellow slot whatever Crest you wear; at 20 it gains a blue slot; at 27 she upgrades the Hunter Crest a second time. None of this needs Silk Soar, so visit her whenever you reach a count. She won't let you near while you're plasmified or cursed.", {"reference": "https://hollowknight.wiki/w/Eva"}],
+        ["ability-sylphsong", ["ability"], "Bind Eva in Weavenest Atla to learn Sylphsong", "At 32 unlocked slots across your Crests other than the Hunter, counting those a Crest starts with and those opened by Memory Lockets, Eva asks you to bind her. Accept and she becomes Sylphsong, which refills your Silk while you rest at a bench. If you're short, the Shaman Crest's slots count, and so does every slot a spare Memory Locket opens once you spend it.", {"reference": "https://hollowknight.wiki/w/Sylphsong"}],
+        ["challenge-curvesickle", ["challenge"], "Clear the Far Fields Curveclaw target room", "The Skarr target room sits above the Far Fields Bellway. Go in with the Curveclaw equipped. Hit all four targets with a single throw and a friendly Skarr scout pops up and takes your Curveclaw: until you get it back, it no longer counts toward your percentage. Rest at any bench, come back, and pick the Curvesickle up off the floor to restore the point.", {"reference": "https://hollowknight.wiki/w/Completion_(Silksong)"}],
+        ["wish-advanced-alchemy", ["wish"], "Continue Zylotol's Advanced Alchemy in Act 3", "With the Wormways now overrun by Plasmium, and Alchemist's Assistant behind you, talk to Alchemist Zylotol again. He hands back the Needle Phial: charge it fully and stab plasmified creatures such as Plasmids and Plasmidases to draw out 10 samples of Plasmified Blood. Bring them to him for the Plasmium Gland, which refills your Plasmium Phial at any bench.", {"reference": "https://hollowknight.wiki/w/Advanced_Alchemy"}],
+        ["boss-plasmified-zango", ["boss"], "Defeat Plasmified Zango in the western Wormways", "Zango's corpse in a secret room of the western Wormways has risen, plasmified, now that the Plasmium has spread. He heals whenever you stop hurting him, so keep the pressure on; the room doesn't lock, so you can leave and come back. Each Plasmified Blood you draw from him with the Needle Phial cuts his health for good, and four draws kill him.", {"reference": "https://hollowknight.wiki/w/Plasmified_Zango"}],
       ],
     },
     {
@@ -46,7 +49,7 @@ export default {
       compact: true,
       map: ["Pharloom Calculator", "https://pharloomcalculator.com/map/"],
       rows: [
-        ["mask-shard-20", ["mask-shard"], "Mask Shard · Brightvein", "Climb Mount Fay's Brightvein branch after learning Silk Soar. Use the rising line from the high cave to reach the uppermost shard.", {"reference": "https://hollowknight.wiki/w/Mask_Shard_(Silksong)", "map": ["Map Genie", "https://mapgenie.io/hollow-knight-silksong/maps/pharloom?locationIds=479460"]}],
+        ["mask-shard-20", ["mask-shard"], "Mask Shard · Brightvein", "From Mount Fay's south-eastern bench, head south and then west. In the room west of the big chasm, Silk Soar from the rock floating in the icy water up into Brightvein, then bounce off the Mnemonords along its platforming run to the shard.", {"reference": "https://hollowknight.wiki/w/Mount_Fay", "map": ["Map Genie", "https://mapgenie.io/hollow-knight-silksong/maps/pharloom?locationIds=479460"]}],
       ],
     },
     {
@@ -55,7 +58,7 @@ export default {
       compact: true,
       map: ["Pharloom Calculator", "https://pharloomcalculator.com/map/"],
       rows: [
-        ["memory-locket-bellhart-2", ["memory-locket"], "Memory Locket · Bellhart (#2)", "Stand under the town roof opening and Silk Soar into the hidden upper space for the locket.", {"reference": "https://hollowknight.wiki/w/Memory_Locket", "map": ["Map Genie", "https://mapgenie.io/hollow-knight-silksong/maps/pharloom?locationIds=478212"]}],
+        ["memory-locket-bellhart-2", ["memory-locket"], "Memory Locket · Bellhart (#2)", "This locket sits above your Bellhome at the top of Bellhart.", {"reference": "https://hollowknight.wiki/w/Memory_Locket", "map": ["Map Genie", "https://mapgenie.io/hollow-knight-silksong/maps/pharloom?locationIds=478212"]}],
       ],
     },
     {
@@ -64,7 +67,7 @@ export default {
       compact: true,
       map: ["Pharloom Calculator", "https://pharloomcalculator.com/map/"],
       rows: [
-        ["relic-choral-commandment-whiteward-2", ["relic"], "Choral Commandment · Whiteward (#2)", "Use Silk Soar to reach the high room above Whiteward's hidden passage. Search the far end for the Choral Commandment.", {"reference": "https://hollowknight.wiki/w/Items_(Silksong)#Tradables", "map": ["Map Genie", "https://mapgenie.io/hollow-knight-silksong/maps/pharloom?locationIds=478919"]}],
+        ["relic-choral-commandment-whiteward-2", ["relic"], "Choral Commandment · Whiteward (#2)", "A second Commandment lies among the corpses on the right side of a Whiteward room, behind a breakable wall that hides the way in. Silk Soar gets you up to it; a precise jump with the Faydown Cloak can too.", {"reference": "https://hollowknight.wiki/w/Choral_Commandment", "map": ["Map Genie", "https://mapgenie.io/hollow-knight-silksong/maps/pharloom?locationIds=478919"]}],
       ],
     },
     {
@@ -73,7 +76,7 @@ export default {
       compact: true,
       map: ["Pharloom Calculator", "https://pharloomcalculator.com/map/"],
       rows: [
-        ["relic-rune-harp-high-halls", ["relic"], "Rune Harp · High Halls", "Return to Conductor Ballador's room during Act 3 and look for the Rune Harp.", {"reference": "https://hollowknight.wiki/w/Items_(Silksong)#Tradables", "map": ["Map Genie", "https://mapgenie.io/hollow-knight-silksong/maps/pharloom?locationIds=479495"]}],
+        ["relic-rune-harp-high-halls", ["relic"], "Rune Harp · High Halls", "Go back through the High Halls to the bedchamber where Conductor Ballador lay. The Rune Harp is on the left side of the room now; it's only there from this point in the story.", {"reference": "https://hollowknight.wiki/w/Rune_Harp", "map": ["Map Genie", "https://mapgenie.io/hollow-knight-silksong/maps/pharloom?locationIds=479495"]}],
       ],
     },
     {
@@ -82,8 +85,8 @@ export default {
       compact: true,
       map: ["Pharloom Calculator", "https://pharloomcalculator.com/map/"],
       rows: [
-        ["relic-arcane-egg", ["relic"], "Arcane Egg", "Complete the mapped side platforming sequence below the Deep Docks for the Arcane Egg.", {"reference": "https://hollowknight.wiki/w/Items_(Silksong)#Tradables", "map": ["Map Genie", "https://mapgenie.io/hollow-knight-silksong/maps/pharloom?locationIds=479281"]}],
-        ["map-the-abyss", ["map"], "Get the The Abyss map", "Read the map tablet in the Abyss during the first dive, before using the escape route.", {"reference": "https://hollowknight.wiki/w/Map_and_Quill_(Silksong)#Maps"}],
+        ["relic-arcane-egg", ["relic"], "Arcane Egg", "In the Abyss, take the room you enter from the west and follow it to its dead end for the Arcane Egg, a black stone relic older than Pharloom.", {"reference": "https://hollowknight.wiki/w/Arcane_Egg_(Silksong)", "map": ["Map Genie", "https://mapgenie.io/hollow-knight-silksong/maps/pharloom?locationIds=479281"]}],
+        ["map-the-abyss", ["map"], "Get the Abyss map", "The Abyss's map is a rune tablet you read down there. If you leave without it, the reinforced bell can take you back later.", {"reference": "https://hollowknight.wiki/w/Map_and_Quill_(Silksong)#Maps"}],
       ],
     },
   ],
