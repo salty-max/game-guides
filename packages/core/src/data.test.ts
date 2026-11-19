@@ -136,7 +136,7 @@ describe("guide data", () => {
     else expect(said.map(([path, text]) => `${path}: ${text}`)).toEqual([]);
   });
 
-  it("reads every row, chapter, group, map, category, chip, missable, questline, page text and panel title as reader text, and never a citation, a link or an id", () => {
+  it("reads every row, chapter, group, map, category, chip, missable, choice, questline, page text and panel title as reader text, and never a citation, a link or an id", () => {
     const found = readerText(config, panels);
     const text = new Set(found.map(([, value]) => value));
     for (const row of allRows) for (const value of [row.title, row.text]) expect(text.has(value), row.id).toBe(true);
@@ -153,6 +153,7 @@ describe("guide data", () => {
       ...chapters.flatMap((chapter) => chapter.groups.flatMap((group) => [group.title, group.location, group.note, group.map?.[0]])),
       ...allRows.map((row) => row.map?.[0]),
       ...config.missables.map((item) => item.why),
+      ...(config.choices ?? []).flatMap((choice) => [choice.name, choice.why, ...choice.later.map((later) => later.on)]),
       config.reassurance?.text,
       completion.overall?.label,
       config.questlines.tab,

@@ -11,6 +11,7 @@ const hidden = new Set([
   "fonts",
   "banners",
   "id",
+  "row",
   "tag",
   "opens",
   "steps",
