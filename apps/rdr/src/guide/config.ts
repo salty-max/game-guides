@@ -9,7 +9,7 @@ import chapter5 from "./data/chapter-5";
 import { missables } from "./data/missables";
 import { questlines } from "./data/questlines";
 import { sources } from "./data/sources";
-import { countsTowardStat, estimate, pointsLeft, readReported } from "./estimate";
+import { readReported } from "./estimate";
 
 const banners = byChapter(import.meta.glob<Banner>("./banners/chapter-*.webp", { eager: true, query: "?banner", import: "default" }));
 
@@ -64,14 +64,10 @@ const config: GuideConfig = {
   banners,
   defer: (row) => sweep.has(row.tags[0]),
   completion: {
-    isCore: countsTowardStat,
-    overall: { label: "estimated in-game completion", percent: estimate },
-    // Stranger Tasks counts each task once, by its last step: the steps before it get no tile of their own, and the tile opens every step.
+    // Every category counts, each item once. A Stranger task counts once, by its last step: the steps before it get no tile of their own, and the tile opens every step.
     board: Object.keys(categories)
       .filter((tag) => tag !== "stranger-step")
       .map((tag) => (tag === "stranger" ? { tag, opens: "stranger-step" } : { tag })),
-    left: pointsLeft,
-    unit: "points",
   },
   state: {
     // Saves from before the shared format: version 1 (no in-game percentage) and version 2 (`reported` at the top level).
@@ -82,10 +78,11 @@ const config: GuideConfig = {
   text: {
     checklistIntro: "Search by item, location or activity. Checks are shared with the walkthrough.",
     searchPlaceholder: "Search items or locations",
-    dashboardIntro: "Compare the estimate with Stats → General in your game.",
+    dashboardIntro:
+      "100% is every target on the board, each item counted once, outfit scraps and optional tasks included. The game’s own weighted percentage is estimated under Check against the game, to compare with Stats → General.",
     boardTitle: "By category",
     boardNote:
-      "The estimate uses the game’s category weights. Ambient Challenges add credit at ranks 5 and 10. A Stranger task counts once its last step is checked. Outfit scraps and optional tasks are tracked separately.",
+      "Every category counts, each item once, so 100% is exactly when What’s left is empty. That includes outfit scraps and optional tasks, which the game’s own percentage leaves out, and every Ambient Challenge rank, where the game credits only ranks 5 and 10. A Stranger task counts once its last step is checked. The game’s weights are in the estimate under Check against the game.",
     nextUpDone: "Everything revealed is checked. Reveal the next chapter or compare with Stats → General.",
     backupBlurb: "Export a copy of your checks, spoiler settings and in-game percentage.",
   },
