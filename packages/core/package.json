@@ -7,6 +7,7 @@
     "./format": "./src/format.ts",
     "./fonts": "./src/fonts.ts",
     "./guide": "./src/guide.ts",
+    "./reader-text": "./src/reader-text.ts",
     "./progress-state": "./src/progress-state.ts",
     "./persistence": "./src/persistence.ts",
     "./counts": "./src/counts.ts",
