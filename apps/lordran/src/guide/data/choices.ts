@@ -1,6 +1,7 @@
 import type { Choice } from "@hundo/core/types";
 
-// The first cycle takes the way the guide recommends; the other way is a row of its own in NG+ or NG++ (chapter 13), so both count.
+// The first cycle takes the way the guide recommends; the other way is a row of its own in NG+ or NG++ (chapter 13), so both count. Where
+// the other way only yields an item, the item's own row is the later way (Siegmeyer's ring, the Abyss Greatsword), so it counts once.
 // A choice's name, its why and the later rows' titles show in the choice's chapter, so they say only what that chapter says.
 export const choices: Choice[] = [
   {
@@ -34,15 +35,15 @@ export const choices: Choice[] = [
   {
     row: "quest-sieg-ash",
     name: "How Siegmeyer leaves the pit",
-    why: "Out of the Chaos Eaters’ pit above half health he goes to Ash Lake with Sieglinde; below it he dies and drops his ring. One per cycle.",
-    later: [{ row: "cycle-ng-plus-siegmeyer", on: "NG+" }],
+    why: "Out of the Chaos Eaters’ pit at half health or more he goes to Ash Lake with Sieglinde; below half he dies and drops his ring. One per cycle.",
+    later: [{ row: "ring-speckled-stoneplate", on: "NG+" }],
     sources: ["https://darksouls.wikidot.com/siegmeyer-of-catarina", "https://darksouls.wiki.fextralife.com/Siegmeyer+of+Catarina"],
   },
   {
     row: "quest-ciaran",
     name: "Ciaran and the Soul of Artorias",
     why: "Hand the Soul of Artorias to Ciaran for her Tracers and it’s hers for this cycle.",
-    later: [{ row: "cycle-ng-plus-dlc", on: "NG+" }],
+    later: [{ row: "dlc-abyss-greatsword", on: "NG+" }],
     sources: ["https://darksouls.wikidot.com/lord-s-blade-ciaran", "https://darksouls.wiki.fextralife.com/Lord's+Blade+Ciaran"],
   },
 ];
