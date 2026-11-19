@@ -2,7 +2,8 @@ import type { Missable } from "@hundo/core/types";
 
 /**
  * Entries that can be lost for good, each on two independent hosts that state the same condition (hollowknight.wiki and its copies
- * count as one). Nothing here costs the game's own completion; each costs an entry this guide tracks. A line shows in its
+ * count as one). Nothing here costs the game's own completion; each costs an entry this guide counts, except Broodfeast's, a one-way choice on no
+ * target until core's choice block lands. A line shows in its
  * chapter's strip and on the Questlines page once that chapter is revealed, so before chapter 10 none names the last act.
  */
 export const missables: Missable[] = [
@@ -13,7 +14,7 @@ export const missables: Missable[] = [
   },
   {
     id: "wish-shakra-duel",
-    why: "Gone once the story moves on: finish Trail's End and duel Shakra before then, with the Flea Caravan out of Greymoor.",
+    why: "Gone once the story moves on: finish Trail's End and duel Shakra before then.",
     sources: [
       "https://hollowknight.wiki/w/Shakra",
       "https://www.nintendolife.com/guides/hollow-knight-silksong-all-bosses-in-order-locations-and-rewards",
