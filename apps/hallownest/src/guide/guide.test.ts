@@ -54,9 +54,15 @@ describe("Hollow Knight completion", () => {
     expect(overall(tick(off)).percent).toBe(0);
   });
 
+  // One each: no row counts under two targets (a quest step that is also a charm, a boss or a nail upgrade counts as that).
+  it("counts every row under at most one target", () => {
+    for (const row of allRows) expect(row.tags.filter((tag) => targets.some((target) => target.tag === tag)), row.id).toHaveLength(row.tags.some((tag) => targets.some((target) => target.tag === tag)) ? 1 : 0);
+    for (const id of ["charm-grimmchild", "boss-troupe-master-grimm", "troupe-finale-grimm-finale", "quest-city-nailsmith"]) expect(rowsByTag("quest").map((row) => row.id), id).not.toContain(id);
+  });
+
   // The rows of a one-way choice, counted by no target until the choice block lands.
   it("leaves the rows of a one-way choice off every target", () => {
-    expect(rowsByTag("choice").map((row) => row.id).sort()).toEqual(["dream-boss-grey-prince-zote", "quest-nailsmith-sheo", "quest-zote-arena", "quest-zote-deepnest", "quest-zote-greenpath"]);
+    expect(rowsByTag("choice").map((row) => row.id).sort()).toEqual(["quest-nailsmith-sheo"]);
     for (const row of rowsByTag("choice")) expect(row.tags.some((tag) => targets.some((target) => target.tag === tag)), row.id).toBe(false);
     expect(overall(tick(rowsByTag("choice"))).percent).toBe(0);
   });

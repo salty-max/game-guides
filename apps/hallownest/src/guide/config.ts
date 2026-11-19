@@ -53,12 +53,12 @@ export const targets: BoardItem[] = [
   { tag: "root", goal: 15 },
   { tag: "simple-key", goal: 4 },
   { tag: "ending", goal: 5 },
-  { tag: "dream-boss", goal: 4 },
+  { tag: "dream-boss", goal: 5 },
   { tag: "other-boss", goal: 6 },
   { tag: "pickup", goal: 7 },
   { tag: "challenge", goal: 4 },
   { tag: "achievement", goal: 1 },
-  { tag: "quest", goal: 42 },
+  { tag: "quest", goal: 41 },
 ];
 
 const config: GuideConfig = {
@@ -130,7 +130,7 @@ const config: GuideConfig = {
       "100% is every target on the board, each item counted once: the game’s own completion with all four free content packs, and the Grubs, maps, endings, quest steps and the rest it leaves out. What your save should read is under Check against the game.",
     boardTitle: "Completion targets",
     boardNote:
-      "Every target counts, each item once, so 100% is exactly when What’s left is empty. The first sixteen are the game’s own completion, which weighs them differently (equipment counts twice, and Mask Shards and Vessel Fragments count only as whole masks and vessels), so its figure, in Check against the game, differs from this bar. Grubs, notches, Pale Ore, maps, stations, Roots, keys, endings and four dream rematches count here too, and so do the guide’s own lists: key pickups, six bosses outside the game’s percentage, the challenges, Pure Completion and the quest steps.",
+      "Every target counts, each item once, so 100% is exactly when What’s left is empty. The first sixteen are the game’s own completion, which weighs them differently (equipment counts twice, and Mask Shards and Vessel Fragments count only as whole masks and vessels), so its figure, in Check against the game, differs from this bar. Grubs, notches, Pale Ore, maps, stations, Roots, keys, endings and dream rematches count here too, and so do the guide’s own lists: key pickups, six bosses outside the game’s percentage, the challenges, Pure Completion and the quest steps.",
     nextUpDone: "Everything revealed is checked. Reveal the next chapter or check the totals on the Progress page.",
     backupBlurb: "Export a copy of your checks and spoiler settings.",
   },
