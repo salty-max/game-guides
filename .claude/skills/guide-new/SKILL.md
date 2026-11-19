@@ -42,7 +42,7 @@ Then follow [step 1 of the doc](../../../docs/adding-a-guide.md#1-copy-the-folde
 
 ## 4. Art
 
-- **Icon:** the painting in `scripts/icon-master.webp` (prompts in `docs/icon-art.md`) and the tab drawing in `scripts/favicon.svg`, then copy a guide's `scripts/icons.mjs` and run `pnpm icons` in the app folder ([house-style.md](../../../docs/house-style.md#icon)), then `pnpm screenshots <name>` at the root once the first chapter renders. Look at what it wrote: the maskable icon through an 80% circle, and the tab icon at 16 and 32px in light and dark browser chrome.
+- **Icon:** the painting in `scripts/icon-master.webp` (prompts in `docs/icon-art.md`) and the tab drawing in `scripts/favicon.svg`, then copy a guide's `scripts/icons.mjs` and run `pnpm icons` in the app folder ([house-style.md](../../../docs/house-style.md#icon)), then `bun harness/q.ts --queue screenshots -- pnpm screenshots <name>` at the root (in the background: it takes its turn in the queue) once the first chapter renders. Look at what it wrote: the maskable icon through an 80% circle, and the tab icon at 16 and 32px in light and dark browser chrome.
 - **Banners:** use the `guide-banners` skill. It starts with whatever the research folder already has.
 
 ## 5. Wire it in
@@ -52,7 +52,7 @@ Do [step 4 of the doc](../../../docs/adding-a-guide.md#4-wire-it-into-the-reposi
 ## 6. Check
 
 - At the root, `bun harness/q.ts check -- bun run check`.
-- `pnpm lighthouse <name>` at the root, before asking for the push ([doc](../../../docs/adding-a-guide.md#5-check-it)). CI's limits come from the guides that do worst, so a new guide can fail them: fix the guide (banner weight, fonts) and never loosen a threshold, which is the user's call through the opener.
+- `pnpm lighthouse <name>` at the root (it queues itself: run it in the background and read the table at the end of its log), before asking for the push ([doc](../../../docs/adding-a-guide.md#5-check-it)). CI's limits come from the guides that do worst, so a new guide can fail them: fix the guide (banner weight, fonts) and never loosen a threshold, which is the user's call through the opener.
 - The `guide-check` skill on the new guide, with `--reveal`, so every chapter is shown.
 - Review: run `bun harness/packet.ts hundo`, have the `reviewer` helper read it, fix what it finds, then `bun harness/review.ts hundo "<verdict>"`. Then commit.
 

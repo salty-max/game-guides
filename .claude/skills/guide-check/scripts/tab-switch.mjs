@@ -26,6 +26,10 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 
 import { createServer } from "node:net";
 import { join, resolve } from "node:path";
 import { chromium, webkit } from "playwright-core";
+import { queueSelf } from "../../../../tools/queued.mjs";
+
+// (a heavy browser job: it takes its turn in the machine's queue and runs in the background, see tools/queued.mjs)
+await queueSelf("tab-switch");
 
 const args = Object.fromEntries(
   process.argv.slice(2).reduce((pairs, arg, i, all) => (arg.startsWith("--") ? [...pairs, [arg.slice(2), all[i + 1]?.startsWith("--") ? true : (all[i + 1] ?? true)]] : pairs), []),

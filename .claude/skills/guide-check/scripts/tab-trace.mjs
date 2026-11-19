@@ -5,6 +5,11 @@
 import { spawn } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { chromium } from "playwright-core";
+import { queueSelf } from "../../../../tools/queued.mjs";
+
+// (a heavy browser job: it takes its turn in the machine's queue and runs in the background, see tools/queued.mjs)
+await queueSelf("tab-trace");
+
 const [root, out, dist] = process.argv.slice(2);
 const port = 4991;
 const server = spawn("pnpm", ["-C", "apps/rdr", "exec", "vite", "preview", "--port", String(port), "--strictPort", ...(dist ? ["--outDir", dist] : [])], { cwd: root, stdio: "ignore", detached: true });

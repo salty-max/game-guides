@@ -119,7 +119,7 @@ What finds the guides in `apps/` by itself and needs nothing: `pnpm lighthouse`,
 
 - Run `pnpm check` at the root. Core's shared suites run against the new guide: the data rules, the app flows for its layout, the theme's keys and contrast, the deploy settings and the lists of step 4.
 - Look at it in a browser on desktop and phone, in light and dark ([testing.md](testing.md#in-a-browser)).
-- Run `pnpm lighthouse <name>` at the root before asking for the push ([testing.md](testing.md#lighthouse)). CI audits the guide on its first pull request, against limits set per page from the guide that does worst, so a new guide can fail them. If it does, fix the guide (its banners' weight and its fonts' size are where to look first, and the report's diagnostics say where the time went). **Never loosen a threshold in `lighthouse/lighthouserc.mjs` to let a guide through**: moving one is the user's call, through the opener.
+- Run `pnpm lighthouse <name>` at the root before asking for the push ([testing.md](testing.md#lighthouse)); it takes its turn in the queue, so run it in the background. CI audits the guide on its first pull request, against limits set per page from the guide that does worst, so a new guide can fail them. If it does, fix the guide (its banners' weight and its fonts' size are where to look first, and the report's diagnostics say where the time went). **Never loosen a threshold in `lighthouse/lighthouserc.mjs` to let a guide through**: moving one is the user's call, through the opener.
 
 ## 6. Deploy it
 

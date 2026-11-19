@@ -24,6 +24,8 @@ Run `bun harness/q.ts check -- bun run check` at the root.
 node .claude/skills/guide-check/scripts/shoot.mjs --out <scratchpad>/after --apps echoes
 ```
 
+Run it in the background. It takes its turn in the machine's queue, behind any `check` or other heavy job, so it can wait for minutes, and its output goes to the log its verdict line names (`.cache/logs/`), the last lines after it. `report.md` in `--out` is still the report to read. The same goes for `tab-switch.mjs`, `tab-trace.mjs`, `reveal-probe.mjs` and `sheet-probe.mjs` below ([docs/testing.md](../../../docs/testing.md#heavy-jobs-share-the-mac)).
+
 What `shoot.mjs` does, so you don't redo it by hand:
 
 - builds each guide from `--root` (the folder you run it from unless you say otherwise) and serves the build with `vite preview` on a free port, so nothing clashes with a server someone left running. From a worktree it shoots that worktree's code, whatever the pane's servers serve. From a session whose own folder is the main checkout, pass `--root <worktree>`;
@@ -42,7 +44,7 @@ Add `--full` for whole-page shots.
    - contrast in dark mode;
    - text that wraps badly at 375px;
    - focus rings and checkboxes.
-3. **Interactions** (a tick and its undo toast, the settings dialog): drive them in the browser pane, or write a few lines of Playwright in the scratchpad on top of what `shoot.mjs` does. Each new browser context starts with empty storage, so there's nothing to clean up.
+3. **Interactions** (a tick and its undo toast, the settings dialog): drive them in the browser pane, or write a few lines of Playwright in the scratchpad on top of what `shoot.mjs` does. A sweep of your own that launches several browsers or loops over the guides starts with `import { queueSelf } from "<root>/tools/queued.mjs"; await queueSelf("<name>")`, or runs as `bun harness/q.ts --queue <name> -- node <script>`, so it takes its turn too. Each new browser context starts with empty storage, so there's nothing to clean up.
    - **Which code the pane shows.** `preview_start` serves the folder the session works in: its worktree if the app opened it in one, the main checkout otherwise. Before trusting a page, read the `cwd` in `preview_list` (or `lsof -a -p $(lsof -nP -iTCP:<port> -sTCP:LISTEN -t | head -1) -d cwd`) and make sure it's the worktree you edit in. If it's main, build and `vite preview` from your worktree on a free port, as [docs/testing.md](../../../docs/testing.md#which-folder-the-pane-serves) lists.
 
 ## 5. Before and after, for a visual change
@@ -91,7 +93,7 @@ node .claude/skills/guide-check/scripts/tab-switch.mjs --out <scratchpad>/perf -
 - `tab-trace.mjs` traces one warm Guide → Checklist switch in Chrome at 6x and sums the main thread's work, and, given an unminified build (`vite build --minify false`), the JavaScript by function.
 - `reveal-probe.mjs` times revealing the checklist in WebKit with one suspect (`:has()`, the hidden inputs, transitions, shadows, rows' `content-visibility`) taken away at a time.
 - `sheet-probe.mjs` opens the checklist's filter sheet on a phone, goes Back and Forward, and counts the frames that still draw the sheet on the way back, with where the focus is (Chrome as Android and as desktop, WebKit).
-- `sim-tabs.mjs` runs the same walk in the iOS simulator's Safari, behind a proxy that puts the timing script first in the page; record the screen with `xcrun simctl io <device> recordVideo` alongside. Shut down only the simulator you booted.
+- `sim-tabs.mjs` (not queued: it waits for you to open the page in the Simulator) runs the same walk in the iOS simulator's Safari, behind a proxy that puts the timing script first in the page; record the screen with `xcrun simctl io <device> recordVideo` alongside. Shut down only the simulator you booted.
 
 ## 7. What this can't check
 
