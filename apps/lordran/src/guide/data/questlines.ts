@@ -5,7 +5,7 @@ export const questlines: Questlines = {
   tab: "Quests",
   title: "NPC questlines",
   intro: "Each character’s story in order, as far as you’ve revealed. Ticking a step here ticks it in the guide.",
-  cover: ["quest", "choice", "invasion"],
+  cover: ["quest", "invasion"],
   lines: [
     { id: "solaire", name: "Solaire of Astora", steps: ["quest-solaire-bridge", "quest-solaire-summons", "quest-solaire-anor", "quest-solaire-altar", "quest-solaire-shortcut", "quest-solaire-saved"] },
     { id: "lautrec", name: "Lautrec of Carim", steps: ["quest-lautrec", "quest-lautrec-before-gargoyles", "quest-lautrec-invasion", "quest-anastacia-return"] },
@@ -18,7 +18,7 @@ export const questlines: Questlines = {
     { id: "domhnall", name: "Domhnall of Zena", steps: ["quest-domhnall-depths", "quest-domhnall-firelink"] },
     { id: "mildred", name: "Maneater Mildred", steps: ["invasion-mildred"] },
     { id: "fair-lady", name: "The Fair Lady and Quelana", steps: ["quest-fair-lady", "quest-eingyi", "quest-quelaana", "quest-chaos-rank"] },
-    { id: "frampt", name: "Kingseeker Frampt", steps: ["quest-frampt"] },
+    { id: "frampt", name: "Kingseeker Frampt", steps: ["quest-frampt", "quest-lordvessel-frampt"] },
     { id: "crestfallen", name: "The Crestfallen Warrior", steps: ["quest-crestfallen-firelink", "quest-crestfallen-new-londo"] },
     { id: "shiva", name: "Shiva", steps: ["quest-shiva-shop"] },
     { id: "dusk", name: "Dusk", steps: ["quest-dusk", "quest-dusk-rescued"] },
