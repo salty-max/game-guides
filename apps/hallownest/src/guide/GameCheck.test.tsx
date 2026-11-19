@@ -27,9 +27,15 @@ describe("Check against the game", () => {
     expect(screen.getByText("Your save should read 0%.")).toBeInTheDocument();
   });
 
-  it("names the game's 112% as the save's figure, with the content packs it assumes, and says when everything is in", () => {
+  it("names the game's 112% as the save's figure, with the content packs it assumes, and says when all the game counts is in", () => {
     show(allRows);
-    expect(screen.getByText("Your save should read 112%: everything.")).toBeInTheDocument();
+    expect(screen.getByText("Your save should read 112%: all the game counts.")).toBeInTheDocument();
     expect(screen.getByText(/counts up to 112% with all four free content packs installed/)).toBeInTheDocument();
+  });
+
+  it("says it is the game's count and not the bar's, and never shows a bare 112%", () => {
+    show(allRows);
+    expect(screen.getByText(/That’s the game’s count, not the bar’s/)).toBeInTheDocument();
+    for (const element of screen.getAllByText(/112%/)) expect(element.textContent, element.textContent ?? "").toMatch(/save|game/);
   });
 });

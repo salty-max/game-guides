@@ -5,7 +5,8 @@ export const questlines = {
   "title": "Hallownest questlines",
   "intro": "Find selected NPC routes as far as you have revealed them. Their checks are shared with the walkthrough.",
   "cover": [
-    "quest"
+    "quest",
+    "choice"
   ],
   "lines": [
     {
