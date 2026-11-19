@@ -33,7 +33,7 @@ export default {
       title: "Blossu and the lockup",
       rows: [
         ["heart-faron-dark-cave", ["heart-piece"], "Collect the Heart Piece in the dark south Faron cave", "Return to Scrubton and follow the river south to the cave. Light braziers to see the gaps. Cross to the piece near the east exit."],
-        ["chest-faron-dark-cave-50", ["chest"], "Open the 50-rupee chest in the dark cave's north room", "Defeat the enemies and light the braziers. Backtrack and take the route south toward Blossu's house."],
+        ["chest-faron-dark-cave-50", ["chest", "overworld-chest"], "Open the 50-rupee chest in the dark cave's north room", "Defeat the enemies and light the braziers. Backtrack and take the route south toward Blossu's house."],
         ["waypoint-blossu", ["waypoint"], "Activate the Waypoint near Blossu's house", "Go east up the steps past the cave, talk to the Deku Scrubs and enter the rift after the scene."],
         ["crystal-stilled-blossu", ["might-crystal"], "Free all five groups in Stilled Blossu's House", "Burn the first web to the north, then the web covering the gap above the climbing wall and defeat the plant below. Use the ladder at the top of the wall to reach the cave's plant group and the group behind breakable rock. Leave the cave and drop left to the trees for the last group.", { quantity: 2 }],
         ["story-lockup-key", ["story"], "Pull the cell key through the bars", "Use Bind even though the Tri Rod was taken. Unlock the cell, go down the left stairs and avoid the guards by staying behind cover and moving between their patrols."],
@@ -46,11 +46,11 @@ export default {
     {
       title: "Stilled Faron Wetlands approach",
       rows: [
-        ["chest-stilled-faron-rupees", ["chest"], "Open the 20-rupee chest left of the first plant path", "Go north from the rift entrance and Bind the plants' heads. Climb the left detour to the chest, then continue right."],
+        ["chest-stilled-faron-rupees", ["chest", "overworld-chest"], "Open the 20-rupee chest left of the first plant path", "Go north from the rift entrance and Bind the plants' heads. Climb the left detour to the chest, then continue right."],
         ["echo-electric-keese", ["echo"], "Learn Electric Keese along the rift path", "Defeat one from range. You will use its electricity on the crystal switches."],
-        ["chest-stilled-faron-golden-egg", ["chest"], "Burn the web hiding a Golden Egg chest", "Check the web near the Electric Keese and use fire to open the route to the chest."],
+        ["chest-stilled-faron-golden-egg", ["chest", "overworld-chest"], "Burn the web hiding a Golden Egg chest", "Check the web near the Electric Keese and use fire to open the route to the chest."],
         ["echo-goo-specter", ["echo"], "Learn Goo Specter near the ruined platform", "Cross left over the trees, clear the enemies in the ruins and learn the remnant."],
-        ["chest-stilled-faron-milk", ["chest"], "Open the chest of four Fresh Milk by the ruins", "Take it after clearing the Goo Specter area. Follow the web bridges to the right."],
+        ["chest-stilled-faron-milk", ["chest", "overworld-chest"], "Open the chest of four Fresh Milk by the ruins", "Take it after clearing the Goo Specter area. Follow the web bridges to the right."],
         ["waypoint-stilled-faron", ["dungeon-waypoint"], "Activate the stilled wetland Waypoint and open the torch cave", "Use a Drippitune to extinguish the six flames. Climb into the opened cave."],
         ["echo-beamos", ["echo"], "Learn Beamos in the cave below the temple", "Damage it until it turns to stone, then use an explosive to break it. Learn it and use Electric Keese on the crystals at the top of the cave to open the way forward."],
       ],

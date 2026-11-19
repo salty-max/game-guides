@@ -20,8 +20,8 @@ export default {
         ["story-still-missing", ["story"], "Start Still Missing at Lueburry's house", "After Gerudo Sanctum and Jabul Ruins, speak with Lueburry and the ministers. Follow the main road north to Castle Town, where the gates are blocked by the rift."],
         ["story-castle-town-well", ["story"], "Enter the rift at the bottom of the town well", "Go around to the northwest side of town and look behind the red-roofed house. Jump into the well and let Tri open a passage beside the guard."],
         ["waypoint-stilled-castle-town", ["dungeon-waypoint"], "Activate the stilled town Waypoint", "Climb through the guard house and exit south. Head east behind the shop, climb across the tilted building and follow the broken streets north past the fountain."],
-        ["chest-stilled-castle-butter", ["chest"], "Open the chest of seven Radiant Butter by the stilled town Waypoint", "Check the chest near the stone before taking the water route up."],
-        ["chest-stilled-castle-wall", ["chest"], "Open the 20-rupee chest on the castle wall", "Build west from the Waypoint to the top of the wall. Then return to the river, swim up and use the trees and echoes to reach the castle doors."],
+        ["chest-stilled-castle-butter", ["chest", "overworld-chest"], "Open the chest of seven Radiant Butter by the stilled town Waypoint", "Check the chest near the stone before taking the water route up."],
+        ["chest-stilled-castle-wall", ["chest", "overworld-chest"], "Open the 20-rupee chest on the castle wall", "Build west from the Waypoint to the top of the wall. Then return to the river, swim up and use the trees and echoes to reach the castle doors."],
       ],
     },
     {
