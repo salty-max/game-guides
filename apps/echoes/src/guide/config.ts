@@ -36,7 +36,7 @@ export const targets = [
   { tag: "recipe", goal: 69 },
   { tag: "automaton", goal: 6 },
   { tag: "fairy-bottle", goal: 4 },
-  { tag: "dungeon-chest", goal: 59 },
+  { tag: "dungeon-chest", goal: 57 },
   { tag: "mini-dungeon-chest", goal: 12 },
   { tag: "overworld-chest", goal: 38 },
   { tag: "equipment", goal: 4 },
