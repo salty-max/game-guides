@@ -55,7 +55,7 @@ export default {
         ["sorcery-dark-bead", ["sorcery", "dlc", "dlc-spell"], "Collect Dark Bead", "Leave the Chasm of the Abyss bonfire through the doorway and keep left. Bloatheads and a Bloathead Sorcerer guard the corpse with the spell.", {"reference": "https://darksouls.wikidot.com/dark-bead"}],
         ["sorcery-dark-fog", ["sorcery", "dlc", "dlc-spell"], "Collect Dark Fog", "In the big Township hall with two Bloathead Sorcerers and a crowd of Bloatheads, go down the stairs. A body hangs at the far end of the room, by the small archway to the shortcut lift: shoot it down for the spell."],
         ["sorcery-dark-orb", ["sorcery", "dlc", "dlc-spell"], "Collect Dark Orb", "Past the Township room hiding the Silver Pendant, cross the bridge and take the stairs down to two Bloathead Sorcerers. Of the three chests there, two are already open: the closed one holds the spell."],
-        ["sorcery-pursuers", ["sorcery", "dlc", "dlc-spell", "trade"], "Trade for Pursuers", "Drop the Soul of Manus alone in Snuggly’s small nest at the Asylum, then quit and reload. The same soul can instead make the Manus Catalyst, so plan both across two cycles.", {"reference": "https://darksouls.wikidot.com/pursuers"}],
+        ["sorcery-pursuers", ["sorcery", "dlc", "dlc-spell"], "Trade for Pursuers", "Drop the Soul of Manus alone in Snuggly’s small nest at the Asylum, then quit and reload. The same soul can instead make the Manus Catalyst, so plan both across two cycles.", {"reference": "https://darksouls.wikidot.com/pursuers"}],
       ],
     },
     {
@@ -208,7 +208,7 @@ export default {
         ["reinforcement-chaos", ["reinforcement", "achievement"], "Raise a Chaos weapon to +5", "Use the Chaos Flame Ember with Vamos on a Fire +5 weapon. Finish with red chunks and a Red Titanite Slab.", {"reference": "https://darksouls.wikidot.com/chaos"}],
         ["reinforcement-lightning", ["reinforcement", "achievement"], "Raise a Lightning weapon to +5", "Use a normal +10 at the Giant Blacksmith or reinforce the Lightning Spear from Sen’s Fortress mimic. Use regular chunks and a Titanite Slab.", {"reference": "https://darksouls.wikidot.com/lightning"}],
         ["reinforcement-crystal", ["reinforcement", "achievement"], "Raise a Crystal weapon to +5", "Use the Crystal Ember and a normal +10 at the Giant, or start with the Crystal Halberd from the first mimic at the start of Anor Londo. Finish with regular chunks and a Titanite Slab. Crystal weapons can’t be repaired, though upgrading restores their durability.", {"reference": "https://darksouls.wikidot.com/crystal"}],
-        ["forge-snuggly-red-slab", ["forge", "trade"], "Trade for a second Red Titanite Slab", "Have Quelana ascend a +15 normal flame into an Ascended Pyromancy Flame, and don’t upgrade it any further. Drop that flame alone in Snuggly’s small nest and reload for the slab."],
+        ["forge-snuggly-red-slab", ["forge"], "Trade for a second Red Titanite Slab", "Have Quelana ascend a +15 normal flame into an Ascended Pyromancy Flame, and don’t upgrade it any further. Drop that flame alone in Snuggly’s small nest and reload for the slab."],
       ],
     },
     {

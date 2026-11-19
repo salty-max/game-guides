@@ -58,7 +58,10 @@ describe("Dark Souls Remastered completion", () => {
       expect(target, tag).toBeDefined();
       expect("goal" in target! && target.goal, tag).toBe(rowsByTag(tag).length);
     }
-    // (Snuggly's 20 trades, no how-to row among them; the five slabs the guide sends you to, not a farming row)
+    // (Snuggly's trades without the how-to row, and without the two that count as their own kind; the five slabs the guide sends you to, not a farming row)
+    for (const [id, tag] of [["sorcery-pursuers", "dlc-spell"], ["forge-snuggly-red-slab", "forge"], ["extra-laurentius-goodbye", "quest"]] as const) {
+      expect(targets.filter((target) => rowsByTag(target.tag).some((row) => row.id === id)).map((target) => target.tag), id).toEqual([tag]);
+    }
     expect(rowsByTag("trade").some((row) => row.id === "trade-snuggly-how")).toBe(false);
     expect(rowsByTag("forge").some((row) => row.id === "forge-kiln-farm")).toBe(false);
   });

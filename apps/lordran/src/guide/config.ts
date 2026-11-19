@@ -23,7 +23,7 @@ const banners = byChapter(import.meta.glob<Banner>("./banners/chapter-*.webp", {
 /**
  * The guide's own completion list, and what 100% is: every target counts, each item once, up to its goal, so the bar reads 100
  * exactly when What's left is empty. The Steam achievements and the lists they count, the rings and the expansion's spells
- * come with game totals (facts-to-verify.md has their hosts), and so do Snuggly's trades and the NPC invasions, whose lists two hosts
+ * come with game totals (facts-to-verify.md has their hosts), and so do Snuggly's trades (the game's 20, less the Pursuers spell and the Red Titanite Slab, which count as a spell and a slab, so 18) and the NPC invasions, whose lists two hosts
  * give as tables. The rest are the guide's own lists, whose goals are their rows, not a game total: the NPC quest steps, the Estus
  * souls and Titanite Slabs it sends you to, the expansion's gear, the New Game+ steps, the discoveries and the loot sweeps. A test pins every
  * goal to the data, so a missing row shows up as a failing
@@ -47,12 +47,12 @@ export const targets = [
   { tag: "quest", goal: 53 },
   { tag: "dlc-spell", goal: 5 },
   { tag: "dlc-gear" },
-  { tag: "trade", goal: 20 },
+  { tag: "trade", goal: 18 },
   { tag: "estus", goal: 5 },
   { tag: "forge", goal: 5 },
   { tag: "invasion", goal: 7 },
   { tag: "cycle", goal: 10 },
-  { tag: "extra", goal: 12 },
+  { tag: "extra", goal: 11 },
   { tag: "pickup", goal: 22 },
 ];
 
@@ -114,7 +114,7 @@ const config: GuideConfig = {
     dashboardIntro: "100% is every target on the board, each item counted once, across three playthroughs: the Steam achievements and the lists they count, the rings, the expansion, the NPC quests, Snuggly’s trades, the invasions and the later cycles.",
     boardTitle: "Completion targets",
     boardNote:
-      "Every target counts, each item once, so 100% is exactly when What’s left is empty. Spell counts are the base game’s, as the achievements count them; the five expansion spells have their own line. Knight’s Honor counts all 47 rare weapons. NPC quests, Estus souls, slabs, later cycles, discoveries and pickups count the guide’s own rows, not a game total; trades and invasions follow the game’s lists. A one-way choice, like Frampt or Kaathe, is left off until a choice can count once whichever way you go.",
+      "Every target counts, each item once, so 100% is exactly when What’s left is empty. Spell counts are the base game’s, as the achievements count them; the five expansion spells have their own line. Knight’s Honor counts all 47 rare weapons. NPC quests, Estus souls, slabs, later cycles, discoveries and pickups count the guide’s own rows, not a game total; trades (the game’s 20, less two that count as a spell and a slab) and invasions follow the game’s lists. A one-way choice, like Frampt or Kaathe, is left off until a choice can count once whichever way you go.",
     nextUpDone: "Everything revealed is checked. Reveal the next chapter or check the totals on the Progress page.",
     backupBlurb: "Export a copy of your checks and spoiler settings.",
   },
