@@ -256,8 +256,8 @@ export interface GuideConfig {
    * Set only when the game keeps an achievement list of its own, so every reader has one whatever they play on: in-game where the
    * platform has no achievements (Hollow Knight's Feats on Switch). Its sources, two hosts or more, back that and aren't shown.
    * Without it no text a reader sees says "achievement" or "trophy" (data.test.ts): a platform's achievements (Steam, Xbox,
-   * PlayStation) can check the data for gaps but are never shown. Lordran's are: Dark Souls Remastered's achievements are the
-   * platforms' alone (its facts-to-verify.md has what backs that).
+   * PlayStation) can check the data for gaps but are never shown. Lordran sets none: nothing found names a list of Dark Souls
+   * Remastered's own, and its facts-to-verify.md says what backs that (one host and the user's word) and what would settle it.
    */
   achievements?: { sources: SourceLink[] };
   categories: Record<string, Category>;
