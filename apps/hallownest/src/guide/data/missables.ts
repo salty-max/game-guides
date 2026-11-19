@@ -3,7 +3,7 @@ import type { Missable } from "@hundo/core/types";
 const steam = "https://steamcommunity.com/sharedfiles/filedetails/?id=3005043947";
 const fextralifeTroupe = "https://hollowknight.wiki.fextralife.com/The+Grimm+Troupe+(Quest)";
 
-/** What can be lost for good, in route order. None of it costs a point of the game's own completion, but six of the nine are board rows a save can't get back once it has gone past them (three quest steps, the two endings and the Arcane Egg), so the bar needs them; the Troupe's finale is on the board too and is the same either way, and Zote's rescue and the Nailsmith are one-way choices counted by no target. */
+/** What can be lost for good, in route order. None of it costs a point of the game's own completion, but seven of the nine are board rows a save can't get back once it has gone past them (four quest steps, the two endings and the Arcane Egg), so the bar needs them; the Troupe's finale is on the board too and is the same either way, and the Nailsmith is a one-way choice counted by no target. */
 export const missables: Missable[] = [
   {
     id: "quest-zote-greenpath",
