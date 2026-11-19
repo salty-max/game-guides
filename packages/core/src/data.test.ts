@@ -155,7 +155,6 @@ describe("guide data", () => {
       ...config.missables.map((item) => item.why),
       ...(config.choices ?? []).flatMap((choice) => [choice.name, choice.why, ...choice.later.map((later) => later.on)]),
       config.reassurance?.text,
-      completion.overall?.label,
       config.questlines.tab,
       config.questlines.title,
       config.questlines.intro,

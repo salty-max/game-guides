@@ -7,32 +7,28 @@ import { expect } from "storybook/test";
 const meta = {
   title: "Core/Overall",
   component: OverallBar,
-  args: { percent: 41, label: "complete", entries: null, place: "page" },
+  args: { percent: 41, label: "complete", place: "page" },
   decorators: [(Story, { args }) => <div style={{ maxWidth: args.place === "rail" ? 250 : 720 }}><Story /></div>],
 } satisfies Meta<typeof OverallBar>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/** The Progress page's hero, for a guide counting its completion list: the figure alone. */
+/** The Progress page's hero: the figure and its words alone. */
 export const Page: Story = {};
 export const PageEmpty: Story = { args: { percent: 0 } };
 export const PageFull: Story = { args: { percent: 100 } };
 
-/** Red Dead's: the game's own percentage, to a tenth, with the entries it reads beside it. */
-export const PageWeighted: Story = { args: { percent: 55.1, label: "estimated in-game completion", entries: { done: 164, total: 274 } } };
-
 /** In the rail and the drawer: the label and the figure over a thin bar. */
 export const Rail: Story = { args: { place: "rail" } };
-export const RailWeighted: Story = { args: { place: "rail", percent: 55.1, label: "estimated in-game completion" } };
 
 /** A progressbar named "Overall completion", whose value a screen reader hears as shown: 99.9 is never "100%". */
 export const Accessible: Story = {
-  args: { percent: 99.9, label: "estimated in-game completion" },
+  args: { percent: 99.9 },
   play: async ({ canvas }) => {
     const bar = canvas.getByRole("progressbar", { name: "Overall completion" });
     await expect(bar).toHaveAttribute("aria-valuenow", "99.9");
-    await expect(bar).toHaveAttribute("aria-valuetext", "99.9% estimated in-game completion");
+    await expect(bar).toHaveAttribute("aria-valuetext", "99.9% complete");
     await expect(canvas.getByText("99.9%")).toBeVisible();
   },
 };

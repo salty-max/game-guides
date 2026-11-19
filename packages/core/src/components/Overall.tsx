@@ -17,10 +17,8 @@ function Track({ size }: { size: "thin" | "thick" }) {
 interface OverallBarProps {
   /** The figure, already rounded down (guide.ts's `overall`). */
   percent: number;
-  /** The words after it: "complete", "estimated in-game completion". */
+  /** The words after it: "complete". */
   label: string;
-  /** The entries a weighted figure counts beside it (Red Dead's), or null. */
-  entries: { done: number; total: number } | null;
   /** The rail's (and the chapters drawer's) compact line, or the Progress page's hero. */
   place: "rail" | "page";
 }
@@ -31,9 +29,8 @@ interface OverallBarProps {
  * left. Not a link: a progressbar inside one muddles the link's name, and the Progress page is a tab away. `data-nosnippet`, so a search
  * result never quotes a first visit's "0%".
  */
-export function OverallBar({ percent, label, entries, place }: OverallBarProps) {
-  // A progressbar's children are presentational, so what the hero shows beside the figure is said in its value text too.
-  const text = place === "page" && entries ? `${overallText(percent, label)}, ${entries.done} of ${entries.total} entries` : overallText(percent, label);
+export function OverallBar({ percent, label, place }: OverallBarProps) {
+  const text = overallText(percent, label);
   if (place === "rail") {
     return (
       <Progress.Root value={percent} getAriaValueText={() => text} data-nosnippet="" className="grid gap-2 rounded-card border border-line bg-surface px-2.5 pt-2.5 pb-3">
@@ -48,16 +45,9 @@ export function OverallBar({ percent, label, entries, place }: OverallBarProps) 
   return (
     <Progress.Root value={percent} getAriaValueText={() => text} data-nosnippet="" className="grid gap-2.5">
       <Progress.Label className="text-12 font-extrabold tracking-[0.16em] text-muted uppercase">Overall completion</Progress.Label>
-      <span className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1.5">
-        <span className="flex flex-wrap items-baseline gap-x-2">
-          <Progress.Value className="text-38 leading-none font-extrabold tabular-nums">{() => `${percent}%`}</Progress.Value>
-          <span className="text-16 font-bold">{label}</span>
-        </span>
-        {entries && (
-          <span className="text-14 text-muted tabular-nums">
-            {entries.done} of {entries.total} entries
-          </span>
-        )}
+      <span className="flex flex-wrap items-baseline gap-x-2">
+        <Progress.Value className="text-38 leading-none font-extrabold tabular-nums">{() => `${percent}%`}</Progress.Value>
+        <span className="text-16 font-bold">{label}</span>
       </span>
       <Track size="thick" />
     </Progress.Root>

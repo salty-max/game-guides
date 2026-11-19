@@ -21,10 +21,6 @@ const without = (left: (typeof allRows)[number]) => tick(allRows.filter((row) =>
 describe("Red Dead completion", () => {
   it("counts every category of the board, with no weights, points or estimate behind the bar", () => {
     expect(completion.board.some((item) => item.optional)).toBe(false);
-    expect(completion.overall).toBeUndefined();
-    expect(completion.isCore).toBeUndefined();
-    expect(completion.left).toBeUndefined();
-    expect(completion.unit).toBeUndefined();
     expect(completion.board.map((item) => item.tag)).toEqual(expect.arrayContaining(["scrap", "optional", "challenge", "outfit", "stranger"]));
     expect(overall({}).label).toBe("complete");
   });

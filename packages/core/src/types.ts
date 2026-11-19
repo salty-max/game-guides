@@ -176,7 +176,7 @@ export interface Brand {
   /** Document and social title. */
   title: string;
   description: string;
-  /** Storage keys are `<prefix>.v1` (progress), `<prefix>.theme`, `<prefix>.sync` (a synced device's ledger), `<prefix>.awake` (Keep screen on) and `<prefix>.place` (the last place read). */
+  /** Storage keys are `<prefix>.v1` (progress), `<prefix>.theme`, `<prefix>.sync` (a synced device's ledger), `<prefix>.awake` (Keep screen on), `<prefix>.place` (the last place read), `<prefix>.persist` (when the guide last asked to keep its storage) and `<prefix>.counts` (Count my visits turned off). */
   storagePrefix: string;
   backupFile: string;
   /** The word in the header brand, above "HUNDO". */
@@ -202,7 +202,7 @@ export interface BoardItem {
   tag: string;
   /** A fixed total from the game's own list; otherwise the count of tagged rows. */
   goal?: number;
-  /** Shown on the board but left out of "What's left". */
+  /** Shown on the board but left out of "What's left" and the bar. Only for what lies outside the game, such as amiibo, which need physical figures. */
   optional?: boolean;
   /**
    * The category its tile and its line in "What's left" open on the checklist, when that isn't the tag it counts: one that holds every
@@ -218,20 +218,12 @@ export interface LeftItem {
 }
 
 export interface Completion {
-  /** Rows a weighted `overall.percent` reads, and the entries it counts beside it. Default: every row. */
-  isCore?: (row: Row) => boolean;
   /**
-   * The overall figure is the board's targets that aren't optional, each counted as the board counts it and up to its goal (core's
-   * `listedPercent`), followed by "complete". `label` changes those words; `percent` replaces the figure with a model of the game's own
-   * percentage, read over the core rows (Red Dead's estimate, "estimated in-game completion"). Round it down, as the game does: the
-   * bar shows it as given.
+   * The guide's completion list. The overall figure and "What's left" both read it: the targets that aren't optional, each counted as
+   * the board counts it and up to its goal (core's `listedPercent`), followed by "complete". A game's own percentage never replaces it;
+   * a guide shows that in a panel.
    */
-  overall?: { label?: string; percent?: (checks: Checks, rows: Row[]) => number };
   board: BoardItem[];
-  /** A custom "What's left". Default: each board total minus what is checked. */
-  left?: (checks: Checks, rows: Row[]) => LeftItem[];
-  /** "points" shows What's left to one decimal. */
-  unit?: "count" | "points";
 }
 
 export interface GuideText {
@@ -268,7 +260,7 @@ export interface GuideConfig {
   /** The category a row's `quantity` counts toward (Might Crystals by amount). */
   quantity?: string;
   missables: Missable[];
-  /** One-way choices, each drawn as one block and counted once. */
+  /** One-way choices, each drawn as one block. Every way is an ordinary counted row: the recommended one in the choice's chapter, each other in a later playthrough's. */
   choices?: Choice[];
   /** Chained side quests, on the Questlines page. */
   questlines: Questlines;

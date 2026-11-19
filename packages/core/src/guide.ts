@@ -86,9 +86,6 @@ export function nextUp(checks: Checks, isChapterOpen: (chapter: number) => boole
 export const missablesLeft = (chapter: Chapter, checks: Checks) =>
   chapterRows(chapter).filter((row) => (missableIds.has(row.id) || choiceByRow.has(row.id)) && checks[row.id] !== true);
 
-/** Rows a weighted overall figure reads (`completion.overall.percent`, Red Dead's estimate). Default: every row. */
-export const coreRows = completion.isCore ? allRows.filter(completion.isCore) : allRows;
-
 /** How much one entry adds toward a category: the configured quantity category by amount, everything else by one. */
 export const worth = (row: Row, tag: string) => (tag === config.quantity ? row.quantity : 1);
 
@@ -126,32 +123,20 @@ export function listedPercent(checks: Checks) {
 }
 
 /**
- * The guide's one overall figure and the words after it. By default it is the completion list (`listedPercent`); a guide whose game keeps
- * a percentage of its own replaces it with a model of that (`completion.overall.percent`, Red Dead's estimate), whose rows are real
- * entries, so their count comes with it. The list's own total isn't a count of anything a reader can point at (crystals by amount, a row
- * once per target it carries), so it has none.
+ * The guide's one overall figure and the words after it: the completion list (`listedPercent`), "complete". Nothing is counted beside
+ * it: the list's own total isn't a count of anything a reader can point at (crystals by amount, a row once per target it carries).
  */
-export function overall(checks: Checks) {
-  const label = completion.overall?.label ?? "complete";
-  const weighted = completion.overall?.percent;
-  if (!weighted) return { percent: listedPercent(checks), label, entries: null };
-  const done = coreRows.filter((row) => checks[row.id] === true).length;
-  return { percent: weighted(checks, coreRows), label, entries: { done, total: coreRows.length } };
-}
+export const overall = (checks: Checks) => ({ percent: listedPercent(checks), label: "complete" });
 
 /** The figure in words, as a screen reader hears it: as it is shown, never rounded up (Base UI's own text goes through Intl, which reads 99.9 as "100%"). */
 export const overallText = (percent: number, label: string) => `${percent}% ${label}`;
 
 /** What is left per category, biggest first; finished categories drop out. */
 export function whatsLeft(checks: Checks): LeftItem[] {
-  const items = completion.left
-    ? completion.left(checks, coreRows)
-    : completion.board
-        .filter((item) => !item.optional)
-        .map(({ tag, goal }) => {
-          const { done, total } = tally(tag, checks);
-          const target = goal ?? total;
-          return { tag, total: target, left: Math.max(target - done, 0) };
-        });
+  const items = listed.map(({ tag, goal }) => {
+    const { done, total } = tally(tag, checks);
+    const target = goal ?? total;
+    return { tag, total: target, left: Math.max(target - done, 0) };
+  });
   return items.filter((item) => item.left > 0).sort((a, b) => b.left - a.left || tagName(a.tag).localeCompare(tagName(b.tag)));
 }
