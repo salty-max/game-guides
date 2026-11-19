@@ -34,7 +34,8 @@ if (!picked.guides) {
 const apps = picked.guides;
 
 // A heavy job: on a machine shared by several sessions it takes its turn in the queue (tools/queued.mjs; not in CI), and its table is in the log q names.
-await queueSelf("lighthouse");
+// (about two minutes a guide on a quiet Mac, so six take 15 or more: past three guides it asks for 45 minutes, q's default being 30)
+await queueSelf("lighthouse", { limit: apps.length > 3 ? 45 : undefined });
 if (!named) console.log(`lighthouse: ${apps.join(", ")} (${args.includes("--all") ? "--all" : "the guides whose own files this change touches"})${picked.also ?? ""}`);
 const config = `--config=${join(root, "lighthouse", "lighthouserc.mjs")}`;
 const lhci = join(root, "node_modules", ".bin", "lhci");

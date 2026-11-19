@@ -3,6 +3,7 @@
 //
 //   import { queueSelf } from "…/tools/queued.mjs";
 //   await queueSelf("lighthouse");      // before the job's work, after its imports and any check of its arguments
+//   await queueSelf("lighthouse", { limit: 45 });   // a job that can run longer than the 30 minutes q allows by default
 //
 // A check that can end the run without work (no guide to look at, a usage error) goes before it, as in lighthouse/run.mjs and
 // guide-check's shoot.mjs, so such a run doesn't wait for its turn first.
@@ -16,6 +17,12 @@
 //     names a live holder) or inside this module's own re-run, or
 //   - bun or harness/q.ts isn't there.
 // A job that waits can wait for minutes: run it in the background, since a foreground tool call that times out loses its place.
+//
+// A job that holds the place is stopped after 30 minutes (q's DEFAULT_LIMIT, `[checks] queue_limit` in harness.toml): a hung job holds the one
+// place for everyone behind it, and the queue frees a place only when its holder dies. q sends SIGTERM to the job and everything it started, SIGKILL
+// ten seconds later, and ends with a verdict line that says it timed out (exit 124) and names the log, whose last lines say where it was. A job that
+// can take longer passes its own limit, in minutes: `await queueSelf("lighthouse", { limit: 45 })`. A waiting job's line names who holds the place,
+// and `bun harness/q.ts --queue-status` prints it and the line behind it.
 //
 // This lives in tools/, which no guide's or the API's Vercel ignore command watches: a file in scripts/ or a change to the root
 // package.json rebuilds every guide on the next merge.
@@ -98,20 +105,22 @@ export function logTail(name, out, count = TAIL) {
 
 /**
  * Runs `command` through q's queue under `name` (letters, digits, `.`, `-`, `_`), prints the end of its log, and resolves with its exit
- * code, or with undefined when bun isn't there. Signals sent to this process reach q, which stops the job and gives its place up.
+ * code, or with undefined when bun isn't there. `limit` is the minutes q lets it run before it stops it (q's default when left out, 0 for
+ * none). Signals sent to this process reach q, which stops the job and gives its place up.
  */
-export async function runQueued(name, command) {
+export async function runQueued(name, command, { limit } = {}) {
   const exe = bun();
   if (!exe) return undefined;
-  const result = await run(exe, [q, "--queue", name, "--", ...command], { ...process.env, HUNDO_QUEUED: "1" });
+  const flags = limit === undefined ? [] : ["--limit", String(limit)];
+  const result = await run(exe, [q, "--queue", ...flags, name, "--", ...command], { ...process.env, HUNDO_QUEUED: "1" });
   if (result.error) throw result.error;
   for (const line of logTail(name, result.out)) console.log(line);
   return result.code;
 }
 
-/** Re-runs the calling script, with its arguments and from where it was started, through the queue, and exits with its code; returns when it needn't. */
-export async function queueSelf(name) {
+/** Re-runs the calling script, with its arguments and from where it was started, through the queue, and exits with its code; returns when it needn't. `options.limit`: see runQueued. */
+export async function queueSelf(name, options) {
   if (!shouldQueue()) return;
-  const code = await runQueued(name, [process.execPath, ...process.execArgv, ...process.argv.slice(1)]);
+  const code = await runQueued(name, [process.execPath, ...process.execArgv, ...process.argv.slice(1)], options);
   if (code !== undefined) process.exit(code);
 }
