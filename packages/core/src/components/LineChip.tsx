@@ -12,7 +12,7 @@ import type { Row } from "../types";
  * It's drawn only beside a row whose chapter is revealed, and a line keeps to route order, so every step up to this one is revealed too;
  * "of n" is left out, as it would count the hidden ones.
  */
-export function LineChips({ row, at }: { row: Row; /** In a line of prose (a space before each), or in a row's column of tags. */ at: "prose" | "column" }) {
+export function LineChips({ row, at }: { row: Row; /** In a line of prose (a space before each), after a compact list's step (it wraps under the step's box), or in a row's column of tags. */ at: "prose" | "list" | "column" }) {
   // The last revealed chapter alone, so a tick elsewhere doesn't draw every row's chips again (RouteRow is memoised for that).
   const shownTo = useProgress((s) => (s.data.spoilers ? s.data.ceiling : Infinity));
   const lines = linesOf(row.id).filter((line) => line.rows.filter((step) => step.chapter <= shownTo).length > 1);

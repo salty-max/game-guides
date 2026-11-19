@@ -101,7 +101,7 @@ function Later({ row, on }: { row: Row; on: string }) {
  * Beside a later playthrough's way, in its own chapter: the choice it's the other side of, linked to the block. The choice's chapter comes
  * first, so it's revealed whenever this one is.
  */
-export function ChoiceChip({ choice, at }: { choice: Choice; /** In a line of prose (a space before it), or in a row's column of tags. */ at: "prose" | "column" }) {
+export function ChoiceChip({ choice, at }: { choice: Choice; /** In a line of prose (a space before it), after a compact list's step, or in a row's column of tags. */ at: "prose" | "list" | "column" }) {
   const row = byId.get(choice.row);
   if (!row) return null;
   return (

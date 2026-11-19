@@ -115,8 +115,8 @@ export function ListRow({ row, target, inChoice = false }: { row: Row; target?: 
       </label>
       <Badges row={row} inChoice={inChoice} />
       {row.map && <MapLink map={row.map} of={row.title} at="row" />}
-      <LineChips row={row} at="prose" />
-      <LaterChip row={row} at="prose" />
+      <LineChips row={row} at="list" />
+      <LaterChip row={row} at="list" />
       {/* Under the step's words, not under its box. */}
       {row.text && <span className="basis-full ps-check-indent text-14/normal text-muted">{row.text}</span>}
     </li>
@@ -146,7 +146,7 @@ export function ProseRow({ row, target, inChoice = false }: { row: Row; target?:
 }
 
 // Beside a later playthrough's way at a one-way choice: the choice it's the other side of.
-function LaterChip({ row, at }: { row: Row; at: "prose" | "column" }) {
+function LaterChip({ row, at }: { row: Row; at: "prose" | "list" | "column" }) {
   const choice = choiceAt(row.id);
   return choice ? <ChoiceChip choice={choice} at={at} /> : null;
 }
