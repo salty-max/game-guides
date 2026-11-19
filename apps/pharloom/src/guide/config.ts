@@ -20,8 +20,11 @@ import { sources } from "./data/sources";
 const banners = byChapter(import.meta.glob<Banner>("./banners/chapter-*.webp", { eager: true, query: "?banner", import: "default" }));
 
 /**
- * The completion board, and the overall figure with it: every target counts, one entry each, so 100% is everything the guide tracks.
- * The first eleven are the game's own completion count. A test pins every goal to the data.
+ * The completion board, and the overall figure with it: every target counts, one entry each and nothing optional, so 100% is
+ * everything the guide tracks and the bar reads 100 exactly when What's left is empty. The first eleven are the game's own
+ * completion count, term by term. The game's lists follow (fleas, lockets, maps and the rest), then the guide's own lists, whose
+ * goals are their rows rather than a game total: the pickups, the Wishes, the bosses and the challenges. Route steps are
+ * directions and the two sides of a one-way choice (`choice`) wait for core's choice block, so neither counts. A test pins every goal.
  */
 export const targets: BoardItem[] = [
   { tag: "tool", goal: 51 },
@@ -48,10 +51,11 @@ export const targets: BoardItem[] = [
   { tag: "bellshrine", goal: 6 },
   { tag: "bellway", goal: 12 },
   { tag: "ventrica", goal: 7 },
-  { tag: "quest" },
-  { tag: "boss" },
+  { tag: "pickup", goal: 13 },
+  { tag: "wish", goal: 77 },
+  { tag: "boss", goal: 41 },
   { tag: "ending", goal: 5 },
-  { tag: "challenge" },
+  { tag: "challenge", goal: 8 },
 ];
 
 const config: GuideConfig = {
@@ -61,9 +65,10 @@ const config: GuideConfig = {
   sources,
   categories: {
     route: ["Route steps", "Route", "compass"],
+    choice: ["One-way choices", "Choice", "scroll", "rose"],
     pickup: ["Other discoveries", "Pickup", "chest", "mint"],
     boss: ["Boss encounters", "Boss", "sword", "rose"],
-    quest: ["Wishes", "Wish", "scroll", "mint"],
+    wish: ["Wishes", "Wish", "scroll", "mint"],
     tool: ["Tools", "Tool", "chest", "amber"],
     skill: ["Silk Skills", "Silk Skill", "star", "violet"],
     kit: ["Crafting Kits", "Crafting Kit", "chest", "amber"],
@@ -94,7 +99,7 @@ const config: GuideConfig = {
   chips: {
     checklist: [
       ["tool", "Tools"],
-      ["quest", "Wishes"],
+      ["wish", "Wishes"],
       ["flea", "Lost Fleas"],
       ["mask-shard", "Mask Shards"],
       ["spool-fragment", "Spool Fragments"],
@@ -117,7 +122,7 @@ const config: GuideConfig = {
     dashboardIntro: "Every entry the guide tracks counts once, so 100% means all of it: every item, collection, Wish, boss, ending and challenge.",
     boardTitle: "Completion targets",
     boardNote:
-      "Every target counts toward the overall figure, one entry each. The first eleven are what the game's own completion counts, with four Mask Shards to a mask and two Spool Fragments to a spool; the rest are the collections, Wishes, bosses, endings and challenges a full save also holds.",
+      "Every target counts toward the overall figure, one entry each. The first eleven are what the game's own completion counts, with four Mask Shards to a mask and two Spool Fragments to a spool; the rest are the collections, pickups, Wishes, bosses, endings and challenges a full save also holds. Route steps and one-way choices don't count.",
     nextUpDone: "Everything revealed is checked. Reveal the next chapter or check the totals on the Progress page.",
     backupBlurb: "Export a copy of your checks and spoiler settings.",
   },

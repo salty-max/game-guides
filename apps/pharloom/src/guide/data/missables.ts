@@ -1,76 +1,45 @@
 import type { Missable } from "@hundo/core/types";
 
-export const missables = [
+/**
+ * Entries that can be lost for good, each on two independent hosts that state the same condition (hollowknight.wiki and its copies
+ * count as one). Nothing here costs the game's own completion; each costs an entry this guide tracks. A line shows in its
+ * chapter's strip and on the Questlines page once that chapter is revealed, so before chapter 10 none names the last act.
+ */
+export const missables: Missable[] = [
   {
-    "id": "wish-garmond-greymoor",
-    "why": "Speak to Garmond and Zaza before they move into the Citadel. Their later friendly duel is unavailable on this save if you never met them.",
-    "sources": [
-      "https://hollowknight.wiki/w/Garmond_and_Zaza",
-      "https://www.neoseeker.com/hollow-knight-silksong/Garmond_and_Zaza"
-    ]
+    id: "wish-broodfeast",
+    why: "Finish it before the story moves on: afterwards it can't be finished, and another Wish gives its rewards instead.",
+    sources: ["https://hollowknight.wiki/w/Broodfeast", "https://www.neoseeker.com/hollow-knight-silksong/Broodfeast"],
   },
   {
-    "id": "wish-garmond-zaza-act-two",
-    "why": "Duel the pair on the roof above the Vaults before finishing both Threefold Melody and Fine Pins. Entering Act 3 also closes their friendly encounter.",
-    "sources": [
-      "https://hollowknight.wiki/w/Garmond_and_Zaza",
-      "https://www.neoseeker.com/hollow-knight-silksong/Garmond_and_Zaza"
-    ]
-  },
-  {
-    "id": "wish-shakra-duel",
-    "why": "Finish Trail’s End and duel Shakra on the Greymoor side of Bellhart before Act 3. Move the Caravan out of Greymoor first.",
-    "sources": [
+    id: "wish-shakra-duel",
+    why: "Gone once the story moves on: finish Trail's End and duel Shakra before then, with the Flea Caravan out of Greymoor.",
+    sources: [
       "https://hollowknight.wiki/w/Shakra",
-      "https://guidevault.online/silksong/extras/bosses"
-    ]
+      "https://www.nintendolife.com/guides/hollow-knight-silksong-all-bosses-in-order-locations-and-rewards",
+    ],
   },
   {
-    "id": "ending-weaver-queen",
-    "why": "Record the uncursed Bind ending before allowing Greyroot to curse you and before triggering Snared Silk.",
-    "sources": [
-      "https://hollowknight.wiki/w/Endings_(Silksong)",
-      "https://www.pcgamer.com/games/action/silksong-endings/"
-    ]
+    id: "wish-delivery-bone-bottom",
+    why: "Gone once the story moves on: make the delivery before then.",
+    sources: ["https://hollowknight.wiki/w/Bone_Bottom_Supplies", "https://www.neoseeker.com/hollow-knight-silksong/Bone_Bottom_Supplies"],
   },
   {
-    "id": "ending-twisted-child",
-    "why": "Defeat Grand Mother Silk while cursed before curing it or leaving Act 2.",
-    "sources": [
-      "https://hollowknight.wiki/w/Cursed_Crest",
-      "https://www.pcgamer.com/games/action/silksong-endings/"
-    ]
+    id: "wish-delivery-pilgrims-rest",
+    why: "Gone once the story moves on: make the delivery before then.",
+    sources: [
+      "https://hollowknight.wiki/w/Pilgrim%27s_Rest_Supplies",
+      "https://vandal.elespanol.com/noticia/1350783504/cuidado-si-en-silksong-avanzas-al-acto-3-hay-contenidos-que-perderas-para-siempre/",
+    ],
   },
   {
-    "id": "ending-snared-silk",
-    "why": "This choice permanently closes both Act 2 Bind endings on this file. Finish them and any remaining Act 2-only encounters before playing the Needolin.",
-    "sources": [
-      "https://hollowknight.wiki/w/Silk_and_Soul",
-      "https://www.nintendolife.com/guides/hollow-knight-silksong-how-to-unlock-act-3-silk-and-soul-quest"
-    ]
+    id: "ending-weaver-queen",
+    why: "Closed by Snared Silk: bind Grand Mother Silk for this ending, then reload, before you play the Needolin at the Cradle.",
+    sources: ["https://hollowknight.wiki/w/Endings_(Silksong)", "https://www.neoseeker.com/hollow-knight-silksong/Act_2_Ending_%26_How_to_start_Act_3"],
   },
   {
-    "id": "boss-palestag",
-    "why": "Fight the Palestag and fill its entry before defeating the Clover Dancers, after which the memory closes.",
-    "sources": [
-      "https://hollowknight.wiki/w/Palestag",
-      "https://www.neoseeker.com/hollow-knight-silksong/Verdania"
-    ]
+    id: "ending-twisted-child",
+    why: "Beat Grand Mother Silk wearing the Cursed Crest before Infestation Operation cures the curse and before you play the Needolin at the Cradle.",
+    sources: ["https://hollowknight.wiki/w/Endings_(Silksong)", "https://www.pcgamer.com/games/action/silksong-endings/"],
   },
-  {
-    "id": "route-architect",
-    "why": "The Ruined Tool can be repaired only once. If you want the Twelfth Architect’s version, order it before buying out the remaining stock and finishing the Architect’s Melody.",
-    "sources": [
-      "https://hollowknight.wiki/w/Silkshot",
-      "https://www.nintendolife.com/guides/hollow-knight-silksong-all-tools-list-and-locations"
-    ]
-  },
-  {
-    "id": "wish-broodfeast",
-    "why": "Finish this Wish in Act 2 to preserve the Huntress’s outcome. Act 3 has a replacement Wish that still awards Longclaw.",
-    "sources": [
-      "https://hollowknight.wiki/w/Broodfeast",
-      "https://www.neoseeker.com/hollow-knight-silksong/Broodfeast"
-    ]
-  }
-] satisfies Missable[];
+];

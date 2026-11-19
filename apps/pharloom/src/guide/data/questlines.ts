@@ -5,7 +5,7 @@ export const questlines = {
   "title": "Pharloom questlines",
   "intro": "Track Wishes and NPC encounters through your revealed chapters.",
   "cover": [
-    "quest"
+    "wish"
   ],
   "lines": [
     {
@@ -97,7 +97,7 @@ export const questlines = {
     },
     {
       "id": "couriers",
-      "name": "Tipp and Pill",
+      "name": "Frey's couriers",
       "steps": [
         "wish-my-missing-courier",
         "wish-my-missing-brother",
@@ -110,8 +110,8 @@ export const questlines = {
       ]
     },
     {
-      "id": "greyroot-yarnaby",
-      "name": "Greyroot and Yarnaby",
+      "id": "greyroot",
+      "name": "Greyroot",
       "steps": [
         "wish-rite-of-the-pollip",
         "pickup-twisted-bud",
@@ -135,9 +135,9 @@ export const questlines = {
       "name": "Pinmaster Plinney",
       "steps": [
         "needle-sharpened",
+        "wish-pinmasters-oil",
         "needle-shining",
         "needle-hivesteel",
-        "wish-pinmasters-oil",
         "needle-pale-steel"
       ]
     },
@@ -174,9 +174,9 @@ export const questlines = {
       "steps": [
         "route-first-shrine",
         "wish-building-up-songclave",
-        "wish-strengthening-songclave",
         "wish-fine-pins",
         "wish-cloaks-of-the-choir",
+        "wish-strengthening-songclave",
         "wish-wailing-mother"
       ]
     },
@@ -201,13 +201,12 @@ export const questlines = {
       "name": "Savage Beastfly",
       "steps": [
         "boss-savage-beastfly",
-        "wish-savage-beastfly",
-        "mask-shard-7"
+        "wish-savage-beastfly"
       ]
     },
     {
-      "id": "sentinel",
-      "name": "Second Sentinel",
+      "id": "cogheart",
+      "name": "The Cogheart",
       "steps": [
         "pickup-cogheart-choral",
         "pickup-cogheart-vaults",
@@ -219,7 +218,7 @@ export const questlines = {
     },
     {
       "id": "huntress",
-      "name": "Huntress and Runt",
+      "name": "The Huntress",
       "steps": [
         "wish-broodfeast",
         "tool-longclaw"
