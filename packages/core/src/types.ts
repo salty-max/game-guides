@@ -252,6 +252,14 @@ export interface GuideConfig {
   chapters: RawChapter[];
   /** Guide-wide sources; each chapter can carry its own. */
   sources: SourceLink[];
+  /**
+   * Set only when the game keeps an achievement list of its own, so every reader has one whatever they play on: in-game where the
+   * platform has no achievements (Hollow Knight's Feats on Switch). Its sources, two hosts or more, back that and aren't shown.
+   * Without it no text a reader sees says "achievement" or "trophy" (data.test.ts): a platform's achievements (Steam, Xbox,
+   * PlayStation) can check the data for gaps but are never shown. Lordran's are: Dark Souls Remastered's achievements are the
+   * platforms' alone (its facts-to-verify.md has what backs that).
+   */
+  achievements?: { sources: SourceLink[] };
   categories: Record<string, Category>;
   /** Category chips on the checklist page and, in the checklist layout, above the route. */
   chips: { checklist: [id: string, label: string][]; route?: [id: string, label: string][] };
