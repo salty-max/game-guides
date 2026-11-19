@@ -4,7 +4,7 @@ What this guide claims that nobody has confirmed in the game. Nothing here was r
 
 ## Counts
 
-Each game count in `targets` (`src/guide/config.ts`) rests on two independent hosts, except the expansion spells, below. The expansion equipment and the NPC quests are the guide's own rows, so they have no goal and the board counts their rows. The tagged rows match these lists name for name.
+Each game count in `targets` (`src/guide/config.ts`) rests on two independent hosts, except the expansion spells, below. The expansion equipment and the lists marked "the guide's own" are rows the guide chose, not a game total: the board counts their rows and `guide.test.ts` pins each goal to them. The tagged rows match these lists name for name.
 
 | List | Count | Source 1 | Source 2 | Notes |
 | --- | ---: | --- | --- | --- |
@@ -21,7 +21,32 @@ Each game count in `targets` (`src/guide/config.ts`) rests on two independent ho
 | Endings | 2 | Steam | wikidot achievements | |
 | Expansion spells | 5 | wikidot spell lists | fextralife spell lists | The four expansion sorceries and Black Flame |
 | Expansion equipment | 10 rows, no goal | | | The guide’s own selection, not a game count: eight weapons and catalysts, the Silver Pendant and the Cleansing Greatshield |
-| NPC quests | 61 rows, no goal | | | The guide’s own steps, not a game count: the game gives no total, and a quest can end in a death, a hollowing or a choice. They show on the board but are `optional`, so What’s left leaves them out. The seven NPC invasion rows (`invasion`) are fights and have no line |
+| NPC quests | 53 | | | The guide's own steps, not a game count: the game gives no total. 61 rows carried the tag; 8 are now one-way choices, tagged `choice` and left off (below), so 53 carry `quest` |
+| Snuggly's trades | 20 | [wikidot Hawk Girl](https://darksouls.wikidot.com/hawk-girl) | [fextralife Snuggly](https://darksouls.wiki.fextralife.com/Snuggly) | Each host's table has 20 rows (19 base game plus Soul of Manus for Pursuers), neither states "20" in words; once per playthrough. The 20 rows are the 18 `trade-snuggly-*` trades, `sorcery-pursuers` and `forge-snuggly-red-slab` (the last two also count under their own tags). `trade-snuggly-how` is a how-to and is a route step |
+| Estus souls | 5 rows | [wikidot Fire Keeper Soul](https://darksouls.wikidot.com/fire-keeper-soul) | [fextralife Fire Keeper Soul](https://darksouls.wiki.fextralife.com/Fire+Keeper+Soul) | The game has 7 souls (the flask caps at +7): 4 corpses and 3 from killing Lady of the Darkling and Quelaag's Sister or from Anastacia's soul via Lautrec. The guide's goal is its own 5 rows, the 4 corpse souls and `estus-max`; it doesn't send you to kill a keeper, and Anastacia's soul is on a choice row. Neither host says one soul is one level, and NG+ respawn of the corpse souls is not stated by either |
+| Titanite Slabs | 5 rows | [wikidot NG+](https://darksouls.wikidot.com/new-game-plus) | | One host states a total: 9 slabs (Titanite 3, White 2, Red 2, Blue 2, with the expansion). The guide's `forge` rows hold 5 of them (the White at the Tomb, the Red in the poison pit, the Red from Snuggly, the Blue in the Crystal Cave and the Blue in Royal Wood); the Stray Demon's and Sieglinde's slabs sit on `boss-stray` and a choice row, and two more are only in the text of `boss-kalameet` and `route-chasm-spells`. `forge-kiln-farm` is farming and is a route step |
+| NPC invasions | 7 | [fextralife Invaders](https://darksouls.wiki.fextralife.com/Invaders) | [wikidot NPCs](https://darksouls.wikidot.com/npcs) | Five NPCs, seven invasions (Kirk three times, plus Mildred, Leeroy, Jeremiah and Chester); neither host states "7". The rows match; two locations are contradicted, see below |
+| Later cycles | 10 rows | | | The guide's own New Game+ steps; the wikidot NG+ page says up to NG+6 and gives no list |
+| Discoveries | 12 rows | | | The guide's own (tail cuts, hydras, Ricard, Havel, the Valley route, Avelyn, Laurentius's goodbye, two gestures and carvings); no total exists |
+| Pickups | 22 rows | | | The guide's own loot sweeps; no total exists |
+
+## One-way choices, kept off the targets
+
+The rows below are tagged `choice` (their ids and text are unchanged) and count toward no target, so the bar can read 100 without them. A shared choice block is to count each choice once whichever option is taken; this list is its starting point.
+
+- `quest-frampt`: Frampt or Kaathe, which decides the Fire or the Dark Lord ending.
+- `quest-lautrec-invasion`, `quest-anastacia-return`: Lautrec kills Anastacia once both bells are rung or the Parish and Blighttown Fire Keeper Souls are taken; the Black Eye Orb fight and her revival only exist on that branch.
+- `quest-patches-forgive`: forgive Patches (prism stones toward a hidden bonfire) or refuse (Twin Humanities).
+- `quest-ciaran`: give her the Soul of Artorias (the Tracers) or keep it for the Abyss Greatsword; the row calls it the first-run choice.
+- `quest-sieg-ash`: Siegmeyer ends the Izalith fight at half health or more (Sieglinde and a Titanite Slab at Ash Lake) or below it (his ring drops, chapter 13's `cycle-ng-plus-siegmeyer`).
+- `quest-solaire-shortcut`, `quest-solaire-saved`: killing the red-eyed bug at the Chaos shortcut and talking to Solaire there decides how his story ends; the row says one step decides it.
+
+Seen and kept as they were (they carry an earlier target, or only one answer has a row): the yes/no questions that close a shop (Laurentius's pyromancy question, `quest-laurentius`, `quest-laurentius-after-depths`, `extra-laurentius-goodbye`), Dusk's yes, `quest-reah` and `quest-reah-cleanup` (sources disagree on the Divine Blessing), `quest-logan-finish` (kill him only once he attacks), the Dark Lord and Fire endings (`ending`, counted on purpose), `ring-favor-protection` and `ring-speckled-stoneplate` (rings that exist only on one branch of Lautrec's and Siegmeyer's stories), `dlc-gear-gold-tracer` and `dlc-gear-dark-silver-tracer` (Ciaran's refusals), and `rare-weapon-priscilla-tail` (a strong blow kills her before the tail is cut).
+
+## Found while counting
+
+- `invasion-kirk-depths` says Kirk waits in the area with the three large rats; wikidot's Kirk page and fextralife's Knight Kirk page both say near the Basilisk area. The row is not changed.
+- `invasion-mildred` says the tunnel bonfire; wikidot's Mildred page and fextralife's both say the swamp bonfire. The row is not changed.
 
 ## Route decisions
 

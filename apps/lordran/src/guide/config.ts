@@ -21,13 +21,16 @@ import { sources } from "./data/sources";
 const banners = byChapter(import.meta.glob<Banner>("./banners/chapter-*.webp", { eager: true, query: "?banner", import: "default" }));
 
 /**
- * The guide's own completion list: the Steam achievements, the lists they count, the rings, the expansion's gear and the
- * NPC quests. A test pins every goal to the data, so a missing row shows up as a failing count. The expansion equipment
- * and the NPC quests are the guide's own rows, not a game total, so they have no goal: an NPC's arc ends in a death, a
- * hollowing or a choice, so no number of steps is "all of them". The quests are also `optional`, so they show on the
- * board and stay out of What's left, which would otherwise rank them first and need every quest step for "100%". The
- * seven `invasion` rows are fights, not questlines, and have no line. Base-game spells have their own tags, so the five
- * expansion spells count in their schools without inflating the three spell achievements.
+ * The guide's own completion list, and what 100% is: every target counts, each item once, up to its goal, so the bar reads 100
+ * exactly when What's left is empty. The Steam achievements and the lists they count, the rings and the expansion's spells
+ * come with game totals (facts-to-verify.md has their hosts), and so do Snuggly's trades and the NPC invasions, whose lists two hosts
+ * give as tables. The rest are the guide's own lists, whose goals are their rows, not a game total: the NPC quest steps, the Estus
+ * souls and Titanite Slabs it sends you to, the expansion's gear, the New Game+ steps, the discoveries and the loot sweeps. A test pins every
+ * goal to the data, so a missing row shows up as a failing
+ * count. Route steps are directions and carry no target. The rows of a one-way choice (Frampt or Kaathe, Lautrec and
+ * Anastacia, forgiving Patches, Ciaran's soul, Siegmeyer's and Solaire's fates) are tagged `choice` and left off every target
+ * until the choice block counts them once whichever option is taken. Base-game spells have their own tags, so the five expansion
+ * spells count in their schools without inflating the three spell achievements.
  */
 export const targets = [
   { tag: "achievement", goal: 41 },
@@ -41,9 +44,16 @@ export const targets = [
   { tag: "ember", goal: 10 },
   { tag: "reinforcement", goal: 10 },
   { tag: "ending", goal: 2 },
-  { tag: "quest", optional: true },
+  { tag: "quest", goal: 53 },
   { tag: "dlc-spell", goal: 5 },
   { tag: "dlc-gear" },
+  { tag: "trade", goal: 20 },
+  { tag: "estus", goal: 5 },
+  { tag: "forge", goal: 5 },
+  { tag: "invasion", goal: 7 },
+  { tag: "cycle", goal: 10 },
+  { tag: "extra", goal: 12 },
+  { tag: "pickup", goal: 22 },
 ];
 
 const config: GuideConfig = {
@@ -55,6 +65,7 @@ const config: GuideConfig = {
     route: ["Route steps", "Route", "compass"],
     boss: ["Bosses", "Boss", "sword", "rose"],
     quest: ["NPC quests", "Quest", "scroll", "mint"],
+    choice: ["NPC quest choices", "Choice", "scroll", "rose"],
     covenant: ["Covenants", "Covenant", "ribbon", "violet"],
     invasion: ["NPC invasions", "Invasion", "sword", "rose"],
     pickup: ["Equipment and keys", "Pickup", "chest", "sky"],
@@ -74,7 +85,7 @@ const config: GuideConfig = {
     dlc: ["Artorias of the Abyss", "Expansion", "compass", "violet"],
     ending: ["Endings", "Ending", "book", "rose"],
     cycle: ["Later cycles", "Later cycle", "compass", "sky"],
-    extra: ["Optional discoveries", "Optional", "star", "mint"],
+    extra: ["Discoveries", "Discovery", "star", "mint"],
     achievement: ["Achievement milestones", "Achievement", "ribbon", "amber"],
     trade: ["Crow trades", "Trade", "chest", "mint"],
   },
@@ -100,10 +111,10 @@ const config: GuideConfig = {
   text: {
     checklistIntro: "Search by item, boss, NPC or place. Checks are shared with the walkthrough.",
     searchPlaceholder: "Search items, bosses or places",
-    dashboardIntro: "Counts follow the Steam achievements, the lists they count, the rings, the expansion’s gear and the NPC quests, across three playthroughs.",
+    dashboardIntro: "100% is every target on the board, each item counted once, across three playthroughs: the Steam achievements and the lists they count, the rings, the expansion, the NPC quests, Snuggly’s trades, the invasions and the later cycles.",
     boardTitle: "Completion targets",
     boardNote:
-      "Spell counts are the base game’s, as the achievements count them; the five expansion spells have their own line. Knight’s Honor counts all 47 rare weapons. NPC quests count the guide’s own quest steps: a story can end in a death or a choice, so there is no finish line, and they stay out of What’s left.",
+      "Every target counts, each item once, so 100% is exactly when What’s left is empty. Spell counts are the base game’s, as the achievements count them; the five expansion spells have their own line. Knight’s Honor counts all 47 rare weapons. NPC quests, Estus souls, slabs, later cycles, discoveries and pickups count the guide’s own rows, not a game total; trades and invasions follow the game’s lists. A one-way choice, like Frampt or Kaathe, is left off until a choice can count once whichever way you go.",
     nextUpDone: "Everything revealed is checked. Reveal the next chapter or check the totals on the Progress page.",
     backupBlurb: "Export a copy of your checks and spoiler settings.",
   },
