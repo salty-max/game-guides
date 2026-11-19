@@ -3,8 +3,11 @@
 // localStorage before the first paint, the way theme-init.js reads it. Writes <out>/<app>-<page>-<size>-<theme>.png
 // and <out>/report.md (sideways scroll, console errors and loaded fonts per shot). Exits 1 if any shot had a problem.
 // --pages replaces the default pages. --reveal also seeds a save with spoiler protection off, so every chapter shows.
+// --apps names the guides and --all takes every guide; with neither, the guides whose own files the change in --root touches
+// (tools/scope.mjs's guidesOf), and when it also reaches every guide (core, the root's files) the three that cover both layouts, both corner
+// presets and three palettes beside them. A checkout with no change of its own (a base for "before") needs --apps.
 //
-//   node .claude/skills/guide-check/scripts/shoot.mjs --out <dir> [--root <checkout>] [--apps koholint,echoes]
+//   node .claude/skills/guide-check/scripts/shoot.mjs --out <dir> [--root <checkout>] [--apps koholint,echoes | --all]
 //        [--pages guide=/guide/1,checklist=/checklist] [--reveal] [--full]
 import { execFileSync, spawn } from "node:child_process";
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
@@ -12,20 +15,40 @@ import { createServer } from "node:net";
 import { join, resolve } from "node:path";
 import { chromium } from "playwright-core";
 import { queueSelf } from "../../../../tools/queued.mjs";
-
-// (a heavy browser job: it takes its turn in the machine's queue and runs in the background, see tools/queued.mjs)
-await queueSelf("shoot");
+import { BASE, changesOf, COVERING_GUIDES, guidesOf, workspaceOf } from "../../../../tools/scope.mjs";
 
 const args = Object.fromEntries(
   process.argv.slice(2).reduce((pairs, arg, i, all) => (arg.startsWith("--") ? [...pairs, [arg.slice(2), all[i + 1]?.startsWith("--") ? true : (all[i + 1] ?? true)]] : pairs), []),
 );
 if (!args.out || args.out === true) {
-  console.error("usage: shoot.mjs --out <dir> [--root <checkout>] [--apps a,b] [--pages name=/path,…] [--full]");
+  console.error("usage: shoot.mjs --out <dir> [--root <checkout>] [--apps a,b | --all] [--pages name=/path,…] [--full]");
   process.exit(2);
 }
 const root = resolve(args.root === true || !args.root ? "." : args.root);
 const out = resolve(args.out);
-const apps = typeof args.apps === "string" ? args.apps.split(",") : readdirSync(join(root, "apps")).filter((app) => existsSync(join(root, "apps", app, "vercel.json")));
+/** The guides to shoot and why, worked out before the queue, so a run with nothing to shoot doesn't wait for its turn. */
+const pick = () => {
+  if (typeof args.apps === "string") return { apps: args.apps.split(","), why: "--apps" };
+  if (args.all === true) return { apps: readdirSync(join(root, "apps")).filter((app) => existsSync(join(root, "apps", app, "vercel.json"))), why: "--all" };
+  const changes = changesOf(root);
+  if (!changes) return { why: `no ${BASE} in ${root} to tell what changed` };
+  const { every, guides } = guidesOf(changes.files, workspaceOf(root));
+  if (every) {
+    const apps = [...new Set([...guides, ...COVERING_GUIDES])];
+    return { apps, why: `${guides.length ? "the guides whose own files the change touches, and " : ""}for a change that reaches every guide, the three that cover both layouts, both corner presets and three palettes` };
+  }
+  return guides.length ? { apps: guides, why: "the guides whose own files the change touches" } : { why: `no guide changes in ${root} against ${BASE}` };
+};
+const picked = pick();
+if (!picked.apps) {
+  console.error(`shoot: ${picked.why}. Name the guides with --apps (as a base checkout's "before" shot does), or --all for every guide.`);
+  process.exit(2);
+}
+const { apps } = picked;
+
+// (a heavy browser job: it takes its turn in the machine's queue and runs in the background, see tools/queued.mjs)
+await queueSelf("shoot");
+console.log(`shoot: ${apps.join(", ")} (${picked.why})`);
 const pages = (typeof args.pages === "string" ? args.pages : "guide=/guide/1,checklist=/checklist,progress=/dashboard").split(",").map((pair) => pair.split("="));
 const sizes = { desktop: { width: 1280, height: 860 }, tablet: { width: 768, height: 1024 }, phone: { width: 375, height: 812 } };
 

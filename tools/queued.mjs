@@ -2,7 +2,10 @@
 // running Lighthouse, screenshot sweeps or `pnpm check`'s stories, the Mac's load passed 200 and its swap filled.
 //
 //   import { queueSelf } from "…/tools/queued.mjs";
-//   await queueSelf("lighthouse");      // first thing in the script, after its imports
+//   await queueSelf("lighthouse");      // before the job's work, after its imports and any check of its arguments
+//
+// A check that can end the run without work (no guide to look at, a usage error) goes before it, as in lighthouse/run.mjs and
+// guide-check's shoot.mjs, so such a run doesn't wait for its turn first.
 //
 // The script runs again through `bun harness/q.ts --queue <name> -- …`: it waits its turn behind a `check` or another job (one line on
 // stderr says who holds the place), keeps the output in .cache/logs, prints q's verdict line (which ends with that log's path) and then the
