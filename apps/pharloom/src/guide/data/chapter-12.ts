@@ -46,13 +46,12 @@ export default {
       ],
     },
     {
-      title: "Optional keepsakes and Bellhome",
+      title: "The last keepsakes",
       location: "Pharloom",
       compact: true,
-      sources: [["Sprintmaster Swift's fourth race", "https://hollowknight.wiki/w/Sprintmaster_Swift"], ["A Vassal Lost", "https://hollowknight.wiki/w/A_Vassal_Lost"], ["Summoned Saviour", "https://hollowknight.wiki/w/Summoned_Saviour"], ["Steel Seer Zi", "https://hollowknight.wiki/w/Steel_Seer_Zi"], ["Hunter's Journal requirements", "https://hollowknight.wiki/w/Hunter's_Journal_(Silksong)"], ["Hunter's Memento", "https://hollowknight.wiki/w/Hunter's_Memento"], ["Surface Memento", "https://hollowknight.wiki/w/Surface_Memento"]],
+      sources: [["Sprintmaster Swift's fourth race", "https://hollowknight.wiki/w/Sprintmaster_Swift"], ["Hunter's Journal requirements", "https://hollowknight.wiki/w/Hunter's_Journal_(Silksong)"], ["Hunter's Memento", "https://hollowknight.wiki/w/Hunter's_Memento"], ["Surface Memento", "https://hollowknight.wiki/w/Surface_Memento"]],
       rows: [
         ["wish-final-race", ["wish"], "Beat Sprintmaster Swift's final six-lap race", "With the Everbloom and all three Fastest in Pharloom races won, rest at a bench somewhere else and go back to Sprintmaster Swift. He offers one more race on the third course, six laps instead of three, and gives you the Sprintmaster Memento for winning it.", {"reference": "https://hollowknight.wiki/w/Sprintmaster_Swift"}],
-        ["boss-summoned-saviour", ["boss"], "Fight Summoned Saviour on a Steel Soul file", "Steel Soul files only. Steel Seer Zi, hidden at the Blasted Steps' far eastern edge, gives you A Vassal Lost once you own a map. Visit the three resting places she marks and her runaway vassal Sula's spot appears on your map: in Bone Bottom, southwest of Bonegrave, past a broken wall, where Sula has just summoned the Saviour. Beat it, then report to Zi for a Growstone. On a Classic file this fight doesn't exist.", {"reference": "https://hollowknight.wiki/w/Summoned_Saviour"}],
         ["wish-hunters-memento", ["wish"], "Complete Nuu's required Hunter's Journal entries", "Nuu, in the Halfway Home in Greymoor, wants every required Hunter's Journal entry: 230 of them, or 231 on Steel Soul, where the Summoned Saviour is required too. Six entries don't count: Shakra, Lost Lace, Garmond and Zaza, Lost Garmond, Palestag and the Flintbeetle. With the Farsight built, grey slots in the Journal show the required ones you still lack. Show her the finished Journal for the Hunter's Memento.", {"reference": "https://hollowknight.wiki/w/Hunter's_Memento"}],
       ],
     },

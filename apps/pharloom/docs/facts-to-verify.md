@@ -29,7 +29,7 @@ Each fixed total in `targets` (`src/guide/config.ts`) and its source are below; 
 | Bellshrines | 6 | wiki Bench | [Insider Gaming](https://insider-gaming.com/hollow-knight-silksong-old-bell/) (five) | The sixth rests on the wiki alone |
 | Endings | 5 | [wiki Endings](https://hollowknight.wiki/w/Endings_(Silksong)) | [PC Gamer](https://www.pcgamer.com/games/action/silksong-endings/) | |
 
-The guide's own lists have goals equal to their rows, not a game total: 13 pickups (keys, quest items and upgrades), 77 Wish steps (a Wish's parts, the Caravan's moves and the deliveries each count), 41 bosses and 8 challenges. `guide.test.ts` pins each goal to its rows. A row of two kinds counts once, as its real kind: Crawbug Clearing as its Crafting Kit and Savage Beastfly's Wish as its Mask Shard, the Wishes whose task is a fight (The Terrible Tyrant, The Wailing Mother, Hero's Call, Pain, Anguish and Misery) and the record runs (Seth's records, the final race) as Wishes, and Shakra's duel, which is no Wish, as a boss, like Garmond and Zaza's.
+The guide's own lists have goals equal to their rows, not a game total: 13 pickups (keys, quest items and upgrades), 79 Wish steps (a Wish's parts, the Caravan's moves and the deliveries each count, and both ways of the Huntress's choice, Broodfeast and Runtfeast), 41 bosses and 8 challenges. `guide.test.ts` pins each goal to its rows. A row of two kinds counts once, as its real kind: Crawbug Clearing as its Crafting Kit and Savage Beastfly's Wish as its Mask Shard, the Wishes whose task is a fight (The Terrible Tyrant, The Wailing Mother, Hero's Call, Pain, Anguish and Misery) and the record runs (Seth's records, the final race) as Wishes, and Shakra's duel, which is no Wish, as a boss, like Garmond and Zaza's.
 
 ## The overall figure
 
@@ -38,16 +38,15 @@ Every board target counts, one entry each, with nothing optional (the user's rul
 What full completion needs beyond one ordinary save, all of it the user's call:
 
 - **Endings.** All five count. One save can see them all with reloads: after Weaver Queen and Twisted Child the game returns to the last save with Grand Mother Silk alive ([wiki Endings](https://hollowknight.wiki/w/Endings_(Silksong)); the Weaver Queen half also [Neoseeker](https://www.neoseeker.com/hollow-knight-silksong/Act_2_Ending_%26_How_to_start_Act_3)). Snared Silk closes the other two on that save.
-- **Steel Soul.** `boss-summoned-saviour` exists only on a Steel Soul file ([wiki Summoned Saviour](https://hollowknight.wiki/w/Summoned_Saviour)), and on Steel Soul the Hunter's Memento needs its Journal entry too. The user counted mode-locked entries in, so the bar reaches 100 only on a Steel Soul save, which can also take every other entry (its Shell Satchel is the same tool entry as the Dead Bug's Purse, [wiki Completion](https://hollowknight.wiki/w/Completion_(Silksong))). Not verified: that nothing else differs on Steel Soul.
+- **A second save.** Two entries need one, so the user's 100% takes two saves; both sit in chapter 13, A Second Save (the user's rulings, 19 November 2026: mode-locked entries stay counted, and a one-way choice's other way goes to a later playthrough's chapter, as Hallownest's does). `boss-summoned-saviour` exists only on a Steel Soul file ([wiki Summoned Saviour](https://hollowknight.wiki/w/Summoned_Saviour), [Steel Soul Mode](https://hollowknight.wiki/w/Steel_Soul_Mode_(Silksong))), and `wish-runtfeast` only on a save that leaves Broodfeast unfinished into the last act (One-way choices, below). One Steel Soul save played that far covers both. A Steel Soul save can't hold every entry on its own: the Queen's Egg delivery and its Materium entry don't exist there (wiki Steel Soul Mode), so the first save, on Classic, takes the rest. On Steel Soul the Hunter's Memento needs the Saviour's Journal entry too, and the Shell Satchel is the same tool entry as the Dead Bug's Purse. That Steel Soul unlocks once the game is finished, that a death ends the save, and what else the mode changes rest on the wiki alone. Its two achievements (Steel Soul, Steel Heart) are no rows.
 - **Entries that close.** Some counted entries close for good when the story moves on: the strip's missables below, and the one-host candidates after them. A reader who reaches the last act without them can't reach 100 on that save.
 
 ## Missables
 
-The six in `missables.ts` each rest on two hosts that state the same condition (hollowknight.wiki and anything copying it count as one; guidevault.online is AI-written by its own footer and was dropped; Pharloom Calculator scrapes the wiki). None costs the game's own completion; each costs an entry this guide tracks (Broodfeast's row is a one-way choice, on no target until core's choice block lands). Before chapter 10 no line names the last act: they say "before the story moves on", or, in chapter 9's last group, "before you play the Needolin at the Cradle".
+The five in `missables.ts` each rest on two hosts that state the same condition (hollowknight.wiki and anything copying it count as one; guidevault.online is AI-written by its own footer and was dropped; Pharloom Calculator scrapes the wiki). None costs the game's own completion; each costs an entry this guide tracks. Broodfeast was one; it's now the one-way choice below. Before chapter 10 no line names the last act: they say "before the story moves on", or, in chapter 9's last group, "before you play the Needolin at the Cradle".
 
 | Row | Condition | Host 1 | Host 2 |
 | --- | --- | --- | --- |
-| `wish-broodfeast` | Can't be finished once the story moves on; Runtfeast gives its rewards instead | [wiki Broodfeast](https://hollowknight.wiki/w/Broodfeast) | [Neoseeker](https://www.neoseeker.com/hollow-knight-silksong/Broodfeast) |
 | `wish-shakra-duel` | Gone once the story moves on (that the duel can't be reached while the Caravan is in Greymoor is the wiki's alone, and stays in the row) | [wiki Shakra](https://hollowknight.wiki/w/Shakra) | [Nintendo Life](https://www.nintendolife.com/guides/hollow-knight-silksong-all-bosses-in-order-locations-and-rewards) ("Act 2 only"), and Vandal |
 | `wish-delivery-bone-bottom` | Gone once the story moves on | [wiki Bone Bottom Supplies](https://hollowknight.wiki/w/Bone_Bottom_Supplies) | [Neoseeker](https://www.neoseeker.com/hollow-knight-silksong/Bone_Bottom_Supplies), and Vandal |
 | `wish-delivery-pilgrims-rest` | Gone once the story moves on | [wiki Pilgrim's Rest Supplies](https://hollowknight.wiki/w/Pilgrim%27s_Rest_Supplies) | Vandal (Neoseeker's page for it doesn't say it closes) |
@@ -71,11 +70,13 @@ That nothing the game's own completion counts can be missed for good is what the
 
 ## One-way choices
 
-Where one quest has outcomes that exclude each other, the rows stay off the board (tagged `choice`) until core's choice block lands; then the guide's way is counted where it falls and the other way goes to a short "Second save" chapter (the user's ruling, 19 November 2026). Each keeps its id and text.
+Where one quest has outcomes that exclude each other, `choices.ts` names the way the guide takes on the first save, a counted row where it falls, and puts the other way in chapter 13, A Second Save, as a counted row of its own (the user's ruling, 19 November 2026). Core draws the choice as a block in its chapter and lists it in Don't miss until it's ticked, so its row is no longer in `missables.ts`.
 
-| Choice | Rows | The options | Sources |
+| Choice | First save | Second save | Sources |
 | --- | --- | --- | --- |
-| The Huntress | `wish-broodfeast` | Finish Broodfeast before the story moves on (she lives), or leave it and take Runtfeast from Runt later; Longclaw comes either way. The guide has no Runtfeast row | wiki Broodfeast and Runtfeast; Neoseeker Broodfeast |
+| The Huntress's Broodfeast (chapter 9) | `wish-broodfeast`: finish it before the story moves on, for the Longclaw | `wish-runtfeast` (a new row): leave it unfinished into the last act, and Runt asks the same 60 organs for the same Longclaw | [wiki Broodfeast](https://hollowknight.wiki/w/Broodfeast) and [Neoseeker Broodfeast](https://www.neoseeker.com/hollow-knight-silksong/Broodfeast) agree on the condition (not finished during Act 2), on Runtfeast taking its place and on the same reward; [wiki Runtfeast](https://hollowknight.wiki/w/Runtfeast) for the row. Game Rant agrees with a looser trigger. Only the wiki says the Huntress dies |
+
+The block shows the choice's name, its why and the later row's title in chapter 9, so none of them names the last act or Runt (`guide.test.ts`); the later row's own text, in chapter 13, does.
 
 Not choices, checked: the Silkshot's three makers (one tool entry whoever repairs it), Druid's Eye or Eyes and Claw Mirror or Mirrors (one entry each), the Dead Bug's Purse or the Shell Satchel (one entry), Curveclaw handed to the Skarr (its point comes back with the Curvesickle, [wiki Completion](https://hollowknight.wiki/w/Completion_(Silksong))), and the endings (counted by the user's choice).
 
@@ -108,7 +109,7 @@ Six source-checker passes read every row against its pages after the fix, and a 
 
 ## Achievements
 
-Silksong has its own achievement list: on the Switch, which has no system achievements, the game keeps them in-game as "Feats", checked from the main menu ([wiki Achievements](https://hollowknight.wiki/w/Achievements_(Silksong)); [Nintendo Life](https://www.nintendolife.com/guides/hollow-knight-silksong-all-achievements)). So under the user's rule (19 November 2026) the guide may name them, as the game's in-game achievements and never by platform. One row does: `challenge-completion-achievement`, the Completion achievement for a 100% finish at an ending ([wiki Completion](https://hollowknight.wiki/w/Completion_(Silksong))). The guide gives no total: Nintendo Life counts 50 and other sites 52, unsettled.
+Silksong has its own achievement list: on Switch and Switch 2, which have no system achievements, the game keeps them in-game as "Feats" ([wiki Achievements](https://hollowknight.wiki/w/Achievements_(Silksong)), its disclaimer), recorded in-game and found on the main menu ([Nintendo Life](https://www.nintendolife.com/guides/hollow-knight-silksong-all-achievements)). So under the user's rule (19 November 2026) the guide may name them, as the game's in-game achievements and never by platform, and `config.ts` sets `achievements` with those two sources (core's `data.test.ts` refuses the word to a guide without it). Not verified: whether the other platforms also show the list in the game's own menus. One row does: `challenge-completion-achievement`, the Completion achievement for a 100% finish at an ending ([wiki Completion](https://hollowknight.wiki/w/Completion_(Silksong))). The guide gives no total: Nintendo Life counts 50 and other sites 52, unsettled.
 
 ## By chapter
 
@@ -397,7 +398,7 @@ Patch-dated prices:
 Spoiler checks done by eye, not by a playtester: no row before the last group says what closes or names the act after this one; the last group names it only as "before the story moves on" / "before you play the Needolin at the Cradle". "Grand Bellway" kept in a group title and `memory-locket-choral-chambers`: the reader opens it in chapter 6 (`route-grand-bellway`). `tool-conchcutter` no longer hints at the Coral Tower memory, and no longer names whose throne it is.
 
 Left out on purpose:
-- Every later fallback (Runtfeast and Runt for `tool-longclaw` and `wish-broodfeast`, free Steel Spines later, the free Cradle map later, the Terminus being cut off later): chapter 11's job.
+- Every later fallback (free Steel Spines later, the free Cradle map later, the Terminus being cut off later): chapter 11's job. Runtfeast, Broodfeast's other way, is chapter 13's.
 - Delivery rewards: Patch 1 raised them all and the rows don't need them.
 - Songclave Supplies going unavailable once Silk and Soul is done: it comes back later and loses nothing counted.
 - The draft's "open the nearest bench before fighting Lace", "the bench on the eastern side of Groal's approach", "two concealed ceilings" (Quick Sling: one), "double-jump into the crevice" (Ducts Craftmetal), the "false wall" (Slab locket) and the Clawline in the Bilewater Mask Shard corridor: on no page.
@@ -466,7 +467,6 @@ Patch-dated prices and scores:
 | `wish-mushroom-greymoor` | The top of Greymoor's western tower, just above where a lost flea was | Only Nintendo Life gives the tower and the flea; the wiki says only "below Wisp Thicket" | A playthrough |
 | `memento-heart-memento`, ch11 `wish-old-hearts` | If you hold all four hearts, the Shamans take the Encrusted, Pollen and Hunter's Hearts and leave you the Conjoined Heart; to keep another, hand in three before you collect the fourth | Wiki Clover Dancers, Conjoined Heart, Red Memory and Materium agree; nothing outside the wiki. "Heart Memento" is the completionist tracker's name, not the game's, so the title now says "Keep a fourth Old Heart as a memento" (the id stays) | A second host, or a save |
 | `challenge-completion-achievement` | At 100%, beating Lost Lace earns it; if you were short, reload, finish, and beat her again | The achievement's text is "Achieve 100% game completion and finish the game" (the wiki's achievement data module). The wiki's Completion page says these achievements are awarded only at an ending. Wiki Endings: reloading after Sister of the Void puts you at the last Abyss bench with Lost Lace alive. That a second win gives the achievement is put together from the three, not stated anywhere. Steam's own page wasn't read | The Steam achievement page, or a playthrough |
-| `boss-summoned-saviour` | Steel Soul only; A Vassal Lost from Steel Seer Zi; behind a broken wall southwest of Bonegrave | Wiki Summoned Saviour, A Vassal Lost and Steel Seer Zi. None of them ties it to Act 3, and the resting sites include Act 2 areas, so on a Steel Soul file it may be done earlier. It stays in chapter 12, moved from "The Red Memory and the summit" (where the location was wrong) to the keepsakes group beside `wish-hunters-memento` | A Steel Soul playthrough before Act 3 |
 | `route-percentage`, `ending-sister-of-the-void` | The game's percentage shows in the inventory and on the save file once the Farsight is built, and after the final credits either way | The Farsight page alone | A playthrough |
 | `wish-hunters-memento`, `memento-hunters-memento` | 230 required entries (231 on Steel Soul); six don't count | Wiki Hunter's Memento and Hunter's Journal only. The six are Flintbeetle, Palestag, Shakra, Garmond and Zaza, Lost Garmond and Lost Lace | A second host |
 | `skill-pale-nails` | Silk Soar from the upper right hallway of the Choral Chambers into the ruined Cogwork Core, then up to the Cradle's peak | Wiki The Cradle and Pale Nails. Nintendo Life's mushroom guide says "the corridor to the right of Cogwork Core", which fits | Nothing open |
@@ -477,3 +477,13 @@ Left out on purpose:
 - Mister Mushroom's riddle verse, which is the game's text; the row only says it hints at seven places.
 
 No patch-dated prices in this chapter's rows.
+
+### Chapter 13
+
+A Second Save, added on 19 November 2026 for the two entries a first save can't hold. Its banner is still to make.
+
+| Row | The guide says | Open question, and the sources | What would settle it |
+| --- | --- | --- | --- |
+| `boss-summoned-saviour` | Steel Soul only; A Vassal Lost from Steel Seer Zi; behind a broken wall southwest of Bonegrave | Wiki Summoned Saviour, A Vassal Lost and Steel Seer Zi. None of them ties it to Act 3, and the resting sites include Act 2 areas, so on a Steel Soul file it may be done earlier. It moved from chapter 12 to chapter 13, A Second Save, with the user's ruling that Steel Soul's entries go to a later playthrough's chapter. | A Steel Soul playthrough before Act 3 |
+| `wish-runtfeast` | Leave Broodfeast unfinished until Act 3; Runt, one of the Huntress's brood, asks for the same 60 organs where she was; organs carry over; Longclaw | Wiki Runtfeast (the prerequisite, the counts, the carry-over, the reward; its location picture is the Huntress's) and Longclaw. Neoseeker Broodfeast: the same objectives and rewards in Act 3. That Runt is one of her brood is the wiki's (Broodfeast: she is devoured by her offspring) | A playthrough |
+| Chapter intro | Steel Soul unlocks once the game is finished, and most deaths end the save | Wiki Steel Soul Mode alone. It also gives a code on the Extras page that unlocks the mode, and the fights a death doesn't end it in: First Sinner, Shakra, Garmond and Zaza, and the Elegy of the Deep memories | A second host |

@@ -2,16 +2,11 @@ import type { Missable } from "@hundo/core/types";
 
 /**
  * Entries that can be lost for good, each on two independent hosts that state the same condition (hollowknight.wiki and its copies
- * count as one). Nothing here costs the game's own completion; each costs an entry this guide counts, except Broodfeast's, a one-way choice on no
- * target until core's choice block lands. A line shows in its
- * chapter's strip and on the Questlines page once that chapter is revealed, so before chapter 10 none names the last act.
+ * count as one). Nothing here costs the game's own completion; each costs an entry this guide counts. Broodfeast is a one-way
+ * choice (choices.ts), not a missable. A line shows in its chapter's strip and on the Questlines page once that chapter is
+ * revealed, so before chapter 10 none names the last act.
  */
 export const missables: Missable[] = [
-  {
-    id: "wish-broodfeast",
-    why: "Finish it before the story moves on: afterwards it can't be finished, and another Wish gives its rewards instead.",
-    sources: ["https://hollowknight.wiki/w/Broodfeast", "https://www.neoseeker.com/hollow-knight-silksong/Broodfeast"],
-  },
   {
     id: "wish-shakra-duel",
     why: "Gone once the story moves on: finish Trail's End and duel Shakra before then.",
