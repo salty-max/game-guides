@@ -1,4 +1,4 @@
-import { allRows, chapters, rowsByTag, tally, whatsLeft } from "@hundo/core/guide";
+import { allRows, chapters, overall, rowsByTag, tally, whatsLeft } from "@hundo/core/guide";
 import { STORAGE_KEY, validateState } from "@hundo/core/progress-state";
 import { targets } from "./config";
 import { missables } from "./data/missables";
@@ -9,8 +9,16 @@ import { SYNC_KEY } from "@hundo/core/sync/local";
 import { PERSIST_KEY } from "@hundo/core/persistence";
 import { COUNTS_KEY } from "@hundo/core/counts";
 import { flatten } from "@hundo/core/sync/fields";
+import type { Checks, Row } from "@hundo/core/types";
 
 const [a] = allRows.map((row) => row.id);
+const tick = (rows: Row[]): Checks => Object.fromEntries(rows.map((row) => [row.id, true]));
+const without = (rows: Row[], left: Row) => tick(rows.filter((row) => row !== left));
+// What each target counts: its goal, or its rows when it has none (the expansion's gear).
+const goalOf = (target: (typeof targets)[number]) => ("goal" in target && target.goal !== undefined ? target.goal : tally(target.tag, {}).total);
+const goals = targets.reduce((sum, target) => sum + goalOf(target), 0);
+// The rows of a one-way choice, tagged `choice` and counted by no target until the choice block lands.
+const choices = ["quest-lautrec-invasion", "quest-anastacia-return", "quest-frampt", "quest-patches-forgive", "quest-ciaran", "quest-sieg-ash", "quest-solaire-shortcut", "quest-solaire-saved"];
 
 describe("Dark Souls Remastered completion", () => {
   it("cites sources for every chapter", () => {
@@ -25,10 +33,42 @@ describe("Dark Souls Remastered completion", () => {
     for (const { tag, goal } of targets) if (goal !== undefined) expect(tally(tag, {}).total, tag).toBe(goal);
   });
 
-  // The game gives no total for NPC quests: their arcs end in deaths, hollowing and choices, so a goal would invent one.
-  it("counts the NPC quests with no goal, and keeps them out of What's left", () => {
-    expect(targets.find((target) => target.tag === "quest")).toEqual({ tag: "quest", optional: true });
-    expect(whatsLeft({}).some((item) => item.tag === "quest")).toBe(false);
+  it("counts every target: none is optional, and What's left starts with all of them and their goals", () => {
+    expect(targets.some((target) => "optional" in target && target.optional)).toBe(false);
+    expect(whatsLeft({}).map((item) => item.tag).sort()).toEqual(targets.map((target) => target.tag).sort());
+    expect(whatsLeft({}).reduce((sum, item) => sum + item.total, 0)).toBe(goals);
+  });
+
+  // 100% is every target, each item once: it never shows while anything on the board is left, and What's left says what.
+  it("reads 100 only with everything ticked, and under 100 with any one item left", () => {
+    expect(overall({}).percent).toBe(0);
+    expect(overall({}).label).toBe("complete");
+    expect(overall(tick(allRows)).percent).toBe(100);
+    expect(whatsLeft(tick(allRows))).toEqual([]);
+    for (const { tag } of targets) {
+      const [row] = rowsByTag(tag);
+      expect(overall(without(allRows, row)).percent, tag).toBeLessThan(100);
+      expect(whatsLeft(without(allRows, row)).map((item) => item.tag), tag).toContain(tag);
+    }
+  });
+
+  it("counts the NPC quest steps by their rows, goal and all, and the trades, souls, slabs, invasions, cycles, extras and pickups", () => {
+    for (const tag of ["quest", "trade", "estus", "forge", "invasion", "cycle", "extra", "pickup"]) {
+      const target = targets.find((item) => item.tag === tag);
+      expect(target, tag).toBeDefined();
+      expect("goal" in target! && target.goal, tag).toBe(rowsByTag(tag).length);
+    }
+    // (Snuggly's 20 trades, no how-to row among them; the five slabs the guide sends you to, not a farming row)
+    expect(rowsByTag("trade").some((row) => row.id === "trade-snuggly-how")).toBe(false);
+    expect(rowsByTag("forge").some((row) => row.id === "forge-kiln-farm")).toBe(false);
+  });
+
+  it("leaves the rows of a one-way choice off every target, and every other tag the guide tracks is a target or a route step", () => {
+    expect(rowsByTag("choice").map((row) => row.id).sort()).toEqual([...choices].sort());
+    for (const row of rowsByTag("choice")) expect(row.tags.some((tag) => targets.some((target) => target.tag === tag)), row.id).toBe(false);
+    expect(overall(tick(rowsByTag("choice"))).percent).toBe(0);
+    const off = allRows.filter((row) => !row.tags.some((tag) => targets.some((target) => target.tag === tag)));
+    expect(off.every((row) => row.tags[0] === "route" || row.tags[0] === "choice" || row.tags.every((tag) => tag === "route" || tag === "dlc"))).toBe(true);
   });
 
   it("counts the base game's spells apart from the expansion's, as the achievements do", () => {

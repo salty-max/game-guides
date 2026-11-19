@@ -5,7 +5,7 @@ export const questlines: Questlines = {
   tab: "Quests",
   title: "NPC questlines",
   intro: "Each character’s story in order, as far as you’ve revealed. Ticking a step here ticks it in the guide.",
-  cover: ["quest", "invasion"],
+  cover: ["quest", "choice", "invasion"],
   lines: [
     { id: "solaire", name: "Solaire of Astora", steps: ["quest-solaire-bridge", "quest-solaire-summons", "quest-solaire-anor", "quest-solaire-altar", "quest-solaire-shortcut", "quest-solaire-saved"] },
     { id: "lautrec", name: "Lautrec of Carim", steps: ["quest-lautrec", "quest-lautrec-before-gargoyles", "quest-lautrec-invasion", "quest-anastacia-return"] },

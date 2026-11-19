@@ -227,7 +227,7 @@ export default {
       ],
     },
     {
-      title: "Optional encounters and equipment detours",
+      title: "Encounters and equipment detours",
       sources: [["Valley terrain and drops", "https://darksouls.wikidot.com/valley-of-drakes"], ["Undead Dragon’s reach and loot", "https://darksouls.wikidot.com/undead-dragon"], ["Red Tearstone Ring ladder", "https://darksouls.wikidot.com/red-tearstone-ring"], ["Ash Lake Hydra tactics and drops", "https://darksouls.wikidot.com/hydra"], ["Sen’s Fortress rooftop loot", "https://darksouls.wikidot.com/sen-s-fortress"], ["Ricard and his chests", "https://darksouls.wikidot.com/undead-prince-ricard"], ["Archives shelf chest", "https://darksouls.wikidot.com/the-duke-s-archives"], ["Avelyn drop from the stairs", "https://darksouls.wikidot.com/avelyn"], ["Painted World tower", "https://darksouls.wikidot.com/painted-world-of-ariamis"], ["Oswald’s gesture", "https://darksouls.wikidot.com/oswald-of-carim"], ["Domhnall’s Firelink spot and stock", "https://darksouls.wikidot.com/domhnall-of-zena"]],
       compact: true,
       rows: [
@@ -245,7 +245,7 @@ export default {
       sources: [["Trade locations, exchanges and constraints", "https://darksouls.wikidot.com/hawk-girl"], ["Nest spot and one trade per item", "https://darksouls.wiki.fextralife.com/Snuggly"], ["Asylum Demon’s hammer", "https://darksouls.wikidot.com/demon-s-great-hammer"], ["Egg Vermifuge sources", "https://darksouls.wikidot.com/egg-vermifuge"], ["Rubbish corpses", "https://darksouls.wikidot.com/rubbish"], ["Prism Stone sources", "https://darksouls.wikidot.com/prism-stone"], ["Pendant sources", "https://darksouls.wikidot.com/pendant"], ["Souvenir from Crow Demons", "https://darksouls.wikidot.com/souvenir-of-reprisal"], ["Xanthous Crown corpse", "https://darksouls.wikidot.com/xanthous-crown"], ["Cracked Red Eye Orb chest", "https://darksouls.wikidot.com/cracked-red-eye-orb"]],
       compact: true,
       rows: [
-        ["trade-snuggly-how", ["trade"], "Find Snuggly’s smaller nest at the Asylum", "Back at the Asylum, partway down the path toward the torch Hollows, look left for a small nest on a ledge, not the big one you landed in; Snuggly speaks from it. Drop one item, quit and reload, then take the reward. Each item can be traded once per playthrough."],
+        ["trade-snuggly-how", ["route"], "Find Snuggly’s smaller nest at the Asylum", "Back at the Asylum, partway down the path toward the torch Hollows, look left for a small nest on a ledge, not the big one you landed in; Snuggly speaks from it. Drop one item, quit and reload, then take the reward. Each item can be traded once per playthrough."],
         ["trade-snuggly-bloodred", ["trade"], "Trade Bloodred Moss for Twinkling Titanite", "Buy a clump from the female Undead Merchant or farm Demonic Foliage. Trade one clump for one piece."],
         ["trade-snuggly-moss", ["trade"], "Trade Purple Moss for Twinkling Titanite", "Buy a clump from the female Undead Merchant or farm Demonic Foliage, and trade it for one piece."],
         ["trade-snuggly-blooming", ["trade"], "Trade Blooming Purple Moss for Twinkling Titanite", "Trade one clump for two pieces."],
