@@ -14,6 +14,7 @@ import chapter10 from "./data/chapter-10";
 import chapter11 from "./data/chapter-11";
 import chapter12 from "./data/chapter-12";
 import chapter13 from "./data/chapter-13";
+import { choices } from "./data/choices";
 import { missables } from "./data/missables";
 import { questlines } from "./data/questlines";
 import { sources } from "./data/sources";
@@ -27,9 +28,8 @@ const banners = byChapter(import.meta.glob<Banner>("./banners/chapter-*.webp", {
  * give as tables. The rest are the guide's own lists, whose goals are their rows, not a game total: the NPC quest steps, the Estus
  * souls and Titanite Slabs it sends you to, the expansion's gear, the New Game+ steps, the discoveries and the loot sweeps. A test pins every
  * goal to the data, so a missing row shows up as a failing
- * count. Route steps are directions and carry no target. The rows of a one-way choice (Frampt or Kaathe, Lautrec and
- * Anastacia, forgiving Patches, Ciaran's soul, Siegmeyer's and Solaire's fates) are tagged `choice` and left off every target
- * until the choice block counts them once whichever option is taken. Base-game spells have their own tags, so the five expansion
+ * count. Route steps are directions and carry no target. At a one-way choice (data/choices.ts) the first cycle takes the way the
+ * guide recommends and a later cycle the other, each a row that counts, so 100% takes NG+ as the endings do. Base-game spells have their own tags, so the five expansion
  * spells count in their schools without inflating the three spell achievements.
  */
 export const targets = [
@@ -44,14 +44,14 @@ export const targets = [
   { tag: "ember", goal: 10 },
   { tag: "reinforcement", goal: 10 },
   { tag: "ending", goal: 2 },
-  { tag: "quest", goal: 53 },
+  { tag: "quest", goal: 62 },
   { tag: "dlc-spell", goal: 5 },
   { tag: "dlc-gear" },
   { tag: "trade", goal: 18 },
   { tag: "estus", goal: 5 },
   { tag: "forge", goal: 5 },
   { tag: "invasion", goal: 7 },
-  { tag: "cycle", goal: 10 },
+  { tag: "cycle", goal: 14 },
   { tag: "extra", goal: 11 },
   { tag: "pickup", goal: 22 },
 ];
@@ -65,7 +65,6 @@ const config: GuideConfig = {
     route: ["Route steps", "Route", "compass"],
     boss: ["Bosses", "Boss", "sword", "rose"],
     quest: ["NPC quests", "Quest", "scroll", "mint"],
-    choice: ["NPC quest choices", "Choice", "scroll", "rose"],
     covenant: ["Covenants", "Covenant", "ribbon", "violet"],
     invasion: ["NPC invasions", "Invasion", "sword", "rose"],
     pickup: ["Equipment and keys", "Pickup", "chest", "sky"],
@@ -104,6 +103,7 @@ const config: GuideConfig = {
     ],
   },
   missables,
+  choices,
   questlines,
   banners,
   completion: { board: targets },
@@ -114,7 +114,7 @@ const config: GuideConfig = {
     dashboardIntro: "100% is every target on the board, each item counted once, across three playthroughs: the Steam achievements and the lists they count, the rings, the expansion, the NPC quests, Snuggly’s trades, the invasions and the later cycles.",
     boardTitle: "Completion targets",
     boardNote:
-      "Every target counts, each item once, so 100% is exactly when What’s left is empty. Spell counts are the base game’s, as the achievements count them; the five expansion spells have their own line. Knight’s Honor counts all 47 rare weapons. NPC quests, Estus souls, slabs, later cycles, discoveries and pickups count the guide’s own rows, not a game total; trades (the game’s 20, less two that count as a spell and a slab) and invasions follow the game’s lists. A one-way choice, like Frampt or Kaathe, is left off until a choice can count once whichever way you go.",
+      "Every target counts, each item once, so 100% is exactly when What’s left is empty. Spell counts are the base game’s, as the achievements count them; the five expansion spells have their own line. Knight’s Honor counts all 47 rare weapons. NPC quests, Estus souls, slabs, later cycles, discoveries and pickups count the guide’s own rows, not a game total; trades (the game’s 20, less two that count as a spell and a slab) and invasions follow the game’s lists. At a one-way choice, like Frampt or Kaathe, the first cycle takes the way the guide recommends and a later cycle the other, and both count.",
     nextUpDone: "Everything revealed is checked. Reveal the next chapter or check the totals on the Progress page.",
     backupBlurb: "Export a copy of your checks and spoiler settings.",
   },

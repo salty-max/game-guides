@@ -1,6 +1,7 @@
 import { allRows, chapters, overall, rowsByTag, tally, whatsLeft } from "@hundo/core/guide";
 import { STORAGE_KEY, validateState } from "@hundo/core/progress-state";
 import { targets } from "./config";
+import { choices } from "./data/choices";
 import { missables } from "./data/missables";
 import { THEME_KEY } from "@hundo/core/store/theme";
 import { AWAKE_KEY } from "@hundo/core/store/awake";
@@ -17,8 +18,6 @@ const without = (rows: Row[], left: Row) => tick(rows.filter((row) => row !== le
 // What each target counts: its goal, or its rows when it has none (the expansion's gear).
 const goalOf = (target: (typeof targets)[number]) => ("goal" in target && target.goal !== undefined ? target.goal : tally(target.tag, {}).total);
 const goals = targets.reduce((sum, target) => sum + goalOf(target), 0);
-// The rows of a one-way choice, tagged `choice` and counted by no target until the choice block lands.
-const choices = ["quest-lautrec-invasion", "quest-anastacia-return", "quest-frampt", "quest-patches-forgive", "quest-ciaran", "quest-sieg-ash", "quest-solaire-shortcut", "quest-solaire-saved"];
 
 describe("Dark Souls Remastered completion", () => {
   it("cites sources for every chapter", () => {
@@ -66,12 +65,21 @@ describe("Dark Souls Remastered completion", () => {
     expect(rowsByTag("forge").some((row) => row.id === "forge-kiln-farm")).toBe(false);
   });
 
-  it("leaves the rows of a one-way choice off every target, and every other tag the guide tracks is a target or a route step", () => {
-    expect(rowsByTag("choice").map((row) => row.id).sort()).toEqual([...choices].sort());
-    for (const row of rowsByTag("choice")) expect(row.tags.some((tag) => targets.some((target) => target.tag === tag)), row.id).toBe(false);
-    expect(overall(tick(rowsByTag("choice"))).percent).toBe(0);
+  it("counts every tag the guide tracks but route steps", () => {
     const off = allRows.filter((row) => !row.tags.some((tag) => targets.some((target) => target.tag === tag)));
-    expect(off.every((row) => row.tags[0] === "route" || row.tags[0] === "choice" || row.tags.every((tag) => tag === "route" || tag === "dlc"))).toBe(true);
+    expect(off.every((row) => row.tags[0] === "route" || row.tags.every((tag) => tag === "route" || tag === "dlc"))).toBe(true);
+  });
+
+  // Both ways of every one-way choice count: the first cycle's, recommended, and the later cycle's, so 100% takes NG+ and NG++ as the endings do.
+  it("counts both ways of every one-way choice, the later one in chapter 13", () => {
+    for (const choice of choices) {
+      for (const id of [choice.row, ...choice.later.map((later) => later.row)]) {
+        const row = allRows.find((entry) => entry.id === id)!;
+        expect(row.tags.some((tag) => targets.some((target) => target.tag === tag)), id).toBe(true);
+      }
+      for (const later of choice.later) expect(allRows.find((entry) => entry.id === later.row)!.chapter, later.row).toBe(13);
+    }
+    expect(choices.map((choice) => choice.row).sort()).toEqual(["quest-ciaran", "quest-lautrec-invasion", "quest-lordvessel-frampt", "quest-patches-forgive", "quest-sieg-ash", "quest-solaire-shortcut"]);
   });
 
   it("counts the base game's spells apart from the expansion's, as the achievements do", () => {
@@ -83,9 +91,9 @@ describe("Dark Souls Remastered completion", () => {
     }
   });
 
-  // The README and the Don't miss strip are written for these 19.
-  it("keeps the 19 missables the route was checked with", () => {
-    expect(missables).toHaveLength(19);
+  // The README and the Don't miss strip are written for these 18 (Solaire's became a one-way choice, which Don't miss lists too).
+  it("keeps the 18 missables the route was checked with", () => {
+    expect(missables).toHaveLength(18);
   });
 });
 

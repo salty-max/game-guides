@@ -114,14 +114,6 @@ export const missables: Missable[] = [
     ]
   },
   {
-    "id": "quest-solaire-shortcut",
-    "why": "Kill the red-eyed Chaos Bug before you go past the Centipede Demon into Lost Izalith, or Solaire goes mad.",
-    "sources": [
-      "https://darksouls.wikidot.com/solaire-of-astora",
-      "https://www.goldphantom.com/tools/ds1/npc-quest-tracker/"
-    ]
-  },
-  {
     "id": "quest-darkmoon-rank",
     "why": "Join and offer 10 Souvenirs of Reprisal before entering Gwyndolin’s fog or killing him.",
     "sources": [

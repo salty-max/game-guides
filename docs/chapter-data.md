@@ -93,16 +93,16 @@ export const missables: Missable[] = [
 
 ## One-way choices
 
-`data/choices.ts` exports `choices`, which `config.ts` passes as `choices`. Each one is a decision a single playthrough can't take every way of: Frampt or Kaathe for the Lordvessel, the Nailsmith's request. The guide recommends one way for this playthrough, and puts each other way in a later playthrough's chapter as a row of its own: an NG+ chapter where the game has one, otherwise a "Second save" chapter at the end. Every way counts, so 100% takes the later playthrough too, as endings do (decided 19 Nov 2026).
+`data/choices.ts` exports `choices`, which `config.ts` passes as `choices`. Each one is a decision a single playthrough can't take every way of: Lordran's Frampt or Kaathe, Hallownest's Nailsmith. The guide recommends one way for this playthrough, and puts each other way in a later playthrough's chapter as a row of its own: an NG+ chapter where the game has one, otherwise a "Second save" chapter at the end. Every way counts, so 100% takes the later playthrough too, as endings do (decided 19 Nov 2026).
 
 ```ts
 export const choices: Choice[] = [
   {
-    row: "lordvessel-frampt",
+    row: "quest-lordvessel-frampt",
     name: "Frampt or Kaathe",
-    why: "Whichever serpent takes the Lordvessel, the other leaves for the rest of the cycle.",
-    later: [{ row: "cycle-ng-plus-kaathe", on: "NG+" }],
-    sources: ["https://darksouls.wikidot.com/darkstalker-kaathe", "https://darksouls.wiki.fextralife.com/Darkstalker+Kaathe"],
+    why: "If Kaathe takes you to place the Lordvessel, Frampt leaves until the next playthrough.",
+    later: [{ row: "cycle-ng-plus-plus-kaathe", on: "NG++" }],
+    sources: ["https://darksouls.wikidot.com/darkstalker-kaathe", "https://darksouls.wiki.fextralife.com/Kingseeker+Frampt"],
   },
 ];
 ```
