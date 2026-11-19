@@ -4,8 +4,9 @@ import { expect } from "storybook/test";
 import { guides, paletteOf } from "../.storybook/guides";
 import type { GuideId, ThemeId } from "../.storybook/ids";
 
-// Not a component: a guard on the setup. The axe checks only mean something if each Vitest project really renders the guide and theme
-// it says it does, with core's CSS processed. A page with no CSS, or the wrong palette, would otherwise pass on a blank look.
+// Not a component: a guard on the setup. The axe checks only mean something if each of a test's renders really is the guide and theme
+// it is counted as (.storybook/every-look.ts), with core's CSS processed. A page with no CSS, or the wrong palette, would otherwise pass on
+// a blank look.
 const meta = {
   title: "Foundation/Palette",
   component: Button,
@@ -33,10 +34,10 @@ const colourOf = (value: string) => {
 export const GuideLook: Story = {
   play: async ({ canvas, globals }) => {
     const guide = globals.guide as GuideId;
-    // In a test run, the project's own settings say which guide and theme this is: the toolbar globals have to agree.
-    if (typeof __PROJECT_GUIDE__ !== "undefined") {
-      await expect(guide).toBe(__PROJECT_GUIDE__);
-      await expect(globals.theme).toBe(__PROJECT_THEME__);
+    // In a test run, every-look.ts says which guide and theme this render is: the globals the story got have to agree. Unset, the stories
+    // ran without it, under one look instead of ten.
+    if (typeof __EVERY_LOOK__ !== "undefined") {
+      await expect(globalThis.__STORY_LOOK__, "the look every-look.ts set for this render").toEqual({ guide, theme: globals.theme });
     }
     const palette = paletteOf(guide, globals.theme as ThemeId);
     const { brand } = guides[guide];

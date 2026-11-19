@@ -13,8 +13,8 @@ const app = (path: string) => fromHere(`../../../apps/${path}`);
 
 /**
  * Every Base UI part core imports, as Vite's `optimizeDeps.include` writes a dependency of a linked package. Found one by one while the
- * tests run instead, each new one re-bundles and reloads the page under a running test ("Vite unexpectedly reloaded a test"), and the six
- * test projects (guide x theme) start at once: a run with an empty cache fails now and then. Read from core's source, so a new component
+ * tests run instead, each new one re-bundles and reloads the page under a running test ("Vite unexpectedly reloaded a test"), and the test
+ * pages start at once: a run with an empty cache fails now and then. Read from core's source, so a new component
  * needs no list to be kept.
  */
 const baseUiParts = () => {
