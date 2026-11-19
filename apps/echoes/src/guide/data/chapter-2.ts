@@ -59,7 +59,7 @@ export default {
     {
       title: "Gerudo Sanctum lower rooms",
       rows: [
-        ["dungeon-waypoint-gerudo-entrance", ["dungeon-waypoint"], "Activate the first Sanctum Waypoint", "In the entry shaft, alternate between the climbing walls to avoid the wind. Push the boulder into a gust to cover the upper route and climb to the Waypoint."],
+        ["dungeon-waypoint-gerudo-entrance", ["dungeon-waypoint", "waypoint"], "Activate the first Sanctum Waypoint", "In the entry shaft, alternate between the climbing walls to avoid the wind. Push the boulder into a gust to cover the upper route and climb to the Waypoint."],
         ["echo-flying-tile", ["echo"], "Learn Flying Tile in the room west of the Waypoint", "Block the flying tiles with an echo and approach a shimmering tile before it breaks. Use the room's chest as your reason to finish crossing."],
         ["chest-gerudo-sanctum-tiles", ["chest","dungeon-chest"], "Open the tile room chest for 20 rupees", "Use a box to block the flying tiles. The chest appears once the volley is cleared. Open it and return east."],
         ["chest-gerudo-sanctum-key-1", ["chest","dungeon-chest"], "Open the rotating-wall chest for the first Small Key", "Go east from the Waypoint. Pull the timed lever out with Bind and run through the blue gate while it closes. Bind and rotate the wall in the next room, then open the chest. Use the key on the door north of the Waypoint."],
@@ -67,7 +67,7 @@ export default {
         ["echo-mothula", ["echo"], "Learn Mothula in the room after the Snake Statue", "Fight the Mothulas from the side or use a ranged echo. Take the west door and then the south door toward the conveyor room."],
         ["echo-caromadillo-2", ["echo"], "Learn Caromadillo Lv. 2 below the conveyor room", "Bind crates out of the way to cross the conveyors. Take the ladder. A Pathblade can intercept the rolling enemy below."],
         ["chest-gerudo-sanctum-egg", ["chest","dungeon-chest"], "Dig down to the Golden Egg chest", "Use Holmill on the sand above the chest in the Caromadillo passage and drop into the pocket it opens. Continue to the far ladder."],
-        ["dungeon-waypoint-gerudo-tribute", ["dungeon-waypoint"], "Activate the tribute hall Waypoint", "Read the tablet at the locked tribute door. You need the Hawk and Elephant statues. Take the east detour before leaving the hall by the west route."],
+        ["dungeon-waypoint-gerudo-tribute", ["dungeon-waypoint", "waypoint"], "Activate the tribute hall Waypoint", "Read the tablet at the locked tribute door. You need the Hawk and Elephant statues. Take the east detour before leaving the hall by the west route."],
         ["chest-gerudo-sanctum-salt", ["chest","dungeon-chest"], "Uncover the chest of ten Rock Salt", "Bind the rotating door to the east of the tribute hall. Blow away the sand with Wind Cannon. The tablet describes the elephant."],
         ["echo-poe", ["echo"], "Learn Poe west of the tribute hall", "Defeat the Poe and learn the remnant. This also clears the room for the map chest."],
         ["chest-gerudo-sanctum-map", ["chest","dungeon-chest"], "Open the Dungeon Map chest", "Take the chest that appears after clearing the Poe room, then go south to the stilled exterior."],
@@ -78,7 +78,7 @@ export default {
       rows: [
         ["chest-gerudo-stilled-northwest", ["chest", "overworld-chest"], "Pull up the 20-rupee chest on the stilled exterior", "From the exterior exit, work around the ledges to the northwest corner. Use Bind on the partially buried chest and pull it out of the sand."],
         ["chest-gerudo-stilled-ladder", ["chest", "overworld-chest"], "Open the 50-rupee chest above the rotating ladder", "Bind and rotate the drum with the ladder piece until it lines up with the fixed rungs. Climb to the chest, then continue east toward the roof."],
-        ["dungeon-waypoint-gerudo-roof", ["dungeon-waypoint"], "Activate the Sanctum roof Waypoint", "Touch it before making the drop into the hidden chest room."],
+        ["dungeon-waypoint-gerudo-roof", ["dungeon-waypoint", "waypoint"], "Activate the Sanctum roof Waypoint", "Touch it before making the drop into the hidden chest room."],
         ["chest-gerudo-sanctum-roof-drop", ["chest","dungeon-chest"], "Dig through the roof to the isolated 50-rupee chest", "At the sandy square just west of the roof Waypoint, summon Holmill and drop into its hole. Open the chest in the sealed 2F room, then warp back to the roof stone."],
         ["chest-gerudo-stilled-monster-stone", ["chest", "overworld-chest"], "Uncover the Monster Stone chest on the roof", "Blow away the sand piles near the southern side of the roof with Wind Cannon or Tornando."],
         ["echo-hawk-statue", ["echo"], "Learn Hawk Statue on the eastern exterior", "Drop down east of the roof, then work north past the enemies. Line up another rotating ladder with Bind and climb to the statue."],
@@ -89,7 +89,7 @@ export default {
       rows: [
         ["echo-cat-statue", ["echo"], "Learn Cat Statue on the east side of the dungeon", "Enter from the eastern exterior. Pull the timed lever and pass the gate. Blow sand aside, clear the Gibdo and ReDead room, and learn both the Cat Statue and ReDead if needed."],
         ["echo-redead", ["echo"], "Learn ReDead in the Cat Statue room", "Let an echo engage it from another direction while you keep outside its scream. Learn it before moving the statue at the north exit."],
-        ["dungeon-waypoint-gerudo-bow", ["dungeon-waypoint"], "Activate the Waypoint before the bow fight", "Move the Cat Statue blocking the north exit and activate the stone along the corridor to the miniboss."],
+        ["dungeon-waypoint-gerudo-bow", ["dungeon-waypoint", "waypoint"], "Activate the Waypoint before the bow fight", "Move the Cat Statue blocking the north exit and activate the stone along the corridor to the miniboss."],
         ["gear-bow-of-might", ["equipment"], "Defeat the bow wielder and take the Bow of Might", "Close the distance while it aims at a summoned monster. Fight from the flank and retreat during the spread shots after it darkens. After the pickup, use the bow in Swordfighter Form to shoot the dark membrane across the next side-view room."],
         ["echo-beetle", ["echo"], "Learn Beetle in the room beyond the bow fight", "Climb the ladder beyond the arena. Defeat one of the small beetles before the dark membrane."],
         ["echo-beetle-mound", ["echo"], "Learn Beetle Mound in the same passage", "Destroy the mound that spawns the Beetles and learn the remnant."],

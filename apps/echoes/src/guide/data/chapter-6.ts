@@ -64,7 +64,7 @@ export default {
     {
       title: "Lanayru Temple upper floors",
       rows: [
-        ["dungeon-waypoint-lanayru-entry", ["dungeon-waypoint"], "Activate the Lanayru Temple entrance Waypoint", "Touch the stone and enter the hall with the large ice wall."],
+        ["dungeon-waypoint-lanayru-entry", ["dungeon-waypoint", "waypoint"], "Activate the Lanayru Temple entrance Waypoint", "Touch the stone and enter the hall with the large ice wall."],
         ["chest-lanayru-rock-salt", ["chest","dungeon-chest"], "Clear the Ice Octos for five Rock Salt", "Use fire in the room west of the great ice wall. Open the chest that appears."],
         ["story-lanayru-first-orb", ["story"], "Thaw the ice wall with the fire orb", "Go east of the hall, use beds to cross the pool and Bind the red orb. Carry it back to the pedestal without dropping it. Return to the hall and descend the exposed ladder."],
         ["chest-lanayru-fangs", ["chest","dungeon-chest"], "Open the chest of three Monster Fangs in the first shaft", "Use Strandtula silk or Clouds to climb between the cold gusts to the chest. Go down the ladder on the right."],
@@ -79,7 +79,7 @@ export default {
         ["story-lanayru-hidden-ladder", ["story"], "Thaw the second ice divider from its hidden ladder", "Melt the ice block at the top-right of the divided room. Descend, Bind the red orb at the bottom and carry it to the upper pedestal without letting the cold blasts turn it blue."],
         ["chest-lanayru-key-switches", ["chest","dungeon-chest"], "Press both switches together for the Small Key chest", "Go east once the divider thaws. Place a boulder behind the far switch as a stop. Push an ice block along the narrow path to the far switch, and step onto the near switch as the block arrives."],
         ["chest-lanayru-map", ["chest","dungeon-chest"], "Defeat the Temper Tweelus and open the Dungeon Map chest", "Unlock the west door with the switch-room key. Use bombs or explosive echoes on the rocky enemies. Continue left to the hot spring and the next Waypoint."],
-        ["dungeon-waypoint-lanayru-slime", ["dungeon-waypoint"], "Activate the hot spring Waypoint", "Heal here if needed before the miniboss."],
+        ["dungeon-waypoint-lanayru-slime", ["dungeon-waypoint", "waypoint"], "Activate the hot spring Waypoint", "Heal here if needed before the miniboss."],
         ["story-lanayru-slime-eye", ["story"], "Freeze and break up Slime Eye", "Use Ice Octo, Freezard or Ice Block to freeze the giant slime. Strike the frozen body. Freeze and break the smaller slimes as they split until none remain."],
         ["story-lanayru-four-braziers", ["story"], "Light all four braziers below the miniboss", "Descend the ladder. Bind an Ignizol to carry it up to the isolated high brazier. Shield a low brazier from the ice gust with a Water Block or other obstacle and send Fire Keese toward it. Light the remaining braziers and go west."],
         ["chest-lanayru-silver-rupee", ["chest","dungeon-chest"], "Open the 100-rupee chest at the top of the west shaft", "Climb with Strandtula after the brazier door opens. Return down and take the lower ladder to B3."],
@@ -97,7 +97,7 @@ export default {
         ["echo-wolfos", ["echo"], "Learn Wolfos on the route beyond the paired switches", "Defeat the pack after taking the north door, and learn a regular Wolfos if needed."],
         ["echo-white-wolfos", ["echo"], "Learn White Wolfos in the same room", "Finish the stronger white wolf and collect its distinct echo."],
         ["chest-lanayru-big-key", ["chest","dungeon-chest"], "Roll the snowball onto the large switch and open the Big Key chest", "Carry the red orb around the next room to its southeast pedestal to thaw the room below the key. Go south from the Big Key chamber. Place the blue orb to freeze the water so you can reach and light the torch. Carry the orb through the flame and set it down red to melt the icicles. Cool it again and refreeze the floor. Step on the small yellow switch in the key room so the snowball rolls over the cleared ice to the large switch."],
-        ["dungeon-waypoint-lanayru-boss", ["dungeon-waypoint"], "Activate the Lanayru boss Waypoint", "Take the stairs east of the key room and touch the stone before using the Big Key."],
+        ["dungeon-waypoint-lanayru-boss", ["dungeon-waypoint", "waypoint"], "Activate the Lanayru boss Waypoint", "Take the stairs east of the key room and touch the stone before using the Big Key."],
         ["crystal-lanayru-temple-clear", ["might-crystal"], "Defeat Skorchill and receive five Might Crystals", "Attack the ice helmet with fire echoes and the fire helmet with ice echoes. When the helmet falls, switch to Swordfighter Form and attack the exposed boss. For mixed horns, match each with the opposite element. Keep moving during spins, falling icicles and fireballs.", { quantity: 5 }],
         ["container-skorchill", ["heart-container"], "Collect Skorchill's Heart Container", "Pick it up before leaving with Nayru's Sanction."],
       ],

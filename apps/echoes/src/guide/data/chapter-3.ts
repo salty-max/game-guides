@@ -48,8 +48,8 @@ export default {
     {
       title: "Jabul Ruins lower branches",
       rows: [
-        ["dungeon-waypoint-jabul-entry", ["dungeon-waypoint"], "Activate the Jabul Ruins entry Waypoint", "Walk forward and fall into the water. Bind rocks out of the route, top up air from bubbles and swim right through the current. Move boxes and the final boulder aside, then climb out."],
-        ["dungeon-waypoint-jabul-hall", ["dungeon-waypoint"], "Activate the central Waypoint and first water switch", "Go left and upstairs to the main hall. Touch the stone, go north and press the pink switch. The four remaining switches sit at the ends of the two lower and two upper wings."],
+        ["dungeon-waypoint-jabul-entry", ["dungeon-waypoint", "waypoint"], "Activate the Jabul Ruins entry Waypoint", "Walk forward and fall into the water. Bind rocks out of the route, top up air from bubbles and swim right through the current. Move boxes and the final boulder aside, then climb out."],
+        ["dungeon-waypoint-jabul-hall", ["dungeon-waypoint", "waypoint"], "Activate the central Waypoint and first water switch", "Go left and upstairs to the main hall. Touch the stone, go north and press the pink switch. The four remaining switches sit at the ends of the two lower and two upper wings."],
         ["echo-bio-deku-baba", ["echo"], "Learn Bio Deku Baba below the left ladder", "Take the lower-left ladder into dark water. Follow the glowing plants, refill air at bubbles and fight a submerged plant with a swimming echo."],
         ["chest-jabul-ruins-100", ["chest","dungeon-chest"], "Open the 100-rupee chest at the bottom of the dark passage", "Search the lower-left floor before taking the ladder out of the underwater section."],
         ["story-jabul-blue-switch", ["story"], "Light the pool-room braziers and press the blue switch", "Bind the sunken brazier, swim it to dry ground and light it along with the others using Ignizol. Pass the unlocked door and step on the switch. Drop down and return to the hall."],

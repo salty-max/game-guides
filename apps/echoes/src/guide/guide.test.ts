@@ -13,7 +13,7 @@ import type { Checks, Row } from "@hundo/core/types";
 const [a] = allRows.map((row) => row.id);
 const tick = (rows: Row[]): Checks => Object.fromEntries(rows.map((row) => [row.id, true]));
 const hasTarget = (row: Row) => row.tags.some((tag) => targets.some((target) => target.tag === tag));
-// What 100% counts: every row that carries a target. The amiibo outfits are optional, and route, story and Waypoint rows are directions.
+// What 100% counts: every row that carries a target. The amiibo outfits are optional, and route and story rows are directions.
 const counted = allRows.filter(hasTarget);
 
 describe("Echoes of Wisdom completion", () => {
@@ -35,16 +35,28 @@ describe("Echoes of Wisdom completion", () => {
     expect(rowsByTag("might-crystal").some((row) => row.quantity > 1)).toBe(true);
   });
 
-  it("counts every target, each by its goal, and leaves out only the amiibo, the Waypoints and the route and story steps", () => {
+  it("counts every target, each by its goal, and leaves out only the amiibo and the route and story steps", () => {
     expect(targets.some((target) => "optional" in target && target.optional)).toBe(false);
     expect(whatsLeft({}).map((item) => item.tag).sort()).toEqual(targets.map((target) => target.tag).sort());
     expect(whatsLeft({}).reduce((sum, item) => sum + item.total, 0)).toBe(targets.reduce((sum, target) => sum + target.goal, 0));
     const off = allRows.filter((row) => !hasTarget(row));
     expect(off.length).toBeGreaterThan(0);
-    expect(off.every((row) => ["route", "story", "waypoint", "dungeon-waypoint", "amiibo"].includes(row.tags[0]))).toBe(true);
-    // (the game treats Waypoints as fast-travel unlocks: no counter, percentage or reward)
-    expect(rowsByTag("waypoint").length + rowsByTag("dungeon-waypoint").length).toBeGreaterThan(0);
-    for (const row of [...rowsByTag("waypoint"), ...rowsByTag("dungeon-waypoint"), ...rowsByTag("amiibo")]) expect(hasTarget(row), row.id).toBe(false);
+    expect(off.every((row) => ["route", "story", "amiibo"].includes(row.tags[0]))).toBe(true);
+    for (const row of rowsByTag("amiibo")) expect(hasTarget(row), row.id).toBe(false);
+  });
+
+  // The game keeps no count of Waypoints (no counter, percentage or reward), so the guide's own list is the goal: 17 overworld ones and
+  // 26 inside dungeons, each one item. A dungeon Waypoint names its kind first and carries `waypoint` after it, so one tag counts both.
+  it("counts every Waypoint once, as the guide's own list of 43", () => {
+    const dungeon = rowsByTag("dungeon-waypoint");
+    expect(targets.find((target) => target.tag === "waypoint")?.goal).toBe(43);
+    expect(rowsByTag("waypoint")).toHaveLength(43);
+    expect(dungeon).toHaveLength(26);
+    for (const row of dungeon) expect(row.tags, row.id).toEqual(["dungeon-waypoint", "waypoint"]);
+    expect(rowsByTag("waypoint").filter((row) => !dungeon.includes(row)).every((row) => row.tags.length === 1)).toBe(true);
+    // (a Waypoint is no other item the board counts)
+    const others = targets.map((target) => target.tag).filter((tag) => tag !== "waypoint");
+    for (const row of rowsByTag("waypoint")) expect(row.tags.some((tag) => others.includes(tag)), row.id).toBe(false);
   });
 
   // 100% is every target, each item once: it never shows while anything on the board is left, and What's left says what.

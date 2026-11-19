@@ -45,7 +45,7 @@ export default {
         ["story-ancient-ruins", ["story"], "Follow the Deku Tree's route into the Ancient Ruins", "Go past the opened stone puzzle to the tree and take the elevator. Enter the rift once Tri opens it."],
         ["story-stilled-ancient-grass-ice", ["story"], "Cross the grassy and frozen sections of the rift", "Follow the floating ground north. The branches rejoin higher up. Use a fire echo on the ice pillars and keep clear of the Freezards' breath."],
         ["story-stilled-ancient-lava", ["story"], "Cross the lava using Lava Rocks and a flying echo", "Place Lava Rocks on the rising jets. Ride wind with a held Ghirro or another gliding echo, then glide west to the small grass platform and climb."],
-        ["dungeon-waypoint-ancient-ruins", ["dungeon-waypoint"], "Activate the Waypoint at the top of the Ancient Ruins", "Use the stone before approaching the boss plateau."],
+        ["dungeon-waypoint-ancient-ruins", ["dungeon-waypoint", "waypoint"], "Activate the Waypoint at the top of the Ancient Ruins", "Use the stone before approaching the boss plateau."],
         ["story-echo-zelda", ["story"], "Defeat Zelda's Echo", "Send a strong monster into the summoned waves while you aim the Bow of Might at the floating boss. Strike with sword or echoes when she falls. Repeat against the stronger summons and use their energy drops to keep your bow available."],
         ["story-rescue-link", ["story"], "Free Link from the crystal", "Fire an arrow at the crystal after the fight. You can still leave to finish optional tasks. Zelda gives Link the Swordfighter weapons before the final dungeon, so set up your fighting and swimming echoes first."],
       ],

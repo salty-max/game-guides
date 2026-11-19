@@ -17,10 +17,12 @@ const banners = byChapter(import.meta.glob<Banner>("./banners/chapter-*.webp", {
 
 /**
  * The guide's own completion list, and what 100% is: every target counts, each item once, up to its goal, so the bar reads 100 exactly
- * when What's left is empty. Only the amiibo outfits stay out (they need physical figures), and route, story and Waypoint rows are
- * directions: the game treats Waypoints as fast-travel unlocks, with no counter, percentage or reward, so they carry no target. The
- * first thirteen come with game totals; the rest are the guide's own lists, whose goals are their rows (facts-to-verify.md). A test
- * pins every goal to the data, so a missing row shows up as a failing count.
+ * when What's left is empty. Only the amiibo outfits stay out (they need physical figures), and route and story rows are directions.
+ * The first eleven come with game totals, whose hosts facts-to-verify.md names; the rest are the guide's own lists, whose goals are
+ * their rows: the dungeon and mini-dungeon chests (no page read totals them) and the lists after them. The Waypoints are one of those: the
+ * game treats them as fast-travel unlocks, with no counter, percentage or reward, but a reader activates each one, so all 43 count
+ * (the 26 inside dungeons carry `waypoint` after `dungeon-waypoint`, which names the label and icon of the row). A test pins every
+ * goal to the data, so a missing row shows up as a failing count.
  */
 export const targets = [
   { tag: "echo", goal: 127 },
@@ -42,6 +44,7 @@ export const targets = [
   { tag: "upgrade", goal: 11 },
   { tag: "milestone", goal: 2 },
   { tag: "minigame-extra", goal: 22 },
+  { tag: "waypoint", goal: 43 },
 ];
 
 const config: GuideConfig = {
@@ -101,10 +104,10 @@ const config: GuideConfig = {
   text: {
     checklistIntro: "Search by echo, item, place or activity. Checks are shared with the walkthrough.",
     searchPlaceholder: "Search echoes, items or places",
-    dashboardIntro: "100% is every target on the board, each item counted once, with the equipment, upgrades, minigames and chests as well as the game’s own lists. Optional amiibo outfits, which need physical figures, are tracked separately.",
+    dashboardIntro: "100% is every target on the board, each item counted once, with the equipment, upgrades, minigames, chests and Waypoints as well as the game’s own lists. Optional amiibo outfits, which need physical figures, are tracked separately.",
     boardTitle: "Completion targets",
     boardNote:
-      "Every target counts, each item once, so 100% is exactly when What’s left is empty. Might Crystals count by what each entry awards. Accessories count all 28 versions, although two are replaced by upgrades on a finished save. Overworld chests, equipment, abilities, upgrades, milestones and the minigame entries that award nothing the board counts already count the guide’s own rows, not a game total, and Waypoints are directions, not counted.",
+      "Every target counts, each item once, so 100% is exactly when What’s left is empty. Might Crystals count by what each entry awards. Accessories count all 28 versions, although two are replaced by upgrades on a finished save. Dungeon chests, mini-dungeon chests, overworld chests, equipment, abilities, upgrades, milestones, Waypoints and the minigame entries that award nothing the board counts already count the guide’s own rows, not a game total. The game keeps no count of Waypoints, so the guide’s 43 are its own list.",
     nextUpDone: "Everything revealed is checked. Reveal the next chapter or check the totals on the Progress page.",
     backupBlurb: "Export a copy of your checks and spoiler settings.",
   },
