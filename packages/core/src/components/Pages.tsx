@@ -64,8 +64,9 @@ const Page = memo(function Page({ location, returning, since, showing, visible, 
     <Activity mode={visible ? "visible" : "hidden"}>
       <Showing value={visible ? showing : null}>
         <Arrival value={returning}>
-          {/* One element, so Activity hides the page with one style, and the pages' own first and last children stay theirs. */}
-          <div>
+          {/* One element, so Activity hides the page with one style, and the pages' own first and last children stay theirs. It is a track
+              that fills what is left of <main>'s height (Layout), so a page can sit something in the middle of the screen (SealedChapter). */}
+          <div className="flex grow flex-col">
             <Routes key={since} location={location}>
               {routes}
             </Routes>

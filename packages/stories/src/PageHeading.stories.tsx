@@ -25,9 +25,6 @@ export const WithStat: Story = {
   args: { title: "Questlines", intro: "Chained side quests, step by step.", stat: "2 under way · 3 done · 7 not started" },
 };
 
-/** A hidden chapter's: the title and what revealing it does. */
-export const HiddenChapter: Story = { args: { title: "Chapter 3 is hidden", intro: "Revealing it also reveals every chapter before it." } };
-
 /** The note above the checklist while spoiler protection hides chapters. */
 export const SpoilerCallout: Story = {
   render: () => <Callout icon="lock">Showing chapters 1–2 only. Later entries unlock as you reveal chapters.</Callout>,

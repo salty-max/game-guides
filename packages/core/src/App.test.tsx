@@ -48,8 +48,10 @@ describe("App", () => {
     const user = userEvent.setup();
     history.replaceState(null, "", "/guide/3/section-3-1");
     render(<App />);
-    expect(await screen.findByRole("heading", { level: 1, name: "Chapter 3 is hidden" })).toBeInTheDocument();
-    await user.click(screen.getByRole("button", { name: "Reveal chapter" }));
+    expect(await screen.findByRole("heading", { level: 1, name: "Chapter 3: Not revealed yet" })).toBeInTheDocument();
+    expect(screen.getByText(/^Hidden to spare you spoilers until you reach it\. Revealing it now also reveals chapter 2\.$/)).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Back to chapter 1" })).toHaveAttribute("href", "/guide/1");
+    await user.click(screen.getByRole("button", { name: "Reveal chapter 3" }));
     await user.click(screen.getByRole("button", { name: "Reveal and open" }));
     expect(await screen.findByRole("heading", { level: 1, name: chapters[2].title })).toBeInTheDocument();
     expect(useProgress.getState().data.ceiling).toBe(3);
