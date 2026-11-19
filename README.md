@@ -25,7 +25,7 @@ Each app's history from its old repository is kept under its folder, so `git log
   Its `vite.config.ts` is a single call to `guideConfig`.
 - **`services/sync`** is the sync API, a small server of its own: it lets a reader's devices share a guide's progress through a six-digit code, with no account. It is a separate Vercel project, `hundo-api`, at `api.hundo.quest` ([its README](services/sync/README.md)).
 - **`lighthouse/`**: the Lighthouse audit every pull request runs on each guide's production build, its thresholds (`lighthouserc.mjs`) and the script that runs it ([docs/testing.md](docs/testing.md#lighthouse)).
-- **`tools/`**: `queued.mjs`, which makes a heavy browser job take its turn in the machine-wide queue ([docs/testing.md](docs/testing.md#heavy-jobs-share-the-mac)). Not in `scripts/`, which every guide's Vercel ignore command watches.
+- **`tools/`**: `check.mjs`, what `pnpm check` runs, and `scope.mjs`, the packages a change reaches ([docs/testing.md](docs/testing.md#what-pnpm-check-runs)); `queued.mjs`, which makes a heavy browser job take its turn in the machine-wide queue, and `measure.mjs`, which measures what a run costs the machine ([docs/testing.md](docs/testing.md#heavy-jobs-share-the-mac)). Not in `scripts/`, which every guide's Vercel ignore command watches.
 - **`docs/`**: how to do each recurring task (below).
 - **`harness/`**, `harness.toml`, `.claude/`: the git hooks, the task board and the review helpers sessions work under. The rules are in [CLAUDE.md](CLAUDE.md).
 
@@ -78,13 +78,13 @@ pnpm check
 pnpm --filter hundo-koholint dev
 ```
 
-`pnpm check` runs `pnpm lint`, `pnpm typecheck`, `pnpm test` and `pnpm build`, each across every package (`pnpm -r`). Lint fails on warnings. Inside an app folder, `pnpm dev`, `pnpm build`, `pnpm preview`, `pnpm test` and `pnpm icons` work on that guide alone. `pnpm screenshots` at the root retakes every guide's install-dialog pictures from its production build ([docs/core.md](docs/core.md#the-installed-app)); run it as `bun harness/q.ts --queue screenshots -- pnpm screenshots` so it takes its turn behind other heavy jobs ([docs/testing.md](docs/testing.md#heavy-jobs-share-the-mac)). `pnpm lighthouse` runs CI's Lighthouse audit on every guide, or `pnpm lighthouse rdr` on one ([docs/testing.md](docs/testing.md#lighthouse)); it queues itself behind other heavy jobs.
+`pnpm check` runs lint, typecheck, tests and build for the packages your change reaches against `origin/main` (a core change reaches every package, a guide's data that guide), and `pnpm check --all` for every package, as CI does with the root's `pnpm lint`, `pnpm typecheck`, `pnpm test` and `pnpm build` ([docs/testing.md](docs/testing.md#what-pnpm-check-runs)). Lint fails on warnings. Inside an app folder, `pnpm dev`, `pnpm build`, `pnpm preview`, `pnpm test` and `pnpm icons` work on that guide alone. `pnpm screenshots` at the root retakes every guide's install-dialog pictures from its production build ([docs/core.md](docs/core.md#the-installed-app)); run it as `bun harness/q.ts --queue screenshots -- pnpm screenshots` so it takes its turn behind other heavy jobs ([docs/testing.md](docs/testing.md#heavy-jobs-share-the-mac)). `pnpm lighthouse` runs CI's Lighthouse audit on the guides whose own files your change touches (a core change alone asks for names, since CI audits every guide), `pnpm lighthouse rdr` on one, `--all` on every guide ([docs/testing.md](docs/testing.md#lighthouse)); it queues itself behind other heavy jobs.
 
 ```bash
 pnpm --filter hundo-stories storybook
 ```
 
-That opens the component stories on port 6006. Their tests are part of `pnpm test`, and drive the system Google Chrome.
+That opens the component stories on port 6006. Their tests are part of `pnpm test`, and drive the system Google Chrome, one Chrome for every guide's look.
 
 Typecheck and tests run per app. Each app's typecheck includes core's source, and core's suites run beside the guide's own tests. That way core is always checked against a real guide config, and a guide that breaks one of core's assumptions fails in its own app.
 

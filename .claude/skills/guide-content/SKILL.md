@@ -59,6 +59,6 @@ Rewriting directions is where errors creep in: a turn smoothed into the wrong co
 ## 6. Check it
 
 - In the app folder, `pnpm test` gives the quick loop: ids, categories, links, missables, and the totals pinned in `guide.test.ts`.
-- At the root, `bun harness/q.ts check -- bun run check`.
+- At the root, `bun harness/q.ts check -- bun run check`. For a data change it checks that guide alone (and the stories too for Koholint's, whose data they render).
 - Read the changed chapters in the browser as a player would: the `guide-check` skill with `--reveal` and `--pages` naming those chapters.
 - Spoilers: shoot or open the guide without `--reveal` as well. Read each hidden chapter's teaser in the rail, and every group title a player sees before revealing a chapter.

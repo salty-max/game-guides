@@ -191,6 +191,6 @@ Gzipped JS in `dist/assets` after `pnpm build`, with the 2.3 KB `workbox-window`
 
 ## Before you commit
 
-- `pnpm check` at the root runs lint, typecheck, tests and build for every package. Each app's typecheck includes core's source, so core is checked against every real config. A change to `GuideConfig` or `Brand` fails until every guide follows it.
+- `pnpm check` at the root runs lint, typecheck, tests and build for every package when core changes ([testing.md](testing.md#what-pnpm-check-runs)). Each app's typecheck includes core's source, so core is checked against every real config. A change to `GuideConfig` or `Brand` fails until every guide follows it.
 - Check the change in a browser in at least one article guide (Koholint or Echoes) and Red Dead's checklist layout, on desktop and phone, in light and dark.
 - Remember that every guide's site deploys from this one change. Check each preview before production ([deploying.md](deploying.md)).
