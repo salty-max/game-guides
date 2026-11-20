@@ -6,5 +6,6 @@ import { home } from "./src/plugin.ts";
 export default defineConfig({
   plugins: process.env.VITEST ? [] : [home()],
   build: { rollupOptions: { input: { index: "index.html", notFound: "404.html" } } },
-  test: { globals: true, environment: "node", include: ["src/**/*.test.{ts,tsx}"], testTimeout: 60_000 },
+  // A suite's beforeAll makes the whole page from every guide's files (plugin.ts's make), as slow as any test here.
+  test: { globals: true, environment: "node", include: ["src/**/*.test.{ts,tsx}"], testTimeout: 60_000, hookTimeout: 60_000 },
 });

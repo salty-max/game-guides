@@ -21,10 +21,13 @@ const CORNERS: Record<Guide["corners"], string> = {
   normal: "--r-button:999px;--r-card:16px;--r-hero:22px;--r-tile:14px",
 };
 
+/** The gap between the logo ring's arcs, in degrees, for so many guides: the link preview's ring (og.ts) keeps it too. */
+export const ringGap = (count: number) => (count > 1 ? Math.min(2.2, 360 / count / 4) : 0);
+
 /** The logo's ring: one arc per guide in its primary, so it gains one with each new guide. */
 export const ring = (guides: Guide[], theme: "light" | "dark") => {
   const step = 360 / guides.length;
-  const gap = guides.length > 1 ? Math.min(2.2, step / 4) : 0;
+  const gap = ringGap(guides.length);
   const stops = guides.flatMap((guide, i) => {
     const start = i * step + gap / 2;
     const end = (i + 1) * step - gap / 2;
