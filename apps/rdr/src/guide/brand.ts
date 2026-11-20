@@ -14,7 +14,6 @@ export const brand = {
   publisher: "Rockstar Games",
   corners: "narrow",
   home: "https://rdr.hundo.quest",
-  movedFrom: ["reddead.hundo.quest"],
   fonts: {
     display: { family: "Barlow Condensed", file: "barlow-condensed.woff2", weight: "700", fallback: '"Arial Narrow",sans-serif' },
     sans: { family: "DM Sans", file: "dm-sans.woff2", weight: "400 700", fallback: "system-ui,sans-serif" },
