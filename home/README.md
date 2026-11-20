@@ -27,9 +27,16 @@ file). From each guide it takes:
   the comment above them says how to make them again. Its tags go in `index.html`'s head alone, at `<!--home:og-->`;
 - renders `src/page.tsx` to static HTML in `index.html` and `404.html`.
 
-React runs only at build. The browser gets the HTML, two stylesheets and `src/main.ts`, about 1 kB, which shows the Find field and
-narrows the guides as a reader types (`src/find.ts`). Without it the field stays hidden and every guide shows. Light and dark follow the
-system. The page keeps nothing in the browser: progress lives on each guide's own address.
+React runs only at build. The browser gets the HTML, two stylesheets and `src/main.ts`, a couple of kB, which shows the Find field and
+narrows the guides as a reader types (`src/find.ts`), and draws a returning reader's progress (`src/progress.ts`). Without it the field stays
+hidden and every guide shows as it does for a first visit. Light and dark follow the system.
+
+The page keeps nothing in the browser: progress lives on each guide's own address. It reads one cookie per guide, `hundo_p_<brand.id>`, which
+the sync API sets on every hundo.quest host when the guide asks it to (core's `summary.ts`, [docs/core.md](../docs/core.md#hundoquests-summary)):
+the guide's figure, as its Progress page shows it, and the chapter the reader was last in. A band whose guide has one says "57% complete ·
+Chapter 6" beside a Continue button, with a bar in the guide's colour along its foot; in a phone's short band the line takes the goals' place,
+on top of them, so no band changes height. Each band carries its guide's `brand.id` as `data-id` for it. Only the chapter's number shows,
+never its title.
 
 A new guide shows up by itself. Its build stops, naming what's missing, if the guide has no `src/guide/banners/chapter-1.webp`, no
 `public/icons/tile-{40,80,120}.png`, or no licence beside its display font (`<Family-Name>-OFL.txt`).
@@ -43,10 +50,11 @@ production build as CI's `lighthouse-home` job does.
 ## Tests
 
 - `page.test.ts`: the page as the build makes it. Every guide with a `vercel.json` in `apps/` is on it, linking to its `brand.home`. Its
-  pictures and fonts are among the files the build writes. Find narrows the guides.
+  pictures and fonts are among the files the build writes. Find narrows the guides. A guide's cookie fills in its band and no other.
 - `guides.test.ts`: what's read from each guide, and how the largest goals are picked.
 - `find.test.ts`: how Find matches.
 - `og.test.ts`: the link preview. Its tags name a picture the build writes, on `https://hundo.quest`, at the size they declare; which
   guides the wall shows; the logo's ring and word; the picture at one guide and at thirty.
+- `progress.test.ts`: how a guide's cookie is read, and what a started band shows.
 - `deploy.test.ts`: `vercel.json` (the guides' headers, the cache only on a hit, the 404), the ignore step, the canonical, sitemap and
-  robots, no inline script and no browser storage.
+  robots, no inline script, no browser storage, and the guides' cookies read but never written.

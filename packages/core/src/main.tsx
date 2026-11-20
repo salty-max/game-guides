@@ -6,6 +6,7 @@ import { createRoot } from "react-dom/client";
 import { App } from "./App";
 import { listenForInstall } from "./store/install";
 import { restoreLaunch } from "./store/place";
+import { startSummary } from "./summary";
 import "./app.css";
 import "virtual:guide/theme.css";
 
@@ -18,6 +19,8 @@ if (!leaving) {
   restoreLaunch();
   // Chromium's offer to install waits for Guide settings, with no banner of the browser's own (store/install.ts).
   listenForInstall();
+  // The summary hundo.quest shows of this guide, kept in step through the sync API (summary.ts).
+  startSummary();
   createRoot(document.getElementById("root")!).render(
     <StrictMode>
       <App />
