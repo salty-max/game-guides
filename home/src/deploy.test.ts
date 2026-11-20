@@ -72,8 +72,13 @@ describe("what a search engine reads", () => {
 });
 
 describe("the page's code", () => {
-  it("keeps nothing in the browser: progress lives on each guide's own address", () => {
+  it("keeps nothing in the browser: progress lives on each guide's own address, and the guides' cookies are only read here", () => {
     const sources = readdirSync(import.meta.dirname, { recursive: true, encoding: "utf8" }).filter((file) => /\.tsx?$/.test(file) && !file.includes(".test."));
-    for (const file of sources) expect(readFileSync(join(import.meta.dirname, file), "utf8"), file).not.toMatch(/localStorage|sessionStorage|indexedDB|document\.cookie/);
+    for (const file of sources) {
+      const code = readFileSync(join(import.meta.dirname, file), "utf8");
+      expect(code, file).not.toMatch(/localStorage|sessionStorage|indexedDB|cookieStore/);
+      // (and Safari has kept a cookie written by script for as little as a week)
+      expect(code, file).not.toMatch(/document\.cookie\s*=(?!=)/);
+    }
   });
 });

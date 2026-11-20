@@ -3,6 +3,7 @@
 import { existsSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { wireFind } from "./find";
+import { wireProgress } from "./progress";
 import { APPS, readGuides, type Guide } from "./guides";
 import { make, type Made } from "./plugin";
 
@@ -81,6 +82,20 @@ describe("the landing page", () => {
     type("");
     expect(bands().some((band) => band.hidden)).toBe(false);
     expect(document.querySelector("[data-find-status]")!.textContent).toBe("");
+  });
+
+  it("names each band by its guide's brand id, and shows a started guide's progress from its cookie, the others as they were", () => {
+    expect(bands().map((band) => band.dataset.id).sort()).toEqual(guides.filter((guide) => deployed.includes(guide.folder)).map((guide) => guide.id).sort());
+    const before = document.body.innerHTML;
+    expect(wireProgress(document, "")).toBe(0);
+    expect(document.body.innerHTML).toBe(before);
+    const [first, second] = bands();
+    expect(wireProgress(document, `hundo_link=abc; hundo_p_${first.dataset.id}=1.57.6`)).toBe(1);
+    expect(first.querySelector(".meta")!.textContent).toBe("57% complete · Chapter 6");
+    expect(first.querySelector(".btn")!.textContent).toBe("Continue");
+    expect(first.querySelector<HTMLElement>(".mine-bar i")!.style.width).toBe("57%");
+    expect(second.querySelector(".mine-bar")).toBeNull();
+    expect(second.querySelector(".btn")!.textContent).toMatch(/^Open /);
   });
 
   it("has a page for an unknown address that leads back", () => {

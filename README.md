@@ -48,9 +48,20 @@ Progress lives in the reader's browser, and that stays true. To keep the same pr
 What the server keeps ([services/sync](services/sync/README.md#what-it-keeps) has the detail):
 
 - No email and no name. Per device: a random id, a label like "Safari · iPhone · Koholint app" (the app part only for an installed guide), and the time it last synced. Per guide: the reader's checks and settings, each with the time it was last changed. The theme isn't synced.
-- Two cookies, both set by the guide's own host through its `/api` rewrite: `hundo_sync` (a random device id and secret, unreadable by script, sent only to `/api`) and `hundo_link` (a short fingerprint of the group that opens nothing, which lets a guide know it is linked without a request). On hundo.quest they cover every guide in the browser, and last 400 days.
+- Two cookies for sync, both set by the guide's own host through its `/api` rewrite: `hundo_sync` (a random device id and secret, unreadable by script, sent only to `/api`) and `hundo_link` (a short fingerprint of the group that opens nothing, which lets a guide know it is linked without a request). On hundo.quest they cover every guide in the browser, and last 400 days.
 - The API is its own Vercel project, and the data is in an Upstash Redis database in Frankfurt. The server sees IP addresses, as any web server does, and uses them only through counters keyed by a salted hash, kept an hour at most, to limit tries at a code.
 - Unlinking a device stops it syncing and leaves its progress. Another device of the group can also remove it (it is unlinked the next time it connects, and its progress stays on it), and one not synced for 60 days is removed by itself and has to be linked again. "Delete synced progress" erases the server's copy and every device record. Anything not synced for 400 days expires by itself.
+
+### Your progress on hundo.quest
+
+hundo.quest shows each guide you've started with its figure and your chapter: "57% complete · Chapter 6". It can't read a guide's own storage, so each guide keeps a cookie for it on every hundo.quest host, `hundo_p_<guide>`, holding three numbers: a format number, the guide's overall completion as its Progress page shows it, and the number of the chapter you were last in. No row, no chapter title, nothing that names you or the device.
+
+- The guide asks its own `/api` (the sync API) to set the cookie, whether or not you sync: the server receives the guide's id, the figure and the chapter number, puts them in the cookie it sends back, and keeps nothing. The guide asks only when the cookie says something else than it would: a moment after it opens, and a few seconds after you stop ticking, never for each tick.
+- The request carries the guide's cookies, as every request to `/api` does: a browser keeps the cookie a server sends back only from a request that carries its own. So on a synced device `hundo_sync` goes with it, and the API reads none of them.
+- The server sets the cookie rather than the guide's script because Safari has kept a cookie set by a page's script for as little as a week, which would blank hundo.quest for anyone away from the guides for longer ([services/sync/README.md](services/sync/README.md#a-guides-summary) has what was checked).
+- Like `hundo_link`, the cookie goes with every request your browser makes to a hundo.quest address: the guides, hundo.quest and `/api`, except the visit counts, which are sent with no cookie. It lasts 400 days from the last change it carried (Brave keeps cookies 180 days at most), and comes back the next time you open the guide. hundo.quest only reads it, and with nothing checked in a guide the cookie is removed.
+- Count my visits and Global Privacy Control don't stop it: they're about counting, and nothing here is counted or kept.
+- An installed iPhone or iPad app keeps its own cookies, apart from Safari's, so hundo.quest in Safari doesn't see the progress made in it. The figure is the one from your last visit to the guide: after an update changes a guide's totals, it catches up when you open the guide.
 
 ### Visit counts
 

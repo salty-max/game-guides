@@ -7,6 +7,7 @@ import { PLACE_KEY } from "@hundo/core/store/place";
 import { SYNC_KEY } from "@hundo/core/sync/local";
 import { PERSIST_KEY } from "@hundo/core/persistence";
 import { COUNTS_KEY } from "@hundo/core/counts";
+import { SUMMARY_COOKIE } from "@hundo/core/summary";
 import { flatten } from "@hundo/core/sync/fields";
 import type { Row } from "@hundo/core/types";
 
@@ -84,6 +85,8 @@ describe("storage", () => {
     expect(SYNC_KEY).toBe("echoes-of-wisdom-field-guide.sync");
     expect(PERSIST_KEY).toBe("echoes-of-wisdom-field-guide.persist");
     expect(COUNTS_KEY).toBe("echoes-of-wisdom-field-guide.counts");
+    // and the cookie hundo.quest reads this guide's progress from (core's summary.ts), set on every hundo.quest host
+    expect(SUMMARY_COOKIE).toBe("hundo_p_echoes-of-wisdom");
   });
 });
 

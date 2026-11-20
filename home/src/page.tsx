@@ -76,7 +76,7 @@ const Footer = () => (
 const Band = ({ guide, art, eager }: { guide: Guide; art: GuideArt; eager: boolean }) => {
   const largest = art.banner.at(-1)!;
   return (
-    <li className={`cell g-${guide.folder}`} data-guide={findTerms(guide)}>
+    <li className={`cell g-${guide.folder}`} data-guide={findTerms(guide)} data-id={guide.id}>
       <div className="world">
         <img
           className="art"

@@ -527,7 +527,7 @@ async function count(ctx: Ctx) {
  * itself; a flood of calls gets back nothing but cookies.
  */
 const SUMMARY_FORMAT = 1;
-/** The cookie's name for a guide. A name never changes once live: a new one would blank every reader's band until they open the guide. */
+/** The cookie's name for a guide. A name never changes once live (each guide's guide.test.ts pins its own): a new one would blank every reader's band until they open the guide. */
 export const summaryCookie = (guide: string) => `hundo_p_${guide}`;
 const whole = (value: unknown, min: number, max: number) => Number.isInteger(value) && (value as number) >= min && (value as number) <= max;
 
