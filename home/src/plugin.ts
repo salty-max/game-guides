@@ -7,20 +7,34 @@ import { join } from "node:path";
 import sharp from "sharp";
 import type { Plugin } from "vite";
 import { APPS, readGuides } from "./guides";
+import { ogImage, ogTags } from "./og";
 import type { GuideArt } from "./page";
 import { faviconSvg, guidesCss, renderHome, renderNotFound } from "./render";
+
+/** The page's address, which the link preview's picture is named on (index.html's canonical and og:url). */
+export const HOME = "https://hundo.quest";
 
 /** The banner's copies: a phone's short band, a desktop's band at 1x, and up to the original for 2x and 3x screens. */
 export const BANNER_WIDTHS = [480, 960, 1800];
 const TILE_WIDTHS = [40, 80, 120];
 const HUNDO_FONT_FILE = join(import.meta.dirname, "fonts", "manrope.woff2");
 
-const contentType: Record<string, string> = { webp: "image/webp", png: "image/png", woff2: "font/woff2", css: "text/css", svg: "image/svg+xml", txt: "text/plain" };
+const contentType: Record<string, string> = {
+  webp: "image/webp",
+  png: "image/png",
+  jpg: "image/jpeg",
+  woff2: "font/woff2",
+  css: "text/css",
+  svg: "image/svg+xml",
+  txt: "text/plain",
+};
 
 /** What the build makes: each file's published path (no leading slash) and its bytes, and the pages' markup and head. */
 export type Made = {
   files: Map<string, Buffer | string>;
   head: string;
+  /** The link preview picture's tags, in index.html's head alone: 404.html is never shared or indexed. */
+  og: string;
   home: string;
   notFound: string;
 };
@@ -71,12 +85,26 @@ export const make = async (apps = APPS): Promise<Made> => {
   const css = guidesCss(guides, { hundo, display });
   const stylesheet = add(hashed("guides", "css", css), css);
   add("favicon.svg", faviconSvg(guides));
+  // Named by its content like every file here: link previews are cached by address, so a new guide's picture gets a new one.
+  const picture = await ogImage(guides, apps);
+  const og = ogTags(HOME + add(hashed("og", "jpg", picture), picture), guides);
   const head = [
     `<link rel="preload" href="${hundo}" as="font" type="font/woff2" crossorigin>`,
     `<link rel="stylesheet" href="${stylesheet}">`,
     `<link rel="icon" href="/favicon.svg" type="image/svg+xml">`,
   ].join("\n    ");
-  return { files, head, home: renderHome(guides, art), notFound: renderNotFound() };
+  return { files, head, og, home: renderHome(guides, art), notFound: renderNotFound() };
+};
+
+/** A page with the build's markup in its marks: index.html gets the home page and the link preview's tags, 404.html the lost page alone. */
+export const fillPage = (html: string, path: string, { head, og, home, notFound }: Made) => {
+  const lost = path.endsWith("404.html");
+  if (!html.includes("<!--home:head-->") || !html.includes("<!--home:body-->")) throw new Error(`${path}: no <!--home:head--> or <!--home:body--> to fill`);
+  if (!lost && !html.includes("<!--home:og-->")) throw new Error(`${path}: no <!--home:og--> for the link preview's picture`);
+  return html
+    .replace("<!--home:og-->", lost ? "" : og)
+    .replace("<!--home:head-->", head)
+    .replace("<!--home:body-->", lost ? notFound : home);
 };
 
 export const home = (): Plugin => {
@@ -87,12 +115,7 @@ export const home = (): Plugin => {
     // After Vite's own pass over the HTML, which would otherwise try to bundle the /assets/ paths written here as its own.
     transformIndexHtml: {
       order: "post",
-      async handler(html, { path }) {
-        const { head, home, notFound } = await ready();
-        const body = path.endsWith("404.html") ? notFound : home;
-        if (!html.includes("<!--home:head-->") || !html.includes("<!--home:body-->")) throw new Error(`${path}: no <!--home:head--> or <!--home:body--> to fill`);
-        return html.replace("<!--home:head-->", head).replace("<!--home:body-->", body);
-      },
+      handler: async (html, { path }) => fillPage(html, path, await ready()),
     },
     async generateBundle() {
       for (const [fileName, source] of (await ready()).files) this.emitFile({ type: "asset", fileName, source });
