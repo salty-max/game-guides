@@ -97,4 +97,11 @@ export default tseslint.config(
   },
   // The sync service runs on Node, not in a browser.
   { files: ["services/**/*.ts"], languageOptions: { globals: globals.node } },
+  {
+    // The landing page (home/) has a plain stylesheet of its own, not core's Tailwind: its classes are its stylesheet's names, which the
+    // Tailwind lint can't read. Its markup is rendered in Node at build, and only find.ts and main.ts reach the browser.
+    files: ["home/**/*.{ts,tsx}"],
+    languageOptions: { globals: { ...globals.browser, ...globals.node } },
+    rules: Object.fromEntries(Object.keys(tailwind.configs["recommended-error"].rules).map((rule) => [rule, "off"])),
+  },
 );

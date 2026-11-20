@@ -1,6 +1,8 @@
 // Runs Lighthouse, through Lighthouse CI, on each guide's production build served by `vite preview`, as the pull request's lighthouse
 // job does: `pnpm lighthouse [koholint,rdr]`, with `--no-build` to audit the dist already there. Named, those guides; with `--all`, every
-// guide; with neither, the guides whose own files this checkout's change touches (tools/scope.mjs's guidesOf). A change to core or the
+// guide; with neither, the guides whose own files this checkout's change touches (tools/scope.mjs's guidesOf), and the landing page when
+// the change touches home/. `home` names the landing page (hundo.quest), audited at / on a phone and on a desktop, as CI's
+// lighthouse-home job does. A change to core or the
 // root's files alone names none: it reaches every guide, which CI's lighthouse job audits, so name the ones worth auditing here. Each guide's pages are audited three
 // times on a phone (Lighthouse's default), and the checklist three times more on a desktop, then held to lighthouserc.mjs's
 // assertions. The reports land in .cache/lighthouse/<guide>/report, a table of each page's numbers as the assertions read them is
@@ -26,7 +28,12 @@ const changedGuides = () => {
   if (guides.length) return { guides, also: every ? " (the change reaches every guide too: CI's lighthouse job audits each one)" : "" };
   return { why: every ? "the change reaches every guide, which CI's lighthouse job audits one by one" : `no guide changes against ${BASE}` };
 };
-const picked = named ? { guides: named.split(",") } : args.includes("--all") ? { guides: everyGuide() } : changedGuides();
+/** The landing page, when the change touches its folder: it is made from the guides, but a guide's change alone leaves it to CI. */
+const withHome = (picked) =>
+  changesOf(root)?.files.some((file) => file.startsWith("home/"))
+    ? { guides: [...(picked.guides ?? []), "home"], also: picked.guides ? picked.also : ` (no guide: ${picked.why})` }
+    : picked;
+const picked = named ? { guides: named.split(",") } : args.includes("--all") ? { guides: everyGuide() } : withHome(changedGuides());
 if (!picked.guides) {
   console.error(`lighthouse: ${picked.why}. Name the guides to audit (pnpm lighthouse koholint,rdr), or --all for every guide.`);
   process.exit(2);
@@ -43,8 +50,12 @@ const out = join(root, ".cache", "lighthouse");
 
 // The pages audited on a phone, and the one audited on a desktop. Lighthouse CI keeps a requested URL's hash in the URL it groups
 // runs by, which is what tells the desktop runs apart from the phone's in lighthouserc.mjs's assertMatrix. The app ignores the hash.
-const phonePages = ["/guide/1", "/checklist", "/dashboard"];
-const desktopPage = "/checklist#desktop";
+// The landing page is one page, so it is / on both.
+const HOME = "home";
+const targetOf = (app) =>
+  app === HOME
+    ? { dir: "home", phonePages: ["/"], desktopPage: "/#desktop" }
+    : { dir: join("apps", app), phonePages: ["/guide/1", "/checklist", "/dashboard"], desktopPage: "/checklist#desktop" };
 // GitHub's Ubuntu runners don't give an unprivileged user the namespaces Chrome's sandbox needs; on a Mac the sandbox stays on.
 const chromeFlags = process.env.CI ? ["--settings.chromeFlags=--no-sandbox"] : [];
 
@@ -103,7 +114,8 @@ const browsers = new Set();
 
 /** One guide: build, serve, collect, assert, report. Anything that goes wrong throws, and the next guide still runs. */
 const audit = async (app) => {
-  const name = readJson(join(root, "apps", app, "package.json")).name;
+  const { dir: folder, phonePages, desktopPage } = targetOf(app);
+  const name = readJson(join(root, folder, "package.json")).name;
   if (build) {
     const built = spawnSync("pnpm", ["--filter", name, "build"], { cwd: root, stdio: "inherit" });
     interrupted(built);

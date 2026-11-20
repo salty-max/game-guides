@@ -25,11 +25,14 @@ CI (`.github/workflows/ci.yml`) runs the root's `pnpm lint`, `pnpm typecheck`, `
 | A change to | Checks |
 | --- | --- |
 | `packages/core` | every package: each guide runs core's suites and typechecks core against its own config, the stories render core's components, and every package's lint reads core's `app.css` (the Tailwind lint's entry point) |
-| a guide's data, its own test, its docs | that guide: its `guide.test.ts` and core's 48 shared suites against it, its lint, typecheck and build |
-| a guide's `brand.ts` | that guide, the stories (they show every guide's brand) and the sync API (its `project.test.ts` reads every guide's id) |
-| a guide's `theme.css` or `public/fonts` | that guide and the stories |
-| Koholint's `src/guide` or `public/icons` | Koholint and the stories, which render its data and its brand tile |
-| a guide's `vercel.json` or `package.json` | every guide (core's `deploy.test.ts` and `wiring.test.ts` read them all) and the stories (`guides.test.ts` counts the guides) |
+| a guide's own test, its docs | that guide: its `guide.test.ts` and core's 48 shared suites against it, its lint, typecheck and build |
+| a guide's data, or anything else in its `src/guide` but its tests | that guide and the landing page (`home/` is made from every guide's `config.ts` and what it imports, and its chapter 1 banner) |
+| a guide's `brand.ts` | that guide, the landing page, the stories (they show every guide's brand) and the sync API (its `project.test.ts` reads every guide's id) |
+| a guide's `theme.css` or `public/fonts` | that guide, the landing page and the stories |
+| a guide's `public/icons` | that guide and the landing page (its icon tiles); Koholint's, the stories too |
+| Koholint's `src/guide` | Koholint, the landing page and the stories, which render its data and its brand tile |
+| a guide's `vercel.json` or `package.json` | every guide (core's `deploy.test.ts` and `wiring.test.ts` read them all) and the stories (`guides.test.ts` counts the guides); for `vercel.json`, the landing page too (its `deploy.test.ts` holds its headers to Koholint's) |
+| `home/` | the landing page |
 | `services/sync/src`, its tests aside | the sync API and every guide: core's sync tests run the API's code (`test/sync-world.ts` imports its `harness.ts`), and core's `ledger.test.ts` holds its copy of the ledger to the API's |
 | the sync API's tests, `api/` or config | the sync API |
 | a story | the stories |
@@ -95,12 +98,13 @@ Each guide's own `guide.test.ts` adds its totals, its legacy saves, its extra st
 
 ## Lighthouse
 
-CI's `lighthouse` job audits each guide's production build with Lighthouse on every pull request and every push to `main`, beside the four checks. A regression fails the pull request, as an axe violation in the stories does.
+CI's `lighthouse` job audits each guide's production build with Lighthouse on every pull request and every push to `main`, beside the four checks, and its `lighthouse-home` job the landing page's (`home/`). A regression fails the pull request, as an axe violation in the stories does.
 
 **What runs.** One job per guide (the `guide: [...]` matrix in `ci.yml`, which `wiring.test.ts` holds to the folders in `apps/`), about three minutes each on GitHub's runner with the install and the build, so the guides don't share a CPU and one failing doesn't stop the others. Each one builds its guide (`pnpm --filter hundo-<name> build`), serves `dist` with `vite preview` inside the runner, and runs Lighthouse CI (`@lhci/cli`, pinned at 0.16.1 in the root `package.json`, which pins Lighthouse 13.6.0) on the runner's own Google Chrome. The job prints Chrome's version, and the summary names its major version: the runner image updates it, so a jump in every number at once can be a new Chrome. `lighthouse/run.mjs` does all of it, and `pnpm lighthouse` runs that same script on a laptop.
 
 - **Pages:** `/guide/1`, `/checklist` (the heaviest page: Red Dead's has 307 rows) and `/dashboard` (Progress) on a phone, which is Lighthouse's default (a 412×823 screen, a slow 4G network and a four-times-slower CPU, all simulated), and `/checklist` again on a desktop. The desktop run's URL ends in `#desktop`: the app ignores the hash, and Lighthouse CI keeps it in the URL it groups runs by, which is how the thresholds tell the two apart.
 - **Runs:** three of each, so twelve per guide. Every run starts from an empty save: a reader with half of Red Dead ticked is never measured.
+- **The landing page** (`pnpm lighthouse home`, CI's `lighthouse-home` job) is one page, `/`, three times on a phone and three on a desktop (`/#desktop`). Its speed limits are its own (`:\d+/$` in `lighthouserc.mjs`), the desktop's are the guides' desktop limits, and the scores are held to 100 like every page. `pnpm lighthouse` with no names adds it when the change touches `home/`.
 - **Not audited here:** Vercel's headers and CDN (`vite preview` sends no CSP, so a CSP violation never shows as a console error here: [deploying.md](deploying.md#preview-first) covers headers on a preview), the service worker's offline mode and the manifest (Lighthouse 13 has no PWA category any more; the `guide-deploy` skill checks them), Lighthouse's new agentic browsing category, and byte budgets, which there are none of on purpose.
 
 **What it's held to.** `lighthouse/lighthouserc.mjs`, whose comments give each number's reason:

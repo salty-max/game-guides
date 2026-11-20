@@ -47,13 +47,14 @@ Then follow [step 1 of the doc](../../../docs/adding-a-guide.md#1-copy-the-folde
 
 ## 5. Wire it in
 
-Do [step 4 of the doc](../../../docs/adding-a-guide.md#4-wire-it-into-the-repository): `pnpm install` and the lockfile, the API's `GUIDES`, CI's lighthouse matrix, Storybook's `ids.ts` and `guides.ts`, the README's apps table and `.claude/launch.json`. A test holds each list, and `pnpm check` names the one that's missing. Write the app's README too.
+Do [step 4 of the doc](../../../docs/adding-a-guide.md#4-wire-it-into-the-repository): `pnpm install` and the lockfile, the API's `GUIDES`, CI's lighthouse matrix, Storybook's `ids.ts` and `guides.ts`, the README's apps table and `.claude/launch.json`. A test holds each list, and `pnpm check` names the one that's missing. Write the app's README too. The landing page at hundo.quest (`home/`) needs nothing added: it shows every guide by itself, from its `config.ts`, palette, chapter 1 banner, icon tiles and display font, which needs its licence beside it as `<Family-Name>-OFL.txt` (home's build stops without it).
 
 ## 6. Check
 
 - At the root, `bun harness/q.ts check -- bun run check`.
 - `pnpm lighthouse <name>` at the root (it queues itself: run it in the background and read the table at the end of its log), before asking for the push ([doc](../../../docs/adding-a-guide.md#5-check-it)). CI's limits come from the guides that do worst, so a new guide can fail them: fix the guide (banner weight, fonts) and never loosen a threshold, which is the user's call through the opener.
 - The `guide-check` skill on the new guide, with `--reveal`, so every chapter is shown.
+- The landing page with the new guide on it: `preview_start` with `home-preview`, desktop and phone, light and dark. Look at its band: the banner's crop, the name in its display font, and its three largest goals on one or two lines.
 - Review: run `bun harness/packet.ts hundo`, have the `reviewer` helper read it, fix what it finds, then `bun harness/review.ts hundo "<verdict>"`. Then commit.
 
 ## 7. Vercel, up to launch
@@ -61,4 +62,4 @@ Do [step 4 of the doc](../../../docs/adding-a-guide.md#4-wire-it-into-the-reposi
 - **The API first:** the guide's `brand.id` in production's `GUIDES` before the project's first deployment ([doc](../../../docs/deploying.md#the-api-knows-the-guide-first)). It's the doc's first way, a one-line pull request of its own deployed ahead (recommended), or the second, with the guide's own and the sync and count checks after the merge: a child sends the choice, and the merge's go, to its opener.
 - **The project:** create it only with the user's go, following [docs/deploying.md](../../../docs/deploying.md#a-new-project). That covers the name, Root Directory, outside files, Node, production branch and the preview toolbar's variable; the hundo.quest subdomain goes on only at launch.
 - **The first deployment:** get the push go (a child sends the question to its opener), saying exactly what will be pushed, then check it as the `guide-deploy` skill says. On a project with no deployments, the first deployment has gone to production each time (three times, CLI and Git alike, [doc](../../../docs/deploying.md#a-new-project)), which is why the project has no `hundo.quest` domain yet. It comes from Git once the pull request is open, with a last commit that touches the app, and is checked on `<project>.vercel.app` and, for sync and counts, on its `-git-<branch>-jellycat` address.
-- **Stop there.** Launch is its own go: the merge, then the domain once `main`'s production deployment is built ([doc](../../../docs/deploying.md#a-new-project)). Before asking for it, make sure the pull request's last commit touches the app, or the first production build of `main` is most likely skipped.
+- **Stop there.** Launch is its own go: the merge, then the domain once `main`'s production deployment is built ([doc](../../../docs/deploying.md#a-new-project)). Before asking for it, make sure the pull request's last commit touches the app, or the first production build of `main` is most likely skipped. The merge rebuilds the landing page too, whose band links to the guide's address, so add the domain without delay.
