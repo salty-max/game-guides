@@ -34,7 +34,7 @@ describe("App", () => {
     expect(saved()).toEqual({ [firstRow.id]: true });
   });
 
-  it("names the guide <mark> Hundo and puts the copyright under the rail", async () => {
+  it("names the guide <mark> Hundo and puts the copyright under the rail, after a link to every other guide", async () => {
     render(<App />);
     expect(brand.name).toBe(`${brand.mark} Hundo`);
     expect(brand.title.startsWith(`${brand.name} · `)).toBe(true);
@@ -42,6 +42,12 @@ describe("App", () => {
     const rail = screen.getByRole("complementary", { name: "Chapters" });
     expect(within(rail).getByText("© 2026 Hundo")).toBeInTheDocument();
     expect(within(rail).getByText(`Unofficial fan guide, not affiliated with ${brand.publisher}.`)).toBeInTheDocument();
+    // Out to hundo.quest in a new tab, so the installed app opens it in the browser rather than in the guide's own window.
+    const more = within(rail).getByRole("link", { name: "More guides on hundo.quest (opens in a new tab)" });
+    expect(more).toHaveTextContent("More guides on hundo.quest");
+    expect(more).toHaveAttribute("href", "https://hundo.quest/");
+    expect(more).toHaveAttribute("target", "_blank");
+    expect(more).toHaveAttribute("rel", "noopener noreferrer");
   });
 
   it("hides later chapters until revealed, then opens at the linked section", async () => {

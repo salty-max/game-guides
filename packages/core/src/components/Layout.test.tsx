@@ -393,6 +393,20 @@ describe("the chapter drawer under 800px", () => {
     expect(screen.getByRole("dialog", { name: "Chapters" })).toBeInTheDocument();
   });
 
+  it("stays open when the link to hundo.quest is followed: it opens in a new tab, and the reader is still on this page", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await screen.findByRole("heading", { level: 1 });
+    await user.click(toggle());
+    const drawer = await screen.findByRole("dialog", { name: "Chapters" });
+    const link = within(drawer).getByRole("link", { name: "More guides on hundo.quest (opens in a new tab)" });
+    // jsdom has no new tab to open; keep it from trying.
+    link.addEventListener("click", (event) => event.preventDefault());
+    await user.click(link);
+    expect(toggle()).toHaveAttribute("aria-expanded", "true");
+    expect(screen.getByRole("dialog", { name: "Chapters" })).toBeInTheDocument();
+  });
+
   it("stays open under the settings dialog opened from it, and Escape closes only the dialog", async () => {
     const user = userEvent.setup();
     render(<App />);

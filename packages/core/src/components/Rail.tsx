@@ -94,6 +94,18 @@ export function RailContent({ activeChapter, view, heading }: RailProps & { head
           </div>
         </div>
         <small className="grid gap-0.5 px-1 text-12 leading-[1.4] text-pretty text-muted">
+          {/* The way to every other guide. A new tab, as a map link's is, so the installed app doesn't take the reader to another site in
+              the guide's own window; offline, that tab doesn't load and the guide is as it was. */}
+          <a
+            className={`${pressTextClasses} inline-flex min-h-8 items-center gap-1 justify-self-start font-bold text-primary underline underline-offset-3 [&_svg]:size-3.5`}
+            href="https://hundo.quest/"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="More guides on hundo.quest (opens in a new tab)"
+          >
+            More guides on hundo.quest
+            <Icon name="out" />
+          </a>
           <span>© 2026 Hundo</span>
           <span>Unofficial fan guide, not affiliated with {brand.publisher}.</span>
         </small>
