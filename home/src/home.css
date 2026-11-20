@@ -1,0 +1,421 @@
+/* The landing page's look. hundo's own colours are neutral so the guides' carry the page; each guide's palette, display font and corners
+   come from the stylesheet the build writes (render.tsx's guidesCss), as .g-<folder>. Light and dark follow the system. */
+:root {
+  color-scheme: light dark;
+  --paper: #f4f2ee;
+  --surface: #fffdf9;
+  --ink: #1b1a18;
+  --muted: #5f5a54;
+  --line: #e0dcd4;
+  --focus: #1d5fbf;
+  --sans: "Hundo Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #0f0f11;
+    --surface: #18181b;
+    --ink: #f3f0ea;
+    --muted: #aca69e;
+    --line: #2b2b30;
+    --focus: #8ab4ff;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+* {
+  margin: 0;
+  padding: 0;
+}
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+body {
+  min-height: 100vh;
+  background: var(--paper);
+  color: var(--ink);
+  font: 400 1rem/1.55 var(--sans);
+  -webkit-font-smoothing: antialiased;
+}
+a {
+  color: inherit;
+  text-decoration: none;
+}
+ul {
+  list-style: none;
+}
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+}
+[hidden] {
+  display: none !important;
+}
+
+.wrap {
+  max-width: 84rem;
+  margin-inline: auto;
+  padding-inline: max(1rem, env(safe-area-inset-left), min(3.2vw, 2.5rem));
+}
+
+/* The word: "hund" and an "o" that is a ring, one arc per guide. */
+.logo {
+  display: inline-flex;
+  align-items: baseline;
+  font: 800 1.75rem/1 var(--sans);
+  letter-spacing: -0.05em;
+  color: var(--ink);
+}
+.o {
+  display: inline-block;
+  width: 0.6em;
+  height: 0.6em;
+  margin-left: 0.04em;
+  border-radius: 50%;
+  background: var(--ring, var(--ink));
+  mask: radial-gradient(farthest-side, transparent calc(100% - 0.155em), #000 calc(100% - 0.155em + 0.5px));
+}
+.top {
+  display: flex;
+  align-items: center;
+  padding-block: max(1.25rem, env(safe-area-inset-top)) 1.25rem;
+}
+
+.hero {
+  display: grid;
+  justify-items: center;
+  gap: 1.1rem;
+  padding-block: clamp(2.5rem, 6vw, 4.5rem) clamp(1.75rem, 4vw, 2.75rem);
+  text-align: center;
+}
+.hero h1 {
+  max-width: 15ch;
+  font: 800 clamp(2.4rem, 5.8vw, 4.5rem) / 1.02 var(--sans);
+  letter-spacing: -0.045em;
+  text-wrap: balance;
+}
+.hero p {
+  max-width: 34rem;
+  color: var(--muted);
+  font-size: clamp(1.05rem, 1.6vw, 1.25rem);
+  text-wrap: pretty;
+}
+
+.features {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1.25rem;
+  margin-block: clamp(1.5rem, 4vw, 2.5rem) clamp(1.75rem, 4vw, 2.5rem);
+  padding-block: 1.6rem;
+  border-block: 1px solid var(--line);
+}
+.features li {
+  display: grid;
+  align-content: start;
+  gap: 0.4rem;
+}
+.features svg {
+  width: 1.5rem;
+  height: 1.5rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.features strong {
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.features span {
+  color: var(--muted);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+@media (max-width: 50rem) {
+  .features {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.5rem 1.25rem;
+  }
+}
+
+.bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 2rem;
+  margin-bottom: 1.1rem;
+}
+.bar h2 {
+  font: 800 1.375rem/1.2 var(--sans);
+  letter-spacing: -0.03em;
+}
+.bar h2 span {
+  color: var(--muted);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.find {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--muted);
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+.find input {
+  width: 16rem;
+  height: 2.75rem;
+  padding: 0 0.9rem;
+  border: 1px solid color-mix(in srgb, var(--ink) 22%, var(--surface));
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--ink);
+  font: 500 1rem/1 var(--sans);
+}
+.find input::placeholder {
+  color: var(--muted);
+}
+/* Kept in the accessibility tree while empty (no display: none), so the first thing Find says is announced: only its text changes. */
+.status:empty {
+  margin: 0;
+}
+.status {
+  margin-bottom: 1.1rem;
+  color: var(--muted);
+}
+@media (max-width: 36rem) {
+  .find {
+    width: 100%;
+  }
+  .find input {
+    flex: 1;
+    width: auto;
+  }
+}
+
+/* The guides. Each is its own chapter hero: the guide's tint, its banner fading in from the right, its words on the left. Two to a row
+   once two fit; one below that; and in a band narrower than 30rem (a phone), a short band.
+   The words never run onto the art. The banner covers the band's right --art (a fraction), fully transparent for its first --fade of
+   that, so the picture starts showing at 1 - art × (1 - fade) of the band's width: the words stop 1rem before it, measured on the band
+   itself (cqi, the cell being the container), and a long line wraps, the band growing taller, instead. */
+.worlds {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 33rem), 1fr));
+  gap: 1.1rem;
+}
+.cell {
+  container-type: inline-size;
+  content-visibility: auto;
+  contain-intrinsic-size: auto 17.5rem;
+}
+.world {
+  --art: 0.54;
+  --fade: 0.09;
+  --pad: 1.75rem;
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  align-items: center;
+  height: 100%;
+  min-height: 17.5rem;
+  padding: var(--pad);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--r-hero);
+  background: linear-gradient(
+    120deg,
+    color-mix(in srgb, var(--primary) 10%, var(--surface)),
+    color-mix(in srgb, var(--accent) 22%, var(--surface))
+  );
+  color: var(--ink);
+  font-family: var(--sans);
+}
+@media (prefers-color-scheme: dark) {
+  .world {
+    background: linear-gradient(
+      120deg,
+      color-mix(in srgb, var(--primary) 10%, var(--surface)),
+      color-mix(in srgb, var(--primary) 22%, var(--surface))
+    );
+  }
+}
+.world:has(a:focus-visible) {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+}
+.art {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: -1;
+  width: calc(var(--art) * 100%);
+  height: 100%;
+  object-fit: cover;
+  object-position: 76% center;
+  mask: linear-gradient(to right, transparent calc(var(--fade) * 100%), #000 66%);
+}
+.text {
+  display: grid;
+  gap: 0.5rem;
+  max-width: calc(100cqi * (1 - var(--art) * (1 - var(--fade))) - var(--pad) - 1rem);
+}
+.kick {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+.kick span {
+  color: var(--primary);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.tile {
+  flex: none;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: var(--r-tile);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--line) 70%, transparent);
+}
+.world h3 {
+  font: 700 clamp(1.9rem, 6.2cqi, 2.4rem) / 1.02 var(--display);
+  text-wrap: balance;
+}
+/* The guide's name is the band's link, and its box covers the whole band. */
+.world h3 a::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+.world h3 a:focus-visible {
+  outline: none;
+}
+.goals {
+  color: var(--muted);
+  font-size: 0.9375rem;
+  text-wrap: pretty;
+}
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem 1.1rem;
+  margin-top: 0.6rem;
+}
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 2.75rem;
+  padding: 0 1.15rem;
+  border-radius: var(--r-button);
+  background: var(--primary);
+  color: var(--on-primary);
+  font-size: 0.9375rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.world:hover .btn {
+  background: color-mix(in srgb, var(--primary) 84%, var(--ink));
+}
+.btn svg {
+  width: 1.05rem;
+  height: 1.05rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.meta {
+  color: var(--muted);
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+/* A band too narrow for the publisher beside the game. */
+@container (max-width: 36rem) {
+  .pub {
+    display: none;
+  }
+}
+@container (max-width: 30rem) {
+  .world {
+    --art: 0.46;
+    --fade: 0.06;
+    --pad: 1rem;
+    min-height: 9.5rem;
+    padding-block: 0.95rem;
+    border-radius: var(--r-card);
+  }
+  .art {
+    mask: linear-gradient(to right, transparent calc(var(--fade) * 100%), #000 70%);
+  }
+  .text {
+    gap: 0.3rem;
+  }
+  .kick {
+    gap: 0.5rem;
+  }
+  .kick span {
+    font-size: 0.625rem;
+    letter-spacing: 0.1em;
+  }
+  .tile {
+    width: 2rem;
+    height: 2rem;
+  }
+  .world h3 {
+    font-size: 1.5rem;
+  }
+  .goals {
+    font-size: 0.8125rem;
+    line-height: 1.4;
+  }
+  .row {
+    display: none;
+  }
+}
+@media (max-width: 36rem) {
+  .cell {
+    contain-intrinsic-size: auto 9.5rem;
+  }
+}
+
+footer {
+  padding-block: clamp(2.5rem, 5vw, 4rem) max(2.5rem, env(safe-area-inset-bottom));
+}
+footer > div {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+footer .logo {
+  font-size: 1.15rem;
+}
+
+/* The 404 page. */
+.lost {
+  min-height: 50vh;
+  align-content: center;
+}
+.back {
+  color: var(--ink);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}

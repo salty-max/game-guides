@@ -4,7 +4,7 @@ import { describe, it } from "node:test";
 import { guidesOf, scopeOf } from "./scope.mjs";
 
 const apps = ["apps/echoes", "apps/hallownest", "apps/koholint", "apps/lordran", "apps/rdr"];
-const packages = ["packages/core", "packages/stories", "services/sync", ...apps];
+const packages = ["packages/core", "packages/stories", "services/sync", ...apps, "home"];
 const scope = (...files) => scopeOf(files, packages);
 
 describe("what pnpm check runs for a change", () => {
@@ -12,25 +12,36 @@ describe("what pnpm check runs for a change", () => {
     assert.deepEqual(scope("packages/core/src/components/ui/Button.tsx"), packages);
   });
 
-  it("checks one guide for its data, its own test or its docs", () => {
-    assert.deepEqual(scope("apps/lordran/src/guide/data/chapter-3.ts"), ["apps/lordran"]);
+  it("checks one guide for its own test or its docs, and the landing page too for its data", () => {
+    assert.deepEqual(scope("apps/lordran/src/guide/data/chapter-3.ts"), ["apps/lordran", "home"]);
     assert.deepEqual(scope("apps/rdr/src/guide/guide.test.ts", "apps/rdr/docs/facts-to-verify.md"), ["apps/rdr"]);
   });
 
+  it("adds the landing page for what it's made from: a guide's config and all it imports, its banner, icons and fonts", () => {
+    for (const file of ["src/guide/config.ts", "src/guide/banners/chapter-1.webp", "src/guide/run-log.ts", "public/icons/tile-80.png", "public/fonts/x.woff2"]) {
+      assert.ok(scope(`apps/lordran/${file}`).includes("home"), file);
+    }
+    for (const file of ["src/guide/guide.test.ts", "src/guide/GameCheck.test.tsx", "README.md", "scripts/icons.mjs"]) assert.ok(!scope(`apps/lordran/${file}`).includes("home"), file);
+  });
+
+  it("checks the landing page alone for its own files", () => {
+    assert.deepEqual(scope("home/src/page.tsx", "home/vercel.json", "home/package.json"), ["home"]);
+  });
+
   it("adds the stories for the guide whose data they render, and for any guide's palette, fonts or brand", () => {
-    assert.deepEqual(scope("apps/koholint/src/guide/data/chapter-1.ts"), ["packages/stories", "apps/koholint"]);
-    assert.deepEqual(scope("apps/koholint/public/icons/icon-192.png"), ["packages/stories", "apps/koholint"]);
-    assert.deepEqual(scope("apps/echoes/src/guide/theme.css"), ["packages/stories", "apps/echoes"]);
-    assert.deepEqual(scope("apps/echoes/public/fonts/x.woff2"), ["packages/stories", "apps/echoes"]);
-    assert.deepEqual(scope("apps/echoes/public/icons/icon-192.png"), ["apps/echoes"]);
+    assert.deepEqual(scope("apps/koholint/src/guide/data/chapter-1.ts"), ["packages/stories", "apps/koholint", "home"]);
+    assert.deepEqual(scope("apps/koholint/public/icons/icon-192.png"), ["packages/stories", "apps/koholint", "home"]);
+    assert.deepEqual(scope("apps/echoes/src/guide/theme.css"), ["packages/stories", "apps/echoes", "home"]);
+    assert.deepEqual(scope("apps/echoes/public/fonts/x.woff2"), ["packages/stories", "apps/echoes", "home"]);
+    assert.deepEqual(scope("apps/echoes/public/icons/icon-192.png"), ["apps/echoes", "home"]);
   });
 
   it("adds the sync API for a guide's brand, where it reads the guide's id", () => {
-    assert.deepEqual(scope("apps/hallownest/src/guide/brand.ts"), ["packages/stories", "services/sync", "apps/hallownest"]);
+    assert.deepEqual(scope("apps/hallownest/src/guide/brand.ts"), ["packages/stories", "services/sync", "apps/hallownest", "home"]);
   });
 
-  it("checks every guide and the stories for one guide's vercel.json or package.json", () => {
-    assert.deepEqual(scope("apps/rdr/vercel.json"), ["packages/stories", ...apps]);
+  it("checks every guide and the stories for one guide's vercel.json or package.json, and the landing page's headers for its vercel.json", () => {
+    assert.deepEqual(scope("apps/rdr/vercel.json"), ["packages/stories", ...apps, "home"]);
     assert.deepEqual(scope("apps/rdr/package.json"), ["packages/stories", ...apps]);
   });
 
@@ -59,7 +70,7 @@ describe("what pnpm check runs for a change", () => {
   });
 
   it("joins the packages of several files, in the workspace's order", () => {
-    assert.deepEqual(scope("services/sync/api/sync.ts", "apps/rdr/src/guide/data/x.ts", "docs/core.md"), ["services/sync", "apps/rdr"]);
+    assert.deepEqual(scope("services/sync/api/sync.ts", "apps/rdr/src/guide/data/x.ts", "docs/core.md"), ["services/sync", "apps/rdr", "home"]);
   });
 });
 
@@ -76,7 +87,7 @@ describe("the guides a browser job looks at for a change", () => {
     assert.deepEqual(guides("apps/lordran/src/guide/data/x.ts", "pnpm-lock.yaml"), { every: true, guides: ["lordran"] });
   });
 
-  it("are none for the sync API's code, a story or the docs, which change no guide's page", () => {
-    assert.deepEqual(guides("services/sync/src/ledger.ts", "packages/stories/src/Button.stories.tsx", "docs/core.md"), { every: false, guides: [] });
+  it("are none for the sync API's code, a story, the landing page or the docs, which change no guide's page", () => {
+    assert.deepEqual(guides("services/sync/src/ledger.ts", "packages/stories/src/Button.stories.tsx", "home/src/page.tsx", "docs/core.md"), { every: false, guides: [] });
   });
 });

@@ -113,14 +113,17 @@ Every guide is listed in a few places outside its own folder. A test holds each 
 - Root `README.md`: add a row to the apps table, the one list of guides and their Vercel projects (`wiring.test.ts` checks it).
 - `.claude/launch.json`: copy Echoes's two entries onto the next band, 5500 and 4500 (each guide's ports sit 100 apart, [testing.md](testing.md#start-a-guide) says why). Keep `"autoPort": true`, and `--port ${PORT:-<its port>}` in the preview's shell string. `wiring.test.ts` checks the entries, their package filter and that no two share a port.
 
-What finds the guides in `apps/` by itself and needs nothing: `pnpm lighthouse --all`, `pnpm screenshots`, `guide-check`'s scripts with `--all`, and `pnpm check`'s scope (a folder with a `vercel.json` is a guide; a new package checks every package).
+What finds the guides in `apps/` by itself and needs nothing: `pnpm lighthouse --all`, `pnpm screenshots`, `guide-check`'s scripts with `--all`, `pnpm check`'s scope (a folder with a `vercel.json` is a guide; a new package checks every package), and the landing page at hundo.quest (`home/`), which shows every folder with a `src/guide/brand.ts`, A to Z by game. Its band is made from the guide's own files: `config.ts` (the chapters, the rows and the game's three largest goals on the board), the palette, `src/guide/banners/chapter-1.webp`, `public/icons/tile-{40,80,120}.png`, and the display font with its licence beside it as `<Family-Name>-OFL.txt` in `public/fonts`. Home's build stops and names what's missing, and its `page.test.ts` fails when a guide with a `vercel.json` isn't on the page.
 
 ## 5. Check it
 
 - Run `pnpm check` at the root. Core's shared suites run against the new guide: the data rules, the app flows for its layout, the theme's keys and contrast, the deploy settings and the lists of step 4.
 - Look at it in a browser on desktop and phone, in light and dark ([testing.md](testing.md#in-a-browser)).
+- Look at its band on the landing page too: `preview_start` with `home-preview`, or `pnpm --filter hundo-home build && pnpm --filter hundo-home preview` at the root, at desktop and phone width, in light and dark. Its three largest goals are its board's game lists, so a long label shows there first.
 - Run `pnpm lighthouse <name>` at the root before asking for the push ([testing.md](testing.md#lighthouse)); it takes its turn in the queue, so run it in the background. CI audits the guide on its first pull request, against limits set per page from the guide that does worst, so a new guide can fail them. If it does, fix the guide (its banners' weight and its fonts' size are where to look first, and the report's diagnostics say where the time went). **Never loosen a threshold in `lighthouse/lighthouserc.mjs` to let a guide through**: moving one is the user's call, through the opener.
 
 ## 6. Deploy it
 
 Creating the Vercel project and every deploy need the user's go. The steps are in [deploying.md](deploying.md#a-new-project): the API knowing the guide first, root directory `apps/<name>`, the preview toolbar turned off (an environment variable on the project that stops the toolbar's script, which the CSP blocks and logs an error for on every preview), no `hundo.quest` domain until launch, the first deployment checked on its Vercel addresses, then the launch: the merge, then the domain.
+
+The merge also rebuilds the landing page (`hundo-home` watches `apps/`), which then links to the new guide's address. Until the guide's domain is on, that link leads nowhere, so add the domain as soon as the guide's production build of `main` is in, as the launch step says.

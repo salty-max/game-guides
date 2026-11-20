@@ -19,6 +19,7 @@
     "./vite": "./vite.ts",
     "./icon-versions": "./icon-versions.ts",
     "./banners": "./banners.ts",
+    "./palette": "./palette.ts",
     "./icons": "./icons.mjs",
     "./app.css": "./src/app.css"
   },

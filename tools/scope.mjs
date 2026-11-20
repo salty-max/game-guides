@@ -41,6 +41,8 @@ export const packagesFor = (file, packages) => {
     return ["packages/core", ...packages.filter((dir) => dir !== "packages/core")];
   }
   if (top === "packages" && name === "stories") return ["packages/stories"];
+  // The landing page: no other package reads it.
+  if (top === "home") return ["home"];
   if (top === "services" && name === "sync") {
     // Core's sync tests drive the API's own code (core's test/sync-world.ts imports src/harness.ts, and through it app, store and ledger),
     // in every guide's tests and typecheck, under the guides' stricter tsconfig; core's sync/ledger.test.ts holds its copy of the ledger to
@@ -48,10 +50,14 @@ export const packagesFor = (file, packages) => {
     return inside.startsWith("src/") && !inside.endsWith(".test.ts") ? ["services/sync", ...apps] : ["services/sync"];
   }
   if (top === "apps" && packages.includes(`apps/${name}`)) {
-    const own = [`apps/${name}`];
+    // The landing page (home/) is made from every guide's files: its config.ts and all that it imports (brand, data, palette), its banner,
+    // its icon tiles and its display font (home/src/guides.ts and plugin.ts). Not its tests.
+    const home = packages.includes("home") && /^(src\/guide\/(?!.*\.test\.tsx?$)|public\/(icons|fonts)\/)/.test(inside) ? ["home"] : [];
+    const own = [`apps/${name}`, ...home];
     // Every guide's deploy.test.ts holds each guide's vercel.json to its own, and wiring.test.ts reads each guide's package.json and counts the
     // guides by their vercel.json, as the stories' guides.test.ts does.
-    if (inside === "vercel.json" || inside === "package.json") return [...apps, "packages/stories"];
+    // Home's deploy.test.ts holds its headers to the guides' (Koholint's file stands for them all).
+    if (inside === "vercel.json" || inside === "package.json") return [...apps, "packages/stories", ...(inside === "vercel.json" && packages.includes("home") ? ["home"] : [])];
     // The sync API's project.test.ts reads every guide's id from its brand.ts; the stories show every guide's brand, palette and fonts.
     if (inside === "src/guide/brand.ts") return [...own, "services/sync", "packages/stories"];
     if (inside === "src/guide/theme.css" || inside.startsWith("public/fonts/")) return [...own, "packages/stories"];
@@ -78,14 +84,16 @@ export const scopeOf = (files, packages) => {
 /** The branch a change is measured against: main as this checkout last fetched it. */
 export const BASE = "origin/main";
 
-/** Every package folder of a checkout's workspace (pnpm-workspace.yaml: apps/*, packages/*, services/*), in that order. */
-export const workspaceOf = (root) =>
-  ["packages", "services", "apps"].flatMap((top) =>
+/** Every package folder of a checkout's workspace (pnpm-workspace.yaml: packages/*, services/*, apps/*, then home), in that order. */
+export const workspaceOf = (root) => [
+  ...["packages", "services", "apps"].flatMap((top) =>
     readdirSync(join(root, top), { withFileTypes: true })
       .filter((entry) => entry.isDirectory() && existsSync(join(root, top, entry.name, "package.json")))
       .map((entry) => `${top}/${entry.name}`)
       .sort(),
-  );
+  ),
+  ...(existsSync(join(root, "home", "package.json")) ? ["home"] : []),
+];
 
 /**
  * What a commit of a checkout's working directory would change against BASE (or another ref): the files its branch commits since it left

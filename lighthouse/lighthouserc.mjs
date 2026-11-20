@@ -48,6 +48,9 @@ export default {
         speed("/checklist$", { performance: 0.8, lcp: 3000, tbt: 400, cls: 0.15 }),
         speed("/dashboard$", { performance: 0.75, lcp: 4500, tbt: 260, cls: 0.15 }),
         speed("#desktop$", { performance: 0.9, lcp: 1000, tbt: 60, cls: 0.15 }),
+        // The landing page (lighthouse/run.mjs's `home`): one static page and 1 kB of script. On a Mac (20 Nov 2026, cpu about 3,200) its
+        // phone runs were 100 with LCP 907 ms, TBT 0 and CLS 0; these leave the runner, about three quarters of that machine, plenty of room.
+        speed(":\\d+/$", { performance: 0.9, lcp: 2500, tbt: 100, cls: 0.05 }),
       ],
     },
     upload: {

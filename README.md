@@ -13,6 +13,8 @@ Spoiler-aware, installable completion guides for single-player games: one app pe
 
 Each app's history from its old repository is kept under its folder, so `git log -- apps/koholint` goes back to the first commit.
 
+The landing page for hundo.quest, [`home/`](home), lists every guide. Its Vercel project is `hundo-home` ([docs/deploying.md](docs/deploying.md#the-landing-page)).
+
 ## Layout
 
 - **`packages/core`** (`@hundo/core`, used through the workspace, not published) is the app itself. It holds the React 19 pages, components, stores and styles. It also holds the page shell (`index.html`, `theme-init.js`), the shared test suites and `vite.ts`, which builds an app's whole Vite and Vitest config from its brand.
@@ -24,6 +26,7 @@ Each app's history from its old repository is kept under its folder, so `git log
   - `vercel.json`, a README and `docs/facts-to-verify.md`.
 
   Its `vite.config.ts` is a single call to `guideConfig`.
+- **`home/`** (`hundo-home`) is the landing page at hundo.quest: what hundo is, then every guide in `apps/`, each drawn in its own palette, display font and corners with its chapter 1 banner, read from the guide's own files at build. It is static HTML rendered at build, with one small script for its Find field, and holds no progress ([its README](home/README.md)).
 - **`services/sync`** is the sync API, a small server of its own: it lets a reader's devices share a guide's progress through a six-digit code, with no account. It is a separate Vercel project, `hundo-api`, at `api.hundo.quest` ([its README](services/sync/README.md)).
 - **`lighthouse/`**: the Lighthouse audit every pull request runs on each guide's production build, its thresholds (`lighthouserc.mjs`) and the script that runs it ([docs/testing.md](docs/testing.md#lighthouse)).
 - **`tools/`**: `check.mjs`, what `pnpm check` runs, and `scope.mjs`, the packages a change reaches ([docs/testing.md](docs/testing.md#what-pnpm-check-runs)); `queued.mjs`, which makes a heavy browser job take its turn in the machine-wide queue, and `measure.mjs`, which measures what a run costs the machine ([docs/testing.md](docs/testing.md#heavy-jobs-share-the-mac)). Not in `scripts/`, which every guide's Vercel ignore command watches.
