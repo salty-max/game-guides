@@ -3,10 +3,10 @@ import type { RawChapter } from "@hundo/core/types";
 export default {
   id: 8,
   title: "The Slab and the Frozen Ascent",
-  region: "The Slab · Mount Fay · Memorium · Wisp Thicket · revisits",
+  region: "The Slab · Mount Fay · High Halls · Memorium · Wisp Thicket · revisits",
   teaser: "Mount Fay",
-  intro: "Cross the Slab's front hall to Mount Fay and climb it for the Faydown Cloak. The double jump opens the Memorium, where the last Cogheart piece wakes the Second Sentinel, then sends you back through Greymoor, Sinner's Road, the Blasted Steps, the Wormways and the Deep Docks for what was out of reach.",
-  sources: [["The Slab's front door and its Bellway", "https://hollowknight.wiki/w/The_Slab"], ["Mount Fay: access, cold and heat sources", "https://hollowknight.wiki/w/Mount_Fay"], ["Faydown Cloak", "https://hollowknight.wiki/w/Faydown_Cloak"], ["Memorium access and layout", "https://hollowknight.wiki/w/Memorium"], ["Second Sentinel and Final Audience", "https://hollowknight.wiki/w/Second_Sentinel"], ["Wisp Thicket access", "https://hollowknight.wiki/w/Wisp_Thicket"], ["Grindle's Blasted Steps shop", "https://hollowknight.wiki/w/Grindle"], ["Bellway and Ventrica tolls", "https://hollowknight.wiki/w/Fast_Travel_(Silksong)"], ["Memorium after Mount Fay (Nintendo Life)", "https://www.nintendolife.com/guides/hollow-knight-silksong-progression-guide-recommended-route"]],
+  intro: "Cross the Slab's front hall to Mount Fay and climb it for the Faydown Cloak. With it, head for the High Halls and the Conductors' song, the last of the three, and the Rosary Bank. The double jump also opens the Memorium, where the last Cogheart piece wakes the Second Sentinel, then sends you back through Greymoor, Sinner's Road, the Blasted Steps, the Wormways and the Deep Docks for what was out of reach.",
+  sources: [["The Slab's front door and its Bellway", "https://hollowknight.wiki/w/The_Slab"], ["Mount Fay: access, cold and heat sources", "https://hollowknight.wiki/w/Mount_Fay"], ["Faydown Cloak", "https://hollowknight.wiki/w/Faydown_Cloak"], ["High Halls, the Forum and the Rosary Bank", "https://hollowknight.wiki/w/High_Halls"], ["Simple Keys and their four locks", "https://hollowknight.wiki/w/Simple_Key_(Silksong)"], ["Memorium access and layout", "https://hollowknight.wiki/w/Memorium"], ["Second Sentinel and Final Audience", "https://hollowknight.wiki/w/Second_Sentinel"], ["Wisp Thicket access", "https://hollowknight.wiki/w/Wisp_Thicket"], ["Grindle's Blasted Steps shop", "https://hollowknight.wiki/w/Grindle"], ["Bellway and Ventrica tolls", "https://hollowknight.wiki/w/Fast_Travel_(Silksong)"], ["Memorium after Mount Fay (Nintendo Life)", "https://www.nintendolife.com/guides/hollow-knight-silksong-progression-guide-recommended-route"]],
   groups: [
     {
       title: "The prison road and Mount Fay",
@@ -16,6 +16,15 @@ export default {
         ["route-slab", ["route"], "Reach The Slab by the Citadel bridge", "Cross the bridge one floor above the Citadel Spa bench into the Slab and open its Bellway. Coming in by this front door you get only a straight path down to the station, a bench beside it and the way on to Mount Fay; the door into the rest of the prison stays locked for now. If a Wardenfly carried you here earlier, you've already walked out this way.", {"reference": "https://hollowknight.wiki/w/The_Slab"}],
         ["route-fay-climb", ["route"], "Climb Mount Fay from the Slab Bellway", "The mountain starts west of the Slab's Bellway, and you need Clawline and the Drifter's Cloak for it. Away from a heat source you frost over in about 15 seconds, then lose a mask every couple of seconds, so hop from fire to fire. Don't strike the heat sources: some break and can leave a stretch impassable. The water is icy and hurts at once. Shakra's camp on the way up has a bench. Weavelight, Ascendant's Grip and the Plasmium Phial all make the climb easier.", {"reference": "https://hollowknight.wiki/w/Mount_Fay"}],
         ["mobility-faydown-cloak", ["mobility"], "Play the Needolin at the tuning fork to receive the Faydown Cloak", "At the summit, stand by the tuning fork and play the Needolin until a Fayforn comes down and lines your cloak with her down. You can now jump once more in mid-air, refreshed when you land, cling to a wall, bounce off something, catch a Clawline hoop or ride an updraft. The mountain's cold no longer hurts you, though icy water still does.", {"reference": "https://hollowknight.wiki/w/Faydown_Cloak"}],
+      ],
+    },
+    {
+      title: "The High Halls and the Conductor's Melody",
+      location: "High Halls",
+      sources: [["Forum gauntlet, Conductor Ballador and the Rosary Bank", "https://hollowknight.wiki/w/High_Halls"], ["Simple Keys and their four locks", "https://hollowknight.wiki/w/Simple_Key_(Silksong)"]],
+      rows: [
+        ["route-conductors-melody", ["route"], "Win the Forum gauntlet and learn the Conductor's Melody", "The High Halls sit above the upper-left Choral Chambers, and you'll want Clawline and the double jump to get in and around. On their east side, facing the Ventrica, the Forum holds an eleven-wave gauntlet; Garmond and Zaza join you if you won their duel. When the chandelier crashes down at the end, go through to the next room and talk to Conductor Ballador, who sings you the melody.", {"reference": "https://hollowknight.wiki/w/High_Halls"}],
+        ["route-rosary-storage", ["pickup"], "Open the High Halls Rosary Bank with a Simple Key", "The bank beside the Forum, west of the Ventrica, takes a Simple Key: Pharloom has four keys for its four locks. Inside, look for dust falling from a breakable ceiling and climb that vent past its fans to the vault: 560 Rosaries all told, lying loose and in three chests, one of them holding a Pale Rosary Necklace. Clear it in one visit: once it's open, saving anywhere beyond the High Halls, Choral Chambers and Cogwork Core sends a Snitchfly in to take whatever you left.", {"reference": "https://hollowknight.wiki/w/High_Halls"}],
       ],
     },
     {
@@ -94,6 +103,11 @@ export default {
       compact: true,
       map: ["Pharloom Calculator", "https://pharloomcalculator.com/map/"],
       rows: [
+        ["tool-cogfly", ["tool"], "Cogfly", "In the Cogfly workshop in the High Halls, use the crafting bench: it takes one Craftmetal.", {"reference": "https://hollowknight.wiki/w/Cogfly", "map": ["Map Genie", "https://mapgenie.io/hollow-knight-silksong/maps/pharloom?locationIds=478903"]}],
+        ["tool-rosary-cannon", ["tool"], "Rosary Cannon", "Inside the Rosary Bank, break the west wall short of the vault door and hit the stringing machine's mechanism behind it. It falls apart into the cannon, and the machine stops working for good.", {"reference": "https://hollowknight.wiki/w/Rosary_Cannon", "map": ["Map Genie", "https://mapgenie.io/hollow-knight-silksong/maps/pharloom?locationIds=478937"]}],
+        ["relic-psalm-cylinder-high-halls", ["relic"], "Psalm Cylinder · High Halls", "North-west of the Ventrica, thread the maze of pipes to the cylinder.", {"reference": "https://hollowknight.wiki/w/Psalm_Cylinder", "map": ["Map Genie", "https://mapgenie.io/hollow-knight-silksong/maps/pharloom?locationIds=478908"]}],
+        ["map-high-halls", ["map"], "Get the High Halls map", "Use the map machine in the High Halls. The map costs 70 Rosaries.", {"reference": "https://hollowknight.wiki/w/Map_and_Quill_(Silksong)#Maps"}],
+        ["ventrica-high-halls", ["ventrica"], "Open High Halls Ventrica", "Pay 80 Rosaries at the station's toll machine to open this stop.", {"reference": "https://hollowknight.wiki/w/Fast_Travel_(Silksong)", "map": ["Map Genie", "https://mapgenie.io/hollow-knight-silksong/maps/pharloom?locationIds=478445"]}],
         ["spool-fragment-15", ["spool-fragment"], "Spool Fragment · High Halls", "Climb the High Halls' western vertical room to its highest point. Clawline and the double jump needed.", {"reference": "https://hollowknight.wiki/w/Spool_Fragment", "map": ["Map Genie", "https://mapgenie.io/hollow-knight-silksong/maps/pharloom?locationIds=478909"]}],
       ],
     },
