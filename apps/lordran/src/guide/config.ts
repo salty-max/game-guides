@@ -1,5 +1,5 @@
 import { byChapter } from "@hundo/core/format";
-import type { Banner, GuideConfig } from "@hundo/core/types";
+import type { Banner, BoardItem, GuideConfig } from "@hundo/core/types";
 import { brand } from "./brand";
 import chapter1 from "./data/chapter-1";
 import chapter2 from "./data/chapter-2";
@@ -34,27 +34,27 @@ const banners = byChapter(import.meta.glob<Banner>("./banners/chapter-*.webp", {
  * spells count once, on their own line, and still show in their schools. The game keeps no achievement list of its own (facts-to-verify.md
  * has what backs that), so the platforms' achievements are a source here and never a target, a category or a word a reader sees.
  */
-export const targets = [
-  { tag: "boss", goal: 26 },
-  { tag: "covenant", goal: 9 },
-  { tag: "rare-weapon", goal: 47 },
-  { tag: "base-sorcery", goal: 24 },
-  { tag: "base-pyromancy", goal: 19 },
-  { tag: "miracle", goal: 23 },
-  { tag: "ring", goal: 41 },
-  { tag: "ember", goal: 10 },
-  { tag: "reinforcement", goal: 10 },
-  { tag: "ending", goal: 2 },
-  { tag: "quest", goal: 62 },
-  { tag: "dlc-spell", goal: 5 },
-  { tag: "dlc-gear", goal: 8 },
-  { tag: "trade", goal: 18 },
-  { tag: "estus", goal: 5 },
-  { tag: "forge", goal: 5 },
-  { tag: "invasion", goal: 7 },
-  { tag: "cycle", goal: 4 },
-  { tag: "extra", goal: 11 },
-  { tag: "pickup", goal: 22 },
+export const targets: BoardItem[] = [
+  { tag: "boss", goal: 26, list: "game" },
+  { tag: "covenant", goal: 9, list: "game" },
+  { tag: "rare-weapon", goal: 47, list: "game" },
+  { tag: "base-sorcery", goal: 24, list: "game" },
+  { tag: "base-pyromancy", goal: 19, list: "game" },
+  { tag: "miracle", goal: 23, list: "game" },
+  { tag: "ring", goal: 41, list: "game" },
+  { tag: "ember", goal: 10, list: "game" },
+  { tag: "reinforcement", goal: 10, list: "game" },
+  { tag: "ending", goal: 2, list: "game" },
+  { tag: "quest", goal: 62, list: "guide" },
+  { tag: "dlc-spell", goal: 5, list: "game" },
+  { tag: "dlc-gear", goal: 8, list: "guide" },
+  { tag: "trade", goal: 18, list: "game" },
+  { tag: "estus", goal: 5, list: "guide" },
+  { tag: "forge", goal: 5, list: "guide" },
+  { tag: "invasion", goal: 7, list: "game" },
+  { tag: "cycle", goal: 4, list: "guide" },
+  { tag: "extra", goal: 11, list: "guide" },
+  { tag: "pickup", goal: 22, list: "guide" },
 ];
 
 const config: GuideConfig = {
@@ -105,7 +105,7 @@ const config: GuideConfig = {
   choices,
   questlines,
   banners,
-  completion: { board: targets },
+  completion: { board: targets, directions: ["route"] },
   state: {},
   text: {
     checklistIntro: "Search by item, boss, NPC or place. Checks are shared with the walkthrough.",

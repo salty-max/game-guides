@@ -14,7 +14,7 @@ The ghost-house Secret Seashell already says you can return after the escort, so
 
 ## Counts
 
-Each goal in `targets` (`src/guide/config.ts`) and its source, checked on 2026-11-19 for the Switch remake; `guide.test.ts` pins every goal to its rows. Zelda Wiki (ZW) and Game8 refuse plain fetches, so their pages were read in a browser, and so was GameSkinny; Nintendo Life, Thonky and Nintendo Wire were fetched. Zelda Dungeon answered every read with a bot check or a 403 and is unread.
+Each goal in `targets` (`src/guide/config.ts`) and its source, checked on 2026-11-19 for the Switch remake; `guide.test.ts` pins every goal, and core's `data.test.ts` holds each to its rows. Zelda Wiki (ZW) and Game8 refuse plain fetches, so their pages were read in a browser, and so was GameSkinny; Nintendo Life, Thonky and Nintendo Wire were fetched. Zelda Dungeon answered every read with a bot check or a 403 and is unread.
 
 | List | Goal | Source 1 | Source 2 | Notes |
 | --- | ---: | --- | --- | --- |

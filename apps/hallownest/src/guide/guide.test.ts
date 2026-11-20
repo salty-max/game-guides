@@ -1,4 +1,4 @@
-import { allRows, chapters, overall, rowsByTag, tally, whatsLeft } from "@hundo/core/guide";
+import { allRows, chapters, overall, rowsByTag, whatsLeft } from "@hundo/core/guide";
 import { STORAGE_KEY, validateState } from "@hundo/core/progress-state";
 import { THEME_KEY } from "@hundo/core/store/theme";
 import { AWAKE_KEY } from "@hundo/core/store/awake";
@@ -22,7 +22,7 @@ const gameTags = [
 ];
 const beyondTags = targets.map((target) => target.tag).filter((tag) => !gameTags.includes(tag));
 const gameRows = allRows.filter((row) => row.tags.some((tag) => gameTags.includes(tag)));
-const goals = targets.reduce((sum, target) => sum + (target.goal ?? 0), 0);
+const goals = targets.reduce((sum, target) => sum + target.goal, 0);
 
 describe("Hollow Knight completion", () => {
   it("cites sources for every chapter", () => {
@@ -33,29 +33,15 @@ describe("Hollow Knight completion", () => {
     for (const row of allRows) expect(row.text.trim(), row.id).not.toBe("");
   });
 
-  it("reaches every target of the guide's completion list", () => {
-    for (const { tag, goal } of targets) if (goal !== undefined) expect(tally(tag, {}).total, tag).toBe(goal);
-  });
-
-  it("counts every target: none is optional, and What's left starts with all of them and their goals", () => {
-    expect(targets.some((target) => target.optional)).toBe(false);
-    expect(whatsLeft({}).map((item) => item.tag).sort()).toEqual(targets.map((target) => target.tag).sort());
-    expect(whatsLeft({}).reduce((sum, item) => sum + item.total, 0)).toBe(goals);
-  });
-
-  it("counts the game's sixteen and the rest, and leaves out only the route steps", () => {
+  it("counts the game's sixteen and the rest", () => {
     expect(gameTags.every((tag) => targets.some((target) => target.tag === tag))).toBe(true);
     for (const tag of ["grub", "notch", "pale-ore", "map", "stag", "root", "simple-key", "ending", "dream-boss", "other-boss", "pickup", "challenge", "achievement", "quest"]) {
       expect(beyondTags, tag).toContain(tag);
     }
-    const off = allRows.filter((row) => !row.tags.some((tag) => targets.some((target) => target.tag === tag)));
-    expect(off.length).toBeGreaterThan(0);
-    // (a missable row also carries `missable`, which core adds)
-    expect(off.every((row) => row.tags[0] === "route")).toBe(true);
-    expect(overall(tick(off)).percent).toBe(0);
   });
 
-  // One each: no row counts under two targets (a quest step that is also a charm, a boss or a nail upgrade counts as that).
+  // One each, and stricter than core's rule: no row counts under two targets, game lists included (a quest step that is also a charm, a
+  // boss or a nail upgrade counts as that).
   it("counts every row under at most one target", () => {
     for (const row of allRows) expect(row.tags.filter((tag) => targets.some((target) => target.tag === tag)), row.id).toHaveLength(row.tags.some((tag) => targets.some((target) => target.tag === tag)) ? 1 : 0);
     for (const id of ["charm-grimmchild", "boss-troupe-master-grimm", "troupe-finale-grimm-finale", "quest-city-nailsmith"]) expect(rowsByTag("quest").map((row) => row.id), id).not.toContain(id);
@@ -68,21 +54,10 @@ describe("Hollow Knight completion", () => {
     expect(allRows.find((row) => row.id === "quest-nailsmith-purity")?.chapter).toBe(chapters.length);
   });
 
-  // 100% is every target, each item once: it never shows while anything on the board is left, and What's left says what.
-  it("reads 100 only with everything ticked, and What's left is empty then", () => {
-    expect(overall({}).percent).toBe(0);
-    expect(overall({}).label).toBe("complete");
-    expect(overall(tick(allRows)).percent).toBe(100);
-    expect(whatsLeft(tick(allRows))).toEqual([]);
-    // (all the game counts is not enough: the rest counts too)
+  // 100% is every target, each item once, so all the game counts is not enough: the rest counts too.
+  it("reads under 100 with only the game's sixteen ticked", () => {
     expect(overall(tick(gameRows)).percent).toBeLessThan(100);
     expect(whatsLeft(tick(gameRows)).length).toBeGreaterThan(0);
-    for (const { tag } of targets) {
-      const [row] = rowsByTag(tag);
-      const checks = without(allRows, row);
-      expect(overall(checks).percent, tag).toBeLessThan(100);
-      expect(whatsLeft(checks).map((item) => item.tag), tag).toContain(tag);
-    }
   });
 
   it("reads under 100 with one Grub missing, and says it is the Grub that is left", () => {

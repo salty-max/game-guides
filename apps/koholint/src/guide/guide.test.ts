@@ -1,4 +1,4 @@
-import { allRows, chapters, completion, overall, rowsByTag, tally, whatsLeft } from "@hundo/core/guide";
+import { allRows, chapters, rowsByTag } from "@hundo/core/guide";
 import { STORAGE_KEY, defaultState, validateState } from "@hundo/core/progress-state";
 import { readRunLog } from "./run-log";
 import { THEME_KEY } from "@hundo/core/store/theme";
@@ -18,40 +18,9 @@ describe("Koholint completion", () => {
     for (const chapter of chapters) expect(chapter.sources.length, chapter.title).toBeGreaterThan(0);
   });
 
-  it("keeps optional amiibo out of overall completion", () => {
-    expect(completion.board.find((item) => item.tag === "amiibo")?.optional).toBe(true);
-    const amiibo = allRows.filter((row) => row.tags.includes("amiibo"));
-    expect(amiibo.length).toBeGreaterThan(0);
-    expect(overall(Object.fromEntries(amiibo.map((row) => [row.id, true]))).percent).toBe(0);
-    expect(overall(Object.fromEntries(allRows.filter((row) => !amiibo.includes(row)).map((row) => [row.id, true]))).percent).toBe(100);
-  });
-
-  // Everything the board counts is everything but the amiibo and the route steps: 100 only with all of it ticked.
-  it("reads 100 only with everything counted ticked, and under 100 with any one item left", () => {
-    const counted = completion.board.filter((item) => !item.optional);
-    const tick = (rows: typeof allRows) => Object.fromEntries(rows.map((row) => [row.id, true as const]));
-    const everything = allRows.filter((row) => row.tags.some((tag) => counted.some((item) => item.tag === tag)));
-    expect(overall(tick(everything)).percent).toBe(100);
-    expect(whatsLeft(tick(everything))).toEqual([]);
-    expect(overall({}).percent).toBe(0);
-    expect(overall({}).label).toBe("complete");
-    for (const { tag } of counted) {
-      const left = rowsByTag(tag)[0];
-      const checks = tick(everything.filter((row) => row !== left));
-      expect(overall(checks).percent, tag).toBeLessThan(100);
-      expect(whatsLeft(checks).map((item) => item.tag), tag).toContain(tag);
-    }
-  });
-
-  it("leaves out nothing but the optional amiibo and the route steps", () => {
-    const off = allRows.filter((row) => !row.tags.some((tag) => completion.board.some((item) => item.tag === tag && !item.optional)));
-    expect(off.length).toBeGreaterThan(0);
-    expect(off.every((row) => row.tags[0] === "story" || row.tags[0] === "amiibo")).toBe(true);
-    expect(completion.board.filter((item) => item.optional).map((item) => item.tag)).toEqual(["amiibo"]);
-  });
-
-  // Two hosts for each game total, and the guide's own lists, whose goals are their rows: docs/facts-to-verify.md.
-  it("gives every target a goal equal to its rows", () => {
+  // Two hosts for each game total, and the guide's own lists, whose goals are their rows: docs/facts-to-verify.md. Core's data.test.ts
+  // holds each goal to its rows.
+  it("pins every target's goal", () => {
     expect(Object.fromEntries(targets.map(({ tag, goal }) => [tag, goal]))).toEqual({
       heart: 32,
       shell: 50,
@@ -71,18 +40,6 @@ describe("Koholint completion", () => {
       explore: 5,
       amiibo: 6,
     });
-    for (const { tag, goal } of targets) expect(tally(tag, {}).total, tag).toBe(goal);
-  });
-
-  // One each: a row on the guide's own list counts nowhere else. A row on two of the game's own lists counts on both (a Dampé
-  // challenge and the Heart Piece it awards are two items the game lists).
-  it("never counts a row of the guide's own lists on a second target", () => {
-    const own = ["treasure", "gear", "explore"];
-    const counted = targets.filter((item) => !item.optional).map((item) => item.tag);
-    for (const tag of own) {
-      expect(counted, tag).toContain(tag);
-      for (const row of rowsByTag(tag)) expect(row.tags.filter((entry) => counted.includes(entry)), row.id).toEqual([tag]);
-    }
   });
 
   // The Lightweight Lure is the pond's default, and buying back the item traded for the Boomerang gets back one already counted.
@@ -94,7 +51,7 @@ describe("Koholint completion", () => {
     for (const tag of ["mini", "effect"]) {
       expect(targets.map((item) => item.tag), tag).not.toContain(tag);
       expect(rowsByTag(tag).length, tag).toBeGreaterThan(0);
-      for (const row of rowsByTag(tag)) expect(row.tags.some((entry) => targets.some((item) => item.tag === entry && !item.optional)), row.id).toBe(true);
+      for (const row of rowsByTag(tag)) expect(row.tags.some((entry) => entry !== "amiibo" && targets.some((item) => item.tag === entry)), row.id).toBe(true);
     }
   });
 

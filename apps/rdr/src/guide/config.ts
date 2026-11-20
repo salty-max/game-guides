@@ -45,19 +45,19 @@ const sweep = new Set(["location", "scrap", "optional"]);
  * The story missions count: the game itself lists and credits them (Stats → General), so they are not directions. A test pins every goal.
  */
 export const targets: BoardItem[] = [
-  { tag: "mission", goal: 57 },
-  { tag: "stranger", goal: 18, opens: "stranger-step" },
-  { tag: "location", goal: 94 },
-  { tag: "bounty", goal: 20 },
-  { tag: "challenge", goal: 40 },
-  { tag: "outfit", goal: 9 },
-  { tag: "scrap", goal: 30 },
-  { tag: "safehouse", goal: 13 },
-  { tag: "hideout", goal: 7 },
-  { tag: "weapon", goal: 5 },
-  { tag: "job", goal: 5 },
-  { tag: "minigame", goal: 6 },
-  { tag: "optional", goal: 4 },
+  { tag: "mission", goal: 57, list: "game" },
+  { tag: "stranger", goal: 18, list: "game", opens: "stranger-step" },
+  { tag: "location", goal: 94, list: "game" },
+  { tag: "bounty", goal: 20, list: "game" },
+  { tag: "challenge", goal: 40, list: "game" },
+  { tag: "outfit", goal: 9, list: "game" },
+  { tag: "scrap", goal: 30, list: "game" },
+  { tag: "safehouse", goal: 13, list: "game" },
+  { tag: "hideout", goal: 7, list: "game" },
+  { tag: "weapon", goal: 5, list: "game" },
+  { tag: "job", goal: 5, list: "game" },
+  { tag: "minigame", goal: 6, list: "game" },
+  { tag: "optional", goal: 4, list: "guide" },
 ];
 
 const config: GuideConfig = {
@@ -89,7 +89,7 @@ const config: GuideConfig = {
   banners,
   defer: (row) => sweep.has(row.tags[0]),
   // A Stranger task counts once, by its last step: the steps before it get no tile of their own, and the tile opens every step.
-  completion: { board: targets },
+  completion: { board: targets, directions: ["stranger-step"] },
   state: {
     // Saves from before the shared format: version 1 (no in-game percentage) and version 2 (`reported` at the top level).
     legacy: (v) =>

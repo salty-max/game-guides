@@ -200,10 +200,17 @@ export type Category = readonly [plural: string, singular: string, icon: IconNam
 
 export interface BoardItem {
   tag: string;
-  /** A fixed total from the game's own list; otherwise the count of tagged rows. */
-  goal?: number;
-  /** Shown on the board but left out of "What's left" and the bar. Only for what lies outside the game, such as amiibo, which need physical figures. */
-  optional?: boolean;
+  /**
+   * Its total, exactly its rows as the board counts them (data.test.ts): a game's own count, whose two hosts the guide's
+   * facts-to-verify.md names, or the rows of the guide's own list.
+   */
+  goal: number;
+  /**
+   * Whose list it is. "game": a list the game keeps, standing as the game counts it, so it may share a row with another of the game's
+   * lists (an Echoes side quest and the accessory it awards). "guide": a list the guide makes up itself, not a game total, whose rows
+   * count under no other target (data.test.ts).
+   */
+  list: "game" | "guide";
   /**
    * The category its tile and its line in "What's left" open on the checklist, when that isn't the tag it counts: one that holds every
    * row the tag does and more (data.test.ts). Red Dead counts a Stranger task by its last step and opens every step.
@@ -219,11 +226,22 @@ export interface LeftItem {
 
 export interface Completion {
   /**
-   * The guide's completion list. The overall figure and "What's left" both read it: the targets that aren't optional, each counted as
-   * the board counts it and up to its goal (core's `listedPercent`), followed by "complete". A game's own percentage never replaces it;
-   * a guide shows that in a panel.
+   * The guide's completion list. The overall figure and "What's left" both read it: every target but what lies outside the game, each
+   * counted as the board counts it and up to its goal (core's `listedPercent`), followed by "complete". A game's own percentage never
+   * replaces it; a guide shows that in a panel.
    */
   board: BoardItem[];
+  /**
+   * The tags that label a step the game doesn't credit, which only moves the reader on (route steps, Red Dead's Stranger steps before
+   * a task's last). A row whose first tag is one carries no target, and every other row counts, but what lies outside the game
+   * (data.test.ts).
+   */
+  directions: string[];
+  /**
+   * The tags of what lies outside the game, such as amiibo, which need physical figures: a row carrying one never counts, and a board
+   * target with one is shown but left out of What's left and the bar. Nothing else stays out.
+   */
+  outside?: string[];
 }
 
 export interface GuideText {

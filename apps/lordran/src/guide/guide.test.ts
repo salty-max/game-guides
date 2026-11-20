@@ -1,4 +1,4 @@
-import { allRows, chapters, overall, rowsByTag, tally, whatsLeft } from "@hundo/core/guide";
+import { allRows, chapters, rowsByTag } from "@hundo/core/guide";
 import { STORAGE_KEY, validateState } from "@hundo/core/progress-state";
 import config, { targets } from "./config";
 import { readerText } from "@hundo/core/reader-text";
@@ -11,12 +11,8 @@ import { SYNC_KEY } from "@hundo/core/sync/local";
 import { PERSIST_KEY } from "@hundo/core/persistence";
 import { COUNTS_KEY } from "@hundo/core/counts";
 import { flatten } from "@hundo/core/sync/fields";
-import type { Checks, Row } from "@hundo/core/types";
 
 const [a] = allRows.map((row) => row.id);
-const tick = (rows: Row[]): Checks => Object.fromEntries(rows.map((row) => [row.id, true]));
-const without = (rows: Row[], left: Row) => tick(rows.filter((row) => row !== left));
-const goals = targets.reduce((sum, target) => sum + target.goal, 0);
 
 describe("Dark Souls Remastered completion", () => {
   it("cites sources for every chapter", () => {
@@ -27,37 +23,13 @@ describe("Dark Souls Remastered completion", () => {
     for (const row of allRows) expect(row.text.trim(), row.id).not.toBe("");
   });
 
-  it("gives every target a goal and reaches it", () => {
-    for (const target of targets) expect(Number.isInteger(target.goal) && target.goal > 0, target.tag).toBe(true);
-    for (const { tag, goal } of targets) expect(tally(tag, {}).total, tag).toBe(goal);
+  // One each, and stricter than core's rule: no row counts under two targets, game lists included, so Snuggly's trades (the game's 20)
+  // count 18, less the spell and the slab that count as their own kind.
+  it("counts every row under at most one target", () => {
+    for (const row of allRows) expect(row.tags.filter((tag) => targets.some((target) => target.tag === tag)).length, row.id).toBeLessThanOrEqual(1);
   });
 
-  it("counts every target: none is optional, and What's left starts with all of them and their goals", () => {
-    expect(targets.some((target) => "optional" in target && target.optional)).toBe(false);
-    expect(whatsLeft({}).map((item) => item.tag).sort()).toEqual(targets.map((target) => target.tag).sort());
-    expect(whatsLeft({}).reduce((sum, item) => sum + item.total, 0)).toBe(goals);
-  });
-
-  // 100% is every target, each item once: it never shows while anything on the board is left, and What's left says what.
-  it("reads 100 only with everything ticked, and under 100 with any one item left", () => {
-    expect(overall({}).percent).toBe(0);
-    expect(overall({}).label).toBe("complete");
-    expect(overall(tick(allRows)).percent).toBe(100);
-    expect(whatsLeft(tick(allRows))).toEqual([]);
-    for (const { tag } of targets) {
-      const [row] = rowsByTag(tag);
-      expect(overall(without(allRows, row)).percent, tag).toBeLessThan(100);
-      expect(whatsLeft(without(allRows, row)).map((item) => item.tag), tag).toContain(tag);
-    }
-  });
-
-  it("counts the NPC quest steps by their rows, goal and all, and the expansion's gear, trades, souls, slabs, invasions, cycles, extras and pickups", () => {
-    for (const tag of ["quest", "dlc-gear", "trade", "estus", "forge", "invasion", "cycle", "extra", "pickup"]) {
-      const target = targets.find((item) => item.tag === tag);
-      expect(target, tag).toBeDefined();
-      expect("goal" in target! && target.goal, tag).toBe(rowsByTag(tag).length);
-    }
-    // (Snuggly's trades without the how-to row, and without the two that count as their own kind; the five slabs the guide sends you to, not a farming row)
+  it("counts Snuggly's trades without the how-to row, the slabs the guide sends you to without the farming row, and three rows as their own kind", () => {
     for (const [id, tag] of [["sorcery-pursuers", "dlc-spell"], ["forge-snuggly-red-slab", "forge"], ["extra-laurentius-goodbye", "quest"]] as const) {
       expect(targets.filter((target) => rowsByTag(target.tag).some((row) => row.id === id)).map((target) => target.tag), id).toEqual([tag]);
     }
@@ -65,20 +37,9 @@ describe("Dark Souls Remastered completion", () => {
     expect(rowsByTag("forge").some((row) => row.id === "forge-kiln-farm")).toBe(false);
   });
 
-  it("counts every tag the guide tracks but route steps", () => {
-    const off = allRows.filter((row) => !row.tags.some((tag) => targets.some((target) => target.tag === tag)));
-    expect(off.every((row) => row.tags[0] === "route" || row.tags.every((tag) => tag === "route" || tag === "dlc"))).toBe(true);
-  });
-
   // Both ways of every one-way choice count: the first cycle's, recommended, and the later cycle's, so 100% takes NG+ and NG++ as the endings do.
   it("counts both ways of every one-way choice, the later one in chapter 13", () => {
-    for (const choice of choices) {
-      for (const id of [choice.row, ...choice.later.map((later) => later.row)]) {
-        const row = allRows.find((entry) => entry.id === id)!;
-        expect(row.tags.some((tag) => targets.some((target) => target.tag === tag)), id).toBe(true);
-      }
-      for (const later of choice.later) expect(allRows.find((entry) => entry.id === later.row)!.chapter, later.row).toBe(13);
-    }
+    for (const choice of choices) for (const later of choice.later) expect(allRows.find((entry) => entry.id === later.row)!.chapter, later.row).toBe(13);
     expect(choices.map((choice) => choice.row).sort()).toEqual(["quest-ciaran", "quest-lautrec-invasion", "quest-lordvessel-frampt", "quest-patches-forgive", "quest-sieg-ash", "quest-solaire-shortcut"]);
     // Where the other way only yields an item, the item's own row is the later way, so the item counts once (19 Nov 2026).
     const laterOf = (row: string) => choices.find((choice) => choice.row === row)!.later.map((later) => later.row);

@@ -1,5 +1,5 @@
 import { byChapter } from "@hundo/core/format";
-import type { Banner, GuideConfig } from "@hundo/core/types";
+import type { Banner, BoardItem, GuideConfig } from "@hundo/core/types";
 import { brand } from "./brand";
 import chapter1 from "./data/chapter-1";
 import chapter2 from "./data/chapter-2";
@@ -24,27 +24,27 @@ const banners = byChapter(import.meta.glob<Banner>("./banners/chapter-*.webp", {
  * (the 26 inside dungeons carry `waypoint` after `dungeon-waypoint`, which names the label and icon of the row). A test pins every
  * goal to the data, so a missing row shows up as a failing count.
  */
-export const targets = [
-  { tag: "echo", goal: 127 },
-  { tag: "heart-piece", goal: 40 },
-  { tag: "heart-container", goal: 7 },
-  { tag: "might-crystal", goal: 150 },
-  { tag: "side-quest", goal: 50 },
-  { tag: "stamp", goal: 25 },
-  { tag: "accessory", goal: 28 },
-  { tag: "outfit", goal: 8 },
-  { tag: "recipe", goal: 69 },
-  { tag: "automaton", goal: 6 },
-  { tag: "fairy-bottle", goal: 4 },
-  { tag: "dungeon-chest", goal: 57 },
-  { tag: "mini-dungeon-chest", goal: 12 },
-  { tag: "overworld-chest", goal: 38 },
-  { tag: "equipment", goal: 4 },
-  { tag: "ability", goal: 2 },
-  { tag: "upgrade", goal: 11 },
-  { tag: "milestone", goal: 2 },
-  { tag: "minigame-extra", goal: 22 },
-  { tag: "waypoint", goal: 43 },
+export const targets: BoardItem[] = [
+  { tag: "echo", goal: 127, list: "game" },
+  { tag: "heart-piece", goal: 40, list: "game" },
+  { tag: "heart-container", goal: 7, list: "game" },
+  { tag: "might-crystal", goal: 150, list: "game" },
+  { tag: "side-quest", goal: 50, list: "game" },
+  { tag: "stamp", goal: 25, list: "game" },
+  { tag: "accessory", goal: 28, list: "game" },
+  { tag: "outfit", goal: 8, list: "game" },
+  { tag: "recipe", goal: 69, list: "game" },
+  { tag: "automaton", goal: 6, list: "game" },
+  { tag: "fairy-bottle", goal: 4, list: "game" },
+  { tag: "dungeon-chest", goal: 57, list: "guide" },
+  { tag: "mini-dungeon-chest", goal: 12, list: "guide" },
+  { tag: "overworld-chest", goal: 38, list: "guide" },
+  { tag: "equipment", goal: 4, list: "guide" },
+  { tag: "ability", goal: 2, list: "guide" },
+  { tag: "upgrade", goal: 11, list: "guide" },
+  { tag: "milestone", goal: 2, list: "guide" },
+  { tag: "minigame-extra", goal: 22, list: "guide" },
+  { tag: "waypoint", goal: 43, list: "guide" },
 ];
 
 const config: GuideConfig = {
@@ -97,7 +97,7 @@ const config: GuideConfig = {
   reassurance,
   banners,
   defer: (row) => row.tags.includes("amiibo"),
-  completion: { board: targets },
+  completion: { board: targets, directions: ["route", "story"], outside: ["amiibo"] },
   state: {
     legacy: (v) => (v.version === 1 && v.guide === brand.id ? {} : null),
   },

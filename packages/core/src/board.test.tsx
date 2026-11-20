@@ -17,10 +17,10 @@ describe("the Progress board's links", () => {
   beforeEach(() => useProgress.setState({ data: defaultState(), storageError: false }));
 
   it("opens each tile's checklist: its own category, unless the target names another", () => {
-    for (const { tag, opens } of completion.board) {
+    for (const { tag, goal, opens } of completion.board) {
       const { container, unmount } = render(
         <MemoryRouter>
-          <Stat tag={tag} />
+          <Stat tag={tag} goal={goal} />
         </MemoryRouter>,
       );
       expect(container.querySelector("a"), tag).toHaveAttribute("href", opens ? `/checklist/${opens}` : `/checklist/${tag}`);

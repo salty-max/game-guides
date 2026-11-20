@@ -8,12 +8,12 @@ Nothing in this guide has been replayed against the game by its author. The data
 - **Counts:** every target's goal and its hosts are in [Counts](#counts) below. None of it was recounted in the game.
 - **What counts toward the in-game stat:** outfits give credit (0.5 each; iRedDead, PowerPyx, GamerGuides). The optional tasks, I Know You and Solomon's Folly, do not (iRedDead and PowerPyx). Scraps give none of their own, only the outfit they make: iRedDead says so alone ([Counts](#counts), notes). Not tested in the game.
 - The estimate is rounded **down** to a tenth. The game’s own rounding is not confirmed.
-- The estimate is the **Check against the game** panel's figure, not the overall bar's. The bar counts every board target, each item once, scraps and optional tasks included (`guide.test.ts` pins it: 100 only with everything ticked, under 100 with any one item left), and What's left counts items, not points.
+- The estimate is the **Check against the game** panel's figure, not the overall bar's. The bar counts every board target, each item once, scraps and optional tasks included (core's `overall.test.tsx` holds 100 with everything ticked, and `guide.test.ts` that any one item left reads under 100, with What's left naming its category), and What's left counts items, not points.
 - Version differences: the game exists in original and later releases. Guides do not always say which they describe, so unlock conditions may differ between them.
 
 ## Counts
 
-Each target's goal (`targets` in `src/guide/config.ts`) is exactly its rows, and `guide.test.ts` pins all thirteen. Eleven are the game's own counts, the twelfth (scraps) is two hosts' lists, and the thirteenth is the guide's own list. Every page in the table was read in full by the source-checker helper on 19 November 2026 (fetch only; nothing was read in a browser). The audit matched the rows to the hosts' lists name for name, with nothing missing or doubled except where a note says so. The same counts, weighted as the game's checklist weighs them (1, ½, 6/94, ⅒, ½, 2/13, ½, ½, ½, ½, and 1 for each challenge rank 5 and 10), add to exactly 100, which `guide.test.ts` also pins.
+Each target's goal (`targets` in `src/guide/config.ts`) is exactly its rows (core's `data.test.ts`), and `guide.test.ts` pins all thirteen. Eleven are the game's own counts, the twelfth (scraps) is two hosts' lists, and the thirteenth is the guide's own list. Every page in the table was read in full by the source-checker helper on 19 November 2026 (fetch only; nothing was read in a browser). The audit matched the rows to the hosts' lists name for name, with nothing missing or doubled except where a note says so. The same counts, weighted as the game's checklist weighs them (1, ½, 6/94, ⅒, ½, 2/13, ½, ½, ½, ½, and 1 for each challenge rank 5 and 10), add to exactly 100, which `guide.test.ts` also pins.
 
 | List | Goal | Host 1 | Host 2 | Notes |
 | --- | ---: | --- | --- | --- |
