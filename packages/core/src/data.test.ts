@@ -2,6 +2,7 @@
 import { panels } from "virtual:guide/panels";
 import { allRows, brand, byId, cats, chapterRows, chapters, CHAPTER_COUNT, completion, config, guideAnchor, hasMissables, isCategory, missablesLeft, nextUp, readChapter, rowsByTag, tally, whatsLeft } from "./guide";
 import { readerText } from "./reader-text";
+import type { Row } from "./types";
 
 const everything = Object.fromEntries(allRows.map((row) => [row.id, true as const]));
 const hosts = (urls: string[]) => new Set(urls.map((url) => new URL(url).host));
@@ -234,6 +235,53 @@ describe("completion", () => {
       const { done, total } = tally(tag, everything);
       expect(done, tag).toBe(total);
       expect(tally(tag, {}).done, tag).toBe(0);
+    }
+  });
+});
+
+// The completion rules (docs/core.md), held here in every guide so a guide can't drift from them unseen. Each test names its rule.
+describe("the completion rules", () => {
+  const { directions, outside = [] } = completion;
+  const board = new Set(completion.board.map((item) => item.tag));
+  const counted = new Set(completion.board.filter((item) => !outside.includes(item.tag)).map((item) => item.tag));
+  const counts = (row: Row) => row.tags.some((tag) => counted.has(tag));
+
+  it("names its direction tags and what lies outside the game as categories, apart, and never a direction on the board (rules 2 and 3)", () => {
+    expect(directions.length, "a guide names the tags of its route steps").toBeGreaterThan(0);
+    for (const tag of [...directions, ...outside]) expect(isCategory(tag), tag).toBe(true);
+    expect(directions.filter((tag) => outside.includes(tag))).toEqual([]);
+    expect(directions.filter((tag) => board.has(tag)), "a direction is never a target").toEqual([]);
+  });
+
+  it("gives every target a goal, exactly its rows as the board counts them (rule 5)", () => {
+    for (const { tag, goal } of completion.board) {
+      expect(Number.isInteger(goal) && goal > 0, `${tag}: ${goal}`).toBe(true);
+      expect(tally(tag, {}).total, `${tag}'s goal is its rows`).toBe(goal);
+    }
+  });
+
+  // Rule 1, everything the guide tracks counts; rule 2, a step the game doesn't credit never does. The first tag is a row's label, so a
+  // row labelled a direction counts nothing, and every other row counts but what lies outside the game.
+  it("counts every row but its directions and what lies outside the game, and never a row labelled a direction (rules 1 and 2)", () => {
+    const wrong = allRows.flatMap((row) => {
+      if (directions.includes(row.tags[0])) return row.tags.some((tag) => board.has(tag)) ? [`${row.id}: labelled a direction, on a target`] : [];
+      if (row.tags.some((tag) => outside.includes(tag))) return counts(row) ? [`${row.id}: outside the game, but counted`] : [];
+      return counts(row) ? [] : [`${row.id}: counts nothing, but isn't labelled a direction`];
+    });
+    expect(wrong).toEqual([]);
+  });
+
+  // Rule 4, per item: a game's own lists stand as the game counts them and may share a row (an Echoes side quest and the accessory it
+  // awards), but a list the guide makes up itself only takes rows no other target counts.
+  it("never counts a row of the guide's own lists under another target (rule 4)", () => {
+    const own = completion.board.filter((item) => item.list === "guide").map((item) => item.tag);
+    const shared = allRows.filter((row) => row.tags.some((tag) => own.includes(tag)) && row.tags.filter((tag) => board.has(tag)).length > 1);
+    expect(shared.map((row) => `${row.id}: ${row.tags.filter((tag) => board.has(tag)).join(" + ")}`)).toEqual([]);
+  });
+
+  it("counts every way of a one-way choice, the recommended one and each later one (rule 6)", () => {
+    for (const choice of config.choices ?? []) {
+      for (const id of [choice.row, ...choice.later.map((later) => later.row)]) expect(counts(byId.get(id)!), `${choice.name}: ${id}`).toBe(true);
     }
   });
 });

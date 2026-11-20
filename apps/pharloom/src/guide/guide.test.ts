@@ -1,4 +1,4 @@
-import { allRows, chapters, overall, rowsByTag, tally, whatsLeft } from "@hundo/core/guide";
+import { allRows, chapters, overall, rowsByTag } from "@hundo/core/guide";
 import { STORAGE_KEY, validateState } from "@hundo/core/progress-state";
 import { THEME_KEY } from "@hundo/core/store/theme";
 import { AWAKE_KEY } from "@hundo/core/store/awake";
@@ -15,7 +15,6 @@ import { questlines } from "./data/questlines";
 
 const [a] = allRows.map((row) => row.id);
 const tick = (rows: Row[]): Checks => Object.fromEntries(rows.map((row) => [row.id, true]));
-const counted = allRows.filter((row) => targets.some(({ tag }) => row.tags.includes(tag)));
 
 describe("Silksong completion", () => {
   it("cites sources for every chapter", () => {
@@ -26,56 +25,24 @@ describe("Silksong completion", () => {
     for (const row of allRows) expect(row.text.trim(), row.id).not.toBe("");
   });
 
-  it("reaches every fixed total", () => {
-    for (const { tag, goal } of targets) if (goal !== undefined) expect(tally(tag, {}).total, tag).toBe(goal);
-  });
-
   it("counts the game's own 100 in its first eleven targets: 51 tools, the upgrades, 20 shards and 18 fragments", () => {
     const game = targets.slice(0, 11).map(({ tag, goal }) => [tag, goal]);
     expect(Object.fromEntries(game)).toEqual({ tool: 51, skill: 6, kit: 4, pouch: 4, "silk-heart": 3, crest: 6, ability: 7, "mask-shard": 20, "spool-fragment": 18, needle: 4, item: 1 });
     const per = { "mask-shard": 4, "spool-fragment": 2 } as Record<string, number>;
-    expect(targets.slice(0, 11).reduce((sum, { tag, goal = 0 }) => sum + goal / (per[tag] ?? 1), 0)).toBe(100);
-  });
-
-  it("leaves nothing on the board optional", () => {
-    for (const target of targets) expect(target.optional, target.tag).toBeFalsy();
-  });
-
-  // Route steps are directions (core adds "missable" to missables.ts's rows).
-  it("counts every row but the route's steps", () => {
-    for (const row of allRows.filter((row) => !counted.includes(row))) expect(row.tags.every((tag) => ["route", "missable"].includes(tag)), row.id).toBe(true);
+    expect(targets.slice(0, 11).reduce((sum, { tag, goal }) => sum + goal / (per[tag] ?? 1), 0)).toBe(100);
   });
 
   // Both ways of the one-way choice count: the first save's, recommended, and the second save's in the last chapter, A Second Save,
   // beside the boss only Steel Soul has. So 100% takes two saves, and nothing else waits for the second.
   it("counts both ways of its one-way choice and the Steel Soul boss, the second save's two in the last chapter", () => {
     expect(choices.map((choice) => [choice.row, choice.later.map((later) => later.row)])).toEqual([["wish-broodfeast", ["wish-runtfeast"]]]);
-    for (const id of ["wish-broodfeast", "wish-runtfeast"]) expect(counted.map((row) => row.id), id).toContain(id);
     expect(chapters.at(-1)?.title).toBe("A Second Save");
     expect(allRows.filter((row) => row.chapter === chapters.length).map((row) => row.id).sort()).toEqual(["boss-summoned-saviour", "wish-runtfeast"]);
   });
 
-  it("gives every target a goal, the guide's own lists their rows", () => {
-    for (const { tag, goal } of targets) expect(goal, tag).toBe(rowsByTag(tag).length);
-    const own = ["pickup", "wish", "boss", "challenge"];
-    expect(Object.fromEntries(targets.filter(({ tag }) => own.includes(tag)).map(({ tag, goal }) => [tag, goal]))).toEqual({ pickup: 13, wish: 79, boss: 41, challenge: 8 });
+  it("pins the guide's own lists, whose goals are their rows", () => {
+    expect(Object.fromEntries(targets.filter(({ list }) => list === "guide").map(({ tag, goal }) => [tag, goal]))).toEqual({ pickup: 13, wish: 79, boss: 41, challenge: 8 });
   });
-
-  // 100% is full completion: every tracked entry, one each, so it never shows while anything on the board is left.
-  it("reads 100 only with everything ticked, and under 100 with any one entry left", () => {
-    expect(overall({}).percent).toBe(0);
-    expect(overall({}).label).toBe("complete");
-    expect(overall(tick(allRows)).percent).toBe(100);
-    expect(whatsLeft(tick(allRows))).toEqual([]);
-    const all = tick(allRows);
-    for (const row of counted) {
-      const left = { ...all };
-      delete left[row.id];
-      expect(overall(left).percent, row.id).toBeLessThan(100);
-      expect(whatsLeft(left), row.id).not.toEqual([]);
-    }
-    // (some 450 entries, each read twice: past vitest's 5 s default when the whole check runs in parallel)
-  }, 30_000);
 
   it("weighs a flea like a tool", () => {
     const [flea] = rowsByTag("flea");

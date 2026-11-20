@@ -4,7 +4,7 @@ What this guide claims that nobody has confirmed in the game. Nothing here was r
 
 ## Counts
 
-Each game count in `targets` (`src/guide/config.ts`) rests on two independent hosts. The lists marked "the guide's own", the expansion equipment among them, are rows the guide chose, not a game total: each goal is its rows, and `guide.test.ts` pins every goal to them. The tagged rows match these lists name for name.
+Each game count in `targets` (`src/guide/config.ts`) rests on two independent hosts. The lists marked "the guide's own", the expansion equipment among them, are rows the guide chose, not a game total: each goal is its rows, and core's `data.test.ts` holds every goal to them. The tagged rows match these lists name for name.
 
 | List | Count | Source 1 | Source 2 | Notes |
 | --- | ---: | --- | --- | --- |

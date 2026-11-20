@@ -103,21 +103,21 @@ const opens = new Map(completion.board.map((item) => [item.tag, item.opens ?? it
 /** The checklist a target's tile and its line in What's left open: its category, or the one it names (`BoardItem.opens`). */
 export const checklistOf = (tag: string) => `/checklist/${opens.get(tag) ?? tag}`;
 
-const listed = completion.board.filter((item) => !item.optional);
+const outside = new Set(completion.outside ?? []);
+/** The targets What's left and the bar count: every board target but what lies outside the game (`Completion.outside`). */
+const listed = completion.board.filter((item) => !outside.has(item.tag));
 
 /**
- * The guide's completion list done, as a whole percentage rounded down: every board target that isn't optional, counted as the board
- * counts it (an entry by one, the quantity category by amount) and only up to its goal. What's left counts the same targets the same
- * way, so this is 100 exactly when What's left is empty, and never 100 while anything on the list is left.
+ * The guide's completion list done, as a whole percentage rounded down: every board target but what lies outside the game, counted as
+ * the board counts it (an entry by one, the quantity category by amount) and only up to its goal. What's left counts the same targets
+ * the same way, so this is 100 exactly when What's left is empty, and never 100 while anything on the list is left.
  */
 export function listedPercent(checks: Checks) {
   let done = 0;
   let total = 0;
   for (const { tag, goal } of listed) {
-    const count = tally(tag, checks);
-    const target = goal ?? count.total;
-    done += Math.min(count.done, target);
-    total += target;
+    done += Math.min(tally(tag, checks).done, goal);
+    total += goal;
   }
   return pct(done, total);
 }
@@ -133,10 +133,6 @@ export const overallText = (percent: number, label: string) => `${percent}% ${la
 
 /** What is left per category, biggest first; finished categories drop out. */
 export function whatsLeft(checks: Checks): LeftItem[] {
-  const items = listed.map(({ tag, goal }) => {
-    const { done, total } = tally(tag, checks);
-    const target = goal ?? total;
-    return { tag, total: target, left: Math.max(target - done, 0) };
-  });
+  const items = listed.map(({ tag, goal }) => ({ tag, total: goal, left: Math.max(goal - tally(tag, checks).done, 0) }));
   return items.filter((item) => item.left > 0).sort((a, b) => b.left - a.left || tagName(a.tag).localeCompare(tagName(b.tag)));
 }

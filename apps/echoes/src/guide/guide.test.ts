@@ -1,4 +1,4 @@
-import { allRows, chapters, overall, rowsByTag, tally, whatsLeft, worth } from "@hundo/core/guide";
+import { allRows, chapters, rowsByTag, tally } from "@hundo/core/guide";
 import { STORAGE_KEY, validateState } from "@hundo/core/progress-state";
 import { targets } from "./config";
 import { THEME_KEY } from "@hundo/core/store/theme";
@@ -8,13 +8,9 @@ import { SYNC_KEY } from "@hundo/core/sync/local";
 import { PERSIST_KEY } from "@hundo/core/persistence";
 import { COUNTS_KEY } from "@hundo/core/counts";
 import { flatten } from "@hundo/core/sync/fields";
-import type { Checks, Row } from "@hundo/core/types";
+import type { Row } from "@hundo/core/types";
 
 const [a] = allRows.map((row) => row.id);
-const tick = (rows: Row[]): Checks => Object.fromEntries(rows.map((row) => [row.id, true]));
-const hasTarget = (row: Row) => row.tags.some((tag) => targets.some((target) => target.tag === tag));
-// What 100% counts: every row that carries a target. The amiibo outfits are optional, and route and story rows are directions.
-const counted = allRows.filter(hasTarget);
 
 describe("Echoes of Wisdom completion", () => {
   it("cites sources for every chapter", () => {
@@ -25,24 +21,10 @@ describe("Echoes of Wisdom completion", () => {
     for (const row of allRows) expect(row.text.trim(), row.id).not.toBe("");
   });
 
-  it("reaches every target of the guide's completion list", () => {
-    for (const { tag, goal } of targets) expect(tally(tag, {}).total, tag).toBe(goal);
-  });
-
   it("counts Might Crystals by what each entry awards", () => {
     const all = Object.fromEntries(allRows.map((row) => [row.id, true as const]));
     expect(tally("might-crystal", all)).toEqual({ done: 150, total: 150 });
     expect(rowsByTag("might-crystal").some((row) => row.quantity > 1)).toBe(true);
-  });
-
-  it("counts every target, each by its goal, and leaves out only the amiibo and the route and story steps", () => {
-    expect(targets.some((target) => "optional" in target && target.optional)).toBe(false);
-    expect(whatsLeft({}).map((item) => item.tag).sort()).toEqual(targets.map((target) => target.tag).sort());
-    expect(whatsLeft({}).reduce((sum, item) => sum + item.total, 0)).toBe(targets.reduce((sum, target) => sum + target.goal, 0));
-    const off = allRows.filter((row) => !hasTarget(row));
-    expect(off.length).toBeGreaterThan(0);
-    expect(off.every((row) => ["route", "story", "amiibo"].includes(row.tags[0]))).toBe(true);
-    for (const row of rowsByTag("amiibo")) expect(hasTarget(row), row.id).toBe(false);
   });
 
   // The game keeps no count of Waypoints (no counter, percentage or reward), so the guide's own list is the goal: 17 overworld ones and
@@ -54,32 +36,6 @@ describe("Echoes of Wisdom completion", () => {
     expect(dungeon).toHaveLength(26);
     for (const row of dungeon) expect(row.tags, row.id).toEqual(["dungeon-waypoint", "waypoint"]);
     expect(rowsByTag("waypoint").filter((row) => !dungeon.includes(row)).every((row) => row.tags.length === 1)).toBe(true);
-    // (a Waypoint is no other item the board counts)
-    const others = targets.map((target) => target.tag).filter((tag) => tag !== "waypoint");
-    for (const row of rowsByTag("waypoint")) expect(row.tags.some((tag) => others.includes(tag)), row.id).toBe(false);
-  });
-
-  // 100% is every target, each item once: it never shows while anything on the board is left, and What's left says what.
-  it("reads 100 only with everything counted ticked, and under 100 with any one item left", () => {
-    expect(overall({}).percent).toBe(0);
-    expect(overall({}).label).toBe("complete");
-    expect(overall(tick(counted)).percent).toBe(100);
-    expect(overall(tick(allRows)).percent).toBe(100);
-    expect(whatsLeft(tick(counted))).toEqual([]);
-    for (const { tag } of targets) {
-      // (a row that adds something to it: the Might Crystal category counts by amount)
-      const left = rowsByTag(tag).find((row) => worth(row, tag) > 0)!;
-      const checks = tick(counted.filter((row) => row !== left));
-      expect(overall(checks).percent, tag).toBeLessThan(100);
-      expect(whatsLeft(checks).map((item) => item.tag), tag).toContain(tag);
-    }
-  });
-
-  it("keeps the optional amiibo out of the bar", () => {
-    const amiibo = rowsByTag("amiibo");
-    expect(amiibo.length).toBeGreaterThan(0);
-    expect(overall(tick(amiibo)).percent).toBe(0);
-    expect(overall(tick(allRows.filter((row) => !amiibo.includes(row)))).percent).toBe(100);
   });
 
   it("splits chests into dungeon, mini-dungeon and overworld ones", () => {
@@ -103,16 +59,6 @@ describe("Echoes of Wisdom completion", () => {
     const extra = rowsByTag("minigame").filter((row) => !row.tags.some((tag) => others.includes(tag)));
     expect(rowsByTag("minigame-extra").map((row) => row.id)).toEqual(extra.map((row) => row.id));
     expect(rowsByTag("minigame").length).toBeGreaterThan(rowsByTag("minigame-extra").length);
-  });
-
-  // One each: a guide's own list counts only rows no other target counts, while a game's list keeps every row it lists (a side quest and
-  // the accessory it awards are two items the game lists).
-  it("counts a row of the guide's own lists under no other target", () => {
-    const own = ["dungeon-chest", "mini-dungeon-chest", "overworld-chest", "equipment", "ability", "upgrade", "milestone", "minigame-extra", "waypoint"];
-    for (const tag of own) {
-      expect(targets.some((target) => target.tag === tag), tag).toBe(true);
-      for (const row of rowsByTag(tag)) expect(row.tags.filter((other) => other !== tag && targets.some((target) => target.tag === other)), `${row.id} (${tag})`).toEqual([]);
-    }
   });
 });
 

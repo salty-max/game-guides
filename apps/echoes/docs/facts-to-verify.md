@@ -31,7 +31,7 @@ Read on 19 Nov 2026. A wiki and its fork count as one host, and GameFAQs is Game
 
 ## What the bar counts beyond the game's own lists
 
-The first eleven targets come with game totals (above), and the dungeon chests and mini-dungeon chests are sums of the guide's rows (above). The rest are the guide's own lists, whose goals are their rows (`guide.test.ts` pins each to its tag), so no total is claimed for them; what the sources do say:
+The first eleven targets come with game totals (above), and the dungeon chests and mini-dungeon chests are sums of the guide's rows (above). The rest are the guide's own lists, whose goals are their rows (core's `data.test.ts` holds each to its tag's rows), so no total is claimed for them; what the sources do say:
 
 - **Equipment (4):** the Tri Rod and the Sword, Bow and Bombs of Might. [Zelda Wiki](https://zeldawiki.wiki/wiki/Swordfighter_Form) and [Game8](https://game8.co/games/Zelda-Echoes-of-Wisdom/archives/477095) give the three weapons, and [Zelda Wiki](https://zeldawiki.wiki/wiki/Tri_Rod) the Tri Rod; no source states a total.
 - **Abilities (2):** Bind and Reverse Bond, the two Tri teaches in Suthorn Ruins ([Zelda Wiki](https://zeldawiki.wiki/wiki/Echoes_of_wisdom), [Game8](https://game8.co/games/Zelda-Echoes-of-Wisdom/archives/471933)). Zelda Wiki's category of abilities has 21 pages (Jumping, Swimming and Swordfighter Form among them), so there is no wider game total.

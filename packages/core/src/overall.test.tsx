@@ -12,7 +12,7 @@ import { allowSlowMounts } from "./test/slow";
 allowSlowMounts();
 
 const tick = (rows: Row[]): Checks => Object.fromEntries(rows.map((row) => [row.id, true]));
-const listed = new Set(completion.board.filter((item) => !item.optional).map((item) => item.tag));
+const listed = new Set(completion.board.filter((item) => !completion.outside?.includes(item.tag)).map((item) => item.tag));
 
 // Runs in every guide, against its own config (core's tests run once per app).
 describe("the overall figure", () => {
@@ -48,7 +48,7 @@ describe("the overall figure", () => {
     }
   });
 
-  it("leaves out rows that carry no target on the list (optional targets, route steps)", () => {
+  it("leaves out rows that carry no target on the list (what lies outside the game, route steps)", () => {
     const off = allRows.filter((row) => !row.tags.some((tag) => listed.has(tag)));
     expect(off.length).toBeGreaterThan(0);
     expect(overall(tick(off)).percent).toBe(0);

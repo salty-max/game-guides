@@ -45,31 +45,31 @@ const categories: GuideConfig["categories"] = {
  * The guide's completion list, and what 100% is: every target counts, each item once, up to its goal, so the bar reads 100 exactly when
  * What's left is empty. Only the amiibo stay out (they need physical figures), and route steps (`story`) are directions, among them
  * fishing with the pond's default Lightweight Lure and buying back the item traded for the Boomerang. Treasure Chests, Equipment &
- * Upgrades and the Island Sweep are the guide's own lists, and the rest are game totals (facts-to-verify.md names two hosts for each).
- * A row of the guide's own lists counts nowhere else: Treasure Chests are the chests holding nothing another target counts (`chest`
- * tags the guide's chest list, for the filter), Equipment leaves out the instruments and songs, and the Mini-game Rewards (`mini`) and Chamber
- * Effects (`effect`) are filters, not targets, since each of their rows is already a Heart Piece, a figure, a Chamber Stone and so on.
+ * Upgrades, the Island Sweep and the amiibo panels are the guide's own lists, and the rest are game totals (facts-to-verify.md names two
+ * hosts for each). A row of the guide's own lists counts nowhere else: Treasure Chests are the chests holding nothing another target
+ * counts (`chest` tags the guide's chest list, for the filter), Equipment leaves out the instruments and songs, and the Mini-game Rewards
+ * (`mini`) and Chamber Effects (`effect`) are filters, not targets, since each of their rows is already a Heart Piece, a figure, a Chamber Stone and so on.
  * A row on two of the game's lists counts on both: Dampé's challenges that award a Heart Piece, a Seashell, a Fairy Bottle or a Heart
  * Container, and Manbo's Mambo, a song and the Manbo's Pond warp point. guide.test.ts pins every goal.
  */
 export const targets: BoardItem[] = [
-  { tag: "heart", goal: 32 },
-  { tag: "shell", goal: 50 },
-  { tag: "treasure", goal: 83 },
-  { tag: "trade", goal: 14 },
-  { tag: "gear", goal: 24 },
-  { tag: "container", goal: 9 },
-  { tag: "instrument", goal: 8 },
-  { tag: "song", goal: 3 },
-  { tag: "bottle", goal: 3 },
-  { tag: "figure", goal: 10 },
-  { tag: "lure", goal: 2 },
-  { tag: "challenge", goal: 24 },
-  { tag: "stone", goal: 14 },
-  { tag: "warp", goal: 10 },
-  { tag: "fairy", goal: 4 },
-  { tag: "explore", goal: 5 },
-  { tag: "amiibo", goal: 6, optional: true },
+  { tag: "heart", goal: 32, list: "game" },
+  { tag: "shell", goal: 50, list: "game" },
+  { tag: "treasure", goal: 83, list: "guide" },
+  { tag: "trade", goal: 14, list: "game" },
+  { tag: "gear", goal: 24, list: "guide" },
+  { tag: "container", goal: 9, list: "game" },
+  { tag: "instrument", goal: 8, list: "game" },
+  { tag: "song", goal: 3, list: "game" },
+  { tag: "bottle", goal: 3, list: "game" },
+  { tag: "figure", goal: 10, list: "game" },
+  { tag: "lure", goal: 2, list: "game" },
+  { tag: "challenge", goal: 24, list: "game" },
+  { tag: "stone", goal: 14, list: "game" },
+  { tag: "warp", goal: 10, list: "game" },
+  { tag: "fairy", goal: 4, list: "game" },
+  { tag: "explore", goal: 5, list: "guide" },
+  { tag: "amiibo", goal: 6, list: "guide" },
 ];
 
 const config: GuideConfig = {
@@ -94,7 +94,7 @@ const config: GuideConfig = {
   reassurance,
   banners,
   defer: (row) => row.tags.includes("amiibo"),
-  completion: { board: targets },
+  completion: { board: targets, directions: ["story"], outside: ["amiibo"] },
   state: {
     // Saves from before the shared format: version 1, no guide id, the run log at the top level.
     legacy: (v) => (v.version === 1 && v.guide === undefined ? { extra: { mode: v.mode, runs: v.runs } } : null),

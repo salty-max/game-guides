@@ -142,7 +142,7 @@ A platform's achievements (Steam, Xbox, PlayStation trophies) are a good source:
 
 ## Counts
 
-Where the game has a fixed total, put it in `completion.board` with a `goal` and pin it in `guide.test.ts`, as Echoes' `targets` does. A missing or doubled row then fails a count. The test checks the data against the number, not the number against the game, so record where each number came from in `facts-to-verify.md`.
+Every target in `completion.board` has a `goal`, and core's `data.test.ts` holds it to the target's rows, so a missing or doubled row fails a count. Where the game has a fixed total, the goal is that total and the target is `list: "game"`. A list the guide makes up itself is `list: "guide"`, its goal is its rows, and none of its rows may count under another target. The test checks the data against the number, not the number against the game, so record where each number came from in `facts-to-verify.md`.
 
 ## Facts to verify
 

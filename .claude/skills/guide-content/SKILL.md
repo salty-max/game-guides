@@ -25,7 +25,8 @@ The rules and the shapes are in [docs/chapter-data.md](../../../docs/chapter-dat
 - **Chapters:** decide how the research's chapters map onto `data/chapter-N.ts`. A catalogue-only chapter, like Dragon Quest's "Completion and crafting", can carry the compact lists, as Echoes' last chapter does with `sweep-lists.ts`.
 - **Categories:** list every kind of row the game has in `config.ts`'s `categories`. Take the research's `category:` values as the starting set.
 - **Achievements:** a research folder's achievement list is a source, not a category. Show achievements only when the game keeps a list of its own, so every reader has one whatever they play on, sourced in `config.ts`'s `achievements` ([the doc](../../../docs/chapter-data.md#achievements)); otherwise file each such row under its real kind, or as a route step when the board already counts it.
-- **Fixed totals:** the game's own counts, with their source, go into `completion.board` as goals and into `guide.test.ts`. `SOURCES.md` gives Dragon Quest's: 40 Mini Medals, 22 scrolls, 15 Secret Spots, and more.
+- **Fixed totals:** the game's own counts, with their source, go into `completion.board` as goals (`list: "game"`, two hosts in `facts-to-verify.md`). A list the guide makes up itself is `list: "guide"`, its goal its rows. Core's `data.test.ts` holds every goal to its rows, so a missing or doubled row fails. `SOURCES.md` gives Dragon Quest's: 40 Mini Medals, 22 scrolls, 15 Secret Spots, and more.
+- **Route steps:** name the tags that label a step the game doesn't credit in `completion.directions` (`route`). A row whose first tag is one counts nothing, and every other row must carry a board target, but what lies outside the game, such as amiibo, named in `completion.outside` ([the rules](../../../docs/core.md#the-completion-rules)).
 
 ## 3. Write the rows
 

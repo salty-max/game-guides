@@ -10,9 +10,9 @@ import { pressClasses } from "./press-style";
 const statIcon = cva("grid size-7 flex-none place-items-center rounded-small [&_svg]:size-3.75", { variants: { tone: toneClasses }, defaultVariants: { tone: "none" } });
 
 /** A category's count on the dashboard's board: its icon and name, done of its goal, and the bar. It opens the category's checklist (`checklistOf`). */
-export function Stat({ tag, goal }: { tag: string; goal?: number }) {
+export function Stat({ tag, goal }: { tag: string; goal: number }) {
   const checks = useProgress((s) => s.data.checks);
-  const { done, total } = tally(tag, checks);
+  const { done } = tally(tag, checks);
   const [name, , graphic, tone] = cats[tag];
   return (
     <Link
@@ -26,9 +26,9 @@ export function Stat({ tag, goal }: { tag: string; goal?: number }) {
         {name}
       </span>
       <span className="flex items-baseline gap-1.5 text-22 leading-[1.18] font-extrabold tabular-nums">
-        {done} <small className="text-12 font-bold text-muted">/ {goal ?? total}</small>
+        {done} <small className="text-12 font-bold text-muted">/ {goal}</small>
       </span>
-      <ProgressBar done={done} total={goal ?? total} label={name} />
+      <ProgressBar done={done} total={goal} label={name} />
     </Link>
   );
 }
