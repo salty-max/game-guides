@@ -3,10 +3,10 @@ import type { RawChapter } from "@hundo/core/types";
 export default {
   id: 7,
   title: "The Threefold Melody",
-  region: "Cogwork Core · Whispering Vaults · High Halls",
+  region: "Cogwork Core · Whispering Vaults",
   teaser: "Cogwork Core",
-  intro: "Get past the Cogwork Dancers into the Citadel's clockwork heart, then gather the three songs its statues ask for: the Vaultkeepers' from the Whispering Vaults and the Stage, the Architects' from the top of the Core, and the Conductors' from the High Halls. The lift the statues guard can wait: there's plenty to do first.",
-  sources: [["Threefold Melody: where each part is learnt", "https://hollowknight.wiki/w/Threefold_Melody"], ["Cogwork Core access and its upper half", "https://hollowknight.wiki/w/Cogwork_Core"], ["Whispering Vaults access and the Stage", "https://hollowknight.wiki/w/Whispering_Vaults"], ["High Halls, the Forum and the Rosary Bank", "https://hollowknight.wiki/w/High_Halls"], ["Psalm and Sacred Cylinders", "https://hollowknight.wiki/w/Psalm_Cylinder"], ["Cogheart pieces and bell solutions", "https://hollowknight.wiki/w/Cogheart"], ["Melody order and the skills each needs", "https://www.nintendolife.com/guides/hollow-knight-silksong-progression-guide-recommended-route"]],
+  intro: "Get past the Cogwork Dancers into the Citadel's clockwork heart, then gather the first two of the three songs its statues ask for: the Vaultkeepers' from the Whispering Vaults and the Stage, and the Architects' from the top of the Core. The Conductors' song waits in the High Halls, which chapter 8 visits once you have the Faydown Cloak. The lift the statues guard can wait: there's plenty to do first.",
+  sources: [["Threefold Melody: where each part is learnt", "https://hollowknight.wiki/w/Threefold_Melody"], ["Cogwork Core access and its upper half", "https://hollowknight.wiki/w/Cogwork_Core"], ["Whispering Vaults access and the Stage", "https://hollowknight.wiki/w/Whispering_Vaults"], ["Psalm and Sacred Cylinders", "https://hollowknight.wiki/w/Psalm_Cylinder"], ["Cogheart pieces and bell solutions", "https://hollowknight.wiki/w/Cogheart"], ["Melody order and the skills each needs", "https://www.nintendolife.com/guides/hollow-knight-silksong-progression-guide-recommended-route"]],
   groups: [
     {
       title: "The Cogwork Dancers",
@@ -32,14 +32,12 @@ export default {
       ],
     },
     {
-      title: "The Core's summit and the High Halls",
-      location: "Cogwork Core · High Halls",
-      sources: [["Architect's Melody and the climb to the Core's top", "https://hollowknight.wiki/w/Cogwork_Core"], ["Architect's Melody puzzle", "https://hollowknight.wiki/w/Threefold_Melody"], ["Twelfth Architect's stock and its end", "https://hollowknight.wiki/w/Twelfth_Architect"], ["Forum gauntlet, Conductor Ballador and the Rosary Bank", "https://hollowknight.wiki/w/High_Halls"], ["Simple Keys and their four locks", "https://hollowknight.wiki/w/Simple_Key_(Silksong)"]],
+      title: "The Core's summit",
+      location: "Cogwork Core",
+      sources: [["Architect's Melody and the climb to the Core's top", "https://hollowknight.wiki/w/Cogwork_Core"], ["Architect's Melody puzzle", "https://hollowknight.wiki/w/Threefold_Melody"], ["Twelfth Architect's stock and its end", "https://hollowknight.wiki/w/Twelfth_Architect"]],
       rows: [
         ["route-architects-melody", ["route"], "Learn the Architect's Melody at the top of the Cogwork Core", "The Core's upper half is one long platforming climb. Drop down the lower central area's left-hand side, climb its right-hand side again and take the door at the top into the upper section, where a Clawline hook opens a shortcut back from the Dancers' arena. At the very top, solve the room's puzzle to set the old constructs working, and they play the Architect's Melody for you.", {"reference": "https://hollowknight.wiki/w/Cogwork_Core"}],
         ["challenge-architect-shop", ["challenge"], "Collect the Architect's workshop stock", "Buy what the Twelfth Architect sells as your Rosaries and Craftmetal allow. Once everything is bought (its repair work aside) and you've learnt the Architect's Melody, one more talk brings its end: later it sits motionless at its desk, with a Pristine Core on the floor for you. Leave one item unbought if you'd rather keep it working.", {"reference": "https://hollowknight.wiki/w/Twelfth_Architect"}],
-        ["route-conductors-melody", ["route"], "Win the Forum gauntlet and learn the Conductor's Melody", "The High Halls sit above the upper-left Choral Chambers, and you need Clawline to get in and around. On their east side, facing the Ventrica, the Forum holds an eleven-wave gauntlet; Garmond and Zaza join you if you won their duel. When the chandelier crashes down at the end, go through to the next room and talk to Conductor Ballador, who sings you the melody. If a gap on the way needs an ability you don't have yet, leave it and come back later.", {"reference": "https://hollowknight.wiki/w/High_Halls"}],
-        ["route-rosary-storage", ["pickup"], "Open the High Halls Rosary Bank with a Simple Key", "The bank beside the Forum, west of the Ventrica, takes a Simple Key: Pharloom has four keys for its four locks. Inside, look for dust falling from a breakable ceiling and climb that vent past its fans to the vault: 560 Rosaries all told, lying loose and in three chests, one of them holding a Pale Rosary Necklace. Clear it in one visit: once it's open, saving anywhere beyond the High Halls, Choral Chambers and Cogwork Core sends a Snitchfly in to take whatever you left.", {"reference": "https://hollowknight.wiki/w/High_Halls"}],
       ],
     },
     {
@@ -85,19 +83,6 @@ export default {
       map: ["Pharloom Calculator", "https://pharloomcalculator.com/map/"],
       rows: [
         ["pale-oil-1", ["pale-oil"], "Pale Oil · Whispering Vaults to Choral Chambers", "The oil is in a north-east Choral Chambers room that only opens from the Vaults room next to it. Cling Grip needed.", {"reference": "https://hollowknight.wiki/w/Pale_Oil", "map": ["Map Genie", "https://mapgenie.io/hollow-knight-silksong/maps/pharloom?locationIds=478668"]}],
-      ],
-    },
-    {
-      title: "Collectibles and unlocks · High Halls",
-      location: "High Halls",
-      compact: true,
-      map: ["Pharloom Calculator", "https://pharloomcalculator.com/map/"],
-      rows: [
-        ["tool-cogfly", ["tool"], "Cogfly", "In the Cogfly workshop in the High Halls, use the crafting bench: it takes one Craftmetal.", {"reference": "https://hollowknight.wiki/w/Cogfly", "map": ["Map Genie", "https://mapgenie.io/hollow-knight-silksong/maps/pharloom?locationIds=478903"]}],
-        ["tool-rosary-cannon", ["tool"], "Rosary Cannon", "Inside the Rosary Bank, break the west wall short of the vault door and hit the stringing machine's mechanism behind it. It falls apart into the cannon, and the machine stops working for good.", {"reference": "https://hollowknight.wiki/w/Rosary_Cannon", "map": ["Map Genie", "https://mapgenie.io/hollow-knight-silksong/maps/pharloom?locationIds=478937"]}],
-        ["relic-psalm-cylinder-high-halls", ["relic"], "Psalm Cylinder · High Halls", "North-west of the Ventrica, thread the maze of pipes to the cylinder.", {"reference": "https://hollowknight.wiki/w/Psalm_Cylinder", "map": ["Map Genie", "https://mapgenie.io/hollow-knight-silksong/maps/pharloom?locationIds=478908"]}],
-        ["map-high-halls", ["map"], "Get the High Halls map", "Use the map machine in the High Halls. The map costs 70 Rosaries.", {"reference": "https://hollowknight.wiki/w/Map_and_Quill_(Silksong)#Maps"}],
-        ["ventrica-high-halls", ["ventrica"], "Open High Halls Ventrica", "Pay 80 Rosaries at the station's toll machine to open this stop.", {"reference": "https://hollowknight.wiki/w/Fast_Travel_(Silksong)", "map": ["Map Genie", "https://mapgenie.io/hollow-knight-silksong/maps/pharloom?locationIds=478445"]}],
       ],
     },
   ],
