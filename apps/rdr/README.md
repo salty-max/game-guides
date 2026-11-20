@@ -19,7 +19,7 @@ pnpm icons      # regenerate public/icons and public/favicon.ico from scripts/ic
 
 ## Deploy
 
-The Vercel project `hundo-rdr` builds this folder as its Root Directory and serves [rdr.hundo.quest](https://rdr.hundo.quest). It moved there from reddead.hundo.quest, which stays attached and hands each reader's progress over (`movedFrom` in `brand.ts`). `vercel.json` here sets the install, build, ignore command, rewrites, CSP and cache rules; [docs/deploying.md](../../docs/deploying.md) explains them.
+The Vercel project `hundo-rdr` builds this folder as its Root Directory and serves [rdr.hundo.quest](https://rdr.hundo.quest). It first lived at reddead.hundo.quest. That address was detached on 20 Nov 2026, and `movedFrom` was removed from `brand.ts` the same day. `vercel.json` here sets the install, build, ignore command, rewrites, CSP and cache rules; [docs/deploying.md](../../docs/deploying.md) explains them.
 
 ## Use the guide
 

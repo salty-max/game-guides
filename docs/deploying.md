@@ -4,7 +4,7 @@ Every push, deploy and release needs the user's go, asked of the user in the ses
 
 ## The projects
 
-Each guide is its own Vercel project on the team jellycat, built from this repository. The project is named after the app's package (`hundo-koholint` for `apps/koholint`). The guide lives at `https://<sub>.hundo.quest`, attached to its project as a domain. The subdomain is chosen per guide (`koholint`, `rdr`, `echoes`) and set as `brand.home`. `hundo.quest` is registered through Vercel on the same team, so Vercel's DNS does the rest. The first three guides moved here from `*.vercel.app` addresses with the hand-off below; once their readers had moved, the old addresses were detached and `movedFrom` removed from their brands. Red Dead then moved from `reddead.hundo.quest` to `rdr.hundo.quest`: `reddead.hundo.quest` stays attached to `hundo-rdr` and listed in its `movedFrom` until it's detached on a later go. The root README's apps table lists the projects and their sites.
+Each guide is its own Vercel project on the team jellycat, built from this repository. The project is named after the app's package (`hundo-koholint` for `apps/koholint`). The guide lives at `https://<sub>.hundo.quest`, attached to its project as a domain. The subdomain is chosen per guide (`koholint`, `rdr`, `echoes`) and set as `brand.home`. `hundo.quest` is registered through Vercel on the same team, so Vercel's DNS does the rest. The first three guides moved here from `*.vercel.app` addresses with the hand-off below; once their readers had moved, the old addresses were detached and `movedFrom` removed from their brands. Red Dead then moved from `reddead.hundo.quest` to `rdr.hundo.quest` the same way, and on 20 Nov 2026 `reddead.hundo.quest` was detached from `hundo-rdr` and removed from `movedFrom`. A fresh visit there gets a 404 (seen with curl, 20 Nov 2026). Not tried: a browser that still holds the old build's service worker probably keeps showing its old shell, and rdr no longer takes a hand-off from it, so progress left there would not come across. No guide lists a `movedFrom`. The root README's apps table lists the projects and their sites.
 
 Settings that live in the Vercel dashboard rather than in the repository:
 
@@ -120,7 +120,7 @@ Set up on 19–20 Nov 2026: the `hundo.quest` Domain property is verified throug
 5. Then watch, over the following weeks:
    - **Pages, under Indexing.** The three sitemap pages should end up indexed. Hidden chapters show as "Excluded by 'noindex' tag", and the deep addresses as "Alternate page with proper canonical tag", as does `/sources` if a crawler still has it (the Sources page is gone and the address names `/guide/1`). All intended.
    - **`/`.** It shows chapter 1 by a change of address in the page, so Google is expected to treat it as a duplicate of `/guide/1`. If a result names the guide by its hostname rather than by its name (the WebSite block's `name`), that's the case where rendering chapter 1 at `/` itself, for a reader with no progress, would be worth doing.
-   - **reddead.hundo.quest.** It's under the same Domain property. Its pages should drop out as Google follows the redirect to rdr.
+   - **reddead.hundo.quest.** It's under the same Domain property. Its pages were redirected to rdr while the hand-off ran; since 20 Nov 2026 the address is detached and answers 404, so what Google still lists there should drop out as it recrawls.
 
 ## The sync API
 

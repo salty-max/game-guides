@@ -204,10 +204,9 @@ describe("storage", () => {
     expect(brand.id).toBe("red-dead-redemption");
   });
 
-  // Moved from reddead.hundo.quest: the old address hands each reader's progress over to the new one.
-  it("hands readers over from its old address", () => {
+  // The guide's address: every canonical, the sitemap and the link preview are on it.
+  it("lives at rdr.hundo.quest", () => {
     expect(brand.home).toBe("https://rdr.hundo.quest");
-    expect(brand.movedFrom).toContain("reddead.hundo.quest");
   });
 });
 
