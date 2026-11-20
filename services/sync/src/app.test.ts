@@ -73,7 +73,7 @@ describe("every request", () => {
     const d = world.device();
     const simple = ["application/x-www-form-urlencoded", "multipart/form-data; boundary=x", "text/plain", "text/plain;charset=UTF-8", ""];
     for (const type of simple) {
-      for (const path of ["/api/pair/start", "/api/pair/claim", "/api/sync", "/api/status", "/api/unlink", "/api/forget"]) {
+      for (const path of ["/api/pair/start", "/api/pair/claim", "/api/sync", "/api/status", "/api/unlink", "/api/forget", "/api/summary"]) {
         const reply = await d.post(path, {}, { origin: KOHOLINT, headers: { "content-type": type }, raw: '{"p":1}' });
         expect(reply.status, `${path} as "${type}"`).toBe(400);
       }
@@ -1277,6 +1277,81 @@ describe("links counted", () => {
     const reply = await b.claim(code, "Second", { deps: { ...world.deps, store: flaky } }, { guide: GUIDE });
     expect(reply.status).toBe(200);
     expect(reply.body.linked).toBe(true);
+  });
+});
+
+describe("a guide's summary for hundo.quest", () => {
+  it("sets a cookie every hundo.quest host can read, for 400 days, holding the format, the figure and the chapter", async () => {
+    const d = new World().device();
+    const reply = await d.summary({ percent: 57, chapter: 6 });
+    expect(reply.status).toBe(200);
+    expect(reply.body).toEqual({ ok: true });
+    NO_STORE(reply.headers);
+    expect(reply.cookies).toEqual([`hundo_p_links-awakening=1.57.6; Max-Age=${KEEP}; Path=/; Domain=hundo.quest; Secure; SameSite=Lax`]);
+    expect(d.jar.get("hundo_p_links-awakening")).toBe("1.57.6");
+    await d.summary({ percent: 100, chapter: 9 }, { guide: "silksong" }, { origin: "https://pharloom.hundo.quest" });
+    expect(d.jar.get("hundo_p_silksong")).toBe("1.100.9");
+    expect(d.jar.get("hundo_p_links-awakening")).toBe("1.57.6");
+  });
+
+  it("keeps it to the page's own host, for a week, on a preview and on localhost", async () => {
+    const preview = await new World().device().summary({ percent: 0, chapter: 1 }, {}, { origin: PREVIEW });
+    expect(preview.cookies).toEqual([`hundo_p_links-awakening=1.0.1; Max-Age=${7 * 86_400}; Path=/; Secure; SameSite=Lax`]);
+    const local = await new World().device().summary({ percent: 3, chapter: 2 }, {}, { origin: LOCAL, direct: true });
+    expect(local.cookies).toEqual([`hundo_p_links-awakening=1.3.2; Max-Age=${7 * 86_400}; Path=/; SameSite=Lax`]);
+  });
+
+  it("clears it when nothing is checked", async () => {
+    const d = new World().device();
+    await d.summary({ percent: 12, chapter: 3 });
+    const cleared = await d.summary(null);
+    expect(cleared.status).toBe(200);
+    expect(cleared.cookies).toEqual(["hundo_p_links-awakening=; Max-Age=0; Path=/; Domain=hundo.quest; Secure; SameSite=Lax"]);
+    expect(d.jar.has("hundo_p_links-awakening")).toBe(false);
+  });
+
+  it("stores nothing and reads no cookie, a synced device's included", async () => {
+    const world = new World();
+    const { a } = await link(world);
+    const before = world.store.snapshot();
+    const commands = world.store.commands;
+    const sync = a.jar.get("hundo_sync");
+    expect((await a.summary({ percent: 40, chapter: 5 })).status).toBe(200);
+    expect((await world.device().summary(null)).status).toBe(200);
+    expect(world.store.commands).toBe(commands);
+    expect(world.store.snapshot()).toBe(before);
+    expect(a.jar.get("hundo_sync")).toBe(sync);
+    // the same answer with the sync cookies as without them
+    const fresh = await world.device().summary({ percent: 40, chapter: 5 });
+    expect(a.set).toEqual(fresh.cookies);
+  });
+
+  it("refuses anything but a known guide, a whole figure from 0 to 100 and a chapter from 1 to 999, and sets nothing then", async () => {
+    const world = new World();
+    const d = world.device();
+    const refused: [string, unknown, Record<string, unknown>?][] = [
+      ["no summary", undefined],
+      ["a list", [57, 6]],
+      ["the cookie's text", "1.57.6"],
+      ["no chapter", { percent: 57 }],
+      ["no figure", { chapter: 6 }],
+      ["something else besides", { percent: 57, chapter: 6, title: "The Castle" }],
+      ["a negative figure", { percent: -1, chapter: 6 }],
+      ["past 100", { percent: 101, chapter: 6 }],
+      ["a fraction", { percent: 57.5, chapter: 6 }],
+      ["text", { percent: "57", chapter: 6 }],
+      ["chapter 0", { percent: 57, chapter: 0 }],
+      ["chapter 1000", { percent: 57, chapter: 1000 }],
+      ["a chapter's name", { percent: 57, chapter: "the-castle" }],
+      ["an unknown guide", { percent: 57, chapter: 6 }, { guide: "zelda-3" }],
+      ["a guide that would break the cookie", null, { guide: "x; Domain=evil.example" }],
+    ];
+    for (const [why, summary, extra] of refused) {
+      const reply = await d.summary(summary, extra);
+      expect(reply.status, why).toBe(400);
+      expect(reply.cookies, why).toEqual([]);
+    }
+    expect(world.store.commands).toBe(0);
   });
 });
 

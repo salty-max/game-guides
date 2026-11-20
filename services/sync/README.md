@@ -16,8 +16,9 @@ Every endpoint is a POST with a JSON body that carries `"p": 1`, the protocol, w
 | `/api/unlink` | | takes this device out and clears its cookies. The last device out deletes the group's data. |
 | `/api/forget` | | deletes the group's data and every device in it. |
 | `/api/count` | `guide`, `counts` | `ok`, and `counted`, false once the month's budget is spent. Reads no cookie and needs none ([Visit counts](#visit-counts)). |
+| `/api/summary` | `guide`, `summary`: `{ percent, chapter }`, or `null` | `ok`, and the `hundo_p_<guide>` cookie set to that summary, or cleared for `null`. Stores nothing and reads no cookie ([A guide's summary](#a-guides-summary)). |
 
-Errors: `400` (bad body, code, guide, entries, or a stamp more than a day ahead, which also returns `now`), `401 unlinked` (and the cookies are cleared), `403 origin`, `409 devices`, `413`, `429 limit`, `503` (the store is down or not set up).
+Errors: `400` (bad body, code, guide, entries, summary, or a stamp more than a day ahead, which also returns `now`), `401 unlinked` (and the cookies are cleared), `403 origin`, `409 devices`, `413`, `429 limit`, `503` (the store is down or not set up).
 
 ### Who may call
 
@@ -27,6 +28,8 @@ Who is calling comes from the `Origin` alone: a guide on `https://*.hundo.quest`
 
 - `hundo_sync=<deviceId>.<secret>`: `HttpOnly; Secure; SameSite=Lax; Path=/api`, 400 days. The server keeps only a SHA-256 of the secret. On hundo.quest it has `Domain=hundo.quest`, so one link covers every guide in a browser. On a preview or localhost it is host-only, and `Secure` is dropped only for plain-http localhost.
 - `hundo_link=<fingerprint>`: the same but `Path=/` and readable by script. The fingerprint is ten characters of a hash of the group id and opens nothing. A guide reads it to know it is linked, with no request.
+
+- `hundo_p_<guide>=1.<percent>.<chapter>`: one per guide, set by `/api/summary` for every reader, synced or not, with the same attributes as `hundo_link` (`Path=/`, readable by script, 400 days, `Domain=hundo.quest` on hundo.quest). It is there for hundo.quest to read, to show a returning reader their progress ([A guide's summary](#a-guides-summary)).
 
 A device that is only showing a code gets the first cookie for fifteen minutes and not the second, so a guide's other tabs don't try to sync before there is a group.
 
@@ -45,7 +48,7 @@ All keys sit under `hs:<namespace>:`.
 | `st:budget:<yyyy-mm>` | the store commands counting has used this month | 40 days |
 | `rl:…` | counters for the limits: for pairing, keyed by a salted hash of the visitor's IP address, and for sync, by the device | the length of their window, an hour at most |
 
-No email, no name. The server sees IP addresses, as any web server does, and uses them only through those counters. The visit counts hold no address, cookie or device. A "touch" is the once-a-day request that pushes the expiry out.
+No email, no name. The server sees IP addresses, as any web server does, and uses them only through those counters. The visit counts hold no address, cookie or device. A guide's summary (`/api/summary`) is answered and kept nowhere. A "touch" is the once-a-day request that pushes the expiry out.
 
 ### Visit counts
 
@@ -56,6 +59,26 @@ Counting shares the store's 500,000 commands a month with sync, which mustn't ru
 Anyone can POST made-up counts with a forged Origin from outside a browser, as with any counter: the caps keep one call from skewing a day, and the numbers are indicative, not audited.
 
 `pnpm stats [days] [--test]` (from this folder; 30 days by default) prints each guide's visits (and the installed app's share), pages, each chapter shown, started and finished, and links made, then the sync groups as they stand: how many hold how many devices, and how many have two or more devices synced in the last 30 days. It reads each group's record (`gd:`), whose values hold the device labels beside their last-synced times, and prints only counts, never a label. It runs with the database's read-only token, `KV_REST_API_READ_ONLY_TOKEN` with `KV_REST_API_URL`, from the environment or from `.env.local`, which `vercel env pull --project hundo-api --environment production` writes (git ignores it). A 30-day read costs 91 commands, plus a SCAN and one for each group.
+
+### A guide's summary
+
+hundo.quest is a page of its own, with no access to the guides' storage. For it to show a returning reader their progress, each guide is to keep a cookie on every hundo.quest host, `hundo_p_<guide>`, holding `1.<percent>.<chapter>`: the format, then what the guide sends, which is meant to be its overall completion as its Progress page shows it (rounded down) and the chapter the reader was last in. This route sets it, so that no guide has to write it from script. (No guide calls it yet.)
+
+`summary` in `src/app.ts` takes a `guide` from `GUIDES`, a whole `percent` from 0 to 100 and a `chapter` from 1 to 999 (the bound the visit counts use: this API knows no guide's chapters, and a guide that gains one mustn't wait on it), and nothing else, or `null` to clear the cookie (nothing is checked). The cookie's name is built from the `GUIDES` entry and its value from the two numbers, never from the body's text. It makes no store command and keeps nothing, so it has no limit of its own: the firewall's rule for every `/api/` call (120 a minute an address) holds a flood, and a flood gets back nothing but cookies. The call carries the guide's cookies like any other to `/api` (a browser keeps a response's cookies only from a call that sends its own), so a synced device's `hundo_sync` comes with it: the route reads none of them, and answers the same with or without them (a test holds it to that).
+
+Why the server and not the guide's script, and what was checked on 20 Nov 2026: a 400-day cookie on a parent domain (hosts under `127.0.0.1.nip.io`), set once by page script and once by a `Set-Cookie` on a `fetch` answer, in each browser fresh with its default settings, the expiry read from the browser's own cookie jar (a throwaway Playwright script):
+
+| Browser | Set by script | Set by the server |
+| --- | --- | --- |
+| Chrome 158 | 400 days | 400 days |
+| Brave 156 | 180 days | 180 days |
+| Firefox 157 (Playwright's build) | 400 days | 400 days |
+| WebKit 27.2 (Playwright's build) | 400 days | 400 days |
+
+- **Safari: not verified.** WebKit capped a cookie set by `document.cookie` at seven days in 2019, and not one set in a response ([ITP 2.1](https://webkit.org/blog/8613/intelligent-tracking-prevention-2-1/)). A 2022 change is reported to have lifted that cap and to delete such cookies instead with the site's other script-written data after seven days of Safari use without a visit ([Simo Ahava](https://www.simoahava.com/privacy/first-party-cookies-webkit-revisited/)). By both accounts a cookie a server sets keeps its 400 days. Playwright's WebKit may run without tracking prevention, so its row says nothing about Safari. What would settle it: the same two cookies made in Safari itself, and their expiry read in Web Inspector (Storage, Cookies), or through `safaridriver` once `safaridriver --enable` has been run.
+- **Brave** says it keeps a cookie set by script seven days and one set by a server 180 ([Forgetful Browsing](https://brave.com/privacy-updates/25-forgetful-browsing/), and a reply from Brave on [its forum](https://community.brave.com/t/cookie-max-age-too-short/466612)). Brave 156 above kept both 180 days.
+- **The address it comes from.** Since Safari 16.4, a cookie set in a response from a server whose address doesn't share the first half of the site's is held to seven days ([WebKit bug 247865](https://bugs.webkit.org/show_bug.cgi?id=247865)). A guide calls its own `/api`, which Vercel answers from the page's own host, so the address is the page's: on 20 Nov 2026 `https://koholint.hundo.quest/` and a POST to its `/api` both answered from 216.150.16.129, with no redirect.
+- **Out of reach:** an installed iPhone or iPad app keeps a cookie jar of its own, copied from Safari's once when it's added to the home screen ([core.md](../../docs/core.md#syncing-devices): WebKit says so, and a probe on 15 Nov 2026 saw it), so a cookie set in it never reaches hundo.quest in Safari.
 
 ### Revisions
 

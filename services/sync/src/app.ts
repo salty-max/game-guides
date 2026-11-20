@@ -519,6 +519,35 @@ async function count(ctx: Ctx) {
   return reply(200, { ok: true, counted: await tally(ctx, guide, fields as [string, number][]) });
 }
 
+/*
+ * A guide's summary for hundo.quest (/api/summary): its overall figure and the reader's chapter, in a cookie for the landing page to read,
+ * `hundo_p_<guide>` = `1.<percent>.<chapter>` (the 1 is the format). The server sets it so that no guide has to set it from script, which
+ * Safari has kept for as little as a week, while one set by a response lasts longer (README.md, "A guide's summary", has what was checked).
+ * Nothing is stored and no cookie is read: the route never calls the store, so it has no rate limit, which would cost the store's commands
+ * itself; a flood of calls gets back nothing but cookies.
+ */
+const SUMMARY_FORMAT = 1;
+/** The cookie's name for a guide. A name never changes once live: a new one would blank every reader's band until they open the guide. */
+export const summaryCookie = (guide: string) => `hundo_p_${guide}`;
+const whole = (value: unknown, min: number, max: number) => Number.isInteger(value) && (value as number) >= min && (value as number) <= max;
+
+/**
+ * Set a guide's summary, or clear it with `summary: null` (nothing checked). The figure is a whole percent from 0 to 100 and the chapter a
+ * number from 1 to 999, the bound the visit counts take: the API knows no guide's chapters, and a guide gaining one mustn't wait on it.
+ */
+async function summary(ctx: Ctx) {
+  const guide = ctx.body.guide;
+  if (typeof guide !== "string" || !GUIDES.includes(guide)) return reply(400, { error: "guide" });
+  const given = ctx.body.summary;
+  const name = summaryCookie(guide);
+  if (given === null) return reply(200, { ok: true }, [cookie(ctx.where, name, "", { maxAge: 0, path: "/" })]);
+  if (given === undefined || typeof given !== "object" || Array.isArray(given)) return reply(400, { error: "summary" });
+  const fields = given as Record<string, unknown>;
+  const { percent, chapter } = fields;
+  if (Object.keys(fields).length !== 2 || !whole(percent, 0, 100) || !whole(chapter, 1, 999)) return reply(400, { error: "summary" });
+  return reply(200, { ok: true }, [cookie(ctx.where, name, `${SUMMARY_FORMAT}.${percent as number}.${chapter as number}`, { maxAge: ttl(ctx.where.ns), path: "/" })]);
+}
+
 const routes: Record<string, (ctx: Ctx) => Promise<Response>> = {
   "/api/pair/start": pairStart,
   "/api/pair/claim": pairClaim,
@@ -528,6 +557,7 @@ const routes: Record<string, (ctx: Ctx) => Promise<Response>> = {
   "/api/remove": remove,
   "/api/forget": forget,
   "/api/count": count,
+  "/api/summary": summary,
 };
 
 /** Answer one request. `deps` is null when the store isn't set up, which is a 503 for every real call. */

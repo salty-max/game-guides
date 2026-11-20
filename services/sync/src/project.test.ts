@@ -34,7 +34,7 @@ describe("the guides", () => {
 
 describe("api/", () => {
   it("holds one thin function a route and nothing else, since each file there becomes a function", () => {
-    expect(files("api").sort()).toEqual(["api/count.ts", "api/forget.ts", "api/pair/claim.ts", "api/pair/start.ts", "api/remove.ts", "api/status.ts", "api/sync.ts", "api/unlink.ts"]);
+    expect(files("api").sort()).toEqual(["api/count.ts", "api/forget.ts", "api/pair/claim.ts", "api/pair/start.ts", "api/remove.ts", "api/status.ts", "api/summary.ts", "api/sync.ts", "api/unlink.ts"]);
     for (const path of files("api")) {
       const up = "../".repeat(path.split("/").length - 1);
       expect(read(path), path).toBe(
@@ -46,7 +46,7 @@ describe("api/", () => {
   it("covers every route the handler answers", () => {
     const source = read("src/app.ts");
     const routes = [...source.matchAll(/^\s*"(\/api\/[a-z/]+)": \w+,$/gm)].map(([, route]) => route);
-    expect(routes.length).toBe(8);
+    expect(routes.length).toBe(9);
     expect(routes.map((route) => `${route.slice(1)}.ts`).sort()).toEqual(files("api").sort());
   });
 });

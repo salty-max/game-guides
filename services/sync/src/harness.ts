@@ -117,6 +117,11 @@ export class Device {
     return this.post("/api/count", { guide: GUIDE, counts, ...extra }, { ...options, headers: { cookie: "", ...options?.headers } });
   }
 
+  /** A guide's summary for hundo.quest, sent the way a guide sends it: with its cookies, so the reply's can be kept. */
+  summary(summary: unknown, extra: Record<string, unknown> = {}, options?: Parameters<Device["post"]>[2]) {
+    return this.post("/api/summary", { guide: GUIDE, summary, ...extra }, options);
+  }
+
   sync(entries: Record<string, unknown> = {}, extra: Record<string, unknown> = {}, options?: Parameters<Device["post"]>[2]) {
     return this.post("/api/sync", { guide: GUIDE, entries, ...extra }, options);
   }
