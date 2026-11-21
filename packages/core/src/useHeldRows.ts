@@ -10,12 +10,16 @@ import type { Row } from "./types";
 export function useHeldRows(fresh: Row[], checks: Record<string, true>) {
   const [held, setHeld] = useState<string[] | null>(null);
   const holding = held !== null && held.some((id) => checks[id] === true);
+  // A hold whose ticks were all undone is spent, so it lets go at once (adjusting state during render, as RouteGroup does). Kept, the next
+  // tick would hold the old list and drop a row that came in since from under the pointer, and a tick from another device or tab on one
+  // of its rows would bring the old list back. The box's tick and its hold land in the same render, so a fresh hold is never let go early.
+  if (held !== null && !holding) setHeld(null);
   const rows = holding ? held.flatMap((id) => byId.get(id) ?? []) : fresh;
   return {
     rows,
     holding,
     /** Call when a checkbox in the list changes (before the new state lands). */
-    hold: () => setHeld((current) => current ?? fresh.map((row) => row.id)),
+    hold: () => setHeld((current) => (holding ? current : fresh.map((row) => row.id))),
     release: () => setHeld(null),
   };
 }
