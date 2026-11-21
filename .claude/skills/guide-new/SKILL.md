@@ -54,7 +54,7 @@ Do [step 4 of the doc](../../../docs/adding-a-guide.md#4-wire-it-into-the-reposi
 - At the root, `bun harness/q.ts check -- bun run check`.
 - `pnpm lighthouse <name>` at the root (it queues itself: run it in the background and read the table at the end of its log), before asking for the push ([doc](../../../docs/adding-a-guide.md#5-check-it)). CI's limits come from the guides that do worst, so a new guide can fail them: fix the guide (banner weight, fonts) and never loosen a threshold, which is the user's call through the opener.
 - The `guide-check` skill on the new guide, with `--reveal`, so every chapter is shown.
-- The landing page with the new guide on it: `preview_start` with `home-preview`, desktop and phone, light and dark. Look at its band: the banner's crop, the name in its display font, and its three largest goals on one or two lines.
+- The landing page with the new guide on it: `preview_start` with `home-preview`, desktop and phone, light and dark. Look at its band: the banner's crop, the game's name in its display font as the title, and the band no taller than the others.
 - Review: run `bun harness/packet.ts hundo`, have the `reviewer` helper read it, fix what it finds, then `bun harness/review.ts hundo "<verdict>"`. Then commit.
 
 ## 7. Vercel, up to launch

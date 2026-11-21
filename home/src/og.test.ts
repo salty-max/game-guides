@@ -3,8 +3,9 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import sharp from "sharp";
 import { APPS, readGuides, type Guide } from "./guides";
-import { OG_HEIGHT, OG_WIDTH, ogImage, ogTags, ringArcs, wallGuides, WORD, WORD_ADVANCE, WORD_HEIGHT } from "./og";
+import { OG_HEIGHT, OG_WIDTH, ogImage, ogTags, ringArcs, WORD, WORD_ADVANCE, WORD_HEIGHT } from "./og";
 import { fillPage, HOME, make, type Made } from "./plugin";
+import { wallGuides, wallTiles } from "./wall";
 
 const index = readFileSync(join(import.meta.dirname, "..", "index.html"), "utf8");
 const range = (n: number) => Array.from({ length: n }, (_, i) => i);
@@ -74,6 +75,12 @@ describe("the link preview", () => {
 describe("the wall's guides", () => {
   it("are every guide up to six, in order", () => {
     for (const n of [1, 4, 6]) expect(wallGuides(range(n))).toEqual(range(n));
+  });
+
+  it("fill six tiles, starting again from the first under six", () => {
+    expect(wallTiles(range(1))).toEqual([0, 0, 0, 0, 0, 0]);
+    expect(wallTiles(range(4))).toEqual([0, 1, 2, 3, 0, 1]);
+    expect(wallTiles(range(30))).toEqual(wallGuides(range(30)));
   });
 
   it("are six spread across A to Z past six, from the first stretch to the last, the same each build", () => {

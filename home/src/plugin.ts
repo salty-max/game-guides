@@ -16,6 +16,13 @@ export const HOME = "https://hundo.quest";
 
 /** The banner's copies: a phone's short band, a desktop's band at 1x, and up to the original for 2x and 3x screens. */
 export const BANNER_WIDTHS = [480, 960, 1800];
+/**
+ * The hero's wall copy. Chrome counts an image drawn larger than its own size as only part of its area for the largest contentful paint,
+ * so a tile this small, stretched, stays smaller than the headline, which is the paint that matters. Measured in Chrome on 21 Nov 2026:
+ * with this copy the headline was the largest paint at every width tried from 320 to 1440px, where it counted 33,300px² at least and a tile
+ * (measured from 360px) 25,600 at most; the 480 copy's tile outranked the headline from 412 to 900px wide, Lighthouse's phone among them.
+ */
+export const WALL_WIDTH = 320;
 const TILE_WIDTHS = [40, 80, 120];
 const HUNDO_FONT_FILE = join(import.meta.dirname, "fonts", "manrope.woff2");
 
@@ -67,6 +74,11 @@ export const make = async (apps = APPS): Promise<Made> => {
           return { url: add(hashed(`${guide.folder}-banner-${w}`, "webp", source), source), width: w };
         }),
       ),
+      wall: await (async () => {
+        const w = Math.min(WALL_WIDTH, width);
+        const source = await sharp(banner).resize({ width: w }).webp({ quality: 78 }).toBuffer();
+        return { url: add(hashed(`${guide.folder}-wall-${w}`, "webp", source), source), width: w };
+      })(),
       tile: TILE_WIDTHS.map((w) => {
         const source = readFileSync(join(root, "public", "icons", `tile-${w}.png`));
         return { url: add(hashed(`${guide.folder}-tile-${w}`, "png", source), source), width: w };
