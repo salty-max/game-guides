@@ -1,12 +1,12 @@
 import { useState, type FormEvent } from "react";
 import { useLocation, useNavigate } from "react-router";
-import { Checkbox, FileField, RadioGroup, Switch } from "./controls";
+import { Checkbox, CheckboxGroup, FileField, RadioGroup, Switch } from "./controls";
 // The settings screen is in the dialog's chunk, so it uses the select itself: the shell's stand-in would flash while the select loaded.
 import { SelectImpl as Select } from "./select-impl";
 import { DialogDescription, DialogFooter, DialogSeparator, DialogStatus, DialogText } from "./dialog";
 import { StorageWarning } from "./StorageWarning";
 import { Button } from "./ui";
-import { brand, chapters, readChapter, text } from "../guide";
+import { brand, chapters, hasBuilds, leanings, readChapter, text } from "../guide";
 import { exportProgress } from "../backup";
 import { validateState } from "../progress-state";
 import { isOpen, useProgress } from "../store/progress";
@@ -16,6 +16,7 @@ import { declined, uncounted, useCounts } from "../counts";
 import { install, useInstall } from "../store/install";
 import { installed } from "../persistence";
 import { normalizeTheme, themeOptions, useTheme } from "../store/theme";
+import { useBuild } from "../store/build";
 import { useUi, type DialogState } from "../store/ui";
 import type { ProgressState } from "../types";
 
@@ -73,14 +74,15 @@ function InstallSection() {
 }
 
 /**
- * Theme, how far the guide reveals, keeping the screen on (where the browser can), counting visits (counts.ts), the progress backup, and
- * installing the guide.
+ * Theme, how far the guide reveals, the reader's build (in a guide with builds), keeping the screen on (where the browser can), counting
+ * visits (counts.ts), the progress backup, and installing the guide.
  */
-export function SettingsScreen() {
+export function SettingsScreen({ dialog }: { dialog: Extract<Screens, { kind: "settings" }> }) {
   const data = useProgress((s) => s.data);
   const preference = useTheme((s) => s.preference);
   const keptAwake = useAwake((s) => s.on);
   const counting = useCounts((s) => s.on);
+  const picked = useBuild((s) => s.picked);
   const closeDialogThen = useUi((s) => s.closeDialogThen);
   const openDialog = useUi((s) => s.openDialog);
   const announce = useUi((s) => s.announce);
@@ -91,6 +93,7 @@ export function SettingsScreen() {
   const [theme, setTheme] = useState(preference);
   const [awake, setAwake] = useState(keptAwake);
   const [count, setCount] = useState(counting);
+  const [build, setBuild] = useState(picked);
   const [notTracked] = useState(declined);
   const [spoilers, setSpoilers] = useState(data.spoilers);
   const [ceiling, setCeiling] = useState(data.ceiling);
@@ -102,6 +105,7 @@ export function SettingsScreen() {
     useTheme.getState().setPreference(theme);
     useAwake.getState().setOn(awake);
     useCounts.getState().setOn(count);
+    if (hasBuilds) useBuild.getState().setPicked(build);
     useProgress.getState().saveSettings({ spoilers, ceiling });
     closeDialogThen(() => announce("Guide settings saved."));
     const next = useProgress.getState().data;
@@ -135,7 +139,7 @@ export function SettingsScreen() {
 
   return (
     <>
-      <DialogText>Choose your theme and how far the guide can reveal.</DialogText>
+      <DialogText>{hasBuilds ? "Choose your theme, how far the guide can reveal, and your build." : "Choose your theme and how far the guide can reveal."}</DialogText>
       <form id="guide-settings" className="grid gap-2.5" onSubmit={submit}>
         <RadioGroup label="Appearance" choices={themeOptions} value={theme} onChange={(next) => setTheme(normalizeTheme(next))} />
         <Checkbox label="Hide later chapters" checked={spoilers} onChange={setSpoilers} />
@@ -146,6 +150,20 @@ export function SettingsScreen() {
           value={ceiling}
           onChange={(next) => setCeiling(readChapter(next))}
         />
+        {hasBuilds && (
+          <>
+            <CheckboxGroup
+              label="Your build"
+              choices={leanings.map(({ id, label }): [string, string] => [id, label])}
+              value={build}
+              onChange={setBuild}
+              autoFocus={dialog.at === "build"}
+            />
+            <DialogText small>
+              Rows that serve what you tick get a badge and a note, and the Progress page lists what’s next for it. It changes no count.
+            </DialogText>
+          </>
+        )}
         {canKeepAwake() && <Switch label="Keep screen on" checked={awake} onChange={setAwake} />}
         <Switch label="Count my visits" checked={count && !notTracked} onChange={setCount} disabled={notTracked} />
         <DialogText small>

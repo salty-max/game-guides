@@ -3,7 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { panels } from "virtual:guide/panels";
 import { App } from "./App";
 import { dashboardSections } from "./dashboard";
-import { chapters, text } from "./guide";
+import { chapters, hasBuilds, text } from "./guide";
 import { defaultState } from "./progress-state";
 import { forgetPlaces } from "./store/place";
 import { useProgress } from "./store/progress";
@@ -35,13 +35,13 @@ const open = async (path: string) => {
 };
 
 describe("the Progress page", () => {
-  it("is one column in the phone's order: the overall figure, the chapters, the backup, the guide's panels, what's left, the board", async () => {
+  it("is one column in the phone's order: the overall figure, the chapters, the build (with builds), the backup, the guide's panels, what's left, the board", async () => {
     await open("/dashboard");
-    const ids = ["chapters", "backup", ...panels.map((panel) => panel.id), "whats-left", "categories"];
+    const ids = ["chapters", ...(hasBuilds ? ["build"] : []), "backup", ...panels.map((panel) => panel.id), "whats-left", "categories"];
     const [hero, ...rest] = parts();
     expect(within(hero).getByRole("progressbar", { name: "Overall completion" })).toBeInTheDocument();
     expect(rest.map((part) => part.id)).toEqual(ids);
-    expect(rest.map(titleOf)).toEqual(["Chapter progress", "Progress backup", ...panels.map((panel) => panel.title), "What’s left", text.boardTitle]);
+    expect(rest.map(titleOf)).toEqual(["Chapter progress", ...(hasBuilds ? ["Next for your build"] : []), "Progress backup", ...panels.map((panel) => panel.title), "What’s left", text.boardTitle]);
     // All of them in the one column the list stands beside, none in a column of its own.
     const column = rest[0].parentElement!;
     for (const part of rest) expect(part.parentElement).toBe(column);

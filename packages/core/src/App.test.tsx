@@ -149,6 +149,7 @@ describe("App", () => {
     for (const row of chapterRows(chapter)) if (row.reference) cited.add(row.reference);
     for (const missable of config.missables) for (const url of missable.sources) cited.add(url);
     for (const choice of config.choices ?? []) for (const url of choice.sources) cited.add(url);
+    for (const entry of config.builds?.entries ?? []) for (const url of entry.sources) cited.add(url);
     for (const group of chapter.groups) for (const map of [group.map, ...group.rows.map((row) => row.map)]) if (map) cited.delete(map[1]);
     const hrefs = [...document.querySelectorAll("a[href]")].map((link) => link.getAttribute("href"));
     expect(hrefs.filter((href) => href && cited.has(href))).toEqual([]);

@@ -115,6 +115,44 @@ export interface Choice {
   sources: string[];
 }
 
+/**
+ * A way a reader levels their character that the guide can point toward ("Faith"). Its `id` is what a reader's pick saves (core's
+ * `store/build.ts`), so it stays once live, as a row id does.
+ */
+export interface Leaning {
+  /** Lowercase letters, digits and hyphens: "str", "fth" (data.test.ts). */
+  id: string;
+  /** The word Your build and a row's badge show: "Dexterity". */
+  label: string;
+}
+
+/**
+ * What a build entry's item is, as a build page lays gear out by slot: "catalyst" holds catalysts, talismans and the pyromancy flame, and
+ * "path" an upgrade path (an ember, a flame's reinforcement, a smith who opens a path). Next for your build groups by it.
+ */
+export type BuildKind = "weapon" | "catalyst" | "spell" | "ring" | "armor" | "path";
+
+/**
+ * One item in a row that a build wants, by a fact its sources state: what it needs, which stats it scales with, what only one seller
+ * has. A lens over the checklist: it points, it never counts. One entry per item, so a row can have several.
+ */
+export interface BuildEntry {
+  /** A row id from the guide data. */
+  row: string;
+  /** The leanings it serves, by id, each once. */
+  serves: string[];
+  kind: BuildKind;
+  /**
+   * Names the item first ("Winged Spear: needs 15 Dexterity…"), then the facts, never "best". Which stats it scales with, never a letter:
+   * the wikis' letter ranges differ, and a letter at +0 doesn't survive upgrades (data.test.ts). It shows beside the row and in Next for
+   * your build, so it names no place, boss or character the row's chapter hasn't reached, and no fate, as a questline's name doesn't. The
+   * item's own facts (what it needs, how far it goes) are what it's for.
+   */
+  note: string;
+  /** One or more https pages that state the note's facts. */
+  sources: string[];
+}
+
 /** A chained side quest: one character's arc, or one task in parts, as existing rows. Progress stays per row. */
 export interface Questline {
   /** Stable once live: it's the line's address, `/questlines/<id>`. Never shown. */
@@ -176,7 +214,7 @@ export interface Brand {
   /** Document and social title. */
   title: string;
   description: string;
-  /** Storage keys are `<prefix>.v1` (progress), `<prefix>.theme`, `<prefix>.sync` (a synced device's ledger), `<prefix>.awake` (Keep screen on), `<prefix>.place` (the last place read), `<prefix>.persist` (when the guide last asked to keep its storage) and `<prefix>.counts` (Count my visits turned off). */
+  /** Storage keys are `<prefix>.v1` (progress), `<prefix>.theme`, `<prefix>.sync` (a synced device's ledger), `<prefix>.awake` (Keep screen on), `<prefix>.place` (the last place read), `<prefix>.persist` (when the guide last asked to keep its storage), `<prefix>.counts` (Count my visits turned off) and `<prefix>.build` (the leanings ticked under Your build). */
   storagePrefix: string;
   backupFile: string;
   /** The word in the header brand, above "HUNDO". */
@@ -282,6 +320,11 @@ export interface GuideConfig {
   choices?: Choice[];
   /** Chained side quests, on the Questlines page. */
   questlines: Questlines;
+  /**
+   * The builds the guide can point toward: the leanings a reader ticks under Your build, and the entries that name what serves each.
+   * A lens over the checklist, never a count. A guide without it shows nothing of builds.
+   */
+  builds?: { leanings: Leaning[]; entries: BuildEntry[] };
   /** Shown while nothing is flagged as missable: why that is safe. Its sources back the claim and aren't shown. */
   reassurance?: { text: string; sources: SourceLink[] };
   /** Chapter id → banner, imported with `?banner` (core's banners.ts). */

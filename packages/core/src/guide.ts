@@ -1,6 +1,6 @@
 import config from "virtual:guide/config";
 import { pct } from "./format";
-import type { Chapter, Checks, Choice, LeftItem, Row } from "./types";
+import type { BuildEntry, BuildKind, Chapter, Checks, Choice, LeftItem, Row } from "./types";
 
 export { config };
 export const { brand, categories: cats, completion, text } = config;
@@ -85,6 +85,52 @@ export function nextUp(checks: Checks, isChapterOpen: (chapter: number) => boole
 /** What "Don't miss" lists for a chapter: its missables and the recommended ways at its one-way choices, unticked, in route order. */
 export const missablesLeft = (chapter: Chapter, checks: Checks) =>
   chapterRows(chapter).filter((row) => (missableIds.has(row.id) || choiceByRow.has(row.id)) && checks[row.id] !== true);
+
+/** The leanings a reader can tick under Your build, in the guide's order. Empty for a guide without builds, which shows nothing of them. */
+export const leanings = config.builds?.leanings ?? [];
+export const hasBuilds = leanings.length > 0;
+const leaningLabel = new Map(leanings.map((leaning) => [leaning.id, leaning.label]));
+/** Each kind of build entry's heading in Next for your build, in the order a build page lays gear out, the upgrade path last. */
+export const buildKinds: readonly [kind: BuildKind, heading: string][] = [
+  ["weapon", "Weapons"],
+  ["catalyst", "Catalysts and talismans"],
+  ["spell", "Spells"],
+  ["ring", "Rings"],
+  ["armor", "Armor"],
+  ["path", "Upgrade path"],
+];
+/** A leaning's word ("Faith"). */
+export const leaningName = (id: string) => leaningLabel.get(id) ?? id;
+const buildsByRow = new Map<string, BuildEntry[]>();
+for (const entry of config.builds?.entries ?? []) buildsByRow.set(entry.row, [...(buildsByRow.get(entry.row) ?? []), entry]);
+/** Whether a row has any build entry at all, whatever the pick: a row without one never reads the pick. */
+export const hasBuildEntry = (rowId: string) => buildsByRow.has(rowId);
+
+/** A row's build entries that serve any of the picked leanings, in the guide's order. None without a pick. */
+export const forBuild = (rowId: string, picked: readonly string[]): BuildEntry[] =>
+  picked.length ? (buildsByRow.get(rowId) ?? []).filter((entry) => entry.serves.some((id) => picked.includes(id))) : [];
+
+/** The picked leanings an entry serves, as words, in the guide's order ("Dexterity · Faith"). */
+export const servedBy = (entry: BuildEntry, picked: readonly string[]) =>
+  leanings.filter((leaning) => entry.serves.includes(leaning.id) && picked.includes(leaning.id)).map((leaning) => leaning.label);
+
+/** Whether anything in the revealed chapters serves the pick, ticked or not: what Next for your build says when its groups are empty. */
+export const buildServed = (isChapterOpen: (chapter: number) => boolean, picked: readonly string[]) =>
+  chapters.some((chapter) => isChapterOpen(chapter.id) && chapterRows(chapter).some((row) => forBuild(row.id, picked).length > 0));
+
+/**
+ * Next for your build: the unticked rows with an entry that serves the pick, in revealed chapters only (the guide's spoiler rules), by
+ * kind in `buildKinds`' order, up to `each` of a kind, the missables first and then in route order. A row with entries of two kinds is
+ * in both. Unlike Next up it doesn't hold `defer` rows back: it isn't the route's pace, it's what the build wants from the chapters open.
+ */
+export function buildGroups(checks: Checks, isChapterOpen: (chapter: number) => boolean, picked: readonly string[], each = 3) {
+  if (!picked.length) return [];
+  const left = chapters.filter((chapter) => isChapterOpen(chapter.id)).flatMap(chapterRows).filter((row) => checks[row.id] !== true);
+  const serving = [...left.filter((row) => missableIds.has(row.id)), ...left.filter((row) => !missableIds.has(row.id))];
+  return buildKinds
+    .map(([kind, heading]) => ({ kind, heading, rows: serving.filter((row) => forBuild(row.id, picked).some((entry) => entry.kind === kind)).slice(0, each) }))
+    .filter((group) => group.rows.length > 0);
+}
 
 /** How much one entry adds toward a category: the configured quantity category by amount, everything else by one. */
 export const worth = (row: Row, tag: string) => (tag === config.quantity ? row.quantity : 1);

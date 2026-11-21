@@ -1,11 +1,28 @@
 // @vitest-environment node
 import { panels } from "virtual:guide/panels";
-import { allRows, brand, byId, cats, chapterRows, chapters, CHAPTER_COUNT, completion, config, guideAnchor, hasMissables, isCategory, missablesLeft, nextUp, readChapter, rowsByTag, tally, whatsLeft } from "./guide";
+import { allRows, brand, byId, cats, chapterRows, chapters, CHAPTER_COUNT, completion, buildGroups, buildKinds, config, forBuild, guideAnchor, hasMissables, isCategory, leanings, missablesLeft, nextUp, readChapter, rowsByTag, tally, whatsLeft } from "./guide";
 import { readerText } from "./reader-text";
 import type { Row } from "./types";
 
 const everything = Object.fromEntries(allRows.map((row) => [row.id, true as const]));
 const hosts = (urls: string[]) => new Set(urls.map((url) => new URL(url).host));
+/**
+ * A scaling letter in any form the pages print one: a lone capital S or A–E soon after the verb "scales" in the same clause ("scales C",
+ * "scales with C Strength", "scaling: B"), before "scal…" ("C scaling", "S-scaling"), before a stat that no lowercase word follows
+ * ("E Strength, C Dexterity", where "A Faith catalyst" is an article), after a stat ("Strength: C", "Dexterity (B)"), or a pair ("C/C").
+ * The verb is lowercase: a note starts with its item's name, so a capital "Scale" or "Scales" is a noun (the Dragon Scale).
+ */
+const STAT = "(?:Strength|Dexterity|Intelligence|Faith|Str|Dex|Int|Fth)";
+const LONE = "(?<![\\w'’])[SA-E](?![\\w'’])";
+const scalingLetter = new RegExp(
+  [
+    `\\bscal(?:es|ed|ing)\\b[^.,;]{0,24}?${LONE}`,
+    `(?<![\\w'’])[SA-E](?:\\s*-\\s*|\\s+)[Ss]cal`,
+    `(?<![\\w'’])[SA-E]\\s+${STAT}\\b(?!\\s+(?![Ss]cal)[a-z])`,
+    `\\b${STAT}(?:\\s*:\\s*[SA-E]|\\s*\\(\\s*[SA-E]\\s*\\)|\\s+${LONE}(?!\\s+[a-z]))`,
+    `(?<![\\w'’])[SA-E]\\s*(?:/|-to-)\\s*${LONE}`,
+  ].join("|"),
+);
 
 describe("guide data", () => {
   it("names the game in the page's title and description, the only places the game's full name is", () => {
@@ -81,6 +98,54 @@ describe("guide data", () => {
     if (!hasMissables && config.reassurance) expect(hosts(config.reassurance.sources.map(([, url]) => url)).size).toBeGreaterThanOrEqual(2);
   });
 
+  it("points each build entry at a real row, for leanings the guide names, with a note and an https source", () => {
+    const ids = leanings.map((leaning) => leaning.id);
+    expect(new Set(ids).size, "leaning ids are unique").toBe(ids.length);
+    for (const { id, label } of leanings) {
+      expect(id).toMatch(/^[a-z0-9]+(-[a-z0-9]+)*$/);
+      expect(label.trim(), id).not.toBe("");
+    }
+    if (config.builds) expect(leanings.length, "a guide with builds names its leanings").toBeGreaterThan(0);
+    // A leaning nothing serves would be a box that does nothing.
+    for (const { id } of leanings) expect((config.builds?.entries ?? []).some((entry) => entry.serves.includes(id)), `nothing serves ${id}`).toBe(true);
+    const seen = new Set<string>();
+    const kinds = buildKinds.map(([kind]) => kind);
+    for (const { row, serves, kind, note, sources } of config.builds?.entries ?? []) {
+      expect(byId.has(row), row).toBe(true);
+      expect(serves.length, row).toBeGreaterThan(0);
+      expect(new Set(serves).size, `${row}: a leaning once`).toBe(serves.length);
+      for (const id of serves) expect(ids, `${row}: ${id}`).toContain(id);
+      expect(note.trim().length, row).toBeGreaterThan(10);
+      expect(kinds, `${row}: ${kind}`).toContain(kind);
+      expect(sources.length, row).toBeGreaterThan(0);
+      for (const url of sources) expect(new URL(url).protocol, `${row}: ${url}`).toBe("https:");
+      expect(seen.has(`${row} ${note}`), `${row}: the same note twice`).toBe(false);
+      seen.add(`${row} ${note}`);
+    }
+  });
+
+  // The wikis' letter ranges differ (C is 52–79 on one, 50–74 on the other) and a +0 letter rises with each upgrade, so a note names the stats.
+  it("says which stats a build entry's item scales with, never a scaling letter", () => {
+    for (const bad of ["scales C with Dexterity", "C scaling", "scales with C Strength", "B Strength scaling", "E Strength and C Dexterity", "scaling: B", "S-scaling in Strength", "C/C", "E-to-B", "Strength: C", "Dexterity (B)", "scales with Strength and E", "scales with Faith (S)", "needs 10 Dexterity, B Dexterity."]) {
+      expect(bad, "should be refused").toMatch(scalingLetter);
+    }
+    for (const good of [
+      "needs 13 Strength and 15 Dexterity, and scales mostly with Dexterity.",
+      "scales with both.",
+      "each Normal level raises its Strength and Dexterity scaling.",
+      "A Chaos weapon scales with humanity, up to 10, not with Strength or Dexterity.",
+      "scales with Faith. A talisman",
+      "Canvas Talisman: A Faith catalyst, needs 4 Faith.",
+      "Dragon Scale: A Dragon weapon deals fixed damage.",
+      "Dragon Scales: A Dragon weapon deals fixed damage.",
+      "needs 40 Strength (A two-handed grip lowers that).",
+      "A Strength and Dexterity weapon.",
+    ]) {
+      expect(good, "should pass").not.toMatch(scalingLetter);
+    }
+    for (const { row, note } of config.builds?.entries ?? []) expect(note, row).not.toMatch(scalingLetter);
+  });
+
   it("keeps each one-way choice to real rows, its later ways in later chapters, backed by two independent https sources", () => {
     const missable = new Set(config.missables.map((item) => item.id));
     const ids = (config.choices ?? []).flatMap((choice) => [choice.row, ...choice.later.map((later) => later.row)]);
@@ -137,7 +202,7 @@ describe("guide data", () => {
     else expect(said.map(([path, text]) => `${path}: ${text}`)).toEqual([]);
   });
 
-  it("reads every row, chapter, group, map, category, chip, missable, choice, questline, page text and panel title as reader text, and never a citation, a link or an id", () => {
+  it("reads every row, chapter, group, map, category, chip, missable, choice, questline, build, page text and panel title as reader text, and never a citation, a link or an id", () => {
     const found = readerText(config, panels);
     const text = new Set(found.map(([, value]) => value));
     for (const row of allRows) for (const value of [row.title, row.text]) expect(text.has(value), row.id).toBe(true);
@@ -161,6 +226,8 @@ describe("guide data", () => {
       config.questlines.intro,
       ...config.questlines.lines.map((line) => line.name),
       ...panels.map((panel) => panel.title),
+      ...leanings.map((leaning) => leaning.label),
+      ...(config.builds?.entries ?? []).map((entry) => entry.note),
     ];
     for (const value of shown) {
       if (value !== undefined) expect(text.has(value), value).toBe(true);
@@ -219,6 +286,32 @@ describe("nextUp", () => {
     if (!deferred.length) return;
     const rest = Object.fromEntries(allRows.filter((row) => !config.defer?.(row)).map((row) => [row.id, true as const]));
     expect(nextUp(rest, all, 1, 3).every((row) => config.defer?.(row))).toBe(true);
+  });
+});
+
+describe("buildGroups", () => {
+  const all = leanings.map((leaning) => leaning.id);
+
+  it("is empty without a pick, and once everything is ticked", () => {
+    expect(buildGroups({}, () => true, [])).toEqual([]);
+    expect(buildGroups(everything, () => true, all)).toEqual([]);
+  });
+
+  it("never reaches into hidden chapters, and gives each kind its first few serving the pick, missables first", () => {
+    for (const ceiling of [1, 2, CHAPTER_COUNT]) {
+      const groups = buildGroups({}, (n) => n <= ceiling, all, 3);
+      expect(groups.map((group) => group.kind)).toEqual(buildKinds.map(([kind]) => kind).filter((kind) => groups.some((group) => group.kind === kind)));
+      for (const { kind, rows } of groups) {
+        expect(rows.length, kind).toBeGreaterThan(0);
+        expect(rows.length, kind).toBeLessThanOrEqual(3);
+        for (const row of rows) {
+          expect(row.chapter, row.id).toBeLessThanOrEqual(ceiling);
+          expect(forBuild(row.id, all).some((entry) => entry.kind === kind), `${row.id} in ${kind}`).toBe(true);
+        }
+        const missable = rows.map((row) => row.tags.includes("missable"));
+        expect(missable, kind).toEqual([...missable].sort((a, b) => Number(b) - Number(a)));
+      }
+    }
   });
 });
 

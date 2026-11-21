@@ -1,11 +1,12 @@
 import { useLayoutEffect, useRef } from "react";
 import { Link, useLocation, useParams } from "react-router";
+import { BuildPanel } from "../components/BuildPanel";
 import { Contents } from "../components/Contents";
 import { Stat } from "../components/Stats";
 import { WhatsLeft } from "../components/WhatsLeft";
 import { Overall } from "../components/Overall";
 import { Button, HeadedPage, Panel, PanelActions, PanelHead, PanelText, PanelTitle, ProgressBar } from "../components/ui";
-import { CHAPTER_COUNT, chapterRows, chapters, completion, text } from "../guide";
+import { CHAPTER_COUNT, chapterRows, chapters, completion, hasBuilds, text } from "../guide";
 import { dashboardSections, isDashboardSection } from "../dashboard";
 import { two } from "../format";
 import { exportProgress } from "../backup";
@@ -71,6 +72,7 @@ export function DashboardPage() {
             </div>
             {data.spoilers && data.ceiling < CHAPTER_COUNT && <PanelText>{CHAPTER_COUNT - data.ceiling} chapters hidden by spoiler protection.</PanelText>}
           </Panel>
+          {hasBuilds && <BuildPanel />}
           <Panel id="backup" aria-labelledby="backup-title">
             <PanelHead>
               <PanelTitle id="backup-title">Progress backup</PanelTitle>
