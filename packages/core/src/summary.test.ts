@@ -4,6 +4,7 @@ import type { MockInstance } from "vitest";
 import { brand, chapterRows, chapters, overall } from "./guide";
 import { defaultState } from "./progress-state";
 import { useProgress } from "./store/progress";
+import { setSyncStatus } from "./store/sync";
 import { SUMMARY_COOKIE, SUMMARY_WAIT, readSummary, startSummary, summaryOf, summaryText } from "./summary";
 
 const [one, two] = chapters;
@@ -43,6 +44,8 @@ afterEach(() => {
   vi.useRealTimers();
   Object.defineProperty(document, "visibilityState", { value: "visible", configurable: true });
   clearCookie();
+  document.cookie = "hundo_link=; Path=/; Max-Age=0";
+  setSyncStatus({ phase: "off", devices: 0, lastSync: null });
 });
 
 describe("what the cookie holds", () => {
@@ -174,6 +177,91 @@ describe("keeping it in step", () => {
     await vi.advanceTimersByTimeAsync(SUMMARY_WAIT);
     expect(calls()).toHaveLength(2);
     expect(readSummary()).toBe("");
+  });
+});
+
+describe("on a linked device", () => {
+  // The API keeps a linked device's summary for its group too, for hundo.quest in the group's other browsers.
+  const linkHere = () => (document.cookie = "hundo_link=abcdefghij; Path=/");
+  const firstSync = () => setSyncStatus({ phase: "synced", devices: 2, lastSync: Date.now() });
+
+  it("says nothing before the first sync, whatever changes, since its progress may be behind the group's", async () => {
+    linkHere();
+    setCookie("1.57.6");
+    stop = startSummary();
+    await vi.advanceTimersByTimeAsync(SUMMARY_WAIT);
+    useProgress.getState().setCheck(ids[0], true);
+    await vi.advanceTimersByTimeAsync(SUMMARY_WAIT);
+    hide();
+    await vi.advanceTimersByTimeAsync(SUMMARY_WAIT);
+    expect(fetchSpy).not.toHaveBeenCalled();
+  });
+
+  it("tells the group once after the first sync, with the cookie already in step, then only what changes", async () => {
+    linkHere();
+    useProgress.getState().setCheck(ids[0], true);
+    setCookie(summaryText(summaryOf(useProgress.getState().data)));
+    stop = startSummary();
+    firstSync();
+    await vi.advanceTimersByTimeAsync(SUMMARY_WAIT);
+    expect(calls().map((call) => call.body.summary)).toEqual([summaryOf(useProgress.getState().data)]);
+    // a later round, the cookie still in step: nothing more
+    firstSync();
+    await vi.advanceTimersByTimeAsync(SUMMARY_WAIT);
+    expect(calls()).toHaveLength(1);
+    useProgress.getState().visitChapter(two.id);
+    await vi.advanceTimersByTimeAsync(SUMMARY_WAIT);
+    expect(calls()).toHaveLength(2);
+  });
+
+  it("says nothing checked to the group too, once it has caught up", async () => {
+    linkHere();
+    stop = startSummary();
+    firstSync();
+    await vi.advanceTimersByTimeAsync(SUMMARY_WAIT);
+    expect(calls().map((call) => call.body.summary)).toEqual([null]);
+  });
+
+  it("makes one call for the first sync and the changes it pulled", async () => {
+    linkHere();
+    stop = startSummary();
+    useProgress.getState().applySynced({ ...useProgress.getState().data, checks: { [ids[0]]: true } });
+    firstSync();
+    await vi.advanceTimersByTimeAsync(SUMMARY_WAIT);
+    expect(calls()).toHaveLength(1);
+    expect(calls()[0].body.summary).toEqual(summaryOf(useProgress.getState().data));
+  });
+
+  it("waits again for the first sync of a group it links to after unlinking, in the same visit", async () => {
+    linkHere();
+    stop = startSummary();
+    useProgress.getState().setCheck(ids[0], true);
+    firstSync();
+    await vi.advanceTimersByTimeAsync(SUMMARY_WAIT);
+    expect(calls()).toHaveLength(1);
+    // unlinked (the status keeps its last round's time), then linked to another group
+    setSyncStatus({ phase: "off", devices: 0 });
+    linkHere();
+    setSyncStatus({ phase: "joining" });
+    useProgress.getState().setCheck(ids[1], true);
+    await vi.advanceTimersByTimeAsync(SUMMARY_WAIT);
+    expect(calls()).toHaveLength(1);
+    firstSync();
+    await vi.advanceTimersByTimeAsync(SUMMARY_WAIT);
+    expect(calls()).toHaveLength(2);
+    expect(calls()[1].body.summary).toEqual(summaryOf(useProgress.getState().data));
+  });
+
+  it("goes back to the cookie alone once it is unlinked", async () => {
+    linkHere();
+    stop = startSummary();
+    document.cookie = "hundo_link=; Path=/; Max-Age=0";
+    firstSync();
+    await vi.advanceTimersByTimeAsync(SUMMARY_WAIT);
+    expect(fetchSpy).not.toHaveBeenCalled();
+    useProgress.getState().setCheck(ids[0], true);
+    await vi.advanceTimersByTimeAsync(SUMMARY_WAIT);
+    expect(calls()).toHaveLength(1);
   });
 });
 

@@ -151,7 +151,8 @@ export class MemoryStore implements Store {
       case "SET": {
         const [key, value, ...flags] = args;
         const nx = flags.some((flag) => flag.toUpperCase() === "NX");
-        if (nx && this.live(key)) return null;
+        const xx = flags.some((flag) => flag.toUpperCase() === "XX");
+        if ((nx && this.live(key)) || (xx && !this.live(key))) return null;
         const ex = flags.findIndex((flag) => flag.toUpperCase() === "EX");
         this.data.set(key, { kind: "string", value, expires: ex >= 0 ? this.now() + Number(flags[ex + 1]) * 1000 : undefined });
         return "OK";

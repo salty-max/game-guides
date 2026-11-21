@@ -1372,6 +1372,19 @@ describe("a guide's summary for hundo.quest", () => {
     expect(world.store.ttl(`hs:prod:sm:${group}:${GUIDE}`)).toBe(KEEP);
   });
 
+  it("keeps nothing checked only over a summary the group holds: a device that never had any can't pass for a reset", async () => {
+    const world = new World();
+    const { a } = await link(world);
+    const [group] = groups(world);
+    const reply = await a.summary(null);
+    expect(line(reply.cookies, "hundo_p_links-awakening")).toContain("Max-Age=0");
+    expect(world.store.keys().filter((name) => name.includes(":sm:"))).toEqual([]);
+    expect((await a.summaries()).body).toEqual({ summaries: {} });
+    await a.summary({ percent: 2, chapter: 1 });
+    await a.summary(null);
+    expect(await world.store.exec([["GET", `hs:prod:sm:${group}:${GUIDE}`]])).toEqual(["none"]);
+  });
+
   it("still sets the cookie when the store is down", async () => {
     const world = new World();
     const { a } = await link(world);

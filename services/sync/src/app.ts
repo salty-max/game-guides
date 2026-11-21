@@ -546,13 +546,16 @@ const NOTHING_CHECKED = "none";
 
 /**
  * Keep a linked device's summary for its group: its text, or NOTHING_CHECKED, so hundo.quest can tell a guide reset on another device
- * from one never reported. A device without a group, or no device, keeps nothing. Never fails the call: the cookie is the answer, and
+ * from one never reported. NOTHING_CHECKED only replaces a summary the group holds: a guide joins a group's progress only when a device
+ * opens it after linking, so a device with nothing checked may only mean the others haven't brought theirs yet, and must not read as a
+ * reset of what they hold. A device without a group, or no device, keeps nothing. Never fails the call: the cookie is the answer, and
  * a store that is down mustn't take it away.
  */
 async function keepSummary(ctx: Ctx, guide: string, text: string) {
   try {
     const me = await identify(ctx);
-    if (me?.group) await exec(ctx, [["SET", smKey(ctx, me.group, guide), text, "EX", ttl(ctx.where.ns)]]);
+    const only = text === NOTHING_CHECKED ? ["XX"] : [];
+    if (me?.group) await exec(ctx, [["SET", smKey(ctx, me.group, guide), text, ...only, "EX", ttl(ctx.where.ns)]]);
   } catch (error) {
     if (!(error instanceof StoreError)) throw error;
   }
