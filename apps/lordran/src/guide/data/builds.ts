@@ -741,6 +741,13 @@ export const builds: BuildEntry[] = [
     sources: ["https://darksouls.wikidot.com/demon-s-catalyst"],
   },
   {
+    row: "forge-red-slab",
+    serves: ["hum"],
+    kind: "path",
+    note: "Red Titanite Slab: takes a Chaos weapon, which scales with Humanity, to +5, or a Fire one to +10.",
+    sources: ["https://darksouls.wikidot.com/red-titanite-slab", "https://darksouls.wikidot.com/chaos"],
+  },
+  {
     row: "pyromancy-fire-tempest",
     serves: ["pyro"],
     kind: "spell",
@@ -1476,6 +1483,13 @@ export const builds: BuildEntry[] = [
     kind: "path",
     note: "Crystal path: raises a weapon’s Strength and Dexterity scaling above the normal path’s, but it can’t be repaired.",
     sources: ["https://darksouls.wikidot.com/crystal", "https://darksouls.wiki.fextralife.com/Upgrades"],
+  },
+  {
+    row: "forge-snuggly-red-slab",
+    serves: ["hum"],
+    kind: "path",
+    note: "Red Titanite Slab: takes a Chaos weapon, which scales with Humanity, to +5, or a Fire one to +10.",
+    sources: ["https://darksouls.wikidot.com/red-titanite-slab", "https://darksouls.wikidot.com/chaos"],
   },
   {
     row: "dlc-gear-guardian-tail",
