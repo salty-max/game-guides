@@ -20,6 +20,7 @@
     },
     { "src": "/(index\\.html)?", "headers": { "Cache-Control": "public, max-age=0, must-revalidate" }, "continue": true },
     { "handle": "filesystem" },
+    { "src": "/api(?:/(.*))?", "dest": "https://api.hundo.quest/api/$1", "check": true },
     { "handle": "hit" },
     { "src": "/assets/(.*)", "headers": { "Cache-Control": "public, max-age=31536000, immutable" }, "continue": true },
     { "handle": "error" },

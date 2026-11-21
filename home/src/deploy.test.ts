@@ -36,6 +36,13 @@ describe("home's vercel.json", () => {
     expect(csp).toMatch(/frame-ancestors 'none'/);
   });
 
+  it("sends /api to the sync API as the guides do, ahead of the 404, so a linked browser can read its group's progress", () => {
+    const guide: Route[] = JSON.parse(readFileSync(join(home, "..", "apps", "koholint", "vercel.json"), "utf8")).routes;
+    const api = guide.find((route) => route.src?.startsWith("/api"));
+    expect(api).toEqual({ src: "/api(?:/(.*))?", dest: "https://api.hundo.quest/api/$1", check: true });
+    expect(phase("filesystem")).toEqual([api]);
+  });
+
   it("caches a year only a hashed file that exists, and answers anything else with the 404 page", () => {
     for (const route of [...phase("start"), ...phase("filesystem")]) expect(route.headers?.["Cache-Control"] ?? "", route.src).not.toMatch(/immutable/);
     expect(phase("hit")).toEqual([{ src: "/assets/(.*)", headers: { "Cache-Control": "public, max-age=31536000, immutable" }, continue: true }]);

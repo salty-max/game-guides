@@ -38,23 +38,44 @@ Chapter 6" beside a Continue button, with a bar in the guide's colour along its 
 on top of them, so no band changes height. Each band carries its guide's `brand.id` as `data-id` for it. Only the chapter's number shows,
 never its title.
 
+A browser linked by sync (a well-formed `hundo_link` cookie) also asks its group: one `POST /api/summaries` through the page's own `/api`,
+which `vercel.json` sends to the sync API as the guides do, and which is the one route the API takes from `https://hundo.quest`
+([its README](../services/sync/README.md#a-guides-summary)). The answer is the latest summary any device of the group sent for each guide,
+an installed iPhone app's included, whose cookies never reach this browser, or `null` for a guide reset there. The cookies are drawn
+first, at once. For each guide the answer names, the band then shows the higher figure of the group's and this browser's cookie, the
+group's on a tie (`combine`), and `null` puts the band back as a first visit sees it (each band's first look is kept for that); a guide
+it doesn't name keeps its cookie, and a band whose figure doesn't change isn't drawn again. Not "the newest wins", since the cookie
+carries no time; and not the group's alone, since a guide's progress joins the group only when a device opens it after linking, so this
+browser's own cookie can be ahead of the group's copy until it opens that guide. A reset on another device, `null`, wins over any cookie, so a reset
+shows as one; the API keeps it only in place of a summary the group held, so a device that never had progress in a guide can't blank it
+here. Until this browser opens the guide, two cases show the wrong figure: after an untick elsewhere, too high (this browser's older
+cookie); and after a reset elsewhere of a guide this browser had progress in but hadn't opened since linking, not started (its progress
+joins the group, and mostly comes back, when it opens the guide). Both are rarer than progress made before linking, which the higher
+figure gets right. A third lasts until a linked device next opens the guide: a summary whose cookie landed while the group's write
+failed (the store down) leaves the group's other browsers on the group's older figure. A browser that isn't linked makes no request, and any failure (offline,
+a 401, the store down) leaves the cookies' bands as they are.
+
 A new guide shows up by itself. Its build stops, naming what's missing, if the guide has no `src/guide/banners/chapter-1.webp`, no
 `public/icons/tile-{40,80,120}.png`, or no licence beside its display font (`<Family-Name>-OFL.txt`).
 
 ## Scripts
 
 From this folder: `pnpm dev`, `pnpm build`, `pnpm preview`, `pnpm test`. In the browser pane: `home` (dev) and `home-preview`. The dev
-server reads the guides once, when it starts: restart it after changing a guide. At the root, `pnpm lighthouse home` audits the
+server reads the guides once, when it starts: restart it after changing a guide. Its dev and preview servers send `/api` to the local sync
+API (`sync-api`, port 8787, or `SYNC_API`), as a guide's do: start it first to try a linked browser ([docs/testing.md](../docs/testing.md#sync-in-a-browser)). At the root, `pnpm lighthouse home` audits the
 production build as CI's `lighthouse-home` job does.
 
 ## Tests
 
 - `page.test.ts`: the page as the build makes it. Every guide with a `vercel.json` in `apps/` is on it, linking to its `brand.home`. Its
-  pictures and fonts are among the files the build writes. Find narrows the guides. A guide's cookie fills in its band and no other.
+  pictures and fonts are among the files the build writes. Find narrows the guides. A guide's cookie fills in its band and no other, and
+  a linked browser's group draws over them.
 - `guides.test.ts`: what's read from each guide, and how the largest goals are picked.
 - `find.test.ts`: how Find matches.
 - `og.test.ts`: the link preview. Its tags name a picture the build writes, on `https://hundo.quest`, at the size they declare; which
   guides the wall shows; the logo's ring and word; the picture at one guide and at thirty.
-- `progress.test.ts`: how a guide's cookie is read, and what a started band shows.
-- `deploy.test.ts`: `vercel.json` (the guides' headers, the cache only on a hit, the 404), the ignore step, the canonical, sitemap and
+- `progress.test.ts`: how a guide's cookie is read, and what a started band shows; a linked browser asks its group and an unlinked one
+  asks nothing, the higher figure shows (a reset puts the band back, an unknown guide keeps its cookie, a band that doesn't change keeps
+  focus), and only a good answer is read.
+- `deploy.test.ts`: `vercel.json` (the guides' headers, the guides' `/api` route ahead of the 404, the cache only on a hit, the 404), the ignore step, the canonical, sitemap and
   robots, no inline script, no browser storage, and the guides' cookies read but never written.

@@ -3,7 +3,7 @@
 import { existsSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { wireFind } from "./find";
-import { wireProgress } from "./progress";
+import { wireGroup, wireProgress } from "./progress";
 import { APPS, readGuides, type Guide } from "./guides";
 import { make, type Made } from "./plugin";
 
@@ -96,6 +96,25 @@ describe("the landing page", () => {
     expect(first.querySelector<HTMLElement>(".mine-bar i")!.style.width).toBe("57%");
     expect(second.querySelector(".mine-bar")).toBeNull();
     expect(second.querySelector(".btn")!.textContent).toMatch(/^Open /);
+  });
+
+  it("draws a linked browser's group over the cookies: another device's progress, and a guide reset there put back", async () => {
+    document.body.innerHTML = made.home;
+    const first = document.body.innerHTML;
+    const [one, two] = bands();
+    const cookie = `hundo_link=abc; hundo_p_${one.dataset.id}=1.57.6`;
+    wireProgress(document, cookie);
+    const read = async () =>
+      new Map([
+        [one.dataset.id!, null],
+        [two.dataset.id!, { percent: 12, chapter: 3 }],
+      ]);
+    expect(await wireGroup(document, cookie, read)).toBe(2);
+    const [reset, other] = bands();
+    expect(reset.outerHTML).toBe(new DOMParser().parseFromString(first, "text/html").querySelector<HTMLElement>("[data-guide]")!.outerHTML);
+    expect(other.querySelector(".meta")!.textContent).toBe("12% complete · Chapter 3");
+    expect(other.querySelector(".btn")!.textContent).toBe("Continue");
+    document.body.innerHTML = made.home;
   });
 
   it("has a page for an unknown address that leads back", () => {
