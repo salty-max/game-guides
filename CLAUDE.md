@@ -58,7 +58,7 @@ Each one is a mistake already made, or one that would cost readers their progres
 
 ## Sessions and worktrees
 
-hundo sets `[hooks] lock = false`, `[session] worktrees = true` and `[session] decisions = "opener"` in `harness.toml`. Each child session works in its own git worktree on its own branch, cut from `main`, and asks the user nothing (a plan child's approval of its plan aside): its questions and every go go to its opener. Nothing commits to `main` here and the work meets in pull requests, so no session waits for another's. The board is the list of who does what, not a lock. A card can still be `blocked --on` another, as a choice (the last item).
+hundo sets `[hooks] lock = false`, `[session] worktrees = true` and `[session] decisions = "opener"` in `harness.toml`. Each child session works in its own git worktree on its own branch, cut from `main`, and asks the user nothing: its questions and every go go to its opener. A task that wants its plan approved first doesn't start in plan mode (`session.ts` refuses `--plan` here, since leaving plan mode asks in the child's own session): it is a `--kind prose` (Opus) child that writes its plan, sets its card waiting-review, sends the plan to its opener and stops. The opener asks the user and, for a code task, moves that child to Sonnet before it relays the answer quoted (a CLI child can't be moved: the build is then a new `--kind code` child on the approved plan). Nothing commits to `main` here and the work meets in pull requests, so no session waits for another's. The board is the list of who does what, not a lock. A card can still be `blocked --on` another, as a choice (the last item).
 
 - **`pnpm install` first in a new worktree.** It has no `node_modules`.
 - **Open a child from the desktop app.** The harness's CLI path adds `--worktree` to `claude --bg` (`claude --help` lists `-w, --worktree [name]`), but nobody has run the two together here, so a CLI-opened child may start in the main checkout: look at its folder first.
@@ -129,6 +129,10 @@ How sessions work together (behaviour: no hook checks these):
   from a written brief, a stronger model at higher effort for judgment (prose, voice,
   security, design, a plan the user must approve). Set it when the child starts (a plan
   child once its plan is approved) and say the choice in one line.
+- **Never kill or signal a process another session may share.** A dev server, an e2e
+  server or a watcher may be another session's: stop only what this session started,
+  by the pid it was given, never `pkill -f` or `killall` by name, nor `lsof … | xargs
+  kill` by port. The helpers' Bash is gated on it, a session's is not: this is on you.
 - **A problem found along the way gets fixed now**, under its own card, or handed to a
   new session at once. Never only mentioned in the report.
 - **Review your own work before saying it is done**: read the diff, grep for leftovers,
