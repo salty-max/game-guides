@@ -43,6 +43,12 @@ describe.each(stands)("store contract: $name", ({ make }) => {
     expect(await store.exec([["SET", k, "second", "NX", "EX", 600], ["GET", k]])).toEqual([null, "first"]);
   });
 
+  it("MGET gives each key's value in order, and null for one that isn't there or isn't a string", async () => {
+    const [a, b, h] = [key("many:a"), key("many:b"), key("many:h")];
+    await store.exec([["SET", a, "1.57.6", "EX", 600], ["SET", b, "none"], ["HSET", h, "f", "v"]]);
+    expect(await store.exec([["MGET", a, key("many:missing"), b, h]])).toEqual([["1.57.6", null, "none", null]]);
+  });
+
   it("GETDEL gives a value once", async () => {
     const k = key("once");
     await store.exec([["SET", k, "v"]]);

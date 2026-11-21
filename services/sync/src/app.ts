@@ -57,6 +57,8 @@ interface Where {
   /** Set on hundo.quest guides so one link covers every guide; previews and localhost keep host-only cookies. */
   domain?: string;
   secure: boolean;
+  /** The landing page, https://hundo.quest itself, which may only read the group's summaries (HOME_ROUTES). */
+  home?: boolean;
 }
 
 interface Me {
@@ -87,8 +89,8 @@ const key = (ns: Ns, ...parts: string[]) => ["hs", ns, ...parts].join(":");
 const PREVIEW_HOST = /^hundo-[a-z0-9-]+-jellycat\.vercel\.app$/;
 
 /**
- * Which page is calling, and so which part of the store it may touch, from the `Origin` alone: only a guide's own hosts, the team's
- * previews and localhost are served. The page's host can't be checked against Origin: behind a guide's /api rewrite Vercel hands this
+ * Which page is calling, and so which part of the store it may touch, from the `Origin` alone: only a guide's own hosts, the landing page
+ * (for what it reads, HOME_ROUTES), the team's previews and localhost are served. The page's host can't be checked against Origin: behind a guide's /api rewrite Vercel hands this
  * API its own host in Host, and no x-forwarded-host that names the guide's (seen on the first preview, against what Vercel's docs say).
  * Origin is set by the browser and no page script can change it. A script on another site is refused for its Origin, and couldn't
  * read an answer anyway: this API never sends Access-Control-Allow-Origin, nor answers a preflight. A form or text/plain post, which
@@ -105,6 +107,7 @@ function whereFrom(request: Request): Where | null {
   }
   const secure = url.protocol === "https:" && url.port === "";
   if (secure && /^(?!api\.)[a-z0-9-]+\.hundo\.quest$/.test(url.hostname)) return { ns: "prod", domain: "hundo.quest", secure: true };
+  if (secure && url.hostname === "hundo.quest") return { ns: "prod", domain: "hundo.quest", secure: true, home: true };
   if (secure && PREVIEW_HOST.test(url.hostname)) return { ns: "test", secure: true };
   if (["localhost", "127.0.0.1", "[::1]"].includes(url.hostname)) return { ns: "test", secure: url.protocol === "https:" };
   return null;
@@ -161,6 +164,10 @@ const gdKey = (ctx: Ctx, group: string) => key(ctx.where.ns, "gd", group);
 const pKey = (ctx: Ctx, group: string, guide: string) => key(ctx.where.ns, "p", group, guide);
 /** A guide's revision in a group: a counter that goes up whenever its data is written, so a poll can ask "has anything changed" in one read. */
 const rvKey = (ctx: Ctx, group: string, guide: string) => key(ctx.where.ns, "rv", group, guide);
+/** A guide's summary in a group, as its last call to /api/summary from a device of the group gave it, for hundo.quest to read (/api/summaries). */
+const smKey = (ctx: Ctx, group: string, guide: string) => key(ctx.where.ns, "sm", group, guide);
+/** Everything a group keeps about its guides, which goes with the group. */
+const guideKeys = (ctx: Ctx, group: string) => GUIDES.flatMap((guide) => [pKey(ctx, group, guide), rvKey(ctx, group, guide), smKey(ctx, group, guide)]);
 
 /** The device behind this request's cookie, or null when there is none or it was unlinked. */
 async function identify(ctx: Ctx): Promise<Me | null> {
@@ -259,7 +266,7 @@ async function hasRoom(ctx: Ctx, group: string): Promise<boolean> {
 
 async function dropIfEmpty(ctx: Ctx, group: string) {
   const [count] = await exec(ctx, [["HLEN", gdKey(ctx, group)]]);
-  if (count === 0) await exec(ctx, [["DEL", gdKey(ctx, group), ...GUIDES.flatMap((guide) => [pKey(ctx, group, guide), rvKey(ctx, group, guide)])]]);
+  if (count === 0) await exec(ctx, [["DEL", gdKey(ctx, group), ...guideKeys(ctx, group)]]);
 }
 
 async function pairStart(ctx: Ctx) {
@@ -474,7 +481,7 @@ async function forget(ctx: Ctx) {
   if (!me?.group) return unlinked(ctx);
   const [flat] = await exec(ctx, [["HGETALL", gdKey(ctx, me.group)]]);
   const ids = new Set([me.id, ...toPairs(flat).map(([id]) => id)]);
-  await exec(ctx, [["DEL", ...[...ids].map((id) => dvKey(ctx, id)), gdKey(ctx, me.group), ...GUIDES.flatMap((guide) => [pKey(ctx, me.group, guide), rvKey(ctx, me.group, guide)])]]);
+  await exec(ctx, [["DEL", ...[...ids].map((id) => dvKey(ctx, id)), gdKey(ctx, me.group), ...guideKeys(ctx, me.group)]]);
   return reply(200, { ok: true }, clearCookies(ctx));
 }
 
@@ -523,13 +530,33 @@ async function count(ctx: Ctx) {
  * A guide's summary for hundo.quest (/api/summary): its overall figure and the reader's chapter, in a cookie for the landing page to read,
  * `hundo_p_<guide>` = `1.<percent>.<chapter>` (the 1 is the format). The server sets it so that no guide has to set it from script, which
  * Safari has kept for as little as a week, while one set by a response lasts longer (README.md, "A guide's summary", has what was checked).
- * Nothing is stored and no cookie is read: the route never calls the store, so it has no rate limit, which would cost the store's commands
- * itself; a flood of calls gets back nothing but cookies.
+ * For a reader who isn't linked nothing is stored: the call makes no store command, so it has no rate limit, which would cost the store's
+ * commands itself, and a flood of such calls gets back nothing but cookies. A linked device's call also keeps the summary under its group
+ * (`sm:<group>:<guide>`), for hundo.quest in any of the group's browsers (/api/summaries): an installed iPhone app keeps a cookie jar of its
+ * own, so its cookie never reaches Safari's, but its summary reaches the group.
  */
 const SUMMARY_FORMAT = 1;
 /** The cookie's name for a guide. A name never changes once live (each guide's guide.test.ts pins its own): a new one would blank every reader's band until they open the guide. */
 export const summaryCookie = (guide: string) => `hundo_p_${guide}`;
 const whole = (value: unknown, min: number, max: number) => Number.isInteger(value) && (value as number) >= min && (value as number) <= max;
+/** A summary as the cookie and the store hold it, read back: the format, a figure from 0 to 100 and a chapter from 1 to 999, nothing else. */
+const SUMMARY_TEXT = /^1\.(0|[1-9]\d?|100)\.([1-9]\d{0,2})$/;
+/** What the store keeps for a guide with nothing checked any more. */
+const NOTHING_CHECKED = "none";
+
+/**
+ * Keep a linked device's summary for its group: its text, or NOTHING_CHECKED, so hundo.quest can tell a guide reset on another device
+ * from one never reported. A device without a group, or no device, keeps nothing. Never fails the call: the cookie is the answer, and
+ * a store that is down mustn't take it away.
+ */
+async function keepSummary(ctx: Ctx, guide: string, text: string) {
+  try {
+    const me = await identify(ctx);
+    if (me?.group) await exec(ctx, [["SET", smKey(ctx, me.group, guide), text, "EX", ttl(ctx.where.ns)]]);
+  } catch (error) {
+    if (!(error instanceof StoreError)) throw error;
+  }
+}
 
 /**
  * Set a guide's summary, or clear it with `summary: null` (nothing checked). The figure is a whole percent from 0 to 100 and the chapter a
@@ -540,13 +567,41 @@ async function summary(ctx: Ctx) {
   if (typeof guide !== "string" || !GUIDES.includes(guide)) return reply(400, { error: "guide" });
   const given = ctx.body.summary;
   const name = summaryCookie(guide);
-  if (given === null) return reply(200, { ok: true }, [cookie(ctx.where, name, "", { maxAge: 0, path: "/" })]);
+  if (given === null) {
+    await keepSummary(ctx, guide, NOTHING_CHECKED);
+    return reply(200, { ok: true }, [cookie(ctx.where, name, "", { maxAge: 0, path: "/" })]);
+  }
   if (given === undefined || typeof given !== "object" || Array.isArray(given)) return reply(400, { error: "summary" });
   const fields = given as Record<string, unknown>;
   const { percent, chapter } = fields;
   if (Object.keys(fields).length !== 2 || !whole(percent, 0, 100) || !whole(chapter, 1, 999)) return reply(400, { error: "summary" });
-  return reply(200, { ok: true }, [cookie(ctx.where, name, `${SUMMARY_FORMAT}.${percent as number}.${chapter as number}`, { maxAge: ttl(ctx.where.ns), path: "/" })]);
+  const text = `${SUMMARY_FORMAT}.${percent as number}.${chapter as number}`;
+  await keepSummary(ctx, guide, text);
+  return reply(200, { ok: true }, [cookie(ctx.where, name, text, { maxAge: ttl(ctx.where.ns), path: "/" })]);
 }
+
+/**
+ * Every guide's summary its group holds, for hundo.quest: `{ summaries: { <guide>: { percent, chapter } | null } }`, a guide the group never
+ * reported left out and one with nothing checked any more null. Two store commands, the device's record and one read. A device still
+ * waiting to be linked has nothing to read, and keeps its cookie: unlinking it here would end the pairing it is waiting on.
+ */
+async function summaries(ctx: Ctx) {
+  const me = await identify(ctx);
+  if (!me) return unlinked(ctx);
+  if (!me.group) return reply(200, { summaries: {} });
+  const [values] = await exec(ctx, [["MGET", ...GUIDES.map((guide) => smKey(ctx, me.group, guide))]]);
+  const out: Record<string, { percent: number; chapter: number } | null> = {};
+  GUIDES.forEach((guide, i) => {
+    const text = (values as unknown[])[i];
+    if (text === NOTHING_CHECKED) out[guide] = null;
+    const found = typeof text === "string" ? SUMMARY_TEXT.exec(text) : null;
+    if (found) out[guide] = { percent: Number(found[1]), chapter: Number(found[2]) };
+  });
+  return reply(200, { summaries: out });
+}
+
+/** All the landing page at https://hundo.quest may call: it reads, and pairs nothing. Its previews and localhost look like a guide's, and aren't held to it. */
+const HOME_ROUTES = new Set(["/api/summaries"]);
 
 const routes: Record<string, (ctx: Ctx) => Promise<Response>> = {
   "/api/pair/start": pairStart,
@@ -558,16 +613,18 @@ const routes: Record<string, (ctx: Ctx) => Promise<Response>> = {
   "/api/forget": forget,
   "/api/count": count,
   "/api/summary": summary,
+  "/api/summaries": summaries,
 };
 
 /** Answer one request. `deps` is null when the store isn't set up, which is a 503 for every real call. */
 export async function handle(request: Request, deps: Deps | null): Promise<Response> {
   try {
-    const route = routes[new URL(request.url).pathname];
+    const path = new URL(request.url).pathname;
+    const route = routes[path];
     if (!route) return reply(404, { error: "not_found" });
     if (request.method !== "POST") return reply(405, { error: "method" }, [], { Allow: "POST" });
     const where = whereFrom(request);
-    if (!where) return reply(403, { error: "origin" });
+    if (!where || (where.home && !HOME_ROUTES.has(path))) return reply(403, { error: "origin" });
     if (!deps) return reply(503, { error: "unconfigured" });
     if (!/^application\/json\b/i.test(request.headers.get("content-type") ?? "")) return reply(400, { error: "body" });
     if (Number(request.headers.get("content-length") ?? 0) > MAX_BODY) return reply(413, { error: "size" });
