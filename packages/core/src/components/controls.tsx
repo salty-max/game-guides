@@ -1,4 +1,6 @@
 import { Checkbox as BaseCheckbox } from "@base-ui/react/checkbox";
+import { CheckboxGroup as BaseCheckboxGroup } from "@base-ui/react/checkbox-group";
+import { Fieldset } from "@base-ui/react/fieldset";
 import { OTPField as BaseOTPField } from "@base-ui/react/otp-field";
 import { Radio } from "@base-ui/react/radio";
 import { RadioGroup as BaseRadioGroup } from "@base-ui/react/radio-group";
@@ -36,6 +38,39 @@ export function Checkbox({ label, checked, onChange, disabled = false }: Checkbo
       </BaseCheckbox.Root>
       {label}
     </label>
+  );
+}
+
+interface CheckboxGroupProps {
+  label: string;
+  choices: [key: string, label: string][];
+  value: string[];
+  onChange: (value: string[]) => void;
+  /** Mark the first box as where a dialog's focus goes on opening (data-autofocus). */
+  autoFocus?: boolean;
+}
+
+/**
+ * Several of a few choices, each a labelled tick box: Base UI's checkbox group, a fieldset named by its legend, so a screen reader hears
+ * the group's name on entering it. The boxes flow into as many columns of 9rem as fit, and each line (44px tall) is its box's target.
+ */
+export function CheckboxGroup({ label, choices, value, onChange, autoFocus = false }: CheckboxGroupProps) {
+  return (
+    <Fieldset.Root render={<BaseCheckboxGroup value={value} onValueChange={onChange} />} className="grid gap-1">
+      <Fieldset.Legend className="text-13 font-bold">{label}</Fieldset.Legend>
+      <div className="grid grid-cols-[repeat(auto-fill,minmax(9rem,1fr))] gap-x-4">
+        {choices.map(([key, text], i) => (
+          <label key={key} className="flex min-h-11 cursor-pointer items-center gap-2.5 text-14/sm font-bold">
+            <BaseCheckbox.Root value={key} className={checkBox()} data-autofocus={autoFocus && i === 0 ? "" : undefined}>
+              <BaseCheckbox.Indicator className={checkMarkClasses}>
+                <Icon name="check" className={checkIconClasses} />
+              </BaseCheckbox.Indicator>
+            </BaseCheckbox.Root>
+            {text}
+          </label>
+        ))}
+      </div>
+    </Fieldset.Root>
   );
 }
 

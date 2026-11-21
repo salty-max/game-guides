@@ -109,7 +109,7 @@ describe("settings dialog", () => {
   it("closes on a press on the dimmed area, which is Base UI's viewport layer round the popup, and not on a press inside it", async () => {
     const user = userEvent.setup();
     const { dialog } = await openSettings(user);
-    await user.click(within(dialog).getByText("Choose your theme and how far the guide can reveal."));
+    await user.click(within(dialog).getByText(/^Choose your theme/));
     expect(screen.getByRole("dialog")).toBeInTheDocument();
     await user.click(dialog.parentElement!);
     await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());

@@ -25,7 +25,7 @@ CI (`.github/workflows/ci.yml`) runs the root's `pnpm lint`, `pnpm typecheck`, `
 | A change to | Checks |
 | --- | --- |
 | `packages/core` | every package: each guide runs core's suites and typechecks core against its own config, the stories render core's components, and every package's lint reads core's `app.css` (the Tailwind lint's entry point) |
-| a guide's own test, its docs | that guide: its `guide.test.ts` and core's 48 shared suites against it, its lint, typecheck and build |
+| a guide's own test, its docs | that guide: its `guide.test.ts` and every core suite against it, its lint, typecheck and build |
 | a guide's data, or anything else in its `src/guide` but its tests | that guide and the landing page (`home/` is made from every guide's `config.ts` and what it imports, and its chapter 1 banner) |
 | a guide's `brand.ts` | that guide, the landing page, the stories (they show every guide's brand) and the sync API (its `project.test.ts` reads every guide's id) |
 | a guide's `theme.css` or `public/fonts` | that guide, the landing page and the stories |
@@ -75,7 +75,7 @@ Core's suites run against each guide:
 - **`icon-versions.test.ts`**: a changed icon file gets a new URL and the same bytes the same one, and the page, the manifest (icons, shortcuts' icons, screenshots) and the top bar's tile name only versioned URLs, each with its file's hash ([core.md](core.md#the-installed-app)).
 - **`sync/*.test.ts`, `SyncScreen.test.tsx`**: sync, from the ledger's merge to the screen ([core.md](core.md#syncing-devices)). `cycle.test.ts` runs two simulated browsers against the real API handler on an in-memory store, so the guide and the API are tested against each other. `ledger.test.ts` holds core's ledger equal to the API's.
 
-Each guide's own `guide.test.ts` adds its totals, its legacy saves, its extra state (and how that syncs) and its seven storage keys.
+Each guide's own `guide.test.ts` adds its totals, its legacy saves, its extra state (and how that syncs), its eight storage keys and, in a guide with builds, its leaning ids.
 
 ## Stories
 

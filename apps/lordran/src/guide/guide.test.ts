@@ -10,6 +10,7 @@ import { PLACE_KEY } from "@hundo/core/store/place";
 import { SYNC_KEY } from "@hundo/core/sync/local";
 import { PERSIST_KEY } from "@hundo/core/persistence";
 import { COUNTS_KEY } from "@hundo/core/counts";
+import { BUILD_KEY } from "@hundo/core/store/build";
 import { SUMMARY_COOKIE } from "@hundo/core/summary";
 import { flatten } from "@hundo/core/sync/fields";
 
@@ -99,8 +100,16 @@ describe("storage", () => {
     expect(SYNC_KEY).toBe("hundo-lordran.sync");
     expect(PERSIST_KEY).toBe("hundo-lordran.persist");
     expect(COUNTS_KEY).toBe("hundo-lordran.counts");
+    expect(BUILD_KEY).toBe("hundo-lordran.build");
     // and the cookie hundo.quest reads this guide's progress from (core's summary.ts), set on every hundo.quest host
     expect(SUMMARY_COOKIE).toBe("hundo_p_dark-souls-remastered");
+  });
+});
+
+describe("Lordran builds", () => {
+  // A reader's pick saves these ids (core's store/build.ts): a changed id drops it from every pick.
+  it("keeps its leaning ids", () => {
+    expect(config.builds?.leanings.map(({ id, label }) => `${id} ${label}`)).toEqual(["str Strength", "dex Dexterity", "int Intelligence", "fth Faith", "pyro Pyromancy", "hum Humanity"]);
   });
 });
 

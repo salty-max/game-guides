@@ -14,6 +14,7 @@ import chapter10 from "./data/chapter-10";
 import chapter11 from "./data/chapter-11";
 import chapter12 from "./data/chapter-12";
 import chapter13 from "./data/chapter-13";
+import { builds } from "./data/builds";
 import { choices } from "./data/choices";
 import { missables } from "./data/missables";
 import { questlines } from "./data/questlines";
@@ -104,6 +105,17 @@ const config: GuideConfig = {
   missables,
   choices,
   questlines,
+  builds: {
+    leanings: [
+      { id: "str", label: "Strength" },
+      { id: "dex", label: "Dexterity" },
+      { id: "int", label: "Intelligence" },
+      { id: "fth", label: "Faith" },
+      { id: "pyro", label: "Pyromancy" },
+      { id: "hum", label: "Humanity" },
+    ],
+    entries: builds,
+  },
   banners,
   completion: { board: targets, directions: ["route"] },
   state: {},

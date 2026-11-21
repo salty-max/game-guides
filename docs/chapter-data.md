@@ -1,6 +1,6 @@
 # Writing and sourcing chapter data
 
-A guide's content is plain TypeScript in `apps/<name>/src/guide/data`: one module per chapter, plus `missables.ts`, `questlines.ts`, and `sources.ts` where the guide has guide-wide references. The types are in `packages/core/src/types.ts`. The rules below that core's tests enforce are marked **(tested)**. The rest is how the three guides are written.
+A guide's content is plain TypeScript in `apps/<name>/src/guide/data`: one module per chapter, plus `missables.ts`, `questlines.ts`, `sources.ts` where the guide has guide-wide references, and `builds.ts` where the game is played by build. The types are in `packages/core/src/types.ts`. The rules below that core's tests enforce are marked **(tested)**. The rest is how the three guides are written.
 
 ## A chapter
 
@@ -135,6 +135,30 @@ export const questlines: Questlines = {
 - **A line's `id`** is kebab-case and unique **(tested)**, and stays once live: it's the line's address.
 - **A name says only what the line's first step's chapter already says**: the character as first met ("Siegmeyer of Catarina", never the daughter met later). It shows as soon as that chapter is revealed, so it follows the same rule as a chapter's `teaser`. There's no blurb, for the same reason. No test can catch a name that spoils.
 - A line is a claim that its steps belong together. Group only what the rows' own texts or two sources tie together, and put any doubt in `facts-to-verify.md`.
+
+## Builds
+
+A guide whose game is played by build can point a reader toward theirs: `data/builds.ts` exports `builds`, and `config.ts` passes them with the guide's leanings as `builds: { leanings, entries: builds }`. Only Lordran has builds (decided 21 Nov 2026, after a research pass on how Dark Souls builds work and how build guides present them). A build never counts: an entry points at a row that already exists and changes nothing about it ([core.md](core.md#builds) has what the reader sees).
+
+```ts
+export const builds: BuildEntry[] = [
+  {
+    row: "pickup-claymore",
+    serves: ["str", "dex"],
+    kind: "weapon",
+    note: "Claymore: needs 16 Strength and 10 Dexterity, and scales with both.",
+    sources: ["https://darksouls.wikidot.com/claymore"],
+  },
+];
+```
+
+- **Leanings** (`builds.leanings`): `{ id, label }`, the ways a reader levels that the guide can point toward. Lordran's are Strength, Dexterity, Intelligence and Faith (the stats behind every requirement and scaling), Pyromancy (which grows with the flame, not a stat) and Humanity (which the Chaos path and a few weapons scale with). A player's build name is a combination: Quality is Strength and Dexterity. Attunement isn't a leaning, since every caster needs it: an item that adds slots serves every casting leaning. Ids are lowercase and unique **(tested)**, and **never change once live**: a reader's pick saves them, so the guide's `guide.test.ts` pins them.
+- **One entry per item**: a row that holds two items a build wants has two entries (the Firelink graveyard's Winged Spear and Zweihander).
+- **`row`**: a real row **(tested)**.
+- **`serves`**: the leanings it serves, each one the guide names, each once **(tested)**. Serve what the item's facts back: a weapon serves the stats it scales with, a spell the stat it needs, the Pyromancy Flame Pyromancy.
+- **`kind`**: `weapon`, `catalyst` (catalysts, talismans, the pyromancy flame), `spell`, `ring`, `armor`, or `path`, an upgrade path: an ember, the flame's reinforcement, a smith who opens a path **(tested)**. Next for your build groups by it, the path last.
+- **`note`**: the item's name first ("Winged Spear: …"), then facts its sources state: what it needs (one-handed), which stats it scales with, what only one seller has, how far it goes. **Never a scaling letter** **(tested)**: the wikis' letter ranges differ, and a letter at +0 rises with each upgrade, so say "scales mostly with Dexterity" where the page gives E and C. Never "best", a stat target or a starting-class tip, which are opinion. It shows beside the row and in Next for your build, so it names no place, boss or character the row's chapter hasn't reached, and no fate (no test can catch that). It's reader text, so the achievements rule holds **(tested)**. Missable-ness is never repeated in it: core reads that from `missables.ts`, and lists the missables first.
+- **`sources`**: one or more https pages that state the note **(tested)**, a second host where one page doesn't state it all. Like every source, never shown. Notes go through the `source-checker` helper before they're committed, as rows do.
 
 ## Achievements
 

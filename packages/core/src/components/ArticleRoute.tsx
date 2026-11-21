@@ -1,5 +1,6 @@
 import { cva } from "class-variance-authority";
 import type { ReactNode } from "react";
+import { BuildBadge, BuildNote } from "./BuildMark";
 import { BulkCheck } from "./BulkCheck";
 import { Contents } from "./Contents";
 import { CheckBox } from "./CheckBox";
@@ -114,11 +115,13 @@ export function ListRow({ row, target, inChoice = false }: { row: Row; target?: 
         {row.title}
       </label>
       <Badges row={row} inChoice={inChoice} />
+      <BuildBadge row={row} at="list" />
       {row.map && <MapLink map={row.map} of={row.title} at="row" />}
       <LineChips row={row} at="list" />
       <LaterChip row={row} at="list" />
       {/* Under the step's words, not under its box. */}
       {row.text && <span className="basis-full ps-check-indent text-14/normal text-muted">{row.text}</span>}
+      <BuildNote row={row} at="list" />
     </li>
   );
 }
@@ -132,6 +135,7 @@ export function ProseRow({ row, target, inChoice = false }: { row: Row; target?:
         {/[.!?]$/.test(row.title) ? "" : "."}
       </label>{" "}
       <Badges row={row} inChoice={inChoice} />
+      <BuildBadge row={row} at="prose" />
       {row.text}
       {row.map && (
         <>
@@ -141,6 +145,7 @@ export function ProseRow({ row, target, inChoice = false }: { row: Row; target?:
       )}
       <LineChips row={row} at="prose" />
       <LaterChip row={row} at="prose" />
+      <BuildNote row={row} at="prose" />
     </p>
   );
 }
