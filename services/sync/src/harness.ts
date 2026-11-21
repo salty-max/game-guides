@@ -5,6 +5,8 @@ import { MemoryStore, type Store } from "./store";
 
 export const KOHOLINT = "https://koholint.hundo.quest";
 export const RDR = "https://rdr.hundo.quest";
+/** The landing page. */
+export const HOME = "https://hundo.quest";
 export const PREVIEW = "https://hundo-koholint-git-sync-jellycat.vercel.app";
 export const LOCAL = "http://localhost:5173";
 export const GUIDE = "links-awakening";
@@ -120,6 +122,11 @@ export class Device {
   /** A guide's summary for hundo.quest, sent the way a guide sends it: with its cookies, so the reply's can be kept. */
   summary(summary: unknown, extra: Record<string, unknown> = {}, options?: Parameters<Device["post"]>[2]) {
     return this.post("/api/summary", { guide: GUIDE, summary, ...extra }, options);
+  }
+
+  /** What hundo.quest reads for a linked browser: every guide's summary its group holds. */
+  summaries(options?: Parameters<Device["post"]>[2]) {
+    return this.post("/api/summaries", {}, { origin: HOME, ...options });
   }
 
   sync(entries: Record<string, unknown> = {}, extra: Record<string, unknown> = {}, options?: Parameters<Device["post"]>[2]) {

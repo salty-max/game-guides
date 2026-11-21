@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { describe, expect, it, vi } from "vitest";
 import { GUIDES, handle, visitorOf } from "./app";
-import { GUIDE, KOHOLINT, LOCAL, PREVIEW, RDR, World, link, random, type Device } from "./harness";
+import { GUIDE, HOME, KOHOLINT, LOCAL, PREVIEW, RDR, World, link, random, type Device } from "./harness";
 import { memberOf, merge, type Entries } from "./ledger";
 import { StoreError } from "./store";
 
@@ -36,7 +36,7 @@ describe("every request", () => {
       ["a stranger", { origin: "https://evil.example" }],
       ["a stranger lookalike", { origin: "https://koholint.hundo.quest.evil.example" }],
       ["the API's own host", { origin: "https://api.hundo.quest" }],
-      ["the bare domain", { origin: "https://hundo.quest" }],
+      ["the landing page, for anything but the summaries", { origin: HOME }],
       ["plain http on hundo.quest", { origin: "http://koholint.hundo.quest" }],
       ["a port on hundo.quest", { origin: "https://koholint.hundo.quest:8443" }],
       ["any other vercel.app", { origin: "https://evil.vercel.app" }],
@@ -60,6 +60,20 @@ describe("every request", () => {
     expect((await d.status({ origin: "http://127.0.0.1:5173", direct: true })).status).not.toBe(403);
   });
 
+  it("lets the landing page read the summaries and nothing else, refused before the store", async () => {
+    const world = new World();
+    const { a } = await link(world);
+    const commands = world.store.commands;
+    for (const path of ["/api/pair/start", "/api/pair/claim", "/api/status", "/api/sync", "/api/unlink", "/api/remove", "/api/forget", "/api/count", "/api/summary"]) {
+      expect((await a.post(path, { guide: GUIDE, summary: null, counts: { "v:tab": 1 } }, { origin: HOME })).status, path).toBe(403);
+    }
+    expect(world.store.commands).toBe(commands);
+    expect((await a.summaries()).status).toBe(200);
+    for (const origin of ["http://hundo.quest", "https://hundo.quest:8443", "https://www.hundo.quest.evil.example", "https://hundo.quest.evil.example"]) {
+      expect((await a.summaries({ origin })).status, origin).toBe(403);
+    }
+  });
+
   it("doesn't need the host to say who is calling: behind a guide's rewrite it never names the guide", async () => {
     const d = new World().device();
     const behind = { headers: { host: "api.hundo.quest", "x-forwarded-host": "api.hundo.quest" } };
@@ -73,7 +87,7 @@ describe("every request", () => {
     const d = world.device();
     const simple = ["application/x-www-form-urlencoded", "multipart/form-data; boundary=x", "text/plain", "text/plain;charset=UTF-8", ""];
     for (const type of simple) {
-      for (const path of ["/api/pair/start", "/api/pair/claim", "/api/sync", "/api/status", "/api/unlink", "/api/forget", "/api/summary"]) {
+      for (const path of ["/api/pair/start", "/api/pair/claim", "/api/sync", "/api/status", "/api/unlink", "/api/forget", "/api/summary", "/api/summaries"]) {
         const reply = await d.post(path, {}, { origin: KOHOLINT, headers: { "content-type": type }, raw: '{"p":1}' });
         expect(reply.status, `${path} as "${type}"`).toBe(400);
       }
@@ -232,7 +246,9 @@ describe("pairing", () => {
     const one = await link(world);
     await one.b.post("/api/unlink");
     await one.a.sync({ "c:x": [5, 1] });
+    await one.a.summary({ percent: 4, chapter: 1 });
     const [lonely] = groups(world);
+    expect(keysOf(world, lonely).some((name) => name.includes(":sm:"))).toBe(true);
     const two = await link(world);
     const { code } = await two.a.show();
     expect((await one.a.claim(code)).body).toMatchObject({ moved: true });
@@ -1073,9 +1089,11 @@ describe("unlinking", () => {
     const world = new World();
     const { a, b } = await link(world);
     await a.sync({ "c:x": [5, 1] });
+    await a.summary({ percent: 1, chapter: 1 });
     await a.post("/api/unlink");
+    expect(world.store.keys().filter((name) => name.includes(":sm:"))).toHaveLength(1);
     await b.post("/api/unlink");
-    expect(world.store.keys().filter((name) => /:(p|rv|gd|dv):/.test(name))).toEqual([]);
+    expect(world.store.keys().filter((name) => /:(p|rv|sm|gd|dv):/.test(name))).toEqual([]);
   });
 
   it("revokes the token: an unlinked device's old cookie does nothing", async () => {
@@ -1114,10 +1132,12 @@ describe("deleting the synced progress", () => {
     await c.claim((await a.show()).code);
     await a.sync({ "c:x": [5, 1] });
     await a.post("/api/sync", { guide: "red-dead-redemption", entries: { "c:y": [5, 1] } });
+    await a.summary({ percent: 3, chapter: 2 });
+    await b.summary(null, { guide: "red-dead-redemption" });
     const reply = await a.post("/api/forget");
     expect(reply).toMatchObject({ status: 200, body: { ok: true } });
     expect(line(reply.cookies, "hundo_sync")).toContain("Max-Age=0");
-    expect(world.store.keys().filter((name) => /:(p|gd|dv):/.test(name))).toEqual([]);
+    expect(world.store.keys().filter((name) => /:(p|rv|sm|gd|dv):/.test(name))).toEqual([]);
     for (const device of [b, c]) {
       const next = await device.sync();
       expect(next.status).toBe(401);
@@ -1310,20 +1330,61 @@ describe("a guide's summary for hundo.quest", () => {
     expect(d.jar.has("hundo_p_links-awakening")).toBe(false);
   });
 
-  it("stores nothing and reads no cookie, a synced device's included", async () => {
+  it("stores nothing for a reader who isn't linked, and doesn't call the store", async () => {
     const world = new World();
-    const { a } = await link(world);
+    const pending = world.device();
+    await pending.show();
     const before = world.store.snapshot();
     const commands = world.store.commands;
-    const sync = a.jar.get("hundo_sync");
-    expect((await a.summary({ percent: 40, chapter: 5 })).status).toBe(200);
+    expect((await world.device().summary({ percent: 40, chapter: 5 })).status).toBe(200);
     expect((await world.device().summary(null)).status).toBe(200);
     expect(world.store.commands).toBe(commands);
+    // a device still waiting on a code has no group to keep it for: one read of its record, and nothing written
+    expect((await pending.summary({ percent: 40, chapter: 5 })).status).toBe(200);
+    expect(world.store.commands).toBe(commands + 1);
     expect(world.store.snapshot()).toBe(before);
+  });
+
+  it("keeps a linked device's summary for its group, 400 days from the last, for two commands, with the same answer as anyone gets", async () => {
+    const world = new World();
+    const { a } = await link(world);
+    const [group] = groups(world);
+    const sync = a.jar.get("hundo_sync");
+    const commands = world.store.commands;
+    expect((await a.summary({ percent: 40, chapter: 5 })).status).toBe(200);
+    expect(world.store.commands).toBe(commands + 2);
+    expect(await world.store.exec([["GET", `hs:prod:sm:${group}:${GUIDE}`]])).toEqual(["1.40.5"]);
+    expect(world.store.ttl(`hs:prod:sm:${group}:${GUIDE}`)).toBe(KEEP);
+    // the cookies are the answer, the same with the sync cookies as without them, and the device's own are left alone
     expect(a.jar.get("hundo_sync")).toBe(sync);
-    // the same answer with the sync cookies as without them
     const fresh = await world.device().summary({ percent: 40, chapter: 5 });
     expect(a.set).toEqual(fresh.cookies);
+  });
+
+  it("keeps nothing checked as a summary of its own, so it isn't taken for a guide never reported", async () => {
+    const world = new World();
+    const { a, b } = await link(world);
+    const [group] = groups(world);
+    await a.summary({ percent: 40, chapter: 5 });
+    const cleared = await b.summary(null);
+    expect(line(cleared.cookies, "hundo_p_links-awakening")).toContain("Max-Age=0");
+    expect(await world.store.exec([["GET", `hs:prod:sm:${group}:${GUIDE}`]])).toEqual(["none"]);
+    expect(world.store.ttl(`hs:prod:sm:${group}:${GUIDE}`)).toBe(KEEP);
+  });
+
+  it("still sets the cookie when the store is down", async () => {
+    const world = new World();
+    const { a } = await link(world);
+    const down = { ...world.deps, store: { exec: () => Promise.reject(new StoreError("max requests limit exceeded")) } };
+    const reply = await a.summary({ percent: 40, chapter: 5 }, {}, { deps: down });
+    expect(reply.status).toBe(200);
+    expect(line(reply.cookies, "hundo_p_links-awakening")).toContain("=1.40.5;");
+    expect((await a.summary(null, {}, { deps: down })).status).toBe(200);
+    // and when the device is found but the write fails
+    const failing = { ...world.deps, store: { exec: (commands: readonly (readonly (string | number)[])[]) => (commands.some(([name]) => name === "SET") ? Promise.reject(new StoreError("down")) : world.store.exec(commands)) } };
+    const late = await a.summary({ percent: 41, chapter: 5 }, {}, { deps: failing });
+    expect(late.status).toBe(200);
+    expect(line(late.cookies, "hundo_p_links-awakening")).toContain("=1.41.5;");
   });
 
   it("refuses anything but a known guide, a whole figure from 0 to 100 and a chapter from 1 to 999, and sets nothing then", async () => {
@@ -1352,6 +1413,97 @@ describe("a guide's summary for hundo.quest", () => {
       expect(reply.cookies, why).toEqual([]);
     }
     expect(world.store.commands).toBe(0);
+  });
+});
+
+describe("what hundo.quest reads for a linked browser", () => {
+  const SUMMARY = (percent: number, chapter: number) => ({ percent, chapter });
+
+  it("is every guide's latest summary from any device of the group, null for nothing checked, a guide never reported left out", async () => {
+    const world = new World();
+    const { a, b } = await link(world);
+    await a.summary(SUMMARY(10, 2));
+    // the last device to report a guide speaks for it: an installed app, say, with its own cookies
+    await b.summary(SUMMARY(57, 6));
+    await b.summary(SUMMARY(100, 9), { guide: "silksong" }, { origin: "https://pharloom.hundo.quest" });
+    await a.summary(SUMMARY(3, 1), { guide: "hollow-knight" }, { origin: "https://hallownest.hundo.quest" });
+    await b.summary(null, { guide: "hollow-knight" }, { origin: "https://hallownest.hundo.quest" });
+    for (const device of [a, b]) {
+      const reply = await device.summaries();
+      expect(reply.status).toBe(200);
+      NO_STORE(reply.headers);
+      expect(reply.cookies).toEqual([]);
+      expect(reply.body).toEqual({ summaries: { "links-awakening": SUMMARY(57, 6), silksong: SUMMARY(100, 9), "hollow-knight": null } });
+    }
+  });
+
+  it("costs two store commands, the device's record and one read, and writes nothing", async () => {
+    const world = new World();
+    const { a } = await link(world);
+    await a.summary(SUMMARY(57, 6));
+    const before = world.store.snapshot();
+    const commands = world.store.commands;
+    await a.summaries();
+    expect(world.store.commands).toBe(commands + 2);
+    expect(world.store.snapshot()).toBe(before);
+  });
+
+  it("never shows another group's", async () => {
+    const world = new World();
+    const one = await link(world);
+    const two = await link(world);
+    await one.a.summary(SUMMARY(57, 6));
+    expect((await two.a.summaries()).body).toEqual({ summaries: {} });
+    // nor the progress of a group a device has left
+    await one.b.post("/api/unlink");
+    expect((await one.b.summaries()).status).toBe(401);
+  });
+
+  it("is unlinked, and clears the cookies, for no device or one no longer linked; with no cookie it costs nothing", async () => {
+    const world = new World();
+    const stranger = world.device();
+    const reply = await stranger.summaries();
+    expect(reply).toMatchObject({ status: 401, body: { error: "unlinked" } });
+    expect(line(reply.cookies, "hundo_sync")).toBe("hundo_sync=; Max-Age=0; Path=/api; Domain=hundo.quest; Secure; HttpOnly; SameSite=Lax");
+    expect(line(reply.cookies, "hundo_link")).toBe("hundo_link=; Max-Age=0; Path=/; Domain=hundo.quest; Secure; SameSite=Lax");
+    expect(world.store.commands).toBe(0);
+    const { a, b } = await link(world);
+    const other = ((await b.status()).body.devices as { id: string; self: boolean }[]).find((device) => !device.self)!.id;
+    await b.post("/api/remove", { id: other });
+    const removed = await a.summaries();
+    expect(removed.status).toBe(401);
+    expect(a.jar.has("hundo_link")).toBe(false);
+  });
+
+  it("is empty for a device still waiting on a code, and leaves its cookie, so the pairing goes on", async () => {
+    const world = new World();
+    const a = world.device();
+    const { code } = await a.show();
+    const reply = await a.summaries();
+    expect(reply).toMatchObject({ status: 200, body: { summaries: {} } });
+    expect(reply.cookies).toEqual([]);
+    expect(a.jar.has("hundo_sync")).toBe(true);
+    expect((await world.device().claim(code)).body.linked).toBe(true);
+  });
+
+  it("reads only summaries out of the store, whatever else a key holds", async () => {
+    const world = new World();
+    const { a } = await link(world);
+    const [group] = groups(world);
+    const bad = ["2.57.6", "1.101.6", "1.57.0", "", "1.57.6; Domain=evil.example"];
+    await world.store.exec(bad.map((text, i) => ["SET", `hs:prod:sm:${group}:${GUIDES[i]}`, text]));
+    await world.store.exec([["HSET", `hs:prod:sm:${group}:${GUIDES[5]}`, "f", "1.57.6"]]);
+    expect((await a.summaries()).body).toEqual({ summaries: {} });
+  });
+
+  it("keeps a preview's and localhost's apart from production's, for a week", async () => {
+    const world = new World();
+    const { a } = await link(world, { origin: PREVIEW });
+    await a.summary(SUMMARY(20, 3), {}, { origin: PREVIEW });
+    const [group] = groups(world, "test");
+    expect(world.store.ttl(`hs:test:sm:${group}:${GUIDE}`)).toBe(7 * 86_400);
+    expect((await a.summaries({ origin: PREVIEW })).body).toEqual({ summaries: { "links-awakening": SUMMARY(20, 3) } });
+    expect(world.store.keys().filter((name) => name.startsWith("hs:prod:"))).toEqual([]);
   });
 });
 

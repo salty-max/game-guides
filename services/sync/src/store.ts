@@ -137,6 +137,12 @@ export class MemoryStore implements Store {
     switch (name.toUpperCase()) {
       case "GET":
         return this.typed(args[0], "string")?.value ?? null;
+      case "MGET":
+        // Redis answers null for a key of another kind here, where GET would refuse it.
+        return args.map((key) => {
+          const slot = this.live(key);
+          return slot?.kind === "string" ? slot.value : null;
+        });
       case "GETDEL": {
         const slot = this.typed(args[0], "string");
         this.data.delete(args[0]);
