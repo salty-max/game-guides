@@ -5,7 +5,9 @@ import { join } from "node:path";
 import { wireFind } from "./find";
 import { wireGroup, wireProgress } from "./progress";
 import { APPS, readGuides, type Guide } from "./guides";
-import { make, type Made } from "./plugin";
+import { GITHUB } from "./page";
+import { make, WALL_WIDTH, type Made } from "./plugin";
+import { wallTiles } from "./wall";
 
 const deployed = readdirSync(APPS).filter((name) => existsSync(join(APPS, name, "vercel.json")));
 
@@ -27,13 +29,24 @@ describe("the landing page", () => {
       const link = document.querySelector(`.g-${folder} h3 a`);
       expect(link, `${folder} is on the page`).not.toBeNull();
       expect(link!.getAttribute("href"), folder).toBe(guide.home);
-      expect(link!.textContent, folder).toBe(guide.mark);
+      expect(link!.textContent, folder).toBe(guide.game);
     }
     expect(new Set(links).size).toBe(links.length);
   });
 
-  it("counts them, and says the order", () => {
-    expect(document.querySelector("#guides")!.textContent).toBe(`${deployed.length} guides · A to Z by game`);
+  it("counts them", () => {
+    expect(document.querySelector("#guides")!.textContent).toBe(`${deployed.length} guides`);
+  });
+
+  it("titles each band with its game, the guide's own name above it unless it is the game's, and no publisher", () => {
+    for (const guide of guides.filter((each) => deployed.includes(each.folder))) {
+      const band = document.querySelector(`.g-${guide.folder}`)!;
+      expect(band.querySelector("h3")!.textContent, guide.folder).toBe(guide.game);
+      expect(band.querySelector(".kick span")?.textContent ?? null, guide.folder).toBe(guide.mark === guide.game ? null : guide.mark);
+      expect(band.textContent, guide.folder).not.toContain(guide.publisher);
+      // each number held to its word, so a narrow band never wraps between the two
+      expect(band.querySelector(".meta")!.textContent, guide.folder).toBe(`${guide.chapters}\u00a0chapters · ${guide.rows}\u00a0checks`);
+    }
   });
 
   it("gives each band its banner and tile from the build, the first two loaded at once and the rest as they come near", () => {
@@ -49,7 +62,12 @@ describe("the landing page", () => {
 
   it("ships each display font with its licence, the palettes, and an icon with one arc per guide", () => {
     const css = [...made.files].find(([path]) => /^assets\/guides-\w+\.css$/.test(path))![1] as string;
-    for (const folder of deployed) expect(css, folder).toContain(`.g-${folder}{`);
+    for (const folder of deployed) {
+      expect(css, folder).toContain(`.g-${folder}{`);
+      // dark for a reader's choice of it, and for a dark device with no choice of light
+      expect(css, folder).toContain(`:root[data-theme="dark"] .g-${folder}{`);
+      expect(css, folder).toContain(`@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .g-${folder}{`);
+    }
     expect([...made.files.keys()].filter((path) => path.startsWith("fonts/") && path.endsWith("-OFL.txt")).length).toBeGreaterThan(0);
     for (const [, url] of css.matchAll(/url\(\/([^)]+)\)/g)) expect(made.files.has(url), url).toBe(true);
     expect((made.files.get("favicon.svg") as string).match(/<path /g)?.length).toBe(deployed.length);
@@ -91,7 +109,7 @@ describe("the landing page", () => {
     expect(document.body.innerHTML).toBe(before);
     const [first, second] = bands();
     expect(wireProgress(document, `hundo_link=abc; hundo_p_${first.dataset.id}=1.57.6`)).toBe(1);
-    expect(first.querySelector(".meta")!.textContent).toBe("57% complete · Chapter 6");
+    expect(first.querySelector(".meta")!.textContent).toBe("57% complete · Chapter\u00a06");
     expect(first.querySelector(".btn")!.textContent).toBe("Continue");
     expect(first.querySelector<HTMLElement>(".mine-bar i")!.style.width).toBe("57%");
     expect(second.querySelector(".mine-bar")).toBeNull();
@@ -112,8 +130,44 @@ describe("the landing page", () => {
     expect(await wireGroup(document, cookie, read)).toBe(2);
     const [reset, other] = bands();
     expect(reset.outerHTML).toBe(new DOMParser().parseFromString(first, "text/html").querySelector<HTMLElement>("[data-guide]")!.outerHTML);
-    expect(other.querySelector(".meta")!.textContent).toBe("12% complete · Chapter 3");
+    expect(other.querySelector(".meta")!.textContent).toBe("12% complete · Chapter\u00a03");
     expect(other.querySelector(".btn")!.textContent).toBe("Continue");
+    document.body.innerHTML = made.home;
+  });
+
+  it("puts the link preview's six banners behind the hero, their small wall copies, at low priority, hidden from assistive technology", () => {
+    const wall = document.querySelector("main > .sky > .wall")!;
+    expect(wall.nextElementSibling!.matches("section.hero")).toBe(true);
+    expect(wall.getAttribute("aria-hidden")).toBe("true");
+    const tiles = [...wall.querySelectorAll("img")];
+    expect(tiles.map((tile) => tile.getAttribute("src")!.replace(/-wall-.*/, ""))).toEqual(wallTiles(guides).map((guide) => `/assets/${guide.folder}`));
+    for (const tile of tiles) {
+      expect(tile.getAttribute("src")).toMatch(new RegExp(`-wall-${WALL_WIDTH}-\\w+\\.webp$`));
+      expect(tile.getAttribute("width")).toBe(String(WALL_WIDTH));
+      expect(made.files.has(tile.getAttribute("src")!.slice(1))).toBe(true);
+      expect(tile.getAttribute("alt")).toBe("");
+      expect(tile.getAttribute("fetchpriority")).toBe("low");
+    }
+    // and nothing asks the browser for them ahead of the page's own pictures
+    expect(made.home).not.toMatch(/rel="preload"[^>]*-wall-/);
+  });
+
+  it("has the repository and the theme button in its top bar, the button shown only by the script that runs it", () => {
+    for (const page of [made.home, made.notFound]) {
+      document.body.innerHTML = page;
+      const github = document.querySelector<HTMLAnchorElement>("header.top a.icon-btn")!;
+      expect(github.getAttribute("href")).toBe(GITHUB);
+      expect(GITHUB).toBe("https://github.com/salty-max/hundo");
+      expect(github.target).toBe("_blank");
+      expect(github.rel).toContain("noopener");
+      expect(github.getAttribute("aria-label")).toBe("Hundo on GitHub (opens in a new tab)");
+      const toggle = document.querySelector<HTMLButtonElement>("header.top button[data-theme-toggle]")!;
+      expect(toggle.type).toBe("button");
+      expect(toggle.hidden).toBe(true);
+      expect(toggle.getAttribute("aria-label")).toBe("Dark theme");
+      expect(toggle.getAttribute("aria-pressed")).toBe("false");
+      expect(toggle.compareDocumentPosition(github) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    }
     document.body.innerHTML = made.home;
   });
 

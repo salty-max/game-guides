@@ -1,12 +1,16 @@
 // The landing page's markup, rendered to static HTML at build (render.tsx): no React reaches the browser. Each guide is drawn as its own
-// chapter hero, in its own palette, display font and corners (the .g-<folder> classes guides.css sets), with its chapter 1 banner.
+// chapter hero, in its own palette, display font and corners (the .g-<folder> classes guides.css sets), with its chapter 1 banner. The
+// game is the band's title, the name a reader looks for; the guide's own name goes above it, beside its icon, unless it is the game's.
 import { findTerms } from "./find";
 import type { Guide } from "./guides";
+import { wallTiles } from "./wall";
 
 /** Where the build put each guide's pictures. */
 export type GuideArt = {
   /** The banner's copies, narrowest first. */
   banner: { url: string; width: number }[];
+  /** The banner's small copy for the hero's wall (plugin.ts's WALL_WIDTH). */
+  wall: { url: string; width: number };
   /** The icon tile at 40, 80 and 120px. */
   tile: { url: string; width: number }[];
 };
@@ -64,6 +68,34 @@ export const Logo = ({ href }: { href?: string }) => {
   );
 };
 
+/** The repository, which is public. */
+export const GITHUB = "https://github.com/salty-max/hundo";
+
+const ICON = { viewBox: "0 0 24 24", "aria-hidden": true } as const;
+
+/** The logo, then the theme button and the repository on the right. */
+const TopBar = () => (
+  <header className="top wrap">
+    <Logo href="/" />
+    <div className="tools">
+      {/* Shown by theme.ts: without the script it would do nothing. Left of GitHub's, so appearing moves nothing. */}
+      <button type="button" className="icon-btn" data-theme-toggle aria-label="Dark theme" aria-pressed="false" hidden>
+        <svg className="moon" {...ICON}>
+          <path d="M20 14.6A8.4 8.4 0 0 1 9.4 4 8.4 8.4 0 1 0 20 14.6Z" />
+        </svg>
+        <svg className="sun" {...ICON}>
+          <path d="M8 12a4 4 0 1 0 8 0 4 4 0 0 0-8 0Zm4-9.5v2m0 15v2M5.3 5.3l1.4 1.4m10.6 10.6 1.4 1.4M2.5 12h2m15 0h2M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4" />
+        </svg>
+      </button>
+      <a className="icon-btn" href={GITHUB} target="_blank" rel="noopener" aria-label="Hundo on GitHub (opens in a new tab)">
+        <svg className="mark" {...ICON}>
+          <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" />
+        </svg>
+      </a>
+    </div>
+  </header>
+);
+
 const Footer = () => (
   <footer className="wrap">
     <div>
@@ -92,22 +124,19 @@ const Band = ({ guide, art, eager }: { guide: Guide; art: GuideArt; eager: boole
         <div className="text">
           <div className="kick">
             <img className="tile" src={art.tile.at(-1)!.url} srcSet={srcSet(art.tile)} sizes={TILE_SIZES} width={120} height={120} alt="" loading={eager ? undefined : "lazy"} />
-            <span>
-              {guide.game}
-              <span className="pub"> · {guide.publisher}</span>
-            </span>
+            {guide.mark !== guide.game && <span>{guide.mark}</span>}
           </div>
           <h3>
-            <a href={guide.home}>{guide.mark}</a>
+            <a href={guide.home}>{guide.game}</a>
           </h3>
-          {guide.goals.length > 0 && <p className="goals">{guide.goals.join(", ")}</p>}
           <div className="row">
             <span className="btn" aria-hidden="true">
               Open {guide.mark}
               <Arrow />
             </span>
+            {/* Each number held to its word: a narrow phone's band may wrap the line, never between the two. */}
             <span className="meta">
-              {guide.chapters} chapters · {guide.rows} checks
+              {guide.chapters}&nbsp;chapters · {guide.rows}&nbsp;checks
             </span>
           </div>
         </div>
@@ -116,17 +145,32 @@ const Band = ({ guide, art, eager }: { guide: Guide; art: GuideArt; eager: boole
   );
 };
 
+/**
+ * Behind the headline, and up behind the top bar: the link preview's six chapter 1 banners (wall.ts), muted and fading out at the foot, each
+ * the small copy made for it (plugin.ts's WALL_WIDTH), at a low fetch priority, and never preloaded (React preloads an eager image
+ * otherwise). Decoration, so hidden from assistive technology.
+ */
+const Wall = ({ guides, art }: { guides: Guide[]; art: Record<string, GuideArt> }) => (
+  <div className="wall" aria-hidden="true">
+    {wallTiles(guides).map((guide, i) => {
+      const { url, width } = art[guide.folder].wall;
+      return <img key={i} src={url} width={width} height={Math.round(width / 3)} alt="" fetchPriority="low" decoding="async" />;
+    })}
+  </div>
+);
+
 /** The page: what hundo is, then every guide. */
 export const Home = ({ guides, art }: { guides: Guide[]; art: Record<string, GuideArt> }) => (
   <>
-    <header className="top wrap">
-      <Logo href="/" />
-    </header>
+    <TopBar />
     <main>
-      <section className="hero wrap">
-        <h1>Every last check, one chapter at a time.</h1>
-        <p>Spoiler-aware walkthroughs and completion checklists for single-player games, one guide per game.</p>
-      </section>
+      <div className="sky">
+        <Wall guides={guides} art={art} />
+        <section className="hero wrap">
+          <h1>Every last check, one chapter at a time.</h1>
+          <p>Spoiler-aware walkthroughs and completion checklists for single-player games, one guide per game.</p>
+        </section>
+      </div>
       <section className="wrap" aria-label="What every guide does">
         <ul className="features">
           {features.map((feature) => (
@@ -143,7 +187,7 @@ export const Home = ({ guides, art }: { guides: Guide[]; art: Record<string, Gui
       <section className="wrap guides" aria-labelledby="guides">
         <div className="bar">
           <h2 id="guides">
-            {guides.length} {guides.length === 1 ? "guide" : "guides"} <span>· A to Z by game</span>
+            {guides.length} {guides.length === 1 ? "guide" : "guides"}
           </h2>
           {/* Shown by find.ts: without the script there is nothing to type into. */}
           <div className="find" data-find hidden>
@@ -166,9 +210,7 @@ export const Home = ({ guides, art }: { guides: Guide[]; art: Record<string, Gui
 /** The page Vercel answers an unknown path with (vercel.json). */
 export const NotFound = () => (
   <>
-    <header className="top wrap">
-      <Logo href="/" />
-    </header>
+    <TopBar />
     <main className="hero wrap lost">
       <h1>Nothing here.</h1>
       <p>Each guide lives at its own address. The list of them is on the front page.</p>

@@ -63,6 +63,10 @@ hundo.quest shows each guide you've started with its figure and your chapter: "5
 - Count my visits and Global Privacy Control don't stop it: they're about counting, and nothing here is counted.
 - An installed iPhone or iPad app keeps its own cookies, apart from Safari's, so without sync hundo.quest in Safari doesn't see the progress made in it; with the app and the browser linked, it does (above). The figure is the one from the last visit to the guide on any of your devices: after an update changes a guide's totals, it catches up when you open the guide.
 
+### The theme on hundo.quest
+
+hundo.quest follows your device's light or dark setting. If you pick the other one with the button in its top bar, it keeps that choice in your browser, under `hundo.theme` on hundo.quest alone, so the next visit opens the same way; picking your device's own setting again deletes it. That is the one thing hundo.quest keeps: it sends the choice nowhere, and a guide's theme is its own setting, on its own address.
+
 ### Visit counts
 
 Each guide counts visits, with no cookie and no id, to learn which guides and chapters get used, how far readers get, and how much reading happens in the installed app. When the page goes to the background, the guide sends its own `/api` (the sync API) a few numbers:

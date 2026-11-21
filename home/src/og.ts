@@ -5,13 +5,13 @@ import { join } from "node:path";
 import sharp from "sharp";
 import type { Guide } from "./guides";
 import { ringGap } from "./render";
+import { WALL, wallGuides, wallTiles } from "./wall";
 
 export const OG_WIDTH = 1200;
 export const OG_HEIGHT = 630;
 
 const COLUMNS = 2;
-const ROWS = 3;
-const CELLS = COLUMNS * ROWS;
+const ROWS = WALL / COLUMNS;
 const GAP = 6;
 const CELL_WIDTH = (OG_WIDTH - GAP * (COLUMNS - 1)) / COLUMNS;
 const CELL_HEIGHT = (OG_HEIGHT - GAP * (ROWS - 1)) / ROWS;
@@ -42,10 +42,6 @@ const LOGO_WIDTH = WORD_ADVANCE + RING.margin + RING.size;
 const EM = 150;
 const CARD_PADDING = 64;
 const CARD_HEIGHT = 236;
-
-/** The guides on the wall: every one up to six, and past six, six spread evenly across the A-to-Z list. */
-export const wallGuides = <T>(guides: T[]): T[] =>
-  guides.length <= CELLS ? guides : Array.from({ length: CELLS }, (_, i) => guides[Math.floor(((i + 0.5) * guides.length) / CELLS)]);
 
 type Shown = Pick<Guide, "folder" | "game" | "light">;
 
@@ -106,10 +102,9 @@ const cut = async (banner: string) => {
 
 /** The picture, a 1200×630 JPEG. `apps` holds the guides' folders. With fewer than six guides, the wall starts again from the first. */
 export const ogImage = async (guides: Shown[], apps: string) => {
-  const shown = wallGuides(guides);
   const wall = await Promise.all(
-    Array.from({ length: CELLS }, async (_, i) => ({
-      input: await cut(join(apps, shown[i % shown.length].folder, "src", "guide", "banners", "chapter-1.webp")),
+    wallTiles(guides).map(async (guide, i) => ({
+      input: await cut(join(apps, guide.folder, "src", "guide", "banners", "chapter-1.webp")),
       left: (i % COLUMNS) * (CELL_WIDTH + GAP),
       top: Math.floor(i / COLUMNS) * (CELL_HEIGHT + GAP),
     })),

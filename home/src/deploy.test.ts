@@ -3,6 +3,7 @@
 import { execFileSync } from "node:child_process";
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
+import { THEME_KEY } from "./theme";
 
 type Route = { src?: string; dest?: string; status?: number; headers?: Record<string, string>; continue?: boolean; handle?: string };
 const home = join(import.meta.dirname, "..");
@@ -79,13 +80,37 @@ describe("what a search engine reads", () => {
 });
 
 describe("the page's code", () => {
-  it("keeps nothing in the browser: progress lives on each guide's own address, and the guides' cookies are only read here", () => {
-    const sources = readdirSync(import.meta.dirname, { recursive: true, encoding: "utf8" }).filter((file) => /\.tsx?$/.test(file) && !file.includes(".test."));
+  const src = (file: string) => join("src", file);
+  const sources = [
+    ...readdirSync(import.meta.dirname, { recursive: true, encoding: "utf8" }).filter((file) => /\.tsx?$/.test(file) && !file.includes(".test.")).map(src),
+    "public/theme-init.js",
+  ];
+  const KEEPERS = [src("theme.ts"), "public/theme-init.js"];
+
+  it("keeps one thing in the browser, the reader's theme, and only theme.ts and theme-init.js touch it: progress lives on each guide's own address, and the guides' cookies are only read here", () => {
     for (const file of sources) {
-      const code = readFileSync(join(import.meta.dirname, file), "utf8");
-      expect(code, file).not.toMatch(/localStorage|sessionStorage|indexedDB|cookieStore/);
+      const code = read(file);
+      expect(code, file).not.toMatch(/sessionStorage|indexedDB|cookieStore/);
+      if (!KEEPERS.includes(file)) expect(code, file).not.toMatch(/localStorage/);
       // (and Safari has kept a cookie written by script for as little as a week)
       expect(code, file).not.toMatch(/document\.cookie\s*=(?!=)/);
+    }
+  });
+
+  it("keeps the theme under one key, hundo.theme, the same in both files", () => {
+    expect(THEME_KEY).toBe("hundo.theme");
+    const calls = (file: string) => [...read(file).matchAll(/localStorage\.(\w+)\(([^,)]*)/g)].map(([, method, key]) => `${method} ${key}`);
+    expect(calls("public/theme-init.js")).toEqual(['getItem "hundo.theme"']);
+    expect(calls(src("theme.ts")).sort()).toEqual(["removeItem THEME_KEY", "setItem THEME_KEY"]);
+  });
+
+  it("puts a kept theme back before the first paint: theme-init.js in the head of both pages, ahead of the stylesheets and the module", () => {
+    for (const page of ["index.html", "404.html"]) {
+      const html = read(page);
+      const init = html.indexOf('<script src="/theme-init.js"></script>');
+      expect(init, page).toBeGreaterThan(html.lastIndexOf('<meta name="theme-color"'));
+      expect(init, page).toBeLessThan(html.indexOf("<!--home:head-->"));
+      expect(init, page).toBeLessThan(html.indexOf('<script type="module"'));
     }
   });
 });

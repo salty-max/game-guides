@@ -22,8 +22,6 @@ export type Guide = {
   dark: Palette;
   chapters: number;
   rows: number;
-  /** The game's own lists with the largest goals, largest first: "46 Grubs". At most three. */
-  goals: string[];
 };
 
 /** The repository's apps/ folder. */
@@ -42,17 +40,6 @@ const noBanners: Plugin = {
   load(id) {
     if (id.endsWith("?banner")) return "export default undefined";
   },
-};
-
-/** The largest goals among the lists the game itself keeps (not the guide's own lists, the route's directions or what lies outside the game). */
-export const largestGoals = (config: Pick<GuideConfig, "categories" | "completion">, count = 3) => {
-  const skip = new Set([...(config.completion.directions ?? []), ...(config.completion.outside ?? [])]);
-  return config.completion.board
-    .filter((item) => item.list === "game" && !skip.has(item.tag) && config.categories[item.tag])
-    .map((item, index) => ({ ...item, index }))
-    .sort((a, b) => b.goal - a.goal || a.index - b.index)
-    .slice(0, count)
-    .map((item) => `${item.goal} ${config.categories[item.tag][0]}`);
 };
 
 /** One guide, from its folder. */
@@ -78,7 +65,6 @@ export const readGuide = async (folder: string, apps = APPS): Promise<Guide> => 
     dark: darkPalette(root),
     chapters: config.chapters.length,
     rows: config.chapters.reduce((sum, chapter) => sum + chapter.groups.reduce((n, group) => n + group.rows.length, 0), 0),
-    goals: largestGoals(config),
   };
 };
 

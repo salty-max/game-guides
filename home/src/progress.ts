@@ -33,12 +33,12 @@ export function parseSummary(text: string | undefined): Summary | null {
   return found ? { percent: Number(found[1]), chapter: Number(found[2]) } : null;
 }
 
-/** The words the band shows, the figure in bold. */
+/** The words the band shows, the figure in bold. A narrow phone's band may wrap them, never inside "Chapter 6". */
 const words = (summary: Summary) => {
   const line = document.createDocumentFragment();
   const figure = document.createElement("strong");
   figure.textContent = `${summary.percent}%`;
-  line.append(figure, ` complete · Chapter ${summary.chapter}`);
+  line.append(figure, ` complete · Chapter\u00a0${summary.chapter}`);
   return line;
 };
 
@@ -48,8 +48,8 @@ const firstLook = new WeakMap<HTMLElement, Node[]>();
 const shown = new WeakMap<HTMLElement, Summary | null>();
 
 /**
- * Draws one guide's progress into its band: the words beside the button (or, in a phone's short band, in the goals' place), and a bar.
- * Null puts the band back as a first visit sees it.
+ * Draws one guide's progress into its band: the words in the place of its chapters and checks, the button's label, and a bar. Null puts
+ * the band back as a first visit sees it.
  */
 function draw(band: HTMLElement, summary: Summary | null) {
   const now = shown.get(band) ?? null;
@@ -62,17 +62,12 @@ function draw(band: HTMLElement, summary: Summary | null) {
   } else if (summary) firstLook.set(band, [...band.childNodes].map((node) => node.cloneNode(true)));
   if (!summary) return;
   const meta = band.querySelector(".meta");
-  const goals = band.querySelector(".goals");
   const label = band.querySelector(".btn")?.firstChild;
   const world = band.querySelector(".world");
   if (!meta || !world) return;
   band.classList.add("started");
   meta.replaceChildren(words(summary));
   if (label?.nodeType === Node.TEXT_NODE) label.textContent = "Continue";
-  const line = document.createElement("p");
-  line.className = "mine";
-  line.append(words(summary));
-  (goals ?? band.querySelector("h3"))?.after(line);
   const bar = document.createElement("span");
   bar.className = "mine-bar";
   bar.setAttribute("aria-hidden", "true");

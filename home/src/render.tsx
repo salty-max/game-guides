@@ -36,6 +36,15 @@ export const ring = (guides: Guide[], theme: "light" | "dark") => {
   return `conic-gradient(from -90deg,${stops.join(",")})`;
 };
 
+/**
+ * A rule for the dark theme, as home.css writes its own: the reader's choice of dark (theme.ts, `data-theme` on the root), or a dark device
+ * with no choice of light. `selector` is under the root ("" for the root itself).
+ */
+export const inDark = (selector: string, declarations: string) => {
+  const under = (root: string) => (selector ? `${root} ${selector}` : root);
+  return `${under(':root[data-theme="dark"]')}{${declarations}}\n@media (prefers-color-scheme:dark){${under(':root:not([data-theme="light"])')}{${declarations}}}`;
+};
+
 /** The stylesheet built from the guides: the fonts' faces, each guide's palette in both themes, its corners and display font, the ring. */
 export const guidesCss = (guides: Guide[], fonts: { hundo: string; display: Record<string, string> }) => {
   const faces = [
@@ -47,9 +56,9 @@ export const guidesCss = (guides: Guide[], fonts: { hundo: string; display: Reco
   const looks = guides.map(
     (guide) =>
       `.g-${guide.folder}{${vars(guide.light)};${CORNERS[guide.corners]};--display:"${guide.display.family}",${guide.display.fallback}}\n` +
-      `@media (prefers-color-scheme:dark){.g-${guide.folder}{${vars(guide.dark)}}}`,
+      inDark(`.g-${guide.folder}`, vars(guide.dark)),
   );
-  const rings = `:root{--ring:${ring(guides, "light")}}\n@media (prefers-color-scheme:dark){:root{--ring:${ring(guides, "dark")}}}`;
+  const rings = `:root{--ring:${ring(guides, "light")}}\n${inDark("", `--ring:${ring(guides, "dark")}`)}`;
   return [...faces, ...looks, rings].join("\n") + "\n";
 };
 

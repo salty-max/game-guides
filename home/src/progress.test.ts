@@ -23,9 +23,9 @@ describe("a guide's summary", () => {
 });
 
 describe("the bands", () => {
-  const band = (id: string, goals = true) => `
+  const band = (id: string) => `
     <li class="cell" data-guide="x" data-id="${id}"><div class="world"><div class="text">
-      <h3><a href="https://x.hundo.quest">X</a></h3>${goals ? '<p class="goals">46 Grubs</p>' : ""}
+      <h3><a href="https://x.hundo.quest">X</a></h3>
       <div class="row"><span class="btn" aria-hidden="true">Open X<svg></svg></span><span class="meta">9 chapters · 406 checks</span></div>
     </div></div></li>`;
 
@@ -34,10 +34,8 @@ describe("the bands", () => {
     expect(wireProgress(document, "hundo_p_silksong=1.23.4")).toBe(1);
     const [started, other] = document.querySelectorAll<HTMLElement>("[data-id]");
     expect(started.classList.contains("started")).toBe(true);
-    expect(started.querySelector(".meta")!.textContent).toBe("23% complete · Chapter 4");
+    expect(started.querySelector(".meta")!.textContent).toBe("23% complete · Chapter\u00a04");
     expect(started.querySelector(".meta strong")!.textContent).toBe("23%");
-    expect(started.querySelector(".mine")!.textContent).toBe("23% complete · Chapter 4");
-    expect(started.querySelector(".goals + .mine")).not.toBeNull();
     expect(started.querySelector(".btn")!.textContent).toBe("Continue");
     expect(started.querySelector(".btn svg")).not.toBeNull();
     const bar = started.querySelector<HTMLElement>(".world > .mine-bar")!;
@@ -45,12 +43,6 @@ describe("the bands", () => {
     expect(bar.querySelector("i")!.style.width).toBe("23%");
     expect(other.classList.contains("started")).toBe(false);
     expect(other.querySelector(".meta")!.textContent).toBe("9 chapters · 406 checks");
-  });
-
-  it("put the words under the name when the guide has no goals line", () => {
-    document.body.innerHTML = `<ul>${band("silksong", false)}</ul>`;
-    wireProgress(document, "hundo_p_silksong=1.5.2");
-    expect(document.querySelector("h3 + .mine")!.textContent).toBe("5% complete · Chapter 2");
   });
 
   it("stay as they are with no cookie, or one they can't read", () => {
@@ -65,7 +57,7 @@ describe("the bands", () => {
 describe("a browser linked by sync", () => {
   const band = (id: string) => `
     <li class="cell" data-guide="x" data-id="${id}"><div class="world"><div class="text">
-      <h3><a href="https://x.hundo.quest">X</a></h3><p class="goals">46 Grubs</p>
+      <h3><a href="https://x.hundo.quest">X</a></h3>
       <div class="row"><span class="btn" aria-hidden="true">Open X<svg></svg></span><span class="meta">9 chapters · 406 checks</span></div>
     </div></div></li>`;
   const group = (entries: [string, { percent: number; chapter: number } | null][]) => async (): Promise<GroupSummaries> => new Map(entries);
@@ -103,15 +95,15 @@ describe("a browser linked by sync", () => {
     ]);
     expect(await wireGroup(document, cookie, read)).toBe(4);
     const [silksong, hollow, links, echoes, ahead] = document.querySelectorAll<HTMLElement>("[data-id]");
-    expect(ahead.querySelector(".meta")!.textContent).toBe("60% complete · Chapter 8");
-    expect(silksong.querySelector(".meta")!.textContent).toBe("31% complete · Chapter 5");
-    expect(silksong.querySelectorAll(".mine")).toHaveLength(1);
+    expect(ahead.querySelector(".meta")!.textContent).toBe("60% complete · Chapter\u00a08");
+    expect(silksong.querySelector(".meta")!.textContent).toBe("31% complete · Chapter\u00a05");
+    expect(silksong.querySelectorAll(".meta strong")).toHaveLength(1);
     expect(silksong.querySelectorAll(".mine-bar")).toHaveLength(1);
     expect(silksong.querySelector<HTMLElement>(".mine-bar i")!.style.width).toBe("31%");
     expect(links.classList.contains("started")).toBe(true);
-    expect(links.querySelector(".mine")!.textContent).toBe("7% complete · Chapter 1");
+    expect(links.querySelector(".meta")!.textContent).toBe("7% complete · Chapter\u00a01");
     // a guide the group doesn't know keeps its cookie
-    expect(echoes.querySelector(".meta")!.textContent).toBe("12% complete · Chapter 2");
+    expect(echoes.querySelector(".meta")!.textContent).toBe("12% complete · Chapter\u00a02");
     // reset on another device: as a first visit sees it
     expect(hollow.classList.contains("started")).toBe(false);
     expect(hollow.outerHTML).toBe(new DOMParser().parseFromString(`<ul>${band("hollow-knight")}</ul>`, "text/html").querySelector("li")!.outerHTML);
